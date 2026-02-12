@@ -4,6 +4,19 @@
 
 ---
 
+## 📌 Executive Summary
+
+> 今日共 **{{ total_items }}** 条精选，覆盖 {{ briefs|length }} 个板块。以下是各领域最值得关注的动态：
+>
+{% for section_key in section_order %}
+{% if section_key in briefs and briefs[section_key]|length > 0 %}
+{% set section_meta = section_configs[section_key] %}
+> {{ section_meta.emoji }} **{{ briefs[section_key][0].headline }}**
+{% endif %}
+{% endfor %}
+
+---
+
 ## Table of Contents
 
 {% for section_key in section_order %}

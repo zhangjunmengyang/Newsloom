@@ -322,6 +322,28 @@ class ReportGenerator:
         with open(output_path, 'w', encoding='utf-8') as f:
             f.write('\n'.join(lines))
 
+    def _build_executive_summary(self, briefs: Dict) -> List[str]:
+        """从每个 section 的 top brief 生成 Executive Summary"""
+        lines = []
+        lines.append("## 📌 Executive Summary")
+        lines.append("")
+        total = sum(len(v) for v in briefs.values())
+        lines.append(f"> 今日共 **{total}** 条精选，覆盖 {len(briefs)} 个板块。以下是各领域最值得关注的动态：")
+        lines.append(">")
+        for section in self._get_section_order():
+            if section not in briefs or not briefs[section]:
+                continue
+            section_meta = self.section_configs.get(section, {})
+            emoji = section_meta.get('emoji', '•')
+            top = briefs[section][0]
+            headline = top.get('headline', '')
+            if headline:
+                lines.append(f"> {emoji} **{headline}**")
+        lines.append("")
+        lines.append("---")
+        lines.append("")
+        return lines
+
     def _generate_markdown_fallback(self, briefs: Dict, date_str: str, output_path: Path):
         """Fallback markdown generation without templates"""
         lines = [
@@ -332,6 +354,9 @@ class ReportGenerator:
             "---",
             ""
         ]
+
+        # Executive Summary
+        lines.extend(self._build_executive_summary(briefs))
 
         # Table of contents
         lines.append("## Table of Contents")
