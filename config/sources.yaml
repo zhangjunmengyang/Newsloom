@@ -160,7 +160,7 @@ sources:
     type: "github"
     language: ""
     period: "daily"
-    limit: 15
+    limit: 10
 
   github_python:
     enabled: true
@@ -168,7 +168,7 @@ sources:
     type: "github"
     language: "python"
     period: "daily"
-    limit: 10
+    limit: 5
 
   github_typescript:
     enabled: true
@@ -176,7 +176,7 @@ sources:
     type: "github"
     language: "typescript"
     period: "daily"
-    limit: 10
+    limit: 5
 
   github_rust:
     enabled: true
@@ -184,7 +184,7 @@ sources:
     type: "github"
     language: "rust"
     period: "daily"
-    limit: 10
+    limit: 5
 
   hackernews:
     enabled: true

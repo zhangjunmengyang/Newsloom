@@ -90,6 +90,16 @@ class AIAnalyzer:
                 reverse=True
             )
 
+        # 生成"个人关注"板块 — 从其他 section 高分内容中二次筛选
+        if section_configs and 'personal' in section_configs:
+            try:
+                personal_briefs = self._build_personal_section(results)
+                if personal_briefs:
+                    results['personal'] = personal_briefs
+                    print(f"\n  🎯 个人关注: {len(personal_briefs)} 条")
+            except Exception as e:
+                print(f"\n  ⚠️  个人关注生成失败: {e}")
+
         # 生成 Executive Summary
         if section_configs and self.claude:
             try:
@@ -214,6 +224,96 @@ class AIAnalyzer:
                     })
 
         return all_briefs
+
+    # ============================================================
+    # 个人关注板块 — 从全局高分内容中二次筛选
+    # ============================================================
+
+    # 关键词集合：匹配到任意一个即入选候选
+    PERSONAL_KEYWORDS = [
+        # 量化交易
+        "quant", "quantitative", "algorithmic trading", "algo trading",
+        "backtesting", "backtest", "alpha", "market making", "arbitrage",
+        "trading strategy", "order book", "高频", "量化", "套利", "回测",
+        "策略", "algotrading",
+        # Crypto DeFi
+        "defi", "dex", "amm", "liquidity pool", "yield", "staking",
+        "mev", "flashbots", "uniswap", "aave", "compound", "lido",
+        "restaking", "eigenlayer", "pendle", "ethena",
+        "layer 2", "rollup", "zk-proof", "zk-snark",
+        "on-chain", "链上", "去中心化金融",
+        # AI Agent / 工具链
+        "ai agent", "agent framework", "langchain", "langgraph",
+        "autogpt", "crewai", "tool use", "function calling",
+        "mcp", "model context protocol",
+        "cursor", "copilot", "aider", "coding assistant",
+        "openai api", "claude api", "anthropic api",
+    ]
+
+    def _build_personal_section(self, results: Dict[str, List[Dict]]) -> List[Dict]:
+        """
+        从所有 section 的高分 briefs 中筛选出与老板个人兴趣最相关的内容。
+
+        筛选逻辑：
+        1. 收集所有 section 中 importance >= 3 的 briefs
+        2. 关键词匹配（headline + detail + tags 中命中个人兴趣关键词）
+        3. 按 importance 降序，取 top 8
+        """
+        import re
+
+        candidates = []
+
+        for section, briefs in results.items():
+            if section.startswith('__') or not isinstance(briefs, list):
+                continue
+            for brief in briefs:
+                importance = brief.get('importance', 3)
+                if importance < 3:
+                    continue
+
+                # 拼接检索文本
+                search_text = " ".join([
+                    brief.get('headline', ''),
+                    brief.get('detail', ''),
+                    " ".join(brief.get('category_tags', [])),
+                    brief.get('insight', ''),
+                ]).lower()
+
+                # 关键词匹配
+                match_count = 0
+                for kw in self.PERSONAL_KEYWORDS:
+                    if kw.lower() in search_text:
+                        match_count += 1
+
+                if match_count > 0:
+                    candidates.append({
+                        **brief,
+                        '_match_count': match_count,
+                        '_source_section': section,
+                    })
+
+        # 按匹配数 × importance 排序
+        candidates.sort(
+            key=lambda x: x['_match_count'] * x.get('importance', 3),
+            reverse=True
+        )
+
+        # 取 top 8，去掉内部字段
+        personal = []
+        seen_urls = set()
+        for c in candidates:
+            url = c.get('url', '')
+            if url in seen_urls:
+                continue
+            seen_urls.add(url)
+
+            # 去除内部字段
+            item = {k: v for k, v in c.items() if not k.startswith('_')}
+            personal.append(item)
+            if len(personal) >= 8:
+                break
+
+        return personal
 
     def _generate_executive_summary(self, briefs: Dict[str, List[Dict]],
                                      section_configs: dict) -> str:

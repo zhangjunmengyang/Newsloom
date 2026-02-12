@@ -41,7 +41,7 @@ ai:
     temperature: 0.2
 
 output:
-  base_dir: "./reports"
+  base_dir: "/Users/peterzhang/project/newsloom/reports"
   keep_days: 30
 
 state:

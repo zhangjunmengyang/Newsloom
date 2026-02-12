@@ -2,6 +2,13 @@
 # Defines visual properties and ordering of content sections
 
 sections:
+  personal:
+    title: '个人关注'
+    emoji: '🎯'
+    order: 0
+    color: '#e11d48'
+    description: '量化交易、Crypto DeFi、AI Agent/工具链——从全局高分内容中二次筛选'
+
   ai:
     title: 'AI & 科技'
     emoji: '🤖'
