@@ -132,47 +132,53 @@ class ClaudeClient:
                 return json.loads(cleaned)
             except json.JSONDecodeError:
                 pass
+        else:
+            cleaned = response  # 没有 fences 时保持原文
+
+        # 后续策略都用 cleaned（已去掉 markdown fences）
 
         # 策略 3: 提取任意 {...} 或 [...] (balanced brackets)
-        start = response.find('[')
+        start = cleaned.find('[')
         if start == -1:
-            start = response.find('{')
+            start = cleaned.find('{')
         if start != -1:
-            open_char = response[start]
+            open_char = cleaned[start]
             close_char = ']' if open_char == '[' else '}'
             depth = 0
             end = -1
-            for i in range(start, len(response)):
-                if response[i] == open_char:
+            for i in range(start, len(cleaned)):
+                if cleaned[i] == open_char:
                     depth += 1
-                elif response[i] == close_char:
+                elif cleaned[i] == close_char:
                     depth -= 1
                     if depth == 0:
                         end = i + 1
                         break
             if end > start:
                 try:
-                    return json.loads(response[start:end])
+                    return json.loads(cleaned[start:end])
                 except json.JSONDecodeError:
                     pass
 
-        # 策略 4: Truncated JSON repair — salvage complete objects
-        start = response.find('[')
-        if start != -1:
-            fragment = response[start:]
-            last_brace = fragment.rfind('}')
-            if last_brace > 0:
-                candidate = fragment[:last_brace+1] + ']'
+        # 策略 4: Truncated JSON repair — 逐级回退找最大可解析子集
+        arr_start = cleaned.find('[')
+        if arr_start != -1:
+            fragment = cleaned[arr_start:]
+            # 找所有 '}' 的位置，从后往前尝试截断+闭合
+            brace_positions = [i for i, c in enumerate(fragment) if c == '}']
+            for bp in reversed(brace_positions):
+                candidate = fragment[:bp+1] + ']'
                 try:
                     result = json.loads(candidate)
-                    print(f"   🔧 Repaired truncated JSON ({len(result)} items)")
-                    return result
+                    if isinstance(result, list) and len(result) > 0:
+                        print(f"   🔧 Repaired truncated JSON ({len(result)} items salvaged)")
+                        return result
                 except json.JSONDecodeError:
-                    pass
+                    continue
 
         # 失败：返回空对象
         print(f"   ⚠️ 无法解析 JSON 响应")
-        print(f"   Response preview: {response[:200]}")
+        print(f"   Response preview: {cleaned[:200]}")
         return {}
 
     def estimate_tokens(self, text: str) -> int:
