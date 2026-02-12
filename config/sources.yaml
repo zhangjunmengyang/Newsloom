@@ -1,4 +1,70 @@
 sources:
+  # ============================================================
+  # AI / ML — 官方博客 + 顶级媒体
+  # ============================================================
+  rss_ai:
+    enabled: true
+    channel: "ai"
+    type: "rss"
+    feeds:
+      # --- 官方博客 (第一手信息) ---
+      - url: "https://openai.com/blog/rss.xml"
+        name: "OpenAI Blog"
+      - url: "https://blog.google/technology/ai/rss/"
+        name: "Google AI Blog"
+      - url: "https://deepmind.google/blog/rss.xml"
+        name: "Google DeepMind"
+      - url: "https://www.microsoft.com/en-us/research/feed/"
+        name: "Microsoft Research"
+      - url: "https://huggingface.co/blog/feed.xml"
+        name: "HuggingFace Blog"
+      - url: "https://blogs.nvidia.com/blog/category/deep-learning/feed/"
+        name: "NVIDIA AI"
+      - url: "https://cohere.com/blog/rss.xml"
+        name: "Cohere Blog"
+      - url: "https://engineering.fb.com/feed/"
+        name: "Meta Engineering"
+      - url: "https://changelog.cursor.com/feed.xml"
+        name: "Cursor Changelog"
+      - url: "https://vercel.com/atom"
+        name: "Vercel Blog"
+      # --- AI 媒体 ---
+      - url: "https://www.artificialintelligence-news.com/feed/"
+        name: "AI News"
+      - url: "https://venturebeat.com/category/ai/feed/"
+        name: "VentureBeat AI"
+      - url: "https://www.technologyreview.com/feed/"
+        name: "MIT Tech Review"
+      - url: "https://the-decoder.com/feed/"
+        name: "The Decoder"
+      # --- 个人博客/Newsletter (高信噪比) ---
+      - url: "https://simonwillison.net/atom/everything/"
+        name: "Simon Willison"
+      - url: "https://lilianweng.github.io/index.xml"
+        name: "Lil'Log (Lilian Weng)"
+      - url: "https://importai.substack.com/feed"
+        name: "Import AI (Jack Clark)"
+      - url: "https://thegradient.pub/rss/"
+        name: "The Gradient"
+    max_per_feed: 15
+
+  # ============================================================
+  # AI 中文源
+  # ============================================================
+  rss_ai_cn:
+    enabled: true
+    channel: "ai"
+    type: "rss"
+    feeds:
+      - url: "https://www.jiqizhixin.com/rss"
+        name: "机器之心"
+      - url: "https://www.qbitai.com/feed"
+        name: "量子位"
+    max_per_feed: 15
+
+  # ============================================================
+  # Tech — 综合科技
+  # ============================================================
   rss_tech:
     enabled: true
     channel: "tech"
@@ -8,51 +74,25 @@ sources:
         name: "TechCrunch"
       - url: "https://www.theverge.com/rss/index.xml"
         name: "The Verge"
-      - url: "https://news.ycombinator.com/rss"
-        name: "Hacker News RSS"
-    max_per_feed: 30
-
-  rss_ai:
-    enabled: true
-    channel: "ai"
-    type: "rss"
-    feeds:
-      - url: "https://www.artificialintelligence-news.com/feed/"
-        name: "AI News"
-      - url: "https://blog.google/technology/ai/rss/"
-        name: "Google AI Blog"
-      - url: "https://venturebeat.com/category/ai/feed/"
-        name: "VentureBeat AI"
-      - url: "https://www.technologyreview.com/feed/"
-        name: "MIT Tech Review"
-      - url: "https://the-decoder.com/feed/"
-        name: "The Decoder"
+      - url: "https://feeds.arstechnica.com/arstechnica/index"
+        name: "Ars Technica"
+      - url: "https://www.wired.com/feed/rss"
+        name: "Wired"
       - url: "https://slashdot.org/index.rss"
         name: "Slashdot"
-    max_per_feed: 15
+      - url: "https://www.infoq.com/feed/"
+        name: "InfoQ"
+      - url: "https://dev.to/feed/tag/ai"
+        name: "Dev.to AI"
+      - url: "https://36kr.com/feed"
+        name: "36kr"
+      - url: "https://lobste.rs/rss"
+        name: "Lobsters"
+    max_per_feed: 20
 
-  arxiv:
-    enabled: true  # 现已实现
-    channel: "papers"
-    type: "arxiv"
-    categories: "cat:cs.AI+OR+cat:cs.CL+OR+cat:cs.LG"
-    max_results: 20
-
-  github:
-    enabled: true  # 现已实现
-    channel: "github"
-    type: "github"
-    language: "python"  # 可选：指定语言，留空表示所有语言
-    period: "daily"     # daily/weekly/monthly
-    limit: 15
-
-  hackernews:
-    enabled: true  # 现已实现
-    channel: "community"
-    type: "hackernews"
-    min_score: 100
-    count: 20
-
+  # ============================================================
+  # Crypto / Web3
+  # ============================================================
   rss_crypto:
     enabled: true
     channel: "crypto"
@@ -66,27 +106,84 @@ sources:
         name: "CryptoSlate"
       - url: "https://decrypt.co/feed"
         name: "Decrypt"
-    max_per_feed: 25
+      - url: "https://www.bankless.com/feed"
+        name: "Bankless"
+      - url: "https://thedefiant.io/feed"
+        name: "The Defiant"
+      - url: "https://unchainedcrypto.com/feed/"
+        name: "Unchained Crypto"
+      - url: "https://wublock.substack.com/feed"
+        name: "Wu Blockchain"
+    max_per_feed: 20
 
+  # ============================================================
+  # Finance / Macro
+  # ============================================================
   rss_finance:
     enabled: true
     channel: "finance"
     type: "rss"
     feeds:
+      - url: "https://feeds.a.dj.com/rss/RSSMarketsMain.xml"
+        name: "WSJ Markets"
+      - url: "https://www.ft.com/rss/home"
+        name: "Financial Times"
       - url: "https://feeds.finance.yahoo.com/rss/2.0/headline?s=^GSPC&region=US&lang=en-US"
         name: "Yahoo Finance"
-      - url: "https://feeds.reuters.com/reuters/businessNews"
-        name: "Reuters Business"
       - url: "https://www.cnbc.com/id/100003114/device/rss/rss.html"
         name: "CNBC"
       - url: "https://fortune.com/feed/"
         name: "Fortune"
+      - url: "https://seekingalpha.com/feed.xml"
+        name: "Seeking Alpha"
+      - url: "https://feeds.feedburner.com/zerohedge/feed"
+        name: "ZeroHedge"
+      - url: "https://www.benzinga.com/feed"
+        name: "Benzinga"
       - url: "https://techcrunch.com/tag/fintech/feed/"
         name: "TechCrunch Fintech"
-    max_per_feed: 25
+    max_per_feed: 20
+
+  # ============================================================
+  # 非 RSS 数据源
+  # ============================================================
+  arxiv:
+    enabled: true
+    channel: "papers"
+    type: "arxiv"
+    categories: "cat:cs.AI+OR+cat:cs.CL+OR+cat:cs.LG"
+    max_results: 20
+
+  github:
+    enabled: true
+    channel: "github"
+    type: "github"
+    language: "python"
+    period: "daily"
+    limit: 15
+
+  hackernews:
+    enabled: true
+    channel: "community"
+    type: "hackernews"
+    min_score: 100
+    count: 20
+
+  # ============================================================
+  # 待接入（需要 API key 或暂无 RSS）
+  # ============================================================
+  # Anthropic Blog — 无公开 RSS，需要 scraper
+  # Meta AI Blog (ai.meta.com) — 无公开 RSS
+  # Mistral AI — 无公开 RSS
+  # Stability AI — 无公开 RSS
+  # The Block — 403 反爬
+  # Rekt News — 500 服务端错误
+  # Bloomberg — 403 paywall
+  # MarketWatch — 403
+  # Twitter — 需要 twitterapi.io API key
 
   twitter:
-    enabled: false  # Requires API credentials
+    enabled: false
     channel: "ai"
     type: "twitter"
     api_key: ${TWITTER_API_KEY}
