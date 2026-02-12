@@ -142,13 +142,53 @@ class Pipeline:
 
             items = filtered_items
 
-        # Layer 3: ANALYZE (will be implemented in Phase 3)
+        # Layer 3: ANALYZE
         if 'analyze' in layers:
             print("\n" + "=" * 60)
-            print("LAYER 3: ANALYZE (Coming in Phase 3)")
+            print("LAYER 3: ANALYZE")
             print("=" * 60)
-            print("⚠️  AI analysis not yet implemented")
-            # TODO: Implement in Phase 3
+
+            # 加载 items
+            if not items:
+                filtered_path = self.data_dir / 'filtered' / f'{date_str}.jsonl'
+                if filtered_path.exists():
+                    smart_filter = SmartFilter({})
+                    items = smart_filter.load_filtered_data(filtered_path)
+                else:
+                    print(f"⚠️  未找到过滤数据: {date_str}")
+                    return
+
+            # 检查 API key
+            api_key = self.config['ai']['claude'].get('api_key', '')
+            if not api_key:
+                print("⚠️  未配置 ANTHROPIC_API_KEY，跳过 AI 分析")
+            else:
+                from ai.claude import ClaudeClient
+                from processors.analyzer import AIAnalyzer
+
+                # 初始化 Claude 客户端
+                claude = ClaudeClient(
+                    api_key=api_key,
+                    base_url=self.config['ai']['claude'].get('base_url') or None,
+                    model=self.config['ai']['claude'].get('model')
+                )
+
+                # 初始化分析器
+                analyzer = AIAnalyzer(
+                    claude_client=claude,
+                    language=self.config['project'].get('language', 'zh-CN')
+                )
+
+                # 分析
+                two_pass = self.config['pipeline']['analyze'].get('two_pass_enabled', True)
+                briefs = analyzer.analyze(items, two_pass=two_pass)
+
+                # 保存
+                analyzed_path = self.data_dir / 'analyzed' / f'{date_str}.json'
+                analyzer.save_analyzed_data(briefs, analyzed_path)
+
+                # 传递给下一层
+                items = briefs
 
         # Layer 4: GENERATE
         if 'generate' in layers:

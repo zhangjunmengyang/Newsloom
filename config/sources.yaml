@@ -24,22 +24,22 @@ sources:
     max_per_feed: 20
 
   arxiv:
-    enabled: false  # Requires API setup
+    enabled: true  # 现已实现
     channel: "papers"
     type: "arxiv"
     categories: "cat:cs.AI+OR+cat:cs.CL+OR+cat:cs.LG"
     max_results: 20
 
   github:
-    enabled: false  # Requires API token
+    enabled: true  # 现已实现
     channel: "github"
     type: "github"
-    topics: ["artificial-intelligence", "llm", "machine-learning"]
-    period: "daily"
+    language: "python"  # 可选：指定语言，留空表示所有语言
+    period: "daily"     # daily/weekly/monthly
     limit: 15
 
   hackernews:
-    enabled: false  # Will be implemented in Phase 2
+    enabled: true  # 现已实现
     channel: "community"
     type: "hackernews"
     min_score: 100

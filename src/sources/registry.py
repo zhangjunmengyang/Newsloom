@@ -5,6 +5,9 @@ import yaml
 from pathlib import Path
 from .base import DataSource
 from .rss import RSSSource
+from .arxiv import ArxivSource
+from .github import GitHubSource
+from .hackernews import HackerNewsSource
 
 
 class SourceRegistry:
@@ -13,11 +16,12 @@ class SourceRegistry:
     # Map source types to implementation classes
     SOURCE_MAP: Dict[str, Type[DataSource]] = {
         'rss': RSSSource,
-        # More sources will be added in Phase 2:
+        'arxiv': ArxivSource,
+        'github': GitHubSource,
+        'hackernews': HackerNewsSource,
+        # More sources can be added:
         # 'twitter': TwitterSource,
-        # 'arxiv': ArxivSource,
-        # 'github': GitHubSource,
-        # 'hackernews': HackerNewsSource,
+        # 'reddit': RedditSource,
     }
 
     def __init__(self, sources_config_path: str):
