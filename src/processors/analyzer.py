@@ -20,16 +20,18 @@ class AIAnalyzer:
     - Token-aware 批处理
     """
 
-    def __init__(self, claude_client: ClaudeClient, language: str = "zh-CN"):
+    def __init__(self, claude_client: ClaudeClient, language: str = "zh-CN", config: dict = None):
         """
         初始化分析器
 
         Args:
             claude_client: Claude 客户端实例
             language: 语言（zh-CN 或 en-US）
+            config: 可选配置 (max_items_per_section 等)
         """
         self.claude = claude_client
         self.language = language
+        self.config = config or {}
 
     def analyze(self, items: List[Item], two_pass: bool = True) -> Dict[str, List[Dict]]:
         """
@@ -54,10 +56,11 @@ class AIAnalyzer:
         for section, section_items in by_section.items():
             print(f"\n  📁 分析 section '{section}': {len(section_items)} 条")
 
-            # 限制每个 section 最多 20 条（按 score 降序）
-            if len(section_items) > 20:
-                section_items = sorted(section_items, key=lambda x: x.score, reverse=True)[:20]
-                print(f"     📊 限流: 取 top 20 条（按 score 排序）")
+            # 限流：按 score 降序取 top N（默认 30，可通过 config 配置）
+            max_per_section = self.config.get('max_items_per_section', 30)
+            if len(section_items) > max_per_section:
+                section_items = sorted(section_items, key=lambda x: x.score, reverse=True)[:max_per_section]
+                print(f"     📊 限流: 取 top {max_per_section} 条（按 score 排序）")
 
             if two_pass:
                 # Pass 1: 过滤

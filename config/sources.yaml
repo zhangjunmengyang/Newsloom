@@ -154,13 +154,37 @@ sources:
     categories: "cat:cs.AI+OR+cat:cs.CL+OR+cat:cs.LG"
     max_results: 20
 
-  github:
+  github_all:
+    enabled: true
+    channel: "github"
+    type: "github"
+    language: ""
+    period: "daily"
+    limit: 15
+
+  github_python:
     enabled: true
     channel: "github"
     type: "github"
     language: "python"
     period: "daily"
-    limit: 15
+    limit: 10
+
+  github_typescript:
+    enabled: true
+    channel: "github"
+    type: "github"
+    language: "typescript"
+    period: "daily"
+    limit: 10
+
+  github_rust:
+    enabled: true
+    channel: "github"
+    type: "github"
+    language: "rust"
+    period: "daily"
+    limit: 10
 
   hackernews:
     enabled: true
