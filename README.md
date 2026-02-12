@@ -21,13 +21,14 @@
 ### ✨ 核心特性
 
 - 🔌 **完全可插拔** - 模块化架构，轻松添加新数据源和过滤策略
-- 🚀 **高性能并行** - ThreadPool 并发抓取，快速处理多个信息源
+- 🚀 **高性能并行** - ThreadPool 并发抓取，HackerNews 故事并发获取
 - 🧠 **AI 智能分析** - Claude 双pass处理，提取高质量内容
-- 🎨 **精美报告** - Markdown、HTML（亮/暗主题）、PNG 卡片、RSS 订阅
-- 💾 **状态管理** - 跨运行去重，避免重复内容
+- 🎨 **精美报告** - Markdown、专业暗色主题 HTML（侧边导航 + section 颜色区分）
+- 💾 **智能状态管理** - 自动清理旧记录，跨运行去重
 - ⚙️ **灵活配置** - YAML 驱动，支持环境变量和多配置文件
-- 📊 **可视化输出** - 交互式 HTML 报告，支持主题切换
+- 📊 **可视化输出** - 交互式 HTML 报告，响应式布局，支持主题切换
 - 🔧 **易于扩展** - 清晰的插件系统，几行代码添加新功能
+- 🌐 **多频道支持** - AI、Tech、Crypto、Finance、Papers、GitHub、Community
 
 ---
 
@@ -93,17 +94,24 @@ playwright install chromium
 ### 基础使用
 
 ```bash
-# 运行完整流程
+# 运行完整流程（4层 pipeline: fetch → filter → analyze → generate）
 python3 run.py
 
 # 只运行特定层
 python3 run.py --layers fetch,filter,generate
 
 # 指定日期
-python3 run.py --date 2024-02-12
+python3 run.py --date 2026-02-12
 
 # 使用自定义配置
 python3 run.py --config config/my_config.yaml
+```
+
+**环境变量配置** (在 `.env` 或 `/etc/environment`):
+
+```bash
+ANTHROPIC_API_KEY=your_api_key_here
+ANTHROPIC_BASE_URL=https://api.anthropic.com  # 可选：使用代理
 ```
 
 ### 配置数据源
@@ -119,6 +127,34 @@ sources:
     feeds:
       - url: "https://techcrunch.com/feed/"
         name: "TechCrunch"
+
+  rss_crypto:
+    enabled: true
+    channel: "crypto"
+    type: "rss"
+    feeds:
+      - url: "https://www.coindesk.com/arc/outboundfeeds/rss/"
+        name: "CoinDesk"
+
+  arxiv:
+    enabled: true
+    channel: "papers"
+    type: "arxiv"
+    categories: "cat:cs.AI+OR+cat:cs.CL+OR+cat:cs.LG"
+
+  github:
+    enabled: true
+    channel: "github"
+    type: "github"
+    language: "python"
+    period: "daily"
+
+  hackernews:
+    enabled: true
+    channel: "community"
+    type: "hackernews"
+    min_score: 100
+    count: 20
 ```
 
 ### 配置过滤规则
@@ -134,8 +170,26 @@ channels:
       llm: 5                # 关键词权重
       gpt: 4
       claude: 4
+      transformer: 5
     blacklist:
       - spam                # 黑名单
+
+  crypto:
+    strategy: keyword_score
+    min_score: 4
+    keywords:
+      bitcoin: 5
+      ethereum: 5
+      blockchain: 5
+      defi: 5
+
+  finance:
+    strategy: keyword_score
+    min_score: 3
+    keywords:
+      fintech: 5
+      payment: 4
+      banking: 4
 ```
 
 ### 查看报告
@@ -304,7 +358,10 @@ pipeline:
 ai:
   claude:
     api_key: ${ANTHROPIC_API_KEY}
-    model: "claude-sonnet-4-5-20250929"
+    base_url: ${ANTHROPIC_BASE_URL}  # 可选：API代理地址
+    model: "claude-sonnet-4-20250514"
+    max_tokens: 4096
+    temperature: 0.2
 ```
 
 ### 环境变量
@@ -375,7 +432,8 @@ python3 run.py --config config/testing.yaml
 - [x] **Phase 2**: 更多数据源 (arXiv, GitHub, HN) ✅
 - [x] **Phase 3**: Claude AI 双pass分析 ✅
 - [x] **Phase 5**: GitHub Actions 自动化 ✅
-- [ ] **Phase 4**: PNG 卡片渲染、RSS Feed (可选)
+- [x] **Phase 6**: 深度优化（Crypto/Finance 频道、专业 HTML 主题、并发优化、健壮性）✅
+- [ ] **Phase 4**: PNG 卡片渲染 (可选)
 
 ---
 

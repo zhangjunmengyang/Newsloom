@@ -1,0 +1,71 @@
+# Newsloom Configuration Example
+# 复制此文件为 config.yaml 并填写实际配置
+
+project:
+  name: "Newsloom"
+  timezone: "Asia/Shanghai"  # 或 "UTC", "America/New_York" 等
+  language: "zh-CN"          # 或 "en-US"
+
+pipeline:
+  # 启用的处理层（按顺序执行）
+  enabled_layers: ["fetch", "filter", "analyze", "generate"]
+
+  fetch:
+    parallel_workers: 10      # 并行抓取的线程数
+    timeout_per_source: 30    # 每个数据源的超时时间（秒）
+    hours_ago: 24             # 抓取最近 N 小时的内容
+
+  filter:
+    max_age_hours: 48         # 只保留 N 小时内的内容
+    min_score: 3              # 默认最低分数（可在 filters.yaml 中覆盖）
+
+  analyze:
+    ai_provider: "claude"     # AI 提供商（目前仅支持 claude）
+    two_pass_enabled: true    # 是否启用双 pass 分析（Extract + Summarize）
+    batch_size: 100000        # 单个 batch 的最大 token 数
+
+  generate:
+    formats: ["markdown", "html"]  # 生成的报告格式
+    generate_cards: false          # 是否生成 PNG 卡片（需要 Playwright）
+    generate_rss: true             # 是否生成 RSS feed
+
+# AI 配置
+ai:
+  claude:
+    # API Key（推荐使用环境变量）
+    api_key: ${ANTHROPIC_API_KEY}
+
+    # Base URL（可选，用于代理或自定义端点）
+    # 留空或注释掉则使用官方 API
+    base_url: ${ANTHROPIC_BASE_URL:}
+
+    # 模型选择
+    # 可选: claude-sonnet-4-20250514, claude-opus-4-20250514, claude-haiku-4-20250514
+    model: "claude-sonnet-4-20250514"
+
+    # 生成参数
+    max_tokens: 4096          # 单次生成的最大 token 数
+    temperature: 0.2          # 温度（0-1，越低越确定）
+
+# 输出配置
+output:
+  base_dir: "./reports"       # 报告输出目录
+  keep_days: 30               # 保留最近 N 天的报告
+
+# 状态管理
+state:
+  file: "./data/state/state.json"  # 状态文件路径
+  dedup_window_days: 7             # 去重窗口（天）
+
+# 环境变量配置说明:
+# 1. 在 .env 文件中配置（推荐）:
+#    ANTHROPIC_API_KEY=sk-ant-xxxxx
+#    ANTHROPIC_BASE_URL=https://api.anthropic.com
+#
+# 2. 或在 /etc/environment 中配置（系统级）:
+#    ANTHROPIC_API_KEY="sk-ant-xxxxx"
+#    ANTHROPIC_BASE_URL="https://api.anthropic.com"
+#
+# 3. 或在 shell 中临时配置:
+#    export ANTHROPIC_API_KEY=sk-ant-xxxxx
+#    export ANTHROPIC_BASE_URL=https://api.anthropic.com

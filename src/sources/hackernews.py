@@ -3,6 +3,7 @@
 import httpx
 from typing import List, Optional
 from datetime import datetime, timezone
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from .base import DataSource, Item
 
@@ -28,32 +29,44 @@ class HackerNewsSource(DataSource):
         return "hackernews"
 
     def fetch(self, hours_ago: Optional[int] = None) -> List[Item]:
-        """抓取 Hacker News 热门故事"""
+        """抓取 Hacker News 热门故事（并发优化）"""
         min_score = self.config.get('min_score', 100)
         count = self.config.get('count', 20)
+        max_workers = self.config.get('max_workers', 10)
 
-        print(f"    📰 抓取 Hacker News: min_score={min_score}, count={count}")
+        print(f"    📰 抓取 Hacker News: min_score={min_score}, count={count}, workers={max_workers}")
 
         try:
             # 获取 top stories ID
             top_url = f"{self.API_BASE}/topstories.json"
             response = httpx.get(top_url, timeout=30)
             response.raise_for_status()
-            story_ids = response.json()[:count * 2]  # 多取一些以防过滤
+            story_ids = response.json()[:count * 3]  # 多取一些以防过滤
 
             # 并发获取故事详情
             items = []
-            for story_id in story_ids[:count]:
-                try:
-                    story = self._fetch_story(story_id)
-                    if story and story.metadata.get('score', 0) >= min_score:
-                        items.append(story)
-                        if len(items) >= count:
-                            break
-                except Exception as e:
-                    print(f"    ⚠️  获取 HN 故事 {story_id} 失败: {e}")
-                    continue
+            with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                # 提交所有任务
+                future_to_id = {
+                    executor.submit(self._fetch_story, story_id): story_id
+                    for story_id in story_ids
+                }
 
+                # 收集结果
+                for future in as_completed(future_to_id):
+                    story_id = future_to_id[future]
+                    try:
+                        story = future.result()
+                        if story and story.metadata.get('score', 0) >= min_score:
+                            items.append(story)
+                    except Exception as e:
+                        print(f"    ⚠️  获取 HN 故事 {story_id} 失败: {e}")
+
+            # 按分数排序并限制数量
+            items.sort(key=lambda x: x.metadata.get('score', 0), reverse=True)
+            items = items[:count]
+
+            print(f"    ✅ Hacker News: 获取到 {len(items)} 条故事")
             return items
 
         except Exception as e:

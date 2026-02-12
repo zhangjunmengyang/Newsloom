@@ -45,6 +45,36 @@ sources:
     min_score: 100
     count: 20
 
+  rss_crypto:
+    enabled: true
+    channel: "crypto"
+    type: "rss"
+    feeds:
+      - url: "https://www.coindesk.com/arc/outboundfeeds/rss/"
+        name: "CoinDesk"
+      - url: "https://cointelegraph.com/rss"
+        name: "Cointelegraph"
+      - url: "https://cryptoslate.com/feed/"
+        name: "CryptoSlate"
+      - url: "https://decrypt.co/feed"
+        name: "Decrypt"
+    max_per_feed: 25
+
+  rss_finance:
+    enabled: true
+    channel: "finance"
+    type: "rss"
+    feeds:
+      - url: "https://www.bloomberg.com/feed/podcast/Bloomberg-Technology.xml"
+        name: "Bloomberg Tech"
+      - url: "https://www.reuters.com/rssfeed/technologyNews"
+        name: "Reuters Tech"
+      - url: "https://techcrunch.com/tag/fintech/feed/"
+        name: "TechCrunch Fintech"
+      - url: "https://www.wsj.com/xml/rss/3_7455.xml"
+        name: "WSJ Tech"
+    max_per_feed: 25
+
   twitter:
     enabled: false  # Requires API credentials
     channel: "ai"

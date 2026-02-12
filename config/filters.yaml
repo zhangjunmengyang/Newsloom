@@ -91,3 +91,82 @@ channels:
       programming: 3
       rust: 3
       python: 3
+
+  crypto:
+    strategy: "keyword_score"
+    min_score: 4
+    keywords:
+      # Core Crypto
+      bitcoin: 5
+      ethereum: 5
+      blockchain: 5
+      cryptocurrency: 5
+      crypto: 4
+      defi: 5
+      web3: 5
+      nft: 4
+      # Major Coins
+      btc: 4
+      eth: 4
+      solana: 4
+      polygon: 4
+      # Tech Terms
+      smart contract: 5
+      layer 2: 5
+      consensus: 4
+      mining: 3
+      staking: 4
+      wallet: 3
+      exchange: 3
+      # Chinese
+      比特币: 5
+      以太坊: 5
+      区块链: 5
+      加密货币: 5
+      去中心化: 5
+    blacklist:
+      - "scam"
+      - "airdrop"
+      - "giveaway"
+      - "pump"
+      - "moon"
+      - "gambling"
+
+  finance:
+    strategy: "keyword_score"
+    min_score: 3
+    keywords:
+      # Fintech
+      fintech: 5
+      payment: 4
+      banking: 4
+      digital payment: 5
+      mobile payment: 4
+      # Investment & Markets
+      venture capital: 4
+      vc: 4
+      funding: 4
+      ipo: 4
+      stock: 3
+      market: 3
+      # Technology
+      api: 3
+      platform: 3
+      saas: 3
+      automation: 4
+      ai finance: 5
+      robo-advisor: 4
+      # Regulation
+      regulation: 3
+      compliance: 3
+      security: 3
+      # Chinese
+      金融科技: 5
+      支付: 4
+      银行: 3
+      投资: 3
+      风投: 4
+    blacklist:
+      - "spam"
+      - "advertisement"
+      - "ponzi"
