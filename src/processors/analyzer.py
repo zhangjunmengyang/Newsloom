@@ -54,6 +54,11 @@ class AIAnalyzer:
         for section, section_items in by_section.items():
             print(f"\n  📁 分析 section '{section}': {len(section_items)} 条")
 
+            # 限制每个 section 最多 20 条（按 score 降序）
+            if len(section_items) > 20:
+                section_items = sorted(section_items, key=lambda x: x.score, reverse=True)[:20]
+                print(f"     📊 限流: 取 top 20 条（按 score 排序）")
+
             if two_pass:
                 # Pass 1: 过滤
                 filtered_items = self._pass1_filter(section_items, section)

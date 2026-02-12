@@ -198,13 +198,22 @@ class Pipeline:
 
             # Load items if not from previous layers
             if not items:
-                filtered_path = self.data_dir / 'filtered' / f'{date_str}.jsonl'
-                if filtered_path.exists():
-                    smart_filter = SmartFilter({})
-                    items = smart_filter.load_filtered_data(filtered_path)
+                # 优先加载 analyzed data
+                analyzed_path = self.data_dir / 'analyzed' / f'{date_str}.json'
+                if analyzed_path.exists():
+                    from processors.analyzer import AIAnalyzer
+                    analyzer = AIAnalyzer(claude_client=None)
+                    items = analyzer.load_analyzed_data(analyzed_path)
+                    print(f"📥 已加载 analyzed data: {sum(len(v) for v in items.values())} 条")
                 else:
-                    print(f"⚠️  No filtered data found for {date_str}")
-                    return
+                    # Fallback 到 filtered data
+                    filtered_path = self.data_dir / 'filtered' / f'{date_str}.jsonl'
+                    if filtered_path.exists():
+                        smart_filter = SmartFilter({})
+                        items = smart_filter.load_filtered_data(filtered_path)
+                    else:
+                        print(f"⚠️  No filtered data found for {date_str}")
+                        return
 
             # Generate reports
             output_dir = self.reports_dir / date_str
