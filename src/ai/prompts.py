@@ -106,6 +106,11 @@ IDs:"""
 1. **headline**（一句话标题，20字内，突出核心价值）
 2. **detail**（2-3句话详细说明，包含关键信息和要点）
 
+**注意**：
+- 如果内容字段只包含简单元数据（如 "Score: X | Comments: Y"），请基于标题提炼出有价值的信息
+- 对于社区热门内容，可以将热度信息（评分、评论数）融入 detail 中
+- 每条内容都必须生成有效的 headline 和 detail，不要跳过任何条目
+
 # 输出格式（JSON）
 ```json
 [
@@ -139,6 +144,11 @@ JSON:"""
 For each item, generate:
 1. **headline** (one-sentence title, under 20 words, highlighting core value)
 2. **detail** (2-3 sentences with key information and insights)
+
+**Important**:
+- If content field only contains simple metadata (like "Score: X | Comments: Y"), extract value from the title instead
+- For community trending items, incorporate popularity metrics (score, comments) into the detail
+- You MUST generate valid headline and detail for EVERY item - do not skip any entries
 
 # Output Format (JSON)
 ```json

@@ -21,7 +21,15 @@ sources:
         name: "AI News"
       - url: "https://blog.google/technology/ai/rss/"
         name: "Google AI Blog"
-    max_per_feed: 20
+      - url: "https://venturebeat.com/category/ai/feed/"
+        name: "VentureBeat AI"
+      - url: "https://www.technologyreview.com/feed/"
+        name: "MIT Tech Review"
+      - url: "https://the-decoder.com/feed/"
+        name: "The Decoder"
+      - url: "https://slashdot.org/index.rss"
+        name: "Slashdot"
+    max_per_feed: 15
 
   arxiv:
     enabled: true  # 现已实现
