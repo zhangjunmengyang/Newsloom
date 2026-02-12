@@ -1,0 +1,90 @@
+defaults:
+  min_score: 3
+  strategy: "keyword_score"
+
+channels:
+  ai:
+    strategy: "keyword_score"
+    min_score: 4
+    keywords:
+      # AI Core
+      llm: 5
+      gpt: 4
+      claude: 4
+      gemini: 4
+      openai: 4
+      ai: 3
+      artificial intelligence: 5
+      machine learning: 4
+      deep learning: 4
+      # Technology
+      transformer: 5
+      attention mechanism: 5
+      rag: 5
+      agent: 4
+      prompt engineering: 4
+      fine-tuning: 4
+      # Chinese
+      大模型: 5
+      人工智能: 4
+      机器学习: 4
+      深度学习: 4
+    blacklist:
+      - "spam"
+      - "advertisement"
+      - "crypto airdrop"
+      - "buy now"
+
+  tech:
+    strategy: "keyword_score"
+    min_score: 3
+    keywords:
+      programming: 3
+      software: 3
+      developer: 3
+      api: 3
+      framework: 3
+      cloud: 3
+      kubernetes: 4
+      docker: 3
+      startup: 3
+      technology: 2
+      # Chinese
+      编程: 3
+      软件: 3
+      开发: 3
+    blacklist:
+      - "spam"
+      - "advertisement"
+
+  papers:
+    strategy: "upvote_weighted"
+    min_score: 4
+    upvote_multiplier: 2
+    keywords:
+      reinforcement learning: 5
+      reasoning: 5
+      multimodal: 5
+      neural network: 4
+      dataset: 3
+      benchmark: 3
+      state-of-the-art: 4
+      arxiv: 3
+
+  github:
+    strategy: "pass_through"  # GitHub trending is already filtered
+    min_score: 0
+
+  community:
+    strategy: "keyword_score"
+    min_score: 4
+    hn_score_bonus: 0.01
+    comment_bonus: 0.02
+    keywords:
+      # Inherit AI keywords
+      llm: 5
+      gpt: 4
+      ai: 3
+      startup: 3
+      opensource: 4
+      developer: 3

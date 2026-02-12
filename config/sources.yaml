@@ -1,0 +1,55 @@
+sources:
+  rss_tech:
+    enabled: true
+    channel: "tech"
+    type: "rss"
+    feeds:
+      - url: "https://techcrunch.com/feed/"
+        name: "TechCrunch"
+      - url: "https://www.theverge.com/rss/index.xml"
+        name: "The Verge"
+      - url: "https://news.ycombinator.com/rss"
+        name: "Hacker News RSS"
+    max_per_feed: 30
+
+  rss_ai:
+    enabled: true
+    channel: "ai"
+    type: "rss"
+    feeds:
+      - url: "https://www.artificialintelligence-news.com/feed/"
+        name: "AI News"
+      - url: "https://blog.google/technology/ai/rss/"
+        name: "Google AI Blog"
+    max_per_feed: 20
+
+  arxiv:
+    enabled: false  # Requires API setup
+    channel: "papers"
+    type: "arxiv"
+    categories: "cat:cs.AI+OR+cat:cs.CL+OR+cat:cs.LG"
+    max_results: 20
+
+  github:
+    enabled: false  # Requires API token
+    channel: "github"
+    type: "github"
+    topics: ["artificial-intelligence", "llm", "machine-learning"]
+    period: "daily"
+    limit: 15
+
+  hackernews:
+    enabled: false  # Will be implemented in Phase 2
+    channel: "community"
+    type: "hackernews"
+    min_score: 100
+    count: 20
+
+  twitter:
+    enabled: false  # Requires API credentials
+    channel: "ai"
+    type: "twitter"
+    api_key: ${TWITTER_API_KEY}
+    username: "your_handle"
+    max_tweets_per_user: 20
+    trending_enabled: false

@@ -1,0 +1,44 @@
+# Newsloom Configuration
+
+project:
+  name: "Newsloom"
+  timezone: "Asia/Shanghai"
+  language: "zh-CN"
+
+pipeline:
+  enabled_layers: ["fetch", "filter", "analyze", "generate"]
+
+  fetch:
+    parallel_workers: 10
+    timeout_per_source: 30
+    hours_ago: 24
+
+  filter:
+    max_age_hours: 48
+    min_score: 3
+
+  analyze:
+    ai_provider: "claude"
+    two_pass_enabled: true
+    batch_size: 100000  # tokens
+
+  generate:
+    formats: ["markdown", "html"]
+    generate_cards: false  # Set to true to enable Playwright card rendering
+    generate_rss: true
+
+ai:
+  claude:
+    api_key: ${ANTHROPIC_API_KEY}
+    base_url: ""  # Leave empty to use official API
+    model: "claude-sonnet-4-5-20250929"
+    max_tokens: 4096
+    temperature: 0.2
+
+output:
+  base_dir: "./reports"
+  keep_days: 30  # Keep 30 days of historical reports
+
+state:
+  file: "./data/state/state.json"
+  dedup_window_days: 7
