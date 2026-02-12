@@ -102,7 +102,7 @@ class ClaudeClient:
         self,
         prompt: str,
         system: str = "",
-        max_tokens: int = 4096,
+        max_tokens: int = 8192,
         **kwargs
     ) -> Dict[Any, Any]:
         """
@@ -121,25 +121,58 @@ class ClaudeClient:
         except json.JSONDecodeError:
             pass
 
-        # 策略 2: 提取 ```json ... ``` 代码块
+        # 策略 2: Strip markdown code fences then parse
         import re
-        json_match = re.search(r'```json\s*\n(.*?)\n```', response, re.DOTALL)
-        if json_match:
+        cleaned = response.strip()
+        if cleaned.startswith("```"):
+            cleaned = re.sub(r'^```\w*\n?', '', cleaned)
+            cleaned = re.sub(r'\n?```\s*$', '', cleaned)
+            cleaned = cleaned.strip()
             try:
-                return json.loads(json_match.group(1))
+                return json.loads(cleaned)
             except json.JSONDecodeError:
                 pass
 
-        # 策略 3: 提取任意 {...} 或 [...]
-        json_match = re.search(r'(\{.*\}|\[.*\])', response, re.DOTALL)
-        if json_match:
-            try:
-                return json.loads(json_match.group(1))
-            except json.JSONDecodeError:
-                pass
+        # 策略 3: 提取任意 {...} 或 [...] (balanced brackets)
+        start = response.find('[')
+        if start == -1:
+            start = response.find('{')
+        if start != -1:
+            open_char = response[start]
+            close_char = ']' if open_char == '[' else '}'
+            depth = 0
+            end = -1
+            for i in range(start, len(response)):
+                if response[i] == open_char:
+                    depth += 1
+                elif response[i] == close_char:
+                    depth -= 1
+                    if depth == 0:
+                        end = i + 1
+                        break
+            if end > start:
+                try:
+                    return json.loads(response[start:end])
+                except json.JSONDecodeError:
+                    pass
+
+        # 策略 4: Truncated JSON repair — salvage complete objects
+        start = response.find('[')
+        if start != -1:
+            fragment = response[start:]
+            last_brace = fragment.rfind('}')
+            if last_brace > 0:
+                candidate = fragment[:last_brace+1] + ']'
+                try:
+                    result = json.loads(candidate)
+                    print(f"   🔧 Repaired truncated JSON ({len(result)} items)")
+                    return result
+                except json.JSONDecodeError:
+                    pass
 
         # 失败：返回空对象
         print(f"   ⚠️ 无法解析 JSON 响应")
+        print(f"   Response preview: {response[:200]}")
         return {}
 
     def estimate_tokens(self, text: str) -> int:

@@ -76,15 +76,18 @@ channels:
     min_score: 0
 
   community:
-    strategy: "keyword_score"
-    min_score: 4
-    hn_score_bonus: 0.01
-    comment_bonus: 0.02
+    strategy: "upvote_weighted"
+    min_score: 2
+    upvote_multiplier: 0.01
     keywords:
       # Inherit AI keywords
       llm: 5
       gpt: 4
       ai: 3
+      claude: 4
       startup: 3
       opensource: 4
       developer: 3
+      programming: 3
+      rust: 3
+      python: 3

@@ -146,7 +146,7 @@ class AIAnalyzer:
             try:
                 briefs = self.claude.call_with_json(
                     prompt=prompt,
-                    max_tokens=4096,
+                    max_tokens=8192,
                     temperature=0.3
                 )
 
