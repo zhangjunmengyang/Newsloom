@@ -11,11 +11,20 @@
             --bg-tertiary: #e9ecef;
             --text-primary: #212529;
             --text-secondary: #6c757d;
+            --text-tertiary: #adb5bd;
             --border-color: #dee2e6;
             --link-color: #0d6efd;
             --card-shadow: 0 2px 4px rgba(0,0,0,0.08);
             --nav-bg: #ffffff;
             --nav-border: #e9ecef;
+            --summary-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --summary-text: #ffffff;
+            --importance-high: #ff6b6b;
+            --importance-medium: #ffa726;
+            --importance-low: #66bb6a;
+            --tag-bg: rgba(99, 102, 241, 0.1);
+            --tag-text: #6366f1;
+            --insight-color: #8b5cf6;
         }
 
         [data-theme="dark"] {
@@ -24,11 +33,17 @@
             --bg-tertiary: #21262d;
             --text-primary: #e6edf3;
             --text-secondary: #8b949e;
+            --text-tertiary: #484f58;
             --border-color: #30363d;
             --link-color: #58a6ff;
             --card-shadow: 0 4px 12px rgba(0,0,0,0.6);
             --nav-bg: #161b22;
             --nav-border: #30363d;
+            --summary-bg: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            --summary-text: #e6edf3;
+            --tag-bg: rgba(99, 102, 241, 0.15);
+            --tag-text: #818cf8;
+            --insight-color: #a78bfa;
         }
 
         * {
@@ -124,6 +139,34 @@
             border-radius: 10px;
         }
 
+        /* Mobile hamburger */
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            z-index: 200;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 1.2em;
+            color: var(--text-primary);
+            box-shadow: var(--card-shadow);
+        }
+
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 90;
+        }
+
         /* Main Content */
         .main-content {
             margin-left: 260px;
@@ -136,7 +179,7 @@
             background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-tertiary) 100%);
             padding: 40px;
             border-radius: 12px;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             box-shadow: var(--card-shadow);
         }
 
@@ -149,6 +192,41 @@
         .header-meta {
             color: var(--text-secondary);
             font-size: 0.95em;
+        }
+
+        /* 统计栏 */
+        .stats-bar {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .stat-chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: var(--bg-tertiary);
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .stat-chip .stat-bar {
+            width: 40px;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border-color);
+            overflow: hidden;
+        }
+
+        .stat-chip .stat-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
         }
 
         .theme-toggle {
@@ -172,6 +250,44 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
 
+        /* Executive Summary Card */
+        .executive-summary {
+            background: var(--summary-bg);
+            color: var(--summary-text);
+            padding: 30px 35px;
+            border-radius: 12px;
+            margin-bottom: 35px;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .executive-summary::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .executive-summary h2 {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            font-weight: 700;
+            position: relative;
+        }
+
+        .executive-summary p {
+            font-size: 0.95em;
+            line-height: 1.8;
+            opacity: 0.95;
+            position: relative;
+        }
+
+        /* Section styles */
         .section {
             margin-bottom: 50px;
             scroll-margin-top: 20px;
@@ -205,6 +321,7 @@
             border-radius: 12px;
         }
 
+        /* Card styles */
         .card {
             background-color: var(--bg-primary);
             border-radius: 10px;
@@ -213,6 +330,7 @@
             box-shadow: var(--card-shadow);
             transition: all 0.2s;
             border-left: 4px solid;
+            position: relative;
         }
 
         .card:hover {
@@ -220,11 +338,61 @@
             box-shadow: 0 6px 16px rgba(0,0,0,0.12);
         }
 
+        /* 高重要性卡片高亮 */
+        .card.importance-5 {
+            border-left-width: 6px;
+            box-shadow: 0 4px 16px rgba(255, 107, 107, 0.2);
+        }
+
+        .card.importance-4 {
+            border-left-width: 5px;
+            box-shadow: 0 3px 12px rgba(255, 167, 38, 0.15);
+        }
+
+        .card.importance-1,
+        .card.importance-2 {
+            opacity: 0.8;
+        }
+
+        /* 重要性标记 */
+        .importance-badge {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            font-size: 0.75em;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .importance-badge.level-5 {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+        }
+
+        .importance-badge.level-4 {
+            background: linear-gradient(135deg, #ffa726, #ff9800);
+            color: white;
+        }
+
+        .importance-badge.level-3 {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+
+        .importance-badge.level-2,
+        .importance-badge.level-1 {
+            background: var(--bg-tertiary);
+            color: var(--text-tertiary);
+            font-size: 0.7em;
+        }
+
         .card-title {
             font-size: 1.25em;
             font-weight: 600;
             margin-bottom: 12px;
             line-height: 1.4;
+            padding-right: 80px;
         }
 
         .card-title a {
@@ -244,12 +412,49 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            flex-wrap: wrap;
         }
 
         .card-text {
             color: var(--text-primary);
             line-height: 1.7;
             font-size: 0.95em;
+            margin-bottom: 10px;
+        }
+
+        /* 标签系统 */
+        .tag-list {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.78em;
+            font-weight: 500;
+            background-color: var(--tag-bg);
+            color: var(--tag-text);
+        }
+
+        /* 不同标签的颜色变体 */
+        .tag.tag-ai { background: rgba(99, 102, 241, 0.12); color: #6366f1; }
+        .tag.tag-crypto { background: rgba(249, 115, 22, 0.12); color: #f97316; }
+        .tag.tag-quant { background: rgba(16, 185, 129, 0.12); color: #10b981; }
+        .tag.tag-tool { background: rgba(6, 182, 212, 0.12); color: #06b6d4; }
+        .tag.tag-default { background: var(--tag-bg); color: var(--tag-text); }
+
+        /* 洞察行 */
+        .card-insight {
+            font-style: italic;
+            color: var(--insight-color);
+            font-size: 0.88em;
+            padding: 8px 0 0;
+            border-top: 1px dashed var(--border-color);
+            margin-top: 10px;
         }
 
         .badge {
@@ -259,6 +464,17 @@
             font-size: 0.85em;
             background-color: var(--bg-tertiary);
             font-weight: 500;
+        }
+
+        /* Data Freshness */
+        .data-freshness {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-secondary);
+            font-size: 0.85em;
+            margin-top: 20px;
+            background: var(--bg-primary);
+            border-radius: 8px;
         }
 
         footer {
@@ -279,28 +495,77 @@
                 transform: translateX(0);
             }
 
+            .mobile-toggle {
+                display: block;
+            }
+
+            .mobile-overlay.show {
+                display: block;
+            }
+
             .main-content {
                 margin-left: 0;
                 max-width: 100%;
                 padding: 20px;
+                padding-top: 60px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .section-title {
+                font-size: 1.5em;
+            }
+
+            .section-emoji {
+                font-size: 1.5em;
+            }
+
+            .card-title {
+                font-size: 1.1em;
+                padding-right: 60px;
             }
 
             .theme-toggle {
                 top: 10px;
                 right: 10px;
             }
+
+            .stats-bar {
+                gap: 8px;
+            }
+
+            .stat-chip {
+                font-size: 0.8em;
+                padding: 4px 10px;
+            }
+
+            .executive-summary {
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Mobile hamburger -->
+    <button class="mobile-toggle" onclick="toggleSidebar()">☰</button>
+    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
+
     <div class="layout">
         <!-- Sidebar Navigation -->
-        <nav class="sidebar">
+        <nav class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-title">📰 Newsloom</div>
-                <div class="sidebar-subtitle">{{ date_str }}</div>
+                <div class="sidebar-subtitle">{{ date_str }} | {{ total_items }} items</div>
             </div>
             <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="#executive-summary" class="nav-link">
+                        <span class="nav-emoji">📌</span>
+                        <span>Executive Summary</span>
+                    </a>
+                </li>
                 {% for section_key in section_order %}
                 {% if section_key in briefs and briefs[section_key]|length > 0 %}
                 {% set section_meta = section_configs[section_key] %}
@@ -323,7 +588,39 @@
             <header>
                 <h1>📊 Daily Report</h1>
                 <p class="header-meta">{{ date_str }} | {{ total_items }} items | Powered by Newsloom AI</p>
+
+                <!-- 统计栏 -->
+                {% if stats %}
+                <div class="stats-bar">
+                    {% set max_count = [] %}
+                    {% for key, val in stats.items() %}
+                    {% if max_count.append(val.count) %}{% endif %}
+                    {% endfor %}
+                    {% set max_val = max_count|max if max_count else 1 %}
+                    {% for section_key in section_order %}
+                    {% if section_key in stats %}
+                    {% set s = stats[section_key] %}
+                    <div class="stat-chip">
+                        <span>{{ s.emoji }}</span>
+                        <span>{{ s.title }}</span>
+                        <span style="font-weight:700;">{{ s.count }}</span>
+                        <div class="stat-bar">
+                            <div class="stat-bar-fill" style="width: {{ (s.count / max_val * 100)|int }}%; background-color: {{ s.color }};"></div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                {% endif %}
             </header>
+
+            <!-- Executive Summary -->
+            {% if executive_summary %}
+            <div id="executive-summary" class="executive-summary">
+                <h2>📌 今日要闻概述</h2>
+                <p>{{ executive_summary }}</p>
+            </div>
+            {% endif %}
 
             {% for section_key in section_order %}
             {% if section_key in briefs and briefs[section_key]|length > 0 %}
@@ -337,26 +634,73 @@
                 </div>
 
                 {% for item in items %}
-                <div class="card" style="border-left-color: {{ section_meta.color }};">
+                {% set imp = item.importance|default(3) %}
+                <div class="card importance-{{ imp }}" style="border-left-color: {{ section_meta.color }};">
+                    <!-- 重要性标记 -->
+                    {% if imp >= 4 %}
+                    <span class="importance-badge level-{{ imp }}">
+                        {% if imp == 5 %}🔥 必读{% elif imp == 4 %}⚡ 重要{% endif %}
+                    </span>
+                    {% elif imp <= 2 %}
+                    <span class="importance-badge level-{{ imp }}">
+                        {{ '⭐' * imp }}
+                    </span>
+                    {% endif %}
+
                     <div class="card-title">
                         <a href="{{ item.url }}" target="_blank">{{ item.title }}</a>
                     </div>
-                    {% if item.source %}
+
                     <div class="card-meta">
+                        {% if item.source %}
                         <span class="badge">{{ item.source }}</span>
+                        {% endif %}
+                        <span>{{ '⭐' * imp }}</span>
+                    </div>
+
+                    <!-- 标签系统 -->
+                    {% if item.category_tags %}
+                    <div class="tag-list">
+                        {% for tag in item.category_tags %}
+                        {% set tag_lower = tag|lower %}
+                        {% if 'llm' in tag_lower or 'ai' in tag_lower or 'model' in tag_lower or 'agent' in tag_lower %}
+                        <span class="tag tag-ai">{{ tag }}</span>
+                        {% elif 'crypto' in tag_lower or 'defi' in tag_lower or 'btc' in tag_lower or 'eth' in tag_lower or 'blockchain' in tag_lower %}
+                        <span class="tag tag-crypto">{{ tag }}</span>
+                        {% elif 'quant' in tag_lower or '量化' in tag_lower or 'trading' in tag_lower or 'alpha' in tag_lower %}
+                        <span class="tag tag-quant">{{ tag }}</span>
+                        {% elif 'tool' in tag_lower or '工具' in tag_lower or 'framework' in tag_lower or 'rust' in tag_lower or 'python' in tag_lower %}
+                        <span class="tag tag-tool">{{ tag }}</span>
+                        {% else %}
+                        <span class="tag tag-default">{{ tag }}</span>
+                        {% endif %}
+                        {% endfor %}
                     </div>
                     {% endif %}
+
                     <div class="card-text">
                         {{ item.text }}
                     </div>
+
+                    <!-- 洞察行 -->
+                    {% if item.insight %}
+                    <div class="card-insight">
+                        {{ item.insight }}
+                    </div>
+                    {% endif %}
                 </div>
                 {% endfor %}
             </section>
             {% endif %}
             {% endfor %}
 
+            <!-- Data Freshness -->
+            <div class="data-freshness">
+                📅 报告生成时间: {{ date_str }} | 数据覆盖过去 24 小时
+            </div>
+
             <footer>
-                <p>Generated by Newsloom 📰 | Built with Claude AI</p>
+                <p>Generated by Newsloom 📰 | Built with Claude AI | v0.2.0</p>
             </footer>
         </div>
     </div>
@@ -370,11 +714,18 @@
             localStorage.setItem('theme', newTheme);
         }
 
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobileOverlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('show');
+        }
+
         // Load saved theme (default to dark)
         const savedTheme = localStorage.getItem('theme') || 'dark';
         document.documentElement.setAttribute('data-theme', savedTheme);
 
-        // Smooth scroll for navigation
+        // Smooth scroll for navigation + close sidebar on mobile
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -382,6 +733,11 @@
                 const target = document.querySelector(targetId);
                 if (target) {
                     target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+                // Close sidebar on mobile
+                if (window.innerWidth <= 768) {
+                    document.getElementById('sidebar').classList.remove('open');
+                    document.getElementById('mobileOverlay').classList.remove('show');
                 }
             });
         });
@@ -407,7 +763,7 @@
             });
         }, observerOptions);
 
-        document.querySelectorAll('.section').forEach(section => {
+        document.querySelectorAll('.section, .executive-summary').forEach(section => {
             observer.observe(section);
         });
     </script>

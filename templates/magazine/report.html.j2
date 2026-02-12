@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsloom — {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * Newsloom Magazine Theme v2.0
+         * 暗色主题 | 杂志排版 | 分级阅读
+         * ============================================================ */
+
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-elevated: #1a1a26;
+            --bg-hover: #22223a;
+            --text-primary: #e8e8f0;
+            --text-secondary: #9898b0;
+            --text-muted: #666680;
+            --border: #2a2a40;
+            --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.15);
+            --red: #ef4444;
+            --red-bg: rgba(239, 68, 68, 0.1);
+            --yellow: #f59e0b;
+            --yellow-bg: rgba(245, 158, 11, 0.1);
+            --green: #22c55e;
+            --green-bg: rgba(34, 197, 94, 0.1);
+            --link: #818cf8;
+            --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "SF Pro Text", "Helvetica Neue", sans-serif;
+            --font-mono: "SF Mono", "Fira Code", monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Layout */
+        .layout { display: flex; min-height: 100vh; }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0; top: 0;
+            width: 260px;
+            height: 100vh;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            padding: 24px 16px;
+            z-index: 100;
+        }
+
+        .sidebar-brand {
+            padding: 0 8px 20px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-brand h1 {
+            font-size: 1.3em;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .sidebar-brand p {
+            color: var(--text-muted);
+            font-size: 0.82em;
+            margin-top: 4px;
+        }
+
+        .nav-list { list-style: none; }
+
+        .nav-item { margin-bottom: 4px; }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            transition: all 0.15s;
+            font-size: 0.92em;
+        }
+
+        .nav-link:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .nav-link.active { background: var(--accent-glow); color: var(--link); }
+
+        .nav-emoji { margin-right: 10px; font-size: 1.1em; width: 24px; text-align: center; }
+
+        .nav-count {
+            margin-left: auto;
+            font-size: 0.78em;
+            color: var(--text-muted);
+            background: var(--bg-elevated);
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        .nav-must-read {
+            margin-left: 6px;
+            font-size: 0.78em;
+            color: var(--red);
+        }
+
+        /* Main Content */
+        .main { margin-left: 260px; flex: 1; padding: 40px 48px; max-width: calc(100% - 260px); }
+
+        /* Header */
+        .header {
+            padding-bottom: 32px;
+            margin-bottom: 36px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--link) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-meta {
+            color: var(--text-muted);
+            font-size: 0.88em;
+            margin-top: 8px;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 20px;
+            margin-top: 16px;
+        }
+
+        .stat {
+            background: var(--bg-card);
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 0.85em;
+        }
+
+        .stat-value { font-size: 1.5em; font-weight: 700; }
+        .stat-label { color: var(--text-muted); margin-top: 2px; }
+
+        /* Executive Summary */
+        .exec-summary {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--yellow);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 40px;
+        }
+
+        .exec-summary h2 {
+            font-size: 1.15em;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--yellow);
+        }
+
+        .exec-summary p, .exec-summary li {
+            color: var(--text-primary);
+            font-size: 0.95em;
+            margin-bottom: 8px;
+            line-height: 1.7;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 48px;
+            scroll-margin-top: 20px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .section-emoji { font-size: 1.8em; }
+
+        .section-title {
+            font-size: 1.6em;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .section-count {
+            margin-left: auto;
+            font-size: 0.82em;
+            color: var(--text-muted);
+            background: var(--bg-elevated);
+            padding: 4px 12px;
+            border-radius: 8px;
+        }
+
+        /* Cards */
+        .card {
+            display: flex;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px var(--accent-glow);
+            transform: translateY(-2px);
+        }
+
+        .card-priority {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 52px;
+            font-size: 1.2em;
+            border-right: 1px solid var(--border);
+        }
+
+        .card-priority.must-read { background: var(--red-bg); }
+        .card-priority.recommended { background: var(--yellow-bg); }
+        .card-priority.fyi { background: var(--green-bg); }
+
+        .card-body { padding: 20px; flex: 1; }
+
+        .card-body h3 {
+            font-size: 1.05em;
+            font-weight: 600;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .card-body h3 a {
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: color 0.15s;
+        }
+
+        .card-body h3 a:hover { color: var(--link); }
+
+        .card-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .source-badge {
+            font-size: 0.8em;
+            color: var(--text-muted);
+            background: var(--bg-elevated);
+            padding: 3px 10px;
+            border-radius: 5px;
+        }
+
+        .tag {
+            font-size: 0.78em;
+            color: var(--link);
+            background: var(--accent-glow);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .card-detail {
+            color: var(--text-secondary);
+            font-size: 0.92em;
+            line-height: 1.65;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 48px 0;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            margin-top: 48px;
+            font-size: 0.85em;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main { margin-left: 0; max-width: 100%; padding: 20px 16px; }
+            .header h1 { font-size: 1.6em; }
+            .header-stats { flex-direction: column; gap: 8px; }
+            .card { flex-direction: column; }
+            .card-priority { min-width: auto; padding: 8px; border-right: none; border-bottom: 1px solid var(--border); }
+        }
+
+        /* Scroll bar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-brand">
+                <h1>📰 Newsloom</h1>
+                <p>{{ date_str }} · {{ total_items }} 条精选</p>
+            </div>
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="#exec-summary" class="nav-link">
+                        <span class="nav-emoji">📌</span>
+                        <span>今日核心</span>
+                    </a>
+                </li>
+                {% for section_key in section_order %}
+                {% if section_key in briefs and briefs[section_key]|length > 0 %}
+                {% set meta = section_configs[section_key] %}
+                {% set items = briefs[section_key] %}
+                {% set must_read_count = items|selectattr('priority', 'equalto', '🔴')|list|length %}
+                <li class="nav-item">
+                    <a href="#section-{{ section_key }}" class="nav-link">
+                        <span class="nav-emoji">{{ meta.emoji }}</span>
+                        <span>{{ meta.title }}</span>
+                        <span class="nav-count">{{ items|length }}</span>
+                        {% if must_read_count > 0 %}
+                        <span class="nav-must-read">{{ must_read_count }}🔴</span>
+                        {% endif %}
+                    </a>
+                </li>
+                {% endif %}
+                {% endfor %}
+            </ul>
+        </nav>
+
+        <!-- Main -->
+        <div class="main">
+            <div class="header">
+                <h1>每日情报简报</h1>
+                <p class="header-meta">{{ date_str }} · {{ generated_time }} 生成 · Powered by Claude AI</p>
+                <div class="header-stats">
+                    <div class="stat">
+                        <div class="stat-value">{{ total_items }}</div>
+                        <div class="stat-label">条精选</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">{{ briefs|length }}</div>
+                        <div class="stat-label">个板块</div>
+                    </div>
+                    {% set must_read_total = [] %}
+                    {% for section_key, items in briefs.items() %}
+                    {% for item in items %}
+                    {% if item.priority == '🔴' %}
+                    {% if must_read_total.append(1) %}{% endif %}
+                    {% endif %}
+                    {% endfor %}
+                    {% endfor %}
+                    <div class="stat">
+                        <div class="stat-value" style="color: var(--red);">{{ must_read_total|length }}</div>
+                        <div class="stat-label">必读</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Executive Summary -->
+            {% if executive_summary %}
+            <div id="exec-summary" class="exec-summary">
+                <h2>📌 今日核心</h2>
+                {% for line in executive_summary.strip().split('\n') %}
+                {% if line.strip() %}
+                <p>{{ line }}</p>
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Sections -->
+            {% for section_key in section_order %}
+            {% if section_key in briefs and briefs[section_key]|length > 0 %}
+            {% set meta = section_configs[section_key] %}
+            {% set items = briefs[section_key] %}
+            <section id="section-{{ section_key }}" class="section">
+                <div class="section-header">
+                    <span class="section-emoji">{{ meta.emoji }}</span>
+                    <h2 class="section-title">{{ meta.title }}</h2>
+                    <span class="section-count">{{ items|length }} 条</span>
+                </div>
+
+                {% for item in items %}
+                {% set priority = item.priority|default('🟢') %}
+                {% set priority_class = 'must-read' if priority == '🔴' else ('recommended' if priority == '🟡' else 'fyi') %}
+                <div class="card">
+                    <div class="card-priority {{ priority_class }}">{{ priority }}</div>
+                    <div class="card-body">
+                        <h3><a href="{{ item.url }}" target="_blank">{{ item.headline|default(item.title|default('No title')) }}</a></h3>
+                        <div class="card-meta">
+                            {% if item.source %}
+                            <span class="source-badge">{{ item.source }}</span>
+                            {% endif %}
+                            {% if item.tags %}
+                            {% for tag in item.tags %}
+                            <span class="tag">{{ tag }}</span>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                        <p class="card-detail">{{ item.detail|default(item.text|default('')) }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </section>
+            {% endif %}
+            {% endfor %}
+
+            <footer>
+                Generated by Newsloom v2 📰 · {{ date_str }}
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        // Smooth scroll
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const target = document.querySelector(link.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        // Active section highlight
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                    const link = document.querySelector(`.nav-link[href="#${entry.target.id}"]`);
+                    if (link) link.classList.add('active');
+                }
+            });
+        }, { rootMargin: '-20% 0px -70% 0px' });
+
+        document.querySelectorAll('.section, .exec-summary').forEach(s => observer.observe(s));
+    </script>
+</body>
+</html>

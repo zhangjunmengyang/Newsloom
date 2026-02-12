@@ -1,4 +1,4 @@
-"""Layer 3: AI 分析器 - Claude 双pass处理"""
+"""Layer 3: AI 分析器 - Claude 双pass处理 + Executive Summary"""
 
 import json
 from typing import List, Dict
@@ -12,11 +12,12 @@ from ai.prompts import PromptTemplates
 
 class AIAnalyzer:
     """
-    AI 分析器 - Claude 双pass处理
+    AI 分析器 - Claude 双pass处理 (v0.2.0 增强版)
 
     整合 morning-brief 和 twitter-watchdog 的最佳实践:
     - Pass 1: 智能过滤（识别高质量内容）
-    - Pass 2: 结构化提取（生成 headline + detail）
+    - Pass 2: 结构化提取（生成 headline + detail + importance + tags + insight）
+    - Executive Summary: AI 生成今日要闻概述
     - Token-aware 批处理
     """
 
@@ -33,16 +34,19 @@ class AIAnalyzer:
         self.language = language
         self.config = config or {}
 
-    def analyze(self, items: List[Item], two_pass: bool = True) -> Dict[str, List[Dict]]:
+    def analyze(self, items: List[Item], two_pass: bool = True,
+                section_configs: dict = None) -> Dict[str, List[Dict]]:
         """
         分析 items 并生成结构化输出
 
         Args:
             items: 要分析的 Item 列表
             two_pass: 是否使用双pass处理
+            section_configs: section 配置（用于生成 Executive Summary）
 
         Returns:
             Dict[section, List[brief]]: 按 section 分组的 briefs
+            特殊 key "__executive_summary__" 存放 AI 生成的概述
         """
         print(f"\n🧠 AI 分析中...")
         print(f"   模型: {self.claude.model}")
@@ -78,7 +82,26 @@ class AIAnalyzer:
                 results[section] = briefs
                 print(f"     ✓ 提取: {len(briefs)} 条 briefs")
 
-        print(f"\n✅ AI 分析完成: {sum(len(b) for b in results.values())} 条 briefs")
+        # 按 importance 排序每个 section
+        for section in results:
+            results[section] = sorted(
+                results[section],
+                key=lambda x: x.get('importance', 3),
+                reverse=True
+            )
+
+        # 生成 Executive Summary
+        if section_configs and self.claude:
+            try:
+                executive_summary = self._generate_executive_summary(results, section_configs)
+                if executive_summary:
+                    results['__executive_summary__'] = executive_summary
+                    print(f"\n  📝 Executive Summary 已生成 ({len(executive_summary)} 字)")
+            except Exception as e:
+                print(f"\n  ⚠️  Executive Summary 生成失败: {e}")
+
+        total_briefs = sum(len(b) for k, b in results.items() if k != '__executive_summary__')
+        print(f"\n✅ AI 分析完成: {total_briefs} 条 briefs")
         return results
 
     def _group_by_section(self, items: List[Item]) -> Dict[str, List[Item]]:
@@ -134,9 +157,9 @@ class AIAnalyzer:
 
     def _pass2_extract(self, items: List[Item], section: str) -> List[Dict]:
         """
-        Pass 2: 结构化提取
+        Pass 2: 结构化提取（v0.2.0 增强版）
 
-        使用 Claude 生成 headline + detail
+        使用 Claude 生成 headline + detail + importance + category_tags + insight
         """
         # 如果内容太多，分批处理
         batches = self.claude.batch_items_by_tokens(items, max_tokens=80000)
@@ -160,9 +183,18 @@ class AIAnalyzer:
 
                 # 验证格式
                 if isinstance(briefs, list):
+                    # 确保每个 brief 有新增字段的默认值
+                    for brief in briefs:
+                        brief.setdefault('importance', 3)
+                        brief.setdefault('category_tags', [])
+                        brief.setdefault('insight', '')
                     all_briefs.extend(briefs)
                 elif isinstance(briefs, dict) and 'items' in briefs:
                     # 兼容包装格式
+                    for brief in briefs['items']:
+                        brief.setdefault('importance', 3)
+                        brief.setdefault('category_tags', [])
+                        brief.setdefault('insight', '')
                     all_briefs.extend(briefs['items'])
 
             except Exception as e:
@@ -175,10 +207,43 @@ class AIAnalyzer:
                         'headline': item.title,
                         'detail': item.text[:200],
                         'url': item.url,
-                        'source': display_source
+                        'source': display_source,
+                        'importance': 3,
+                        'category_tags': [],
+                        'insight': ''
                     })
 
         return all_briefs
+
+    def _generate_executive_summary(self, briefs: Dict[str, List[Dict]],
+                                     section_configs: dict) -> str:
+        """
+        生成 AI Executive Summary
+
+        Args:
+            briefs: 所有已分析的 briefs
+            section_configs: section 配置
+
+        Returns:
+            str: AI 生成的概述文字
+        """
+        # 过滤掉特殊 key
+        content_briefs = {k: v for k, v in briefs.items() if not k.startswith('__')}
+
+        if not content_briefs:
+            return ""
+
+        prompt = PromptTemplates.executive_summary_prompt(
+            content_briefs, section_configs, self.language
+        )
+
+        response = self.claude.call(
+            prompt=prompt,
+            max_tokens=1000,
+            temperature=0.4
+        )
+
+        return response.strip()
 
     def _parse_ids(self, response: str) -> List[int]:
         """

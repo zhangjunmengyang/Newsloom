@@ -6,7 +6,7 @@ project:
   language: "zh-CN"
 
 pipeline:
-  enabled_layers: ["fetch", "filter", "analyze", "generate"]
+  enabled_layers: ["fetch", "rank", "analyze", "generate"]
 
   fetch:
     parallel_workers: 10
@@ -20,25 +20,29 @@ pipeline:
   analyze:
     ai_provider: "claude"
     two_pass_enabled: true
-    batch_size: 100000  # tokens
+    batch_size: 100000
 
   generate:
     formats: ["markdown", "html"]
-    template: "dark-pro"  # Template name: dark-pro, minimal
-    generate_cards: false  # Set to true to enable Playwright card rendering
+    template: "magazine"
+    generate_cards: false
     generate_rss: true
+
+ranking:
+  coarse_top_n: 200
+  dedup_threshold: 0.55
 
 ai:
   claude:
     api_key: ${ANTHROPIC_API_KEY}
     base_url: ${ANTHROPIC_BASE_URL}
-    model: "claude-sonnet-4-20250514"
-    max_tokens: 4096
+    model: "claude-opus-4-6"
+    max_tokens: 16384
     temperature: 0.2
 
 output:
   base_dir: "./reports"
-  keep_days: 30  # Keep 30 days of historical reports
+  keep_days: 30
 
 state:
   file: "./data/state/state.json"

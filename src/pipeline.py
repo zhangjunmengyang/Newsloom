@@ -179,9 +179,17 @@ class Pipeline:
                     language=self.config['project'].get('language', 'zh-CN')
                 )
 
+                # 加载 section_configs（用于 Executive Summary）
+                sections_config_path = self.config_path.parent / 'sections.yaml'
+                section_configs = {}
+                if sections_config_path.exists():
+                    with open(sections_config_path) as sf:
+                        section_configs = yaml.safe_load(sf).get('sections', {})
+
                 # 分析
                 two_pass = self.config['pipeline']['analyze'].get('two_pass_enabled', True)
-                briefs = analyzer.analyze(items, two_pass=two_pass)
+                briefs = analyzer.analyze(items, two_pass=two_pass,
+                                          section_configs=section_configs)
 
                 # 保存
                 analyzed_path = self.data_dir / 'analyzed' / f'{date_str}.json'
