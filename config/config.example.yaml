@@ -26,6 +26,7 @@ pipeline:
 
   generate:
     formats: ["markdown", "html"]  # 生成的报告格式
+    template: "dark-pro"           # 模板名称: dark-pro (专业暗色), minimal (极简)
     generate_cards: false          # 是否生成 PNG 卡片（需要 Playwright）
     generate_rss: true             # 是否生成 RSS feed
 

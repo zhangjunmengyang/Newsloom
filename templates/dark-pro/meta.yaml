@@ -1,0 +1,8 @@
+name: "Dark Pro"
+author: "Newsloom Team"
+version: "1.0.0"
+description: "Professional dark theme with sidebar navigation and section colors"
+default_theme: "dark"
+supports:
+  - html
+  - markdown

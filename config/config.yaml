@@ -24,6 +24,7 @@ pipeline:
 
   generate:
     formats: ["markdown", "html"]
+    template: "dark-pro"  # Template name: dark-pro, minimal
     generate_cards: false  # Set to true to enable Playwright card rendering
     generate_rss: true
 

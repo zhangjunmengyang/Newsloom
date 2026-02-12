@@ -1,23 +1,69 @@
 """Layer 4: Report generation (Markdown, HTML, Cards, RSS)"""
 
 import json
+import yaml
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, List
-from jinja2 import Template
+from jinja2 import Environment, FileSystemLoader, Template
 
 
 class ReportGenerator:
-    """Multi-format report generator"""
+    """Multi-format report generator with pluggable template system"""
 
     def __init__(self, config: dict):
         self.config = config
         self.formats = config.get('generate', {}).get('formats', ['markdown', 'html'])
         self.generate_rss = config.get('generate', {}).get('generate_rss', False)
 
+        # Template configuration
+        self.template_name = config.get('generate', {}).get('template', 'dark-pro')
+        self.project_root = Path(__file__).parent.parent.parent
+        self.template_dir = self.project_root / 'templates' / self.template_name
+
+        # Load section configurations
+        self.section_configs = self._load_sections_config()
+
+        # Initialize Jinja2 environment if templates exist
+        if self.template_dir.exists():
+            self.jinja_env = Environment(
+                loader=FileSystemLoader(str(self.template_dir)),
+                trim_blocks=True,
+                lstrip_blocks=True
+            )
+        else:
+            self.jinja_env = None
+            print(f"⚠️  Template directory not found: {self.template_dir}, using fallback")
+
+    def _load_sections_config(self) -> Dict:
+        """Load section metadata from sections.yaml"""
+        sections_file = self.project_root / 'config' / 'sections.yaml'
+        if sections_file.exists():
+            with open(sections_file, 'r', encoding='utf-8') as f:
+                data = yaml.safe_load(f)
+                return data.get('sections', {})
+        else:
+            # Fallback to default sections
+            return {
+                'ai': {'title': 'AI & 科技', 'emoji': '🤖', 'order': 1, 'color': '#6366f1'},
+                'tech': {'title': '科技动态', 'emoji': '💻', 'order': 2, 'color': '#06b6d4'},
+                'papers': {'title': '论文速递', 'emoji': '📄', 'order': 3, 'color': '#8b5cf6'},
+                'github': {'title': 'GitHub 趋势', 'emoji': '⭐', 'order': 4, 'color': '#f59e0b'},
+                'community': {'title': '社区热议', 'emoji': '🔥', 'order': 5, 'color': '#ef4444'},
+                'finance': {'title': '金融市场', 'emoji': '📊', 'order': 6, 'color': '#10b981'},
+                'crypto': {'title': 'Crypto 舆情', 'emoji': '💎', 'order': 7, 'color': '#f97316'},
+            }
+
+    def _get_section_order(self) -> List[str]:
+        """Get sections sorted by order field"""
+        return sorted(
+            self.section_configs.keys(),
+            key=lambda k: self.section_configs[k].get('order', 999)
+        )
+
     def generate_markdown(self, items: List, date_str: str, output_path: Path):
         """
-        Generate Markdown report
+        Generate Markdown report (backward compatible fallback)
         From morning-brief summary.py
         """
         output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -99,8 +145,7 @@ class ReportGenerator:
 
     def generate_html(self, items: List, date_str: str, output_path: Path):
         """
-        Generate HTML report with dark/light theme
-        From twitter-watchdog template
+        Generate HTML report (backward compatible fallback)
         """
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -114,7 +159,7 @@ class ReportGenerator:
         for channel in by_channel:
             by_channel[channel].sort(key=lambda x: getattr(x, 'score', 0), reverse=True)
 
-        # HTML template
+        # HTML template (simple fallback)
         html_template = """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -122,189 +167,34 @@ class ReportGenerator:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daily Report - {{ date_str }}</title>
     <style>
-        :root {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f5f5f5;
-            --text-primary: #333333;
-            --text-secondary: #666666;
-            --border-color: #e0e0e0;
-            --link-color: #0066cc;
-            --card-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        [data-theme="dark"] {
-            --bg-primary: #1a1a1a;
-            --bg-secondary: #2d2d2d;
-            --text-primary: #e0e0e0;
-            --text-secondary: #a0a0a0;
-            --border-color: #404040;
-            --link-color: #66b3ff;
-            --card-shadow: 0 2px 8px rgba(0,0,0,0.5);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            line-height: 1.6;
-            background-color: var(--bg-secondary);
-            color: var(--text-primary);
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        header {
-            background-color: var(--bg-primary);
-            padding: 30px 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            box-shadow: var(--card-shadow);
-        }
-
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        .theme-toggle {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background-color: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            padding: 10px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            box-shadow: var(--card-shadow);
-            z-index: 1000;
-        }
-
-        .section {
-            margin-bottom: 40px;
-        }
-
-        .section-title {
-            font-size: 1.8em;
-            margin-bottom: 20px;
-            color: var(--text-primary);
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 10px;
-        }
-
-        .card {
-            background-color: var(--bg-primary);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: var(--card-shadow);
-            transition: transform 0.2s;
-        }
-
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-        .card-title {
-            font-size: 1.3em;
-            margin-bottom: 10px;
-        }
-
-        .card-title a {
-            color: var(--link-color);
-            text-decoration: none;
-        }
-
-        .card-title a:hover {
-            text-decoration: underline;
-        }
-
-        .card-meta {
-            color: var(--text-secondary);
-            font-size: 0.9em;
-            margin-bottom: 10px;
-        }
-
-        .card-text {
-            color: var(--text-primary);
-            line-height: 1.6;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.8em;
-            margin-right: 8px;
-            background-color: var(--bg-secondary);
-        }
-
-        footer {
-            text-align: center;
-            padding: 20px;
-            color: var(--text-secondary);
-            margin-top: 40px;
-        }
+        body { font-family: -apple-system, sans-serif; padding: 40px; background: #f5f5f5; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        header { background: #fff; padding: 30px; border-radius: 8px; margin-bottom: 30px; }
+        .section { margin-bottom: 40px; }
+        .card { background: #fff; padding: 20px; margin-bottom: 20px; border-radius: 8px; }
+        .card-title a { color: #0066cc; text-decoration: none; }
+        .card-meta { color: #666; font-size: 0.9em; margin: 10px 0; }
     </style>
 </head>
 <body>
-    <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
-
     <div class="container">
         <header>
             <h1>📊 Daily Report</h1>
             <p>{{ date_str }} | {{ total_items }} items</p>
         </header>
-
         {% for channel, items in sections.items() %}
         <div class="section">
-            <h2 class="section-title">{{ channel|replace('_', ' ')|title }}</h2>
-
+            <h2>{{ channel|replace('_', ' ')|title }}</h2>
             {% for item in items %}
             <div class="card">
-                <div class="card-title">
-                    <a href="{{ item.url }}" target="_blank">{{ item.title }}</a>
-                </div>
-                <div class="card-meta">
-                    <span class="badge">{{ item.source }}</span>
-                    <span>{{ item.author }}</span> |
-                    <span>Score: {{ "%.1f"|format(item.score) }}</span>
-                </div>
-                <div class="card-text">
-                    {{ item.text[:300] }}{% if item.text|length > 300 %}...{% endif %}
-                </div>
+                <div class="card-title"><a href="{{ item.url }}" target="_blank">{{ item.title }}</a></div>
+                <div class="card-meta">{{ item.source }} | Score: {{ "%.1f"|format(item.score) }}</div>
+                <div class="card-text">{{ item.text[:300] }}{% if item.text|length > 300 %}...{% endif %}</div>
             </div>
             {% endfor %}
         </div>
         {% endfor %}
-
-        <footer>
-            <p>Generated by Newsloom 📰</p>
-        </footer>
     </div>
-
-    <script>
-        function toggleTheme() {
-            const html = document.documentElement;
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-        }
-
-        // Load saved theme
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-    </script>
 </body>
 </html>"""
 
@@ -374,7 +264,7 @@ class ReportGenerator:
         print(f"✅ 报告已生成: {output_dir}")
 
     def generate_markdown_from_briefs(self, briefs: Dict, date_str: str, output_path: Path):
-        """从 AI briefs 生成 Markdown"""
+        """从 AI briefs 生成 Markdown (使用 Jinja2 模板)"""
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
         # Filter out empty sections
@@ -382,26 +272,58 @@ class ReportGenerator:
 
         if not non_empty_briefs:
             print("⚠️ No content to generate (all sections are empty)")
-            # Create empty report
-            lines = [
-                f"# Daily Report - {date_str}",
-                "",
-                f"*Generated by Newsloom AI at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*",
-                "",
-                "---",
-                "",
-                "## No Content",
-                "",
-                "No items to report today.",
-                "",
-                "---",
-                "",
-                "*Generated by Newsloom 📰*"
-            ]
-            with open(output_path, 'w', encoding='utf-8') as f:
-                f.write('\n'.join(lines))
+            self._generate_empty_markdown(date_str, output_path)
             return
 
+        # Use template if available
+        if self.jinja_env:
+            try:
+                template = self.jinja_env.get_template('report.md.j2')
+
+                # Prepare template data
+                total_items = sum(len(items) for items in non_empty_briefs.values())
+                markdown = template.render(
+                    date_str=date_str,
+                    generated_time=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                    total_items=total_items,
+                    briefs=non_empty_briefs,
+                    section_configs=self.section_configs,
+                    section_order=self._get_section_order()
+                )
+
+                with open(output_path, 'w', encoding='utf-8') as f:
+                    f.write(markdown)
+
+                print(f"📄 Markdown 已生成 (使用模板 {self.template_name}): {output_path}")
+                return
+            except Exception as e:
+                print(f"⚠️  Template rendering failed: {e}, falling back to default")
+
+        # Fallback to hardcoded template
+        self._generate_markdown_fallback(non_empty_briefs, date_str, output_path)
+
+    def _generate_empty_markdown(self, date_str: str, output_path: Path):
+        """Generate empty markdown report"""
+        lines = [
+            f"# Daily Report - {date_str}",
+            "",
+            f"*Generated by Newsloom AI at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*",
+            "",
+            "---",
+            "",
+            "## No Content",
+            "",
+            "No items to report today.",
+            "",
+            "---",
+            "",
+            "*Generated by Newsloom 📰*"
+        ]
+        with open(output_path, 'w', encoding='utf-8') as f:
+            f.write('\n'.join(lines))
+
+    def _generate_markdown_fallback(self, briefs: Dict, date_str: str, output_path: Path):
+        """Fallback markdown generation without templates"""
         lines = [
             f"# Daily Report - {date_str}",
             "",
@@ -414,19 +336,27 @@ class ReportGenerator:
         # Table of contents
         lines.append("## Table of Contents")
         lines.append("")
-        for section in sorted(non_empty_briefs.keys()):
-            section_name = section.replace('_', ' ').title()
-            lines.append(f"- [{section_name}](#{section.lower()})")
+        for section in self._get_section_order():
+            if section in briefs:
+                section_meta = self.section_configs.get(section, {})
+                emoji = section_meta.get('emoji', '')
+                title = section_meta.get('title', section.replace('_', ' ').title())
+                lines.append(f"- [{emoji} {title}](#{section})")
         lines.append("")
         lines.append("---")
         lines.append("")
 
         # Content sections
-        for section in sorted(non_empty_briefs.keys()):
-            section_briefs = non_empty_briefs[section]
-            section_name = section.replace('_', ' ').title()
+        for section in self._get_section_order():
+            if section not in briefs:
+                continue
 
-            lines.append(f"## {section_name}")
+            section_briefs = briefs[section]
+            section_meta = self.section_configs.get(section, {})
+            emoji = section_meta.get('emoji', '')
+            title = section_meta.get('title', section.replace('_', ' ').title())
+
+            lines.append(f"## {emoji} {title}")
             lines.append("")
             lines.append(f"*{len(section_briefs)} items*")
             lines.append("")
@@ -457,10 +387,10 @@ class ReportGenerator:
         with open(output_path, 'w', encoding='utf-8') as f:
             f.write('\n'.join(lines))
 
-        print(f"📄 Markdown 已生成: {output_path}")
+        print(f"📄 Markdown 已生成 (fallback): {output_path}")
 
     def generate_html_from_briefs(self, briefs: Dict, date_str: str, output_path: Path):
-        """从 AI briefs 生成 HTML"""
+        """从 AI briefs 生成 HTML (使用 Jinja2 模板)"""
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
         # Filter out empty sections
@@ -468,8 +398,52 @@ class ReportGenerator:
 
         if not non_empty_briefs:
             print("⚠️ No content to generate (all sections are empty)")
-            # Create empty HTML report
-            simple_html = f"""<!DOCTYPE html>
+            self._generate_empty_html(date_str, output_path)
+            return
+
+        # Use template if available
+        if self.jinja_env:
+            try:
+                template = self.jinja_env.get_template('report.html.j2')
+
+                # Prepare data for template
+                total_items = sum(len(items) for items in non_empty_briefs.values())
+
+                # Convert briefs to consistent format
+                formatted_briefs = {}
+                for section, section_briefs in non_empty_briefs.items():
+                    formatted_briefs[section] = [
+                        {
+                            'title': brief.get('headline', 'No title'),
+                            'url': brief.get('url', '#'),
+                            'source': brief.get('source', 'unknown'),
+                            'text': brief.get('detail', ''),
+                        }
+                        for brief in section_briefs
+                    ]
+
+                html = template.render(
+                    date_str=date_str,
+                    total_items=total_items,
+                    briefs=formatted_briefs,
+                    section_configs=self.section_configs,
+                    section_order=self._get_section_order()
+                )
+
+                with open(output_path, 'w', encoding='utf-8') as f:
+                    f.write(html)
+
+                print(f"🌐 HTML 已生成 (使用模板 {self.template_name}): {output_path}")
+                return
+            except Exception as e:
+                print(f"⚠️  Template rendering failed: {e}, falling back to default")
+
+        # Fallback
+        self._generate_html_fallback(non_empty_briefs, date_str, output_path)
+
+    def _generate_empty_html(self, date_str: str, output_path: Path):
+        """Generate empty HTML report"""
+        simple_html = f"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -482,514 +456,50 @@ class ReportGenerator:
     <p>No items to report today.</p>
 </body>
 </html>"""
-            with open(output_path, 'w', encoding='utf-8') as f:
-                f.write(simple_html)
-            return
+        with open(output_path, 'w', encoding='utf-8') as f:
+            f.write(simple_html)
 
-        # 使用相同的 HTML 模板，但传入 briefs 数据
-        html_template = self._get_html_template()
-        template = Template(html_template)
+    def _generate_html_fallback(self, briefs: Dict, date_str: str, output_path: Path):
+        """Fallback HTML generation (simple version)"""
+        html = f"""<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Daily Report - {date_str}</title>
+    <style>
+        body {{ font-family: sans-serif; padding: 40px; background: #f5f5f5; }}
+        .container {{ max-width: 1000px; margin: 0 auto; }}
+        header {{ background: #fff; padding: 30px; border-radius: 8px; margin-bottom: 30px; }}
+        .section {{ margin-bottom: 40px; }}
+        .card {{ background: #fff; padding: 20px; margin-bottom: 20px; border-radius: 8px; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header><h1>📊 Daily Report</h1><p>{date_str}</p></header>
+"""
 
-        # 准备数据
-        sections = {}
-        total_items = 0
-        for section, section_briefs in non_empty_briefs.items():
-            sections[section] = [
-                {
-                    'title': brief.get('headline', 'No title'),
-                    'url': brief.get('url', '#'),
-                    'source': brief.get('source', 'unknown'),
-                    'author': '',
-                    'score': 0,
-                    'text': brief.get('detail', ''),
-                }
-                for brief in section_briefs
-            ]
-            total_items += len(section_briefs)
+        for section in self._get_section_order():
+            if section not in briefs:
+                continue
+            section_meta = self.section_configs.get(section, {})
+            title = section_meta.get('title', section)
+            emoji = section_meta.get('emoji', '')
 
-        html = template.render(
-            date_str=date_str,
-            total_items=total_items,
-            sections=sections
-        )
+            html += f'<div class="section"><h2>{emoji} {title}</h2>'
+            for brief in briefs[section]:
+                headline = brief.get('headline', 'No title')
+                url = brief.get('url', '#')
+                detail = brief.get('detail', '')
+                html += f'<div class="card"><h3><a href="{url}">{headline}</a></h3><p>{detail}</p></div>'
+            html += '</div>'
+
+        html += """
+    </div>
+</body>
+</html>"""
 
         with open(output_path, 'w', encoding='utf-8') as f:
             f.write(html)
 
-        print(f"🌐 HTML 已生成: {output_path}")
-
-    def _get_html_template(self) -> str:
-        """获取 HTML 模板 - 专业暗色主题 + 导航 + section 颜色区分"""
-        return """<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Report - {{ date_str }}</title>
-    <style>
-        :root {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f8f9fa;
-            --bg-tertiary: #e9ecef;
-            --text-primary: #212529;
-            --text-secondary: #6c757d;
-            --border-color: #dee2e6;
-            --link-color: #0d6efd;
-            --card-shadow: 0 2px 4px rgba(0,0,0,0.08);
-            --nav-bg: #ffffff;
-            --nav-border: #e9ecef;
-
-            /* Section colors - Light theme */
-            --color-ai: #8b5cf6;
-            --color-tech: #3b82f6;
-            --color-crypto: #f59e0b;
-            --color-finance: #10b981;
-            --color-papers: #ec4899;
-            --color-github: #6366f1;
-            --color-community: #14b8a6;
-            --color-default: #64748b;
-        }
-
-        [data-theme="dark"] {
-            --bg-primary: #0d1117;
-            --bg-secondary: #161b22;
-            --bg-tertiary: #21262d;
-            --text-primary: #e6edf3;
-            --text-secondary: #8b949e;
-            --border-color: #30363d;
-            --link-color: #58a6ff;
-            --card-shadow: 0 4px 12px rgba(0,0,0,0.6);
-            --nav-bg: #161b22;
-            --nav-border: #30363d;
-
-            /* Section colors - Dark theme (more vibrant) */
-            --color-ai: #a78bfa;
-            --color-tech: #60a5fa;
-            --color-crypto: #fbbf24;
-            --color-finance: #34d399;
-            --color-papers: #f472b6;
-            --color-github: #818cf8;
-            --color-community: #2dd4bf;
-            --color-default: #94a3b8;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
-            line-height: 1.6;
-            background-color: var(--bg-secondary);
-            color: var(--text-primary);
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        .layout {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* Sidebar Navigation */
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 260px;
-            height: 100vh;
-            background-color: var(--nav-bg);
-            border-right: 1px solid var(--nav-border);
-            overflow-y: auto;
-            padding: 20px;
-            z-index: 100;
-            transition: transform 0.3s;
-        }
-
-        .sidebar-header {
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .sidebar-title {
-            font-size: 1.5em;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .sidebar-subtitle {
-            font-size: 0.85em;
-            color: var(--text-secondary);
-        }
-
-        .nav-list {
-            list-style: none;
-        }
-
-        .nav-item {
-            margin-bottom: 8px;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            padding: 10px 12px;
-            border-radius: 6px;
-            text-decoration: none;
-            color: var(--text-primary);
-            transition: all 0.2s;
-            font-size: 0.95em;
-        }
-
-        .nav-link:hover {
-            background-color: var(--bg-tertiary);
-        }
-
-        .nav-link.active {
-            background-color: var(--bg-tertiary);
-            font-weight: 600;
-        }
-
-        .nav-icon {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-right: 10px;
-            flex-shrink: 0;
-        }
-
-        .nav-count {
-            margin-left: auto;
-            font-size: 0.85em;
-            color: var(--text-secondary);
-            background-color: var(--bg-tertiary);
-            padding: 2px 8px;
-            border-radius: 10px;
-        }
-
-        /* Main Content */
-        .main-content {
-            margin-left: 260px;
-            flex: 1;
-            padding: 40px;
-            max-width: calc(100% - 260px);
-        }
-
-        header {
-            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-tertiary) 100%);
-            padding: 40px;
-            border-radius: 12px;
-            margin-bottom: 40px;
-            box-shadow: var(--card-shadow);
-        }
-
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-
-        .header-meta {
-            color: var(--text-secondary);
-            font-size: 0.95em;
-        }
-
-        .theme-toggle {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background-color: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            padding: 10px 18px;
-            border-radius: 20px;
-            cursor: pointer;
-            box-shadow: var(--card-shadow);
-            z-index: 1000;
-            font-size: 0.9em;
-            color: var(--text-primary);
-            transition: all 0.2s;
-        }
-
-        .theme-toggle:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-
-        .section {
-            margin-bottom: 50px;
-            scroll-margin-top: 20px;
-        }
-
-        .section-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 3px solid var(--border-color);
-        }
-
-        .section-indicator {
-            width: 6px;
-            height: 40px;
-            border-radius: 3px;
-            margin-right: 15px;
-        }
-
-        .section-title {
-            font-size: 2em;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .section-count {
-            margin-left: 15px;
-            font-size: 0.8em;
-            color: var(--text-secondary);
-            background-color: var(--bg-tertiary);
-            padding: 4px 12px;
-            border-radius: 12px;
-        }
-
-        /* Dynamic section colors */
-        .section-ai .section-indicator { background: var(--color-ai); }
-        .section-ai .section-header { border-bottom-color: var(--color-ai); }
-
-        .section-tech .section-indicator { background: var(--color-tech); }
-        .section-tech .section-header { border-bottom-color: var(--color-tech); }
-
-        .section-crypto .section-indicator { background: var(--color-crypto); }
-        .section-crypto .section-header { border-bottom-color: var(--color-crypto); }
-
-        .section-finance .section-indicator { background: var(--color-finance); }
-        .section-finance .section-header { border-bottom-color: var(--color-finance); }
-
-        .section-papers .section-indicator { background: var(--color-papers); }
-        .section-papers .section-header { border-bottom-color: var(--color-papers); }
-
-        .section-github .section-indicator { background: var(--color-github); }
-        .section-github .section-header { border-bottom-color: var(--color-github); }
-
-        .section-community .section-indicator { background: var(--color-community); }
-        .section-community .section-header { border-bottom-color: var(--color-community); }
-
-        .card {
-            background-color: var(--bg-primary);
-            border-radius: 10px;
-            padding: 24px;
-            margin-bottom: 20px;
-            box-shadow: var(--card-shadow);
-            transition: all 0.2s;
-            border-left: 4px solid transparent;
-        }
-
-        .card:hover {
-            transform: translateX(4px);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
-        }
-
-        .section-ai .card { border-left-color: var(--color-ai); }
-        .section-tech .card { border-left-color: var(--color-tech); }
-        .section-crypto .card { border-left-color: var(--color-crypto); }
-        .section-finance .card { border-left-color: var(--color-finance); }
-        .section-papers .card { border-left-color: var(--color-papers); }
-        .section-github .card { border-left-color: var(--color-github); }
-        .section-community .card { border-left-color: var(--color-community); }
-
-        .card-title {
-            font-size: 1.25em;
-            font-weight: 600;
-            margin-bottom: 12px;
-            line-height: 1.4;
-        }
-
-        .card-title a {
-            color: var(--text-primary);
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
-        .card-title a:hover {
-            color: var(--link-color);
-        }
-
-        .card-meta {
-            color: var(--text-secondary);
-            font-size: 0.9em;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .card-text {
-            color: var(--text-primary);
-            line-height: 1.7;
-            font-size: 0.95em;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.85em;
-            background-color: var(--bg-tertiary);
-            font-weight: 500;
-        }
-
-        .external-link {
-            color: var(--link-color);
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .external-link:hover {
-            text-decoration: underline;
-        }
-
-        footer {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-secondary);
-            margin-top: 60px;
-            border-top: 1px solid var(--border-color);
-        }
-
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
-            .main-content {
-                margin-left: 0;
-                max-width: 100%;
-                padding: 20px;
-            }
-
-            .theme-toggle {
-                top: 10px;
-                right: 10px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="layout">
-        <!-- Sidebar Navigation -->
-        <nav class="sidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-title">📰 Newsloom</div>
-                <div class="sidebar-subtitle">{{ date_str }}</div>
-            </div>
-            <ul class="nav-list">
-                {% for section, items in sections.items() %}
-                <li class="nav-item">
-                    <a href="#section-{{ section }}" class="nav-link">
-                        <span class="nav-icon" style="background-color: var(--color-{{ section }}, var(--color-default));"></span>
-                        <span>{{ section|replace('_', ' ')|title }}</span>
-                        <span class="nav-count">{{ items|length }}</span>
-                    </a>
-                </li>
-                {% endfor %}
-            </ul>
-        </nav>
-
-        <!-- Main Content -->
-        <div class="main-content">
-            <button class="theme-toggle" onclick="toggleTheme()">🌓 切换主题</button>
-
-            <header>
-                <h1>📊 Daily Report</h1>
-                <p class="header-meta">{{ date_str }} | {{ total_items }} items | Powered by Newsloom AI</p>
-            </header>
-
-            {% for section, items in sections.items() %}
-            <section id="section-{{ section }}" class="section section-{{ section }}">
-                <div class="section-header">
-                    <div class="section-indicator"></div>
-                    <h2 class="section-title">{{ section|replace('_', ' ')|title }}</h2>
-                    <span class="section-count">{{ items|length }} items</span>
-                </div>
-
-                {% for item in items %}
-                <div class="card">
-                    <div class="card-title">
-                        <a href="{{ item.url }}" target="_blank" class="external-link">{{ item.title }}</a>
-                    </div>
-                    {% if item.source %}
-                    <div class="card-meta">
-                        <span class="badge">{{ item.source }}</span>
-                    </div>
-                    {% endif %}
-                    <div class="card-text">
-                        {{ item.text }}
-                    </div>
-                </div>
-                {% endfor %}
-            </section>
-            {% endfor %}
-
-            <footer>
-                <p>Generated by Newsloom 📰 | Built with Claude AI</p>
-            </footer>
-        </div>
-    </div>
-
-    <script>
-        function toggleTheme() {
-            const html = document.documentElement;
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-        }
-
-        // Load saved theme (default to dark)
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-
-        // Smooth scroll for navigation
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const targetId = link.getAttribute('href');
-                const target = document.querySelector(targetId);
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
-        });
-
-        // Highlight active section on scroll
-        const observerOptions = {
-            root: null,
-            rootMargin: '-20% 0px -70% 0px',
-            threshold: 0
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const id = entry.target.id;
-                    document.querySelectorAll('.nav-link').forEach(link => {
-                        link.classList.remove('active');
-                        if (link.getAttribute('href') === `#${id}`) {
-                            link.classList.add('active');
-                        }
-                    });
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.section').forEach(section => {
-            observer.observe(section);
-        });
-    </script>
-</body>
-</html>"""
+        print(f"🌐 HTML 已生成 (fallback): {output_path}")
