@@ -370,12 +370,12 @@ python3 run.py --config config/testing.yaml
 
 ## 📈 路线图
 
-- [x] **Phase 1**: 核心框架 + RSS 数据源
-- [x] **Phase 1.5**: 可插拔过滤系统
-- [ ] **Phase 2**: 更多数据源 (Twitter, arXiv, GitHub, HN)
-- [ ] **Phase 3**: Claude AI 分析
-- [ ] **Phase 4**: PNG 卡片渲染、RSS Feed
-- [ ] **Phase 5**: GitHub Actions 自动化
+- [x] **Phase 1**: 核心框架 + RSS 数据源 ✅
+- [x] **Phase 1.5**: 可插拔过滤系统 ✅
+- [x] **Phase 2**: 更多数据源 (arXiv, GitHub, HN) ✅
+- [x] **Phase 3**: Claude AI 双pass分析 ✅
+- [x] **Phase 5**: GitHub Actions 自动化 ✅
+- [ ] **Phase 4**: PNG 卡片渲染、RSS Feed (可选)
 
 ---
 
