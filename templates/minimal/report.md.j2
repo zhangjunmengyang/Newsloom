@@ -14,6 +14,10 @@
 {% for item in items %}
 **{{ loop.index }}. [{{ item.headline }}]({{ item.url }})**
 
+{% if section_key == 'papers' and item.authors is defined and item.authors %}
+✍️ {{ item.authors }}{% if item.arxiv_id is defined and item.arxiv_id %} | `{{ item.arxiv_id }}`{% endif %}
+
+{% endif %}
 {{ item.detail }}
 
 {% if item.source %}*Source: {{ item.source }}*{% endif %}

@@ -115,7 +115,15 @@
                 <a href="{{ item.url }}" target="_blank">{{ item.title }}</a>
             </h3>
             {% if item.source %}
-            <div class="item-meta">{{ item.source }}</div>
+            <div class="item-meta">
+                {{ item.source }}
+                {% if section_key == 'papers' and item.arxiv_id is defined and item.arxiv_id %}
+                 | <code>arXiv:{{ item.arxiv_id }}</code>
+                {% endif %}
+            </div>
+            {% endif %}
+            {% if section_key == 'papers' and item.authors is defined and item.authors %}
+            <div class="item-meta" style="color:#666;">✍️ {{ item.authors }}</div>
             {% endif %}
             <div class="item-text">{{ item.text }}</div>
         </article>

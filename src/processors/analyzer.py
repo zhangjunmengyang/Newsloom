@@ -170,7 +170,10 @@ class AIAnalyzer:
         Pass 2: 结构化提取（v0.2.0 增强版）
 
         使用 Claude 生成 headline + detail + importance + category_tags + insight
+        papers section 使用专用 prompt，额外提取 authors/arxiv_id/research_tags/practicality_score
         """
+        is_papers = section == 'papers'
+
         # 如果内容太多，分批处理
         batches = self.claude.batch_items_by_tokens(items, max_tokens=80000)
 
@@ -180,8 +183,11 @@ class AIAnalyzer:
             if len(batches) > 1:
                 print(f"     📦 批次 {batch_idx + 1}/{len(batches)}: {len(batch)} 条")
 
-            # 生成 prompt
-            prompt = PromptTemplates.extract_prompt(batch, section, self.language)
+            # 生成 prompt — papers section 使用专用 prompt
+            if is_papers:
+                prompt = PromptTemplates.extract_prompt_papers(batch, section, self.language)
+            else:
+                prompt = PromptTemplates.extract_prompt(batch, section, self.language)
 
             # 调用 Claude（JSON 输出）
             try:
@@ -192,28 +198,33 @@ class AIAnalyzer:
                 )
 
                 # 验证格式
+                brief_list = []
                 if isinstance(briefs, list):
-                    # 确保每个 brief 有新增字段的默认值
-                    for brief in briefs:
-                        brief.setdefault('importance', 3)
-                        brief.setdefault('category_tags', [])
-                        brief.setdefault('insight', '')
-                    all_briefs.extend(briefs)
+                    brief_list = briefs
                 elif isinstance(briefs, dict) and 'items' in briefs:
-                    # 兼容包装格式
-                    for brief in briefs['items']:
-                        brief.setdefault('importance', 3)
-                        brief.setdefault('category_tags', [])
-                        brief.setdefault('insight', '')
-                    all_briefs.extend(briefs['items'])
+                    brief_list = briefs['items']
+
+                for brief in brief_list:
+                    # 通用字段默认值
+                    brief.setdefault('importance', 3)
+                    brief.setdefault('category_tags', [])
+                    brief.setdefault('insight', '')
+                    # papers 专用字段默认值
+                    if is_papers:
+                        brief.setdefault('authors', '')
+                        brief.setdefault('arxiv_id', '')
+                        brief.setdefault('research_tags', [])
+                        brief.setdefault('practicality_score', 3)
+
+                all_briefs.extend(brief_list)
 
             except Exception as e:
                 print(f"     ⚠️  Pass 2 失败: {e}")
-                # 失败时使用简单格式
+                # 失败时使用简单格式，papers 额外从 metadata 回填字段
                 for item in batch:
                     meta = getattr(item, 'metadata', {}) or {}
                     display_source = meta.get('feed_name') or meta.get('feed_title') or item.source
-                    all_briefs.append({
+                    fallback = {
                         'headline': item.title,
                         'detail': item.text[:200],
                         'url': item.url,
@@ -221,7 +232,18 @@ class AIAnalyzer:
                         'importance': 3,
                         'category_tags': [],
                         'insight': ''
-                    })
+                    }
+                    if is_papers:
+                        # 从 Item metadata 回填论文专用字段
+                        authors = meta.get('authors', [])
+                        author_str = ', '.join(authors[:3])
+                        if len(authors) > 3:
+                            author_str += ' et al.'
+                        fallback['authors'] = author_str
+                        fallback['arxiv_id'] = meta.get('arxiv_id', '')
+                        fallback['research_tags'] = meta.get('categories', [])[:4]
+                        fallback['practicality_score'] = 3
+                    all_briefs.append(fallback)
 
         return all_briefs
 

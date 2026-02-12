@@ -56,7 +56,20 @@
 {% set imp = item.importance|default(3) %}
 ### {{ loop.index }}. [{{ item.headline }}]({{ item.url }})
 
+{% if section_key == 'papers' %}
+**来源:** {{ item.source }}{% if item.arxiv_id is defined and item.arxiv_id %} | **arXiv:** `{{ item.arxiv_id }}`{% endif %} | {{ '⭐' * imp }}
+{% if item.authors is defined and item.authors %}
+**作者:** {{ item.authors }}
+{% endif %}
+{% if item.research_tags is defined and item.research_tags %}
+**研究方向:** {% for tag in item.research_tags %}`{{ tag }}` {% endfor %}
+
+{% endif %}
+{% set prac = item.practicality_score|default(3) %}
+**实用性:** {{ '🔧' * prac }} ({{ prac }}/5)
+{% else %}
 **来源:** {{ item.source }} | {{ '⭐' * imp }}
+{% endif %}
 {% if item.category_tags is defined and item.category_tags %}
 **标签:** {% for tag in item.category_tags %}`{{ tag }}` {% endfor %}
 

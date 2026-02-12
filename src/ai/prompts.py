@@ -219,6 +219,152 @@ Return ONLY JSON, nothing else.
 
 JSON:"""
 
+    # ============================================================
+    # Papers section 专用 extract prompt
+    # ============================================================
+
+    @staticmethod
+    def extract_prompt_papers(items: list, section: str, language: str = "zh-CN") -> str:
+        """
+        Pass 2 (papers): 论文专用结构化提取 prompt
+
+        额外提取：authors, arxiv_id, research_tags, practicality_score
+        """
+        if language == "zh-CN":
+            return PromptTemplates._extract_prompt_papers_zh(items, section)
+        else:
+            return PromptTemplates._extract_prompt_papers_en(items, section)
+
+    @staticmethod
+    def _extract_prompt_papers_zh(items: list, section: str) -> str:
+        """中文论文专用提取 prompt"""
+        items_text = "\n\n".join([
+            (
+                f"【{i+1}】\n"
+                f"标题: {item.title}\n"
+                f"作者: {item.author}\n"
+                f"arXiv ID: {(getattr(item, 'metadata', None) or {}).get('arxiv_id', 'N/A')}\n"
+                f"分类: {', '.join((getattr(item, 'metadata', None) or {}).get('categories', []))}\n"
+                f"链接: {item.url}\n"
+                f"摘要: {item.text[:800]}"
+            )
+            for i, item in enumerate(items)
+        ])
+
+        return f"""你是一个专业的 AI 论文编辑，服务于一位 AI 算法工程师 + Crypto 量化研究者。
+
+{OWNER_PROFILE}
+
+请将以下学术论文提炼成结构化的日报条目。
+
+# 论文列表
+{items_text}
+
+# 输出要求
+请为每篇论文生成：
+1. **headline**（一句话标题，20字内，用中文概括论文核心贡献）
+2. **detail**（3-4句话，概括：研究问题→方法→关键结果→意义。要有 "so what" 视角——这对工程实践/产业应用意味着什么）
+3. **authors**（论文作者，取前3位，超过3位加 "et al."，格式如 "Zhang Y, Li X, Wang Z et al."）
+4. **arxiv_id**（arXiv 论文编号，如 "2501.12345"）
+5. **research_tags**（2-4 个研究方向/关键技术标签，如 "Transformer", "RLHF", "多模态", "代码生成", "RAG", "推理加速"）
+6. **practicality_score**（实用性评分 1-5：1=纯理论/数学证明，2=有潜在应用但距离工程化较远，3=有明确应用场景，4=可直接用于工程实践，5=已开源/可立即复现并落地）
+7. **importance**（1-5 重要性评级：1=一般了解，2=值得关注，3=重要，4=非常重要，5=必读/突破性）
+8. **category_tags**（1-3 个大类标签，如 "LLM", "CV", "RL", "NLP", "MLSys"）
+9. **insight**（一句话洞察，用"→"开头，说明这篇论文对读者的工程实践有什么价值或启发）
+
+**评分指南**：
+- practicality_score 侧重"能不能用"：开源代码+复现指南=加分，纯理论证明=减分
+- importance 侧重"该不该看"：顶会论文/大厂出品/领域突破=加分，增量改进=减分
+- 两个评分独立：一篇纯理论突破可以 importance=5 但 practicality=1
+
+# 输出格式（JSON）
+```json
+[
+  {{
+    "headline": "简洁有力的中文标题",
+    "detail": "研究问题→方法→结果→对工程实践的意义...",
+    "url": "原文链接",
+    "source": "arXiv",
+    "authors": "Zhang Y, Li X, Wang Z et al.",
+    "arxiv_id": "2501.12345",
+    "research_tags": ["Transformer", "推理加速"],
+    "practicality_score": 4,
+    "importance": 3,
+    "category_tags": ["LLM", "MLSys"],
+    "insight": "→ 一句话工程实践价值"
+  }}
+]
+```
+
+只返回 JSON，不要其他内容。
+
+JSON:"""
+
+    @staticmethod
+    def _extract_prompt_papers_en(items: list, section: str) -> str:
+        """英文论文专用提取 prompt"""
+        items_text = "\n\n".join([
+            (
+                f"【{i+1}】\n"
+                f"Title: {item.title}\n"
+                f"Authors: {item.author}\n"
+                f"arXiv ID: {(getattr(item, 'metadata', None) or {}).get('arxiv_id', 'N/A')}\n"
+                f"Categories: {', '.join((getattr(item, 'metadata', None) or {}).get('categories', []))}\n"
+                f"URL: {item.url}\n"
+                f"Abstract: {item.text[:800]}"
+            )
+            for i, item in enumerate(items)
+        ])
+
+        return f"""You are a professional AI research editor serving an AI engineer + Crypto quant researcher.
+
+{OWNER_PROFILE}
+
+Please distill the following academic papers into structured daily brief entries.
+
+# Papers
+{items_text}
+
+# Requirements
+For each paper, generate:
+1. **headline** (one-sentence title, under 20 words, highlighting core contribution)
+2. **detail** (3-4 sentences: research question → method → key results → significance. Include "so what" angle — what this means for engineering practice)
+3. **authors** (paper authors, first 3 + "et al." if more, e.g. "Zhang Y, Li X, Wang Z et al.")
+4. **arxiv_id** (arXiv paper ID, e.g. "2501.12345")
+5. **research_tags** (2-4 specific research direction / key technique tags, e.g. "Transformer", "RLHF", "Multimodal", "Code Generation", "RAG", "Inference Optimization")
+6. **practicality_score** (1-5: 1=pure theory, 2=potential application but far from engineering, 3=clear application scenario, 4=directly applicable to engineering, 5=open-sourced/immediately reproducible)
+7. **importance** (1-5: 1=nice to know, 2=worth noting, 3=important, 4=very important, 5=must-read/breakthrough)
+8. **category_tags** (1-3 broad tags like "LLM", "CV", "RL", "NLP", "MLSys")
+9. **insight** (one-sentence insight starting with "→", explaining engineering value)
+
+**Scoring guide**:
+- practicality_score focuses on "can it be used": open-source code + repro guide = bonus, pure proofs = penalty
+- importance focuses on "should you read it": top venue / big lab / field breakthrough = bonus, incremental = penalty
+- The two scores are independent
+
+# Output Format (JSON)
+```json
+[
+  {{
+    "headline": "Concise, impactful title",
+    "detail": "Research question → method → results → engineering significance...",
+    "url": "original URL",
+    "source": "arXiv",
+    "authors": "Zhang Y, Li X, Wang Z et al.",
+    "arxiv_id": "2501.12345",
+    "research_tags": ["Transformer", "Inference Optimization"],
+    "practicality_score": 4,
+    "importance": 3,
+    "category_tags": ["LLM", "MLSys"],
+    "insight": "→ One-sentence engineering value"
+  }}
+]
+```
+
+Return ONLY JSON, nothing else.
+
+JSON:"""
+
     @staticmethod
     def executive_summary_prompt(briefs: dict, section_configs: dict, language: str = "zh-CN") -> str:
         """

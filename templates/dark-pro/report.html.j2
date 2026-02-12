@@ -457,6 +457,89 @@
             margin-top: 10px;
         }
 
+        /* Papers section 专用样式 */
+        .paper-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 16px;
+            margin-bottom: 10px;
+            font-size: 0.88em;
+            color: var(--text-secondary);
+        }
+
+        .paper-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .paper-meta-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .paper-arxiv-id {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 0.85em;
+            background: var(--bg-tertiary);
+            padding: 1px 8px;
+            border-radius: 4px;
+            color: var(--link-color);
+            text-decoration: none;
+        }
+
+        .paper-arxiv-id:hover {
+            text-decoration: underline;
+        }
+
+        .paper-authors {
+            color: var(--text-primary);
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+
+        .research-tag-list {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+
+        .research-tag {
+            display: inline-block;
+            padding: 2px 9px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 500;
+            background: rgba(139, 92, 246, 0.12);
+            color: var(--insight-color);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        .practicality-bar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.82em;
+            color: var(--text-secondary);
+        }
+
+        .practicality-dots {
+            display: flex;
+            gap: 3px;
+        }
+
+        .practicality-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+        }
+
+        .practicality-dot.filled {
+            background: #10b981;
+        }
+
         .badge {
             display: inline-block;
             padding: 4px 10px;
@@ -655,8 +738,39 @@
                         {% if item.source %}
                         <span class="badge">{{ item.source }}</span>
                         {% endif %}
+                        {% if section_key == 'papers' and item.arxiv_id is defined and item.arxiv_id %}
+                        <a class="paper-arxiv-id" href="https://arxiv.org/abs/{{ item.arxiv_id }}" target="_blank">arXiv:{{ item.arxiv_id }}</a>
+                        {% endif %}
                         <span>{{ '⭐' * imp }}</span>
                     </div>
+
+                    <!-- Papers 专用：作者、研究标签、实用性评分 -->
+                    {% if section_key == 'papers' %}
+                    {% if item.authors is defined and item.authors %}
+                    <div class="paper-authors">✍️ {{ item.authors }}</div>
+                    {% endif %}
+
+                    {% if item.research_tags is defined and item.research_tags %}
+                    <div class="research-tag-list">
+                        {% for tag in item.research_tags %}
+                        <span class="research-tag">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    {% if item.practicality_score is defined %}
+                    {% set prac = item.practicality_score|default(3) %}
+                    <div class="practicality-bar">
+                        <span>🔧 实用性:</span>
+                        <div class="practicality-dots">
+                            {% for i in range(5) %}
+                            <span class="practicality-dot {% if i < prac %}filled{% endif %}"></span>
+                            {% endfor %}
+                        </div>
+                        <span>{{ prac }}/5</span>
+                    </div>
+                    {% endif %}
+                    {% endif %}
 
                     <!-- 标签系统 -->
                     {% if item.category_tags %}

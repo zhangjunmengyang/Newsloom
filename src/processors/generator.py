@@ -194,8 +194,9 @@ class ReportGenerator:
                 # 直接传递 briefs（已包含 importance/tags/insight）
                 formatted_briefs = {}
                 for section, section_briefs in non_empty_briefs.items():
-                    formatted_briefs[section] = [
-                        {
+                    formatted_briefs[section] = []
+                    for brief in section_briefs:
+                        entry = {
                             'title': brief.get('headline', 'No title'),
                             'url': brief.get('url', '#'),
                             'source': brief.get('source', 'unknown'),
@@ -204,8 +205,13 @@ class ReportGenerator:
                             'category_tags': brief.get('category_tags', []),
                             'insight': brief.get('insight', ''),
                         }
-                        for brief in section_briefs
-                    ]
+                        # papers section 额外字段
+                        if section == 'papers':
+                            entry['authors'] = brief.get('authors', '')
+                            entry['arxiv_id'] = brief.get('arxiv_id', '')
+                            entry['research_tags'] = brief.get('research_tags', [])
+                            entry['practicality_score'] = brief.get('practicality_score', 3)
+                        formatted_briefs[section].append(entry)
 
                 html = template.render(
                     date_str=date_str,
@@ -331,7 +337,28 @@ class ReportGenerator:
 
                 lines.append(f"### {i}. [{headline}]({url})")
                 lines.append("")
-                lines.append(f"**来源:** {source} | {stars}")
+
+                # papers section 显示额外学术信息
+                if section == 'papers':
+                    authors = brief.get('authors', '')
+                    arxiv_id = brief.get('arxiv_id', '')
+                    research_tags = brief.get('research_tags', [])
+                    practicality = brief.get('practicality_score', 3)
+
+                    meta_parts = [f"**来源:** {source}"]
+                    if arxiv_id:
+                        meta_parts.append(f"**arXiv:** `{arxiv_id}`")
+                    meta_parts.append(stars)
+                    lines.append(" | ".join(meta_parts))
+
+                    if authors:
+                        lines.append(f"**作者:** {authors}")
+                    if research_tags:
+                        lines.append(f"**研究方向:** {' '.join(f'`{t}`' for t in research_tags)}")
+                    lines.append(f"**实用性:** {'🔧' * min(practicality, 5)} ({practicality}/5)")
+                else:
+                    lines.append(f"**来源:** {source} | {stars}")
+
                 if tags:
                     lines.append(f"**标签:** {' '.join(f'`{t}`' for t in tags)}")
                 lines.append("")
