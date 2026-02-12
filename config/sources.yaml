@@ -214,3 +214,61 @@ sources:
     username: "your_handle"
     max_tweets_per_user: 20
     trending_enabled: false
+
+  # ============================================================
+  # Web Search (Brave API)
+  # ============================================================
+  web_search_ai:
+    enabled: false  # 需要 BRAVE_SEARCH_API_KEY
+    channel: "ai"
+    type: "web_search"
+    queries:
+      - "AI news today"
+      - "LLM breakthrough 2026"
+      - "OpenAI latest"
+    max_results_per_query: 5
+    api_key: ${BRAVE_SEARCH_API_KEY}
+
+  # ============================================================
+  # Crypto Market Data (CoinGecko + Fear & Greed)
+  # ============================================================
+  crypto_market:
+    enabled: true
+    channel: "crypto"
+    type: "crypto_market"
+    top_n: 20
+    movers_threshold: 5
+
+  # ============================================================
+  # Reddit 热门帖子
+  # ============================================================
+  reddit_ai:
+    enabled: true
+    channel: "community"
+    type: "reddit"
+    subreddits:
+      - "MachineLearning"
+      - "LocalLLaMA"
+    sort: "hot"
+    limit: 10
+    min_score: 50
+
+  reddit_crypto:
+    enabled: true
+    channel: "crypto"
+    type: "reddit"
+    subreddits:
+      - "CryptoCurrency"
+      - "algotrading"
+    sort: "hot"
+    limit: 10
+    min_score: 30
+
+  # ============================================================
+  # Product Hunt 每日热门
+  # ============================================================
+  producthunt:
+    enabled: true
+    channel: "tech"
+    type: "producthunt"
+    count: 10

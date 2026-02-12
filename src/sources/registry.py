@@ -8,6 +8,10 @@ from .rss import RSSSource
 from .arxiv import ArxivSource
 from .github import GitHubSource
 from .hackernews import HackerNewsSource
+from .web_search import WebSearchSource
+from .crypto_market import CryptoMarketSource
+from .producthunt import ProductHuntSource
+from .reddit import RedditSource
 
 
 class SourceRegistry:
@@ -19,9 +23,12 @@ class SourceRegistry:
         'arxiv': ArxivSource,
         'github': GitHubSource,
         'hackernews': HackerNewsSource,
+        'web_search': WebSearchSource,
+        'crypto_market': CryptoMarketSource,
+        'producthunt': ProductHuntSource,
+        'reddit': RedditSource,
         # More sources can be added:
         # 'twitter': TwitterSource,
-        # 'reddit': RedditSource,
     }
 
     def __init__(self, sources_config_path: str):
