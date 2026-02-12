@@ -51,3 +51,4 @@ logs/
 
 # Playwright
 playwright/.cache/
+.github/workflows/
