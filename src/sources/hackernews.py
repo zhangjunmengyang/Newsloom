@@ -108,6 +108,7 @@ class HackerNewsSource(DataSource):
 
         # 创建 metadata
         metadata = {
+            'feed_name': 'Hacker News',
             'score': score,
             'comments': comments,
             'hn_id': story_id,

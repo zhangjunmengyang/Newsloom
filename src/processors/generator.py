@@ -113,7 +113,8 @@ class ReportGenerator:
                 title = getattr(item, 'title', 'No title')
                 url = getattr(item, 'url', '#')
                 author = getattr(item, 'author', 'Unknown')
-                source = getattr(item, 'source', 'unknown')
+                meta = getattr(item, 'metadata', {}) or {}
+                source = meta.get('feed_name') or meta.get('feed_title') or getattr(item, 'source', 'unknown')
                 score = getattr(item, 'score', 0)
 
                 lines.append(f"### {i}. [{title}]({url})")
@@ -188,7 +189,7 @@ class ReportGenerator:
             {% for item in items %}
             <div class="card">
                 <div class="card-title"><a href="{{ item.url }}" target="_blank">{{ item.title }}</a></div>
-                <div class="card-meta">{{ item.source }} | Score: {{ "%.1f"|format(item.score) }}</div>
+                <div class="card-meta">{{ item.metadata.feed_name or item.metadata.feed_title or item.source }} | Score: {{ "%.1f"|format(item.score) }}</div>
                 <div class="card-text">{{ item.text[:300] }}{% if item.text|length > 300 %}...{% endif %}</div>
             </div>
             {% endfor %}
@@ -208,10 +209,11 @@ class ReportGenerator:
                 {
                     'title': getattr(item, 'title', 'No title'),
                     'url': getattr(item, 'url', '#'),
-                    'source': getattr(item, 'source', 'unknown'),
+                    'source': (getattr(item, 'metadata', {}) or {}).get('feed_name') or (getattr(item, 'metadata', {}) or {}).get('feed_title') or getattr(item, 'source', 'unknown'),
                     'author': getattr(item, 'author', 'Unknown'),
                     'score': getattr(item, 'score', 0),
                     'text': getattr(item, 'text', ''),
+                    'metadata': getattr(item, 'metadata', {}),
                 }
                 for item in items_list
             ]

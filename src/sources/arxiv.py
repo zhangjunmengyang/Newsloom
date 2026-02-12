@@ -111,6 +111,7 @@ class ArxivSource(DataSource):
 
                 # 创建 metadata
                 metadata = {
+                    'feed_name': 'arXiv',
                     'authors': authors,
                     'categories': categories,
                     'pdf_url': pdf_url,

@@ -169,11 +169,13 @@ class AIAnalyzer:
                 print(f"     ⚠️  Pass 2 失败: {e}")
                 # 失败时使用简单格式
                 for item in batch:
+                    meta = getattr(item, 'metadata', {}) or {}
+                    display_source = meta.get('feed_name') or meta.get('feed_title') or item.source
                     all_briefs.append({
                         'headline': item.title,
                         'detail': item.text[:200],
                         'url': item.url,
-                        'source': item.source
+                        'source': display_source
                     })
 
         return all_briefs

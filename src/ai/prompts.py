@@ -27,7 +27,7 @@ class PromptTemplates:
     def _filter_prompt_zh(items: list, section: str) -> str:
         """中文过滤 prompt"""
         items_text = "\n\n".join([
-            f"ID: {i}\n标题: {item.title}\n来源: {item.source} | 作者: {item.author}\n内容: {item.text[:500]}"
+            f"ID: {i}\n标题: {item.title}\n来源: {PromptTemplates._get_display_source(item)} | 作者: {item.author}\n内容: {item.text[:500]}"
             for i, item in enumerate(items)
         ])
 
@@ -52,7 +52,7 @@ ID列表:"""
     def _filter_prompt_en(items: list, section: str) -> str:
         """英文过滤 prompt"""
         items_text = "\n\n".join([
-            f"ID: {i}\nTitle: {item.title}\nSource: {item.source} | Author: {item.author}\nContent: {item.text[:500]}"
+            f"ID: {i}\nTitle: {item.title}\nSource: {PromptTemplates._get_display_source(item)} | Author: {item.author}\nContent: {item.text[:500]}"
             for i, item in enumerate(items)
         ])
 
@@ -89,10 +89,16 @@ IDs:"""
             return PromptTemplates._extract_prompt_en(items, section)
 
     @staticmethod
+    def _get_display_source(item) -> str:
+        """获取人类可读的来源名（优先 metadata 中的 feed_title/feed_name）"""
+        meta = getattr(item, 'metadata', {}) or {}
+        return meta.get('feed_name') or meta.get('feed_title') or getattr(item, 'source', 'unknown')
+
+    @staticmethod
     def _extract_prompt_zh(items: list, section: str) -> str:
         """中文提取 prompt"""
         items_text = "\n\n".join([
-            f"【{i+1}】\n标题: {item.title}\n来源: {item.source} | 作者: {item.author}\n链接: {item.url}\n内容: {item.text[:800]}"
+            f"【{i+1}】\n标题: {item.title}\n来源: {PromptTemplates._get_display_source(item)} | 作者: {item.author}\n链接: {item.url}\n内容: {item.text[:800]}"
             for i, item in enumerate(items)
         ])
 
@@ -131,7 +137,7 @@ JSON:"""
     def _extract_prompt_en(items: list, section: str) -> str:
         """英文提取 prompt"""
         items_text = "\n\n".join([
-            f"【{i+1}】\nTitle: {item.title}\nSource: {item.source} | Author: {item.author}\nURL: {item.url}\nContent: {item.text[:800]}"
+            f"【{i+1}】\nTitle: {item.title}\nSource: {PromptTemplates._get_display_source(item)} | Author: {item.author}\nURL: {item.url}\nContent: {item.text[:800]}"
             for i, item in enumerate(items)
         ])
 

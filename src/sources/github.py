@@ -106,6 +106,7 @@ class GitHubSource(DataSource):
 
                 # 创建 metadata
                 metadata = {
+                    'feed_name': 'GitHub Trending',
                     'stars': stars,
                     'daily_stars': daily_stars,
                     'language': language,

@@ -75,7 +75,8 @@ class RSSSource(DataSource):
 
             # Create metadata
             metadata = {
-                'feed_title': feed.feed.get('title', feed_name),
+                'feed_name': feed_name,  # 配置中的友好名（如 "MIT Tech Review"）
+                'feed_title': feed.feed.get('title', feed_name),  # RSS 自报标题
                 'feed_url': feed_url,
             }
 
