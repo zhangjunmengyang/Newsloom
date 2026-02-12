@@ -4,6 +4,7 @@ import json
 from typing import List, Dict
 from pathlib import Path
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from sources.base import Item
 from ai.claude import ClaudeClient
@@ -34,6 +35,9 @@ class AIAnalyzer:
         self.language = language
         self.config = config or {}
 
+    # Maximum parallel workers for API calls (avoid rate limits)
+    MAX_WORKERS = 3
+
     def analyze(self, items: List[Item], two_pass: bool = True,
                 section_configs: dict = None) -> Dict[str, List[Dict]]:
         """
@@ -51,36 +55,30 @@ class AIAnalyzer:
         print(f"\n🧠 AI 分析中...")
         print(f"   模型: {self.claude.model}")
         print(f"   双pass: {two_pass}")
+        print(f"   并行度: {self.MAX_WORKERS}")
 
         # 按 section 分组
         by_section = self._group_by_section(items)
 
+        # --- 并行处理各 section ---
         results = {}
 
-        for section, section_items in by_section.items():
-            print(f"\n  📁 分析 section '{section}': {len(section_items)} 条")
+        with ThreadPoolExecutor(max_workers=self.MAX_WORKERS) as executor:
+            futures = {}
+            for section, section_items in by_section.items():
+                future = executor.submit(
+                    self._analyze_section, section, section_items, two_pass
+                )
+                futures[future] = section
 
-            # 限流：按 score 降序取 top N（默认 30，可通过 config 配置）
-            max_per_section = self.config.get('max_items_per_section', 30)
-            if len(section_items) > max_per_section:
-                section_items = sorted(section_items, key=lambda x: x.score, reverse=True)[:max_per_section]
-                print(f"     📊 限流: 取 top {max_per_section} 条（按 score 排序）")
-
-            if two_pass:
-                # Pass 1: 过滤
-                filtered_items = self._pass1_filter(section_items, section)
-                print(f"     ✓ Pass 1 过滤: {len(filtered_items)}/{len(section_items)}")
-
-                # Pass 2: 提取
-                if filtered_items:
-                    briefs = self._pass2_extract(filtered_items, section)
-                    results[section] = briefs
-                    print(f"     ✓ Pass 2 提取: {len(briefs)} 条 briefs")
-            else:
-                # 单pass：直接提取
-                briefs = self._pass2_extract(section_items, section)
-                results[section] = briefs
-                print(f"     ✓ 提取: {len(briefs)} 条 briefs")
+            for future in as_completed(futures):
+                section = futures[future]
+                try:
+                    briefs = future.result()
+                    if briefs:
+                        results[section] = briefs
+                except Exception as e:
+                    print(f"\n  ❌ Section '{section}' 分析失败: {e}")
 
         # 按 importance 排序每个 section
         for section in results:
@@ -90,7 +88,7 @@ class AIAnalyzer:
                 reverse=True
             )
 
-        # 生成"个人关注"板块 — 从其他 section 高分内容中二次筛选
+        # 生成"个人关注"板块 — 依赖所有 section 结果，保持串行
         if section_configs and 'personal' in section_configs:
             try:
                 personal_briefs = self._build_personal_section(results)
@@ -100,7 +98,7 @@ class AIAnalyzer:
             except Exception as e:
                 print(f"\n  ⚠️  个人关注生成失败: {e}")
 
-        # 生成 Executive Summary
+        # 生成 Executive Summary — 依赖所有 section 结果，保持串行
         if section_configs and self.claude:
             try:
                 executive_summary = self._generate_executive_summary(results, section_configs)
@@ -113,6 +111,44 @@ class AIAnalyzer:
         total_briefs = sum(len(b) for k, b in results.items() if k != '__executive_summary__')
         print(f"\n✅ AI 分析完成: {total_briefs} 条 briefs")
         return results
+
+    def _analyze_section(self, section: str, section_items: List[Item],
+                         two_pass: bool) -> List[Dict]:
+        """
+        分析单个 section（线程安全，供 ThreadPoolExecutor 调用）
+
+        Args:
+            section: section 名称
+            section_items: 该 section 的 items
+            two_pass: 是否使用双pass处理
+
+        Returns:
+            List[Dict]: 该 section 的 briefs
+        """
+        print(f"\n  📁 分析 section '{section}': {len(section_items)} 条")
+
+        # 限流：按 score 降序取 top N（默认 30，可通过 config 配置）
+        max_per_section = self.config.get('max_items_per_section', 30)
+        if len(section_items) > max_per_section:
+            section_items = sorted(section_items, key=lambda x: x.score, reverse=True)[:max_per_section]
+            print(f"     📊 [{section}] 限流: 取 top {max_per_section} 条（按 score 排序）")
+
+        if two_pass:
+            # Pass 1: 过滤
+            filtered_items = self._pass1_filter(section_items, section)
+            print(f"     ✓ [{section}] Pass 1 过滤: {len(filtered_items)}/{len(section_items)}")
+
+            # Pass 2: 提取
+            if filtered_items:
+                briefs = self._pass2_extract(filtered_items, section)
+                print(f"     ✓ [{section}] Pass 2 提取: {len(briefs)} 条 briefs")
+                return briefs
+            return []
+        else:
+            # 单pass：直接提取
+            briefs = self._pass2_extract(section_items, section)
+            print(f"     ✓ [{section}] 提取: {len(briefs)} 条 briefs")
+            return briefs
 
     def _group_by_section(self, items: List[Item]) -> Dict[str, List[Item]]:
         """按 section/channel 分组"""
