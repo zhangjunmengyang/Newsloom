@@ -249,9 +249,11 @@ sources:
     subreddits:
       - "MachineLearning"
       - "LocalLLaMA"
+      - "artificial"
     sort: "hot"
     limit: 10
     min_score: 50
+    proxy: "http://127.0.0.1:7897"
 
   reddit_crypto:
     enabled: true
@@ -263,6 +265,7 @@ sources:
     sort: "hot"
     limit: 10
     min_score: 30
+    proxy: "http://127.0.0.1:7897"
 
   # ============================================================
   # Product Hunt 每日热门

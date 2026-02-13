@@ -1,6 +1,7 @@
 """Product Hunt 数据源 — 每日热门产品（via RSS）"""
 
 import feedparser
+import httpx
 import re
 from typing import List, Optional
 from datetime import datetime, timezone
@@ -34,7 +35,18 @@ class ProductHuntSource(DataSource):
         print(f"    🚀 Product Hunt: 获取最多 {count} 个产品")
 
         try:
-            feed = feedparser.parse(self.RSS_URL)
+            # Fetch with timeout via httpx (feedparser.parse(url) has no timeout)
+            try:
+                resp = httpx.get(self.RSS_URL, timeout=30, follow_redirects=True, headers={
+                    'User-Agent': 'Newsloom/0.2.0 (News Aggregator)',
+                })
+                resp.raise_for_status()
+                feed = feedparser.parse(resp.text)
+            except httpx.TimeoutException:
+                print(f"    ⚠️  Product Hunt RSS timeout")
+                return []
+            except Exception:
+                feed = feedparser.parse(self.RSS_URL)
 
             if feed.bozo and not feed.entries:
                 print(f"    ⚠️  Product Hunt RSS 解析失败: {feed.bozo_exception}")

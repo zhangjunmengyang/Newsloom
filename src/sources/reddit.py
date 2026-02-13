@@ -93,7 +93,13 @@ class RedditSource(DataSource):
             'User-Agent': 'Newsloom/0.2.0 (News Aggregator Bot)'
         }
 
-        response = httpx.get(url, params=params, headers=headers, timeout=30, follow_redirects=True)
+        # 代理支持
+        proxy = self.config.get('proxy')
+        client_kwargs = dict(timeout=30, follow_redirects=True)
+        if proxy:
+            client_kwargs['proxy'] = proxy
+
+        response = httpx.get(url, params=params, headers=headers, **client_kwargs)
         response.raise_for_status()
 
         data = response.json()

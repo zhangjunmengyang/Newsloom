@@ -11,6 +11,8 @@ import argparse
 import yaml
 import os
 import json
+import signal
+import sys
 from pathlib import Path
 from datetime import datetime, timezone
 
@@ -21,6 +23,15 @@ from processors.analyzer_v2 import AIAnalyzerV2
 from processors.generator_v2 import ReportGeneratorV2
 from utils.state import StateManager
 from utils.time_utils import get_date_str
+
+
+class PipelineTimeout(Exception):
+    """Pipeline global timeout exceeded"""
+    pass
+
+
+def _timeout_handler(signum, frame):
+    raise PipelineTimeout("Pipeline global timeout exceeded (600s)")
 
 
 class PipelineV2:
@@ -70,9 +81,18 @@ class PipelineV2:
         if date_str is None:
             date_str = get_date_str()
 
+        # Global timeout: 10 minutes (signal-based, Unix only)
+        global_timeout = 600
+        try:
+            signal.signal(signal.SIGALRM, _timeout_handler)
+            signal.alarm(global_timeout)
+        except (AttributeError, OSError):
+            pass  # SIGALRM not available on Windows
+
         print(f"\n🚀 Newsloom v2 — Intelligence Pipeline")
         print(f"📅 Date: {date_str}")
         print(f"🔧 Layers: {', '.join(layers)}")
+        print(f"⏱️  Global timeout: {global_timeout}s")
         print("=" * 60)
 
         state_file = self.base_dir / self.config["state"]["file"]
@@ -214,6 +234,12 @@ class PipelineV2:
                     if latest.exists() or latest.is_symlink():
                         latest.unlink()
                     latest.symlink_to(report)
+
+        # Cancel global timeout
+        try:
+            signal.alarm(0)
+        except (AttributeError, OSError):
+            pass
 
         print("\n" + "=" * 60)
         print("✅ Pipeline v2 completed!")

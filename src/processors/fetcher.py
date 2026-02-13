@@ -44,7 +44,7 @@ class ParallelFetcher:
             for future in as_completed(futures):
                 source = futures[future]
                 try:
-                    items = future.result(timeout=30)
+                    items = future.result(timeout=90)
 
                     # Deduplicate against state
                     new_items = [

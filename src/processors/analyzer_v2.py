@@ -11,6 +11,7 @@ import json
 from typing import List, Dict, Optional
 from pathlib import Path
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from sources.base import Item
 from ai.claude import ClaudeClient
@@ -27,10 +28,11 @@ class AIAnalyzerV2:
     3. 全局: Executive Summary 生成
     """
 
-    def __init__(self, claude_client: ClaudeClient, config: dict = None):
+    def __init__(self, claude_client: ClaudeClient, config: dict = None, max_workers: int = 4):
         self.claude = claude_client
         self.config = config or {}
         self.prompts = PromptsV2()
+        self.max_workers = max_workers
 
     def analyze(self, items: List[Item], top_per_section: int = 10) -> Dict:
         """
@@ -56,7 +58,8 @@ class AIAnalyzerV2:
         all_briefs = {}
         stats = {"sections": {}, "total_input": len(items), "total_output": 0}
 
-        for section in sorted(by_section.keys()):
+        def _process_section(section: str) -> Optional[tuple]:
+            """处理单个 section 的精排 + 洞察提取，返回 (section, briefs, stat_dict) 或 None"""
             section_items = by_section[section]
             print(f"\n  📁 处理 '{section}': {len(section_items)} 条候选")
 
@@ -108,14 +111,35 @@ class AIAnalyzerV2:
                         if "priority" not in brief and fr.get("priority"):
                             brief["priority"] = fr["priority"]
 
-                all_briefs[section] = briefs
-                stats["sections"][section] = {
+                section_stat = {
                     "input": len(by_section[section]),
                     "after_fine_rank": len(ranked_items),
                     "output": len(briefs),
                 }
-                stats["total_output"] += len(briefs)
                 print(f"     ✓ 洞察: {len(briefs)} 条 briefs")
+                return (section, briefs, section_stat)
+
+            return None
+
+        # 并行处理各 section（每 section 最多 180s）
+        section_timeout = 180
+        sections = sorted(by_section.keys())
+        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+            future_to_section = {
+                executor.submit(_process_section, section): section
+                for section in sections
+            }
+            for future in as_completed(future_to_section):
+                section = future_to_section[future]
+                try:
+                    result = future.result(timeout=section_timeout)
+                    if result is not None:
+                        sec_name, briefs, section_stat = result
+                        all_briefs[sec_name] = briefs
+                        stats["sections"][sec_name] = section_stat
+                        stats["total_output"] += len(briefs)
+                except Exception as e:
+                    print(f"     ⚠️ Section '{section}' 处理异常: {e}")
 
         # Step 3: Executive Summary
         executive_summary = ""

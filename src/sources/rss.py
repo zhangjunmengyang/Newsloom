@@ -1,6 +1,7 @@
 """RSS Feed data source"""
 
 import feedparser
+import httpx
 from typing import List, Optional
 from datetime import datetime, timezone, timedelta
 from .base import DataSource, Item
@@ -44,7 +45,20 @@ class RSSSource(DataSource):
         cutoff_time: Optional[datetime]
     ) -> List[Item]:
         """Fetch single RSS feed"""
-        feed = feedparser.parse(feed_url)
+        # Fetch with timeout via httpx instead of letting feedparser do HTTP
+        # (feedparser.parse(url) has no timeout and can hang indefinitely)
+        try:
+            resp = httpx.get(feed_url, timeout=30, follow_redirects=True, headers={
+                'User-Agent': 'Newsloom/0.2.0 (News Aggregator)',
+            })
+            resp.raise_for_status()
+            feed = feedparser.parse(resp.text)
+        except httpx.TimeoutException:
+            print(f"    ⚠️  Timeout fetching {feed_name}")
+            return []
+        except Exception:
+            # Fallback: let feedparser try directly (e.g. for file:// URLs)
+            feed = feedparser.parse(feed_url)
         items = []
 
         for entry in feed.entries[:max_items]:

@@ -103,6 +103,8 @@ class ClaudeClient:
         prompt: str,
         system: str = "",
         max_tokens: int = 8192,
+        timeout: int = 120,
+        max_retries: int = 2,
         **kwargs
     ) -> Dict[Any, Any]:
         """
@@ -113,7 +115,7 @@ class ClaudeClient:
         Returns:
             解析后的 JSON 对象
         """
-        response = self.call(prompt, system, max_tokens, **kwargs)
+        response = self.call(prompt, system, max_tokens, timeout=timeout, max_retries=max_retries, **kwargs)
 
         # 策略 1: 直接解析
         try:
