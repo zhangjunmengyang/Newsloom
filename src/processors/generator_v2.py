@@ -15,6 +15,19 @@ from datetime import datetime
 from typing import Dict, List, Optional
 from jinja2 import Environment, FileSystemLoader
 
+try:
+    # macOS: weasyprint 需要 pango/gobject，确保 homebrew 库路径可用
+    import os
+    import platform
+    if platform.system() == "Darwin":
+        _lib_path = os.environ.get("DYLD_FALLBACK_LIBRARY_PATH", "")
+        if "/opt/homebrew/lib" not in _lib_path:
+            os.environ["DYLD_FALLBACK_LIBRARY_PATH"] = f"/opt/homebrew/lib:{_lib_path}"
+    from weasyprint import HTML as WeasyHTML
+    HAS_WEASYPRINT = True
+except (ImportError, OSError):
+    HAS_WEASYPRINT = False
+
 
 PRIORITY_ORDER = {"🔴": 0, "🟡": 1, "🟢": 2}
 
@@ -88,6 +101,13 @@ class ReportGeneratorV2:
         if "html" in self.formats:
             html_path = output_dir / "report.html"
             self._generate_html(briefs, exec_summary, stats, date_str, html_path)
+
+        # PDF 版（从 HTML 转换，适配 A4 打印）
+        if "pdf" in self.formats or True:  # 默认总是生成 PDF
+            pdf_path = output_dir / "report.pdf"
+            html_path = output_dir / "report.html"
+            if html_path.exists():
+                self._generate_pdf(html_path, pdf_path, date_str)
 
         # Discord 精简版
         discord_path = output_dir / "discord.md"
@@ -299,6 +319,108 @@ footer{{text-align:center;padding:40px 0;color:var(--muted);border-top:1px solid
         with open(output_path, "w", encoding="utf-8") as f:
             f.write(html)
         print(f"🌐 HTML (fallback): {output_path}")
+
+    def _generate_pdf(self, html_path: Path, pdf_path: Path, date_str: str):
+        """从 HTML 生成图文并茂的 A4 PDF"""
+        if not HAS_WEASYPRINT:
+            print("⚠️ weasyprint 未安装，跳过 PDF 生成。安装: pip install weasyprint")
+            return
+
+        try:
+            # 读取 HTML 并注入打印优化 CSS
+            with open(html_path, "r", encoding="utf-8") as f:
+                html_content = f.read()
+
+            print_css = """
+<style>
+@page {
+    size: A4;
+    margin: 2cm 1.5cm;
+    @bottom-center {
+        content: "Newsloom """ + date_str + """ — Page " counter(page) " / " counter(pages);
+        font-size: 9px;
+        color: #8b949e;
+    }
+}
+
+/* 覆盖暗色背景为打印友好色 */
+body {
+    background: #0d1117 !important;
+    color: #e6edf3 !important;
+    font-size: 11pt !important;
+    line-height: 1.6 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+}
+
+/* 每个 section 前分页 */
+.section {
+    page-break-before: auto;
+    page-break-inside: avoid;
+}
+
+.section:nth-child(n+2) {
+    page-break-before: always;
+}
+
+/* 卡片不跨页 */
+.card {
+    page-break-inside: avoid;
+    margin-bottom: 12px !important;
+}
+
+/* Executive summary 不跨页 */
+.executive-summary {
+    page-break-inside: avoid;
+    page-break-after: always;
+}
+
+/* 标题页样式 */
+header {
+    page-break-after: avoid;
+    padding: 60px 0 30px !important;
+    text-align: center !important;
+}
+
+header h1 {
+    font-size: 2.2em !important;
+    margin-bottom: 16px !important;
+}
+
+/* 链接显示 URL */
+a[href] {
+    color: #58a6ff !important;
+    text-decoration: none !important;
+}
+
+/* 隐藏页脚 */
+footer {
+    page-break-before: always;
+    text-align: center;
+    padding-top: 40px;
+}
+
+/* 确保暗色背景在 PDF 中渲染 */
+.container {
+    max-width: 100% !important;
+    padding: 0 !important;
+}
+</style>
+"""
+            # 在 </head> 前注入打印 CSS
+            if "</head>" in html_content:
+                html_content = html_content.replace("</head>", print_css + "</head>")
+            else:
+                html_content = print_css + html_content
+
+            pdf_path.parent.mkdir(parents=True, exist_ok=True)
+            WeasyHTML(string=html_content, base_url=str(html_path.parent)).write_pdf(str(pdf_path))
+            
+            file_size = pdf_path.stat().st_size / 1024
+            print(f"📕 PDF: {pdf_path} ({file_size:.0f} KB)")
+
+        except Exception as e:
+            print(f"⚠️ PDF 生成失败: {e}")
 
     def _generate_discord(self, briefs: Dict, exec_summary: str, date_str: str, output_path: Path):
         """生成 Discord 友好的精简版"""

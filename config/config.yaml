@@ -23,7 +23,7 @@ pipeline:
     batch_size: 100000
 
   generate:
-    formats: ["markdown", "html"]
+    formats: ["markdown", "html", "pdf"]
     template: "magazine"
     generate_cards: false
     generate_rss: true

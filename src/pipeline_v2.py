@@ -51,6 +51,42 @@ class PipelineV2:
         self.data_dir.mkdir(exist_ok=True)
         self.reports_dir.mkdir(exist_ok=True)
 
+    OBSIDIAN_VAULT = Path("/Users/peterzhang/project/morpheus-vault")
+    OBSIDIAN_NEWSLOOM_DIR = OBSIDIAN_VAULT / "Newsloom"
+
+    def _archive_to_obsidian(self, output_dir: Path, date_str: str):
+        """将日报 Markdown 归档到 Obsidian vault"""
+        try:
+            source_md = output_dir / "report.md"
+            if not source_md.exists():
+                print("⚠️ Obsidian 入库跳过: report.md 不存在")
+                return
+
+            self.OBSIDIAN_NEWSLOOM_DIR.mkdir(parents=True, exist_ok=True)
+
+            with open(source_md, "r", encoding="utf-8") as f:
+                content = f.read()
+
+            # 添加 Obsidian frontmatter
+            frontmatter = f"""---
+title: "Newsloom 每日情报 {date_str}"
+date: {date_str}
+tags:
+  - newsloom
+  - daily-report
+type: report
+---
+
+"""
+            dest_file = self.OBSIDIAN_NEWSLOOM_DIR / f"{date_str} 每日情报.md"
+            with open(dest_file, "w", encoding="utf-8") as f:
+                f.write(frontmatter + content)
+
+            print(f"📚 Obsidian 入库: {dest_file}")
+
+        except Exception as e:
+            print(f"⚠️ Obsidian 入库失败: {e}")
+
     def _load_config(self) -> dict:
         with open(self.config_path) as f:
             config = yaml.safe_load(f)
@@ -227,13 +263,16 @@ class PipelineV2:
             generator.generate(items, date_str, output_dir)
 
             # latest 软链
-            for fmt in ["md", "html"]:
+            for fmt in ["md", "html", "pdf"]:
                 latest = self.reports_dir / f"latest.{fmt}"
                 report = output_dir / f"report.{fmt}"
                 if report.exists():
                     if latest.exists() or latest.is_symlink():
                         latest.unlink()
                     latest.symlink_to(report)
+
+            # Obsidian 入库
+            self._archive_to_obsidian(output_dir, date_str)
 
         # Cancel global timeout
         try:
