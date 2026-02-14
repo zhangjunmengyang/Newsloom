@@ -239,6 +239,48 @@ type: report
 
             # 传给下一层
             items = result
+            
+            # ============================================================
+            # POST-ANALYZE: DEDUP + TREND DETECTION
+            # ============================================================
+            print("\n" + "-" * 40)
+            print("POST-ANALYZE: DEDUP + TREND DETECTION")
+            print("-" * 40)
+            
+            # --- 去重 ---
+            from processors.deduplicator import Deduplicator
+            deduplicator = Deduplicator()
+            
+            # Get briefs from analyzed data (handle both old and new format)
+            analyzed_briefs = items.get("briefs", items) if isinstance(items, dict) else items
+            
+            for section in analyzed_briefs:
+                if section.startswith('__'):
+                    continue
+                if isinstance(analyzed_briefs[section], list):
+                    before = len(analyzed_briefs[section])
+                    analyzed_briefs[section] = deduplicator.deduplicate(analyzed_briefs[section])
+                    after = len(analyzed_briefs[section])
+                    if before != after:
+                        print(f"  🔄 [{section}] 去重: {before} → {after}")
+
+            # --- 趋势检测 ---
+            from processors.trend_detector import TrendDetector
+            trend_detector = TrendDetector(data_dir=str(self.data_dir))
+            trends = trend_detector.detect(analyzed_briefs, date_str)
+            trend_detector.save_today_keywords(analyzed_briefs, date_str)
+            
+            if trends:
+                # 注入到 briefs 供 generator 渲染
+                analyzed_briefs['__trends__'] = trends
+                rising = [t for t in trends if '🔥' in t['trend'] or '🆕' in t['trend']]
+                print(f"  📊 趋势检测: {len(trends)} 个关键词, {len(rising)} 个上升")
+            
+            # Update items with processed data
+            if isinstance(items, dict):
+                items["briefs"] = analyzed_briefs
+            else:
+                items = analyzed_briefs
 
         # ============================================================
         # Layer 4: GENERATE

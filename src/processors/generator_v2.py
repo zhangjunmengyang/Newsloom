@@ -146,6 +146,32 @@ class ReportGeneratorV2:
             lines.append("---")
             lines.append("")
 
+        # Trends Radar
+        if "__trends__" in briefs and briefs["__trends__"]:
+            trends = briefs["__trends__"]
+            # 只显示 rising 和 new 的，最多 10 条
+            display_trends = [t for t in trends if '🔥' in t['trend'] or '🆕' in t['trend']][:10]
+            
+            if display_trends:
+                lines.append("## 📊 趋势雷达")
+                lines.append("")
+                lines.append("| 关键词 | 趋势 | 今日 | 近7日均值 | 变化 |")
+                lines.append("|--------|------|------|-----------|------|")
+                
+                for trend in display_trends:
+                    keyword = trend.get('keyword', '')
+                    trend_emoji = trend.get('trend', '')
+                    today_count = trend.get('today_count', 0)
+                    avg_count = trend.get('avg_count', 0)
+                    change_pct = trend.get('change_pct', 0)
+                    change_sign = "+" if change_pct >= 0 else ""
+                    
+                    lines.append(f"| {keyword} | {trend_emoji} | {today_count} | {avg_count} | {change_sign}{change_pct}% |")
+                
+                lines.append("")
+                lines.append("---")
+                lines.append("")
+
         # TOC
         lines.append("## 目录")
         lines.append("")
