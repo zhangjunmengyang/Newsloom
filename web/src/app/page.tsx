@@ -1,9 +1,14 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, Database, BarChart3, Activity } from "lucide-react";
+import { fetchDashboardStats, DashboardStats } from "@/lib/api";
 
-const stats = [
+// Fallback 数据
+const fallbackStats = [
   { title: "Total Articles", value: "—", icon: FileText, desc: "Fetched today" },
   { title: "Data Sources", value: "—", icon: Database, desc: "Active feeds" },
   { title: "Reports Generated", value: "—", icon: BarChart3, desc: "This week" },
@@ -11,6 +16,46 @@ const stats = [
 ];
 
 export default function DashboardPage() {
+  const [stats, setStats] = useState(fallbackStats);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // 尝试从 API 获取统计数据
+    fetchDashboardStats()
+      .then((data: DashboardStats) => {
+        setStats([
+          { 
+            title: "Total Articles", 
+            value: data.total_articles.toLocaleString(), 
+            icon: FileText, 
+            desc: "Fetched today" 
+          },
+          { 
+            title: "Data Sources", 
+            value: data.active_sources.toString(), 
+            icon: Database, 
+            desc: "Active feeds" 
+          },
+          { 
+            title: "Reports Generated", 
+            value: data.total_reports.toString(), 
+            icon: BarChart3, 
+            desc: "This week" 
+          },
+          { 
+            title: "Pipeline Status", 
+            value: "Ready", 
+            icon: Activity, 
+            desc: data.last_pipeline_run ? `Last run: ${new Date(data.last_pipeline_run).toLocaleDateString()}` : "Last run: —"
+          },
+        ]);
+      })
+      .catch(error => {
+        console.log("Failed to fetch dashboard stats:", error.message);
+        // 保持 fallback 数据
+      })
+      .finally(() => setLoading(false));
+  }, []);
   return (
     <div className="flex min-h-screen">
       <Sidebar />
