@@ -13,12 +13,18 @@ from cli.commands.status import status
 from cli.commands.serve import serve
 from cli.commands.history import history
 from cli.commands.sources import sources
+from cli.commands.weekly import weekly
+from cli.commands.monthly import monthly
+from cli.commands.feed import feed
 
 cli.add_command(run)
 cli.add_command(status)
 cli.add_command(serve)
 cli.add_command(history)
 cli.add_command(sources)
+cli.add_command(weekly)
+cli.add_command(monthly)
+cli.add_command(feed)
 
 if __name__ == '__main__':
     cli()

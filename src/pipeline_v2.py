@@ -316,6 +316,28 @@ type: report
             # Obsidian 入库
             self._archive_to_obsidian(output_dir, date_str)
 
+            # ============================================================
+            # RSS Feed 自动生成
+            # ============================================================
+            try:
+                from processors.rss_generator import RSSGenerator
+                rss_gen = RSSGenerator()
+                
+                # 从 analyzed briefs 生成 RSS
+                if isinstance(items, dict) and 'briefs' in items:
+                    briefs = items['briefs']
+                elif isinstance(items, dict):
+                    briefs = items
+                else:
+                    briefs = {}
+                    
+                if briefs:
+                    rss_xml = rss_gen.generate_from_briefs(briefs, date=date_str)
+                    rss_gen.save_feed(rss_xml, str(self.reports_dir / "feed.xml"))
+                    print("📡 RSS feed updated")
+            except Exception as e:
+                print(f"⚠️ RSS generation failed: {e}")
+
         # Cancel global timeout
         try:
             signal.alarm(0)
