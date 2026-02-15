@@ -235,19 +235,22 @@ class ReportGeneratorV2:
 
         total = sum(len(v) for v in briefs.values() if isinstance(v, list))
 
+        # 缓存渲染数据，供 PDF 生成复用
+        self._last_render_data = {
+            "date_str": date_str,
+            "generated_time": datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "total_items": total,
+            "executive_summary": exec_summary,
+            "briefs": briefs,
+            "section_configs": self.section_configs,
+            "section_order": self._get_section_order(),
+            "stats": stats,
+        }
+
         if self.jinja_env:
             try:
                 template = self.jinja_env.get_template("report.html.j2")
-                html = template.render(
-                    date_str=date_str,
-                    generated_time=datetime.now().strftime("%Y-%m-%d %H:%M"),
-                    total_items=total,
-                    executive_summary=exec_summary,
-                    briefs=briefs,
-                    section_configs=self.section_configs,
-                    section_order=self._get_section_order(),
-                    stats=stats,
-                )
+                html = template.render(**self._last_render_data)
                 with open(output_path, "w", encoding="utf-8") as f:
                     f.write(html)
                 print(f"🌐 HTML (template {self.template_name}): {output_path}")
@@ -347,13 +350,44 @@ footer{{text-align:center;padding:40px 0;color:var(--muted);border-top:1px solid
         print(f"🌐 HTML (fallback): {output_path}")
 
     def _generate_pdf(self, html_path: Path, pdf_path: Path, date_str: str):
-        """从 HTML 生成图文并茂的 A4 PDF"""
+        """从专用打印模板生成杂志风格 A4 PDF"""
         if not HAS_WEASYPRINT:
             print("⚠️ weasyprint 未安装，跳过 PDF 生成。安装: pip install weasyprint")
             return
 
         try:
-            # 读取 HTML 并注入打印优化 CSS
+            # 读取已分析的数据（从 HTML 对应的数据）
+            # 为了复用，我们需要从 generate() 方法传入数据
+            # 这里先尝试用打印模板，如果不存在则优雅降级
+
+            if self.jinja_env:
+                try:
+                    # 尝试加载打印专用模板
+                    print_template = self.jinja_env.get_template("report-print.html.j2")
+
+                    # 需要重新获取数据 - 从 self 缓存中读取
+                    if hasattr(self, '_last_render_data'):
+                        render_data = self._last_render_data
+                        html_content = print_template.render(**render_data)
+
+                        pdf_path.parent.mkdir(parents=True, exist_ok=True)
+                        WeasyHTML(string=html_content, base_url=str(self.template_dir)).write_pdf(str(pdf_path))
+
+                        file_size = pdf_path.stat().st_size / 1024
+                        print(f"📕 PDF (magazine print): {pdf_path} ({file_size:.0f} KB)")
+                        return
+                except Exception as e:
+                    print(f"⚠️ 打印模板加载失败，使用备用方案: {e}")
+
+            # Fallback: 从现有 HTML 转换
+            self._generate_pdf_fallback(html_path, pdf_path, date_str)
+
+        except Exception as e:
+            print(f"⚠️ PDF 生成失败: {e}")
+
+    def _generate_pdf_fallback(self, html_path: Path, pdf_path: Path, date_str: str):
+        """备用方案：从 HTML 直接转换（保持向后兼容）"""
+        try:
             with open(html_path, "r", encoding="utf-8") as f:
                 html_content = f.read()
 
@@ -363,13 +397,12 @@ footer{{text-align:center;padding:40px 0;color:var(--muted);border-top:1px solid
     size: A4;
     margin: 2cm 1.5cm;
     @bottom-center {
-        content: "Newsloom """ + date_str + """ — Page " counter(page) " / " counter(pages);
+        content: "Newsloom """ + date_str + """ — Page " counter(page);
         font-size: 9px;
         color: #8b949e;
     }
 }
 
-/* 覆盖暗色背景为打印友好色 */
 body {
     background: #0d1117 !important;
     color: #e6edf3 !important;
@@ -379,61 +412,37 @@ body {
     print-color-adjust: exact !important;
 }
 
-/* 每个 section 前分页 */
 .section {
     page-break-before: auto;
     page-break-inside: avoid;
 }
 
-.section:nth-child(n+2) {
-    page-break-before: always;
-}
-
-/* 卡片不跨页 */
 .card {
     page-break-inside: avoid;
     margin-bottom: 12px !important;
 }
 
-/* Executive summary 不跨页 */
-.executive-summary {
+.exec-summary, .executive-summary {
     page-break-inside: avoid;
     page-break-after: always;
 }
 
-/* 标题页样式 */
 header {
     page-break-after: avoid;
     padding: 60px 0 30px !important;
     text-align: center !important;
 }
 
-header h1 {
-    font-size: 2.2em !important;
-    margin-bottom: 16px !important;
-}
-
-/* 链接显示 URL */
-a[href] {
-    color: #58a6ff !important;
-    text-decoration: none !important;
-}
-
-/* 隐藏页脚 */
-footer {
-    page-break-before: always;
-    text-align: center;
-    padding-top: 40px;
-}
-
-/* 确保暗色背景在 PDF 中渲染 */
-.container {
+.container, .main {
     max-width: 100% !important;
     padding: 0 !important;
 }
+
+.sidebar {
+    display: none !important;
+}
 </style>
 """
-            # 在 </head> 前注入打印 CSS
             if "</head>" in html_content:
                 html_content = html_content.replace("</head>", print_css + "</head>")
             else:
@@ -441,12 +450,12 @@ footer {
 
             pdf_path.parent.mkdir(parents=True, exist_ok=True)
             WeasyHTML(string=html_content, base_url=str(html_path.parent)).write_pdf(str(pdf_path))
-            
+
             file_size = pdf_path.stat().st_size / 1024
-            print(f"📕 PDF: {pdf_path} ({file_size:.0f} KB)")
+            print(f"📕 PDF (fallback): {pdf_path} ({file_size:.0f} KB)")
 
         except Exception as e:
-            print(f"⚠️ PDF 生成失败: {e}")
+            raise Exception(f"PDF fallback 生成失败: {e}")
 
     def _generate_discord(self, briefs: Dict, exec_summary: str, date_str: str, output_path: Path):
         """生成 Discord 友好的精简版"""
