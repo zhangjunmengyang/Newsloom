@@ -1,5 +1,131 @@
 <!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"><meta http-equiv="refresh" content="0;url=showcase/"></head>
-<body><a href="showcase/">Newsloom Template Showcase →</a></body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Newsloom — Showcase</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: #0B0F19;
+      color: #F1F5F9;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .logo svg { width: 36px; height: 36px; color: #F59E0B; }
+    .logo span { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; }
+    .subtitle {
+      font-size: 15px;
+      color: #64748B;
+      margin-bottom: 48px;
+      text-align: center;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      max-width: 720px;
+      width: 100%;
+    }
+    .card {
+      display: block;
+      background: #151C2C;
+      border: 1px solid #1E293B;
+      border-radius: 12px;
+      padding: 32px;
+      text-decoration: none;
+      color: inherit;
+      transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    .card-icon svg { width: 24px; height: 24px; }
+    .card-icon.gold { background: rgba(245, 158, 11, 0.15); color: #F59E0B; }
+    .card-icon.blue { background: rgba(59, 130, 246, 0.15); color: #3B82F6; }
+    .card h2 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+    .card p { font-size: 14px; color: #94A3B8; line-height: 1.5; }
+    .card .arrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #F59E0B;
+    }
+    .card .arrow svg { width: 14px; height: 14px; }
+    .footer {
+      margin-top: 48px;
+      font-size: 12px;
+      color: #475569;
+    }
+    .footer a { color: #94A3B8; text-decoration: none; }
+    .footer a:hover { color: #F59E0B; }
+    @media (max-width: 600px) {
+      .cards { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="logo">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
+    <span>Newsloom</span>
+  </div>
+  <p class="subtitle">AI-powered news aggregation &amp; intelligence platform</p>
+
+  <div class="cards">
+    <a href="showcase/" class="card">
+      <div class="card-icon blue">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+      </div>
+      <h2>Template Gallery</h2>
+      <p>Browse report templates with different themes, layouts, and styles. See live previews of newsletter, magazine, and minimal formats.</p>
+      <span class="arrow">
+        Browse templates
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </span>
+    </a>
+
+    <a href="admin/" class="card">
+      <div class="card-icon gold">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+      </div>
+      <h2>Admin Dashboard</h2>
+      <p>Explore the full admin panel with dashboard stats, report management, data source controls, pipeline execution, and settings.</p>
+      <span class="arrow">
+        Open dashboard
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </span>
+    </a>
+  </div>
+
+  <div class="footer">
+    <a href="https://github.com/peterzhang/Newsloom" target="_blank">GitHub</a> · Showcase Demo
+  </div>
+</body>
 </html>

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="midnight-gold">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pipeline — Newsloom Admin</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
+      <span>Newsloom</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div>
+        <div class="nav-section-label">OVERVIEW</div>
+        <div class="nav-items">
+          <a href="index.html" class="nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+            Dashboard
+          </a>
+          <a href="reports.html" class="nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+            Reports
+          </a>
+        </div>
+      </div>
+      <div>
+        <div class="nav-section-label">CONTENT</div>
+        <div class="nav-items">
+          <a href="sources.html" class="nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+            Data Sources
+          </a>
+          <a href="pipeline.html" class="nav-item active">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+            Pipeline
+          </a>
+        </div>
+      </div>
+      <div>
+        <div class="nav-section-label">SYSTEM</div>
+        <div class="nav-items">
+          <a href="settings.html" class="nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+            Settings
+          </a>
+        </div>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="status-row">
+        <span class="status-dot amber"></span>
+        <span>Demo Mode</span>
+      </div>
+      <a href="../showcase/" class="sidebar-gallery-link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+        Template Gallery →
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main-content">
+    <header class="header">
+      <h1>Pipeline Control</h1>
+      <div class="header-actions">
+        <span class="header-clock" id="clock"></span>
+        <button class="icon-btn" id="theme-cycle-btn" title="Cycle theme">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+        </button>
+        <button class="icon-btn" onclick="location.reload()" title="Refresh">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="page-body space-y-6">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-header-text">
+          <h2>Pipeline Control</h2>
+          <p>Run and monitor the news processing pipeline</p>
+        </div>
+        <button class="btn btn-primary gold-glow" id="run-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+          Run Pipeline
+        </button>
+      </div>
+
+      <!-- Running Card (hidden by default) -->
+      <div class="card pipeline-running-card" id="running-card" style="display:none;">
+        <div class="card-header">
+          <div class="card-header-row">
+            <span class="card-title-lg">Current Run</span>
+            <span class="badge badge-primary" id="running-badge">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+              running
+            </span>
+          </div>
+        </div>
+        <div class="card-body space-y-4">
+          <div>
+            <div class="pipeline-progress-header">
+              <span class="pipeline-layer-name" id="current-layer">Current Layer: <strong>fetch</strong></span>
+              <span class="pipeline-percent" id="current-percent">0%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill animated" id="progress-fill" style="width:0%"></div>
+            </div>
+          </div>
+          <div class="pipeline-status-grid" style="grid-template-columns: repeat(2, 1fr);">
+            <div class="pipeline-status-item">
+              <div class="label">Started</div>
+              <div class="value" id="run-started">—</div>
+            </div>
+            <div class="pipeline-status-item">
+              <div class="label">Layers</div>
+              <div class="value">fetch → rank → analyze → generate</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pipeline Status -->
+      <div class="card" id="status-card">
+        <div class="card-header">
+          <span class="card-title-lg">Pipeline Status</span>
+        </div>
+        <div class="card-body space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-secondary">Last Run Status</span>
+            <span class="badge badge-success">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              success
+            </span>
+          </div>
+          <div class="pipeline-status-grid">
+            <div class="pipeline-status-item">
+              <div class="label">Date</div>
+              <div class="value">2026-02-15</div>
+            </div>
+            <div class="pipeline-status-item">
+              <div class="label">Duration</div>
+              <div class="value">3m 42s</div>
+            </div>
+            <div class="pipeline-status-item">
+              <div class="label">Layers</div>
+              <div class="value">4</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Run History -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title-lg">Run History</span>
+        </div>
+        <div class="card-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Layers</th>
+                  <th>Duration</th>
+                  <th>Started</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="font-medium">2026-02-15</td>
+                  <td><span class="badge badge-success"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> success</span></td>
+                  <td>fetch, rank, analyze, generate</td>
+                  <td>3m 42s</td>
+                  <td>2026-02-15 08:30:00</td>
+                </tr>
+                <tr>
+                  <td class="font-medium">2026-02-14</td>
+                  <td><span class="badge badge-success"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> success</span></td>
+                  <td>fetch, rank, analyze, generate</td>
+                  <td>4m 15s</td>
+                  <td>2026-02-14 08:30:00</td>
+                </tr>
+                <tr>
+                  <td class="font-medium">2026-02-13</td>
+                  <td><span class="badge badge-danger"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" x2="9" y1="9" y2="15"/><line x1="9" x2="15" y1="9" y2="15"/></svg> failed</span></td>
+                  <td>fetch, rank</td>
+                  <td>1m 08s</td>
+                  <td>2026-02-13 08:30:00</td>
+                </tr>
+                <tr>
+                  <td class="font-medium">2026-02-12</td>
+                  <td><span class="badge badge-success"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> success</span></td>
+                  <td>fetch, rank, analyze, generate</td>
+                  <td>3m 58s</td>
+                  <td>2026-02-12 08:30:00</td>
+                </tr>
+                <tr>
+                  <td class="font-medium">2026-02-11</td>
+                  <td><span class="badge badge-success"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> success</span></td>
+                  <td>fetch, rank, analyze, generate</td>
+                  <td>3m 31s</td>
+                  <td>2026-02-11 08:30:00</td>
+                </tr>
+                <tr>
+                  <td class="font-medium">2026-02-10</td>
+                  <td><span class="badge badge-success"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> success</span></td>
+                  <td>fetch, rank, analyze, generate</td>
+                  <td>4m 02s</td>
+                  <td>2026-02-10 08:30:00</td>
+                </tr>
+                <tr>
+                  <td class="font-medium">2026-02-09</td>
+                  <td><span class="badge badge-success"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> success</span></td>
+                  <td>fetch, rank, analyze, generate</td>
+                  <td>3m 47s</td>
+                  <td>2026-02-09 08:30:00</td>
+                </tr>
+                <tr>
+                  <td class="font-medium">2026-02-08</td>
+                  <td><span class="badge badge-success"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> success</span></td>
+                  <td>fetch, rank, analyze, generate</td>
+                  <td>3m 55s</td>
+                  <td>2026-02-08 08:30:00</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Clock
+function updateClock(){document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-US',{hour12:false})}
+updateClock();setInterval(updateClock,1000);
+
+// Theme
+const themeList=['midnight-gold','arctic','forest','rose','light'];
+document.getElementById('theme-cycle-btn').addEventListener('click',function(){
+  const html=document.documentElement;const current=html.getAttribute('data-theme')||'midnight-gold';
+  const idx=themeList.indexOf(current);const next=themeList[(idx+1)%themeList.length];
+  html.setAttribute('data-theme',next);localStorage.setItem('newsloom-admin-theme',next);
+});
+(function(){const s=localStorage.getItem('newsloom-admin-theme');if(s)document.documentElement.setAttribute('data-theme',s)})();
+
+// Pipeline simulation
+const layers = ['fetch', 'rank', 'analyze', 'generate'];
+let isRunning = false;
+
+document.getElementById('run-btn').addEventListener('click', function() {
+  if (isRunning) return;
+  isRunning = true;
+
+  const btn = this;
+  btn.disabled = true;
+  btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Running...';
+
+  // Show running card, hide status card
+  document.getElementById('running-card').style.display = 'block';
+  document.getElementById('status-card').style.display = 'none';
+  document.getElementById('run-started').textContent = new Date().toLocaleTimeString('en-US', { hour12: false });
+
+  let layerIdx = 0;
+  let percent = 0;
+  const totalMs = 6000; // 6s total animation
+  const stepMs = 60;
+  const totalSteps = totalMs / stepMs;
+  let step = 0;
+
+  const interval = setInterval(() => {
+    step++;
+    percent = Math.min(100, Math.round((step / totalSteps) * 100));
+    layerIdx = Math.min(3, Math.floor((step / totalSteps) * 4));
+
+    document.getElementById('current-layer').innerHTML = 'Current Layer: <strong>' + layers[layerIdx] + '</strong>';
+    document.getElementById('current-percent').textContent = percent + '%';
+    document.getElementById('progress-fill').style.width = percent + '%';
+
+    if (step >= totalSteps) {
+      clearInterval(interval);
+
+      // Done
+      document.getElementById('running-badge').className = 'badge badge-success';
+      document.getElementById('running-badge').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> success';
+      document.getElementById('progress-fill').classList.remove('animated');
+
+      setTimeout(() => {
+        document.getElementById('running-card').style.display = 'none';
+        document.getElementById('status-card').style.display = 'block';
+        btn.disabled = false;
+        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg> Run Pipeline';
+
+        // Reset running card for next time
+        document.getElementById('running-badge').className = 'badge badge-primary';
+        document.getElementById('running-badge').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> running';
+        document.getElementById('progress-fill').style.width = '0%';
+        document.getElementById('progress-fill').classList.add('animated');
+        document.getElementById('current-percent').textContent = '0%';
+        document.getElementById('current-layer').innerHTML = 'Current Layer: <strong>fetch</strong>';
+        isRunning = false;
+      }, 2000);
+    }
+  }, stepMs);
+});
+</script>
+</body>
+</html>

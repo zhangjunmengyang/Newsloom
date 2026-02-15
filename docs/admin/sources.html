@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="midnight-gold">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Sources — Newsloom Admin</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
+      <span>Newsloom</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div>
+        <div class="nav-section-label">OVERVIEW</div>
+        <div class="nav-items">
+          <a href="index.html" class="nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+            Dashboard
+          </a>
+          <a href="reports.html" class="nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+            Reports
+          </a>
+        </div>
+      </div>
+      <div>
+        <div class="nav-section-label">CONTENT</div>
+        <div class="nav-items">
+          <a href="sources.html" class="nav-item active">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+            Data Sources
+          </a>
+          <a href="pipeline.html" class="nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+            Pipeline
+          </a>
+        </div>
+      </div>
+      <div>
+        <div class="nav-section-label">SYSTEM</div>
+        <div class="nav-items">
+          <a href="settings.html" class="nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+            Settings
+          </a>
+        </div>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="status-row">
+        <span class="status-dot amber"></span>
+        <span>Demo Mode</span>
+      </div>
+      <a href="../showcase/" class="sidebar-gallery-link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+        Template Gallery →
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main-content">
+    <header class="header">
+      <h1>Data Sources</h1>
+      <div class="header-actions">
+        <span class="header-clock" id="clock"></span>
+        <button class="icon-btn" id="theme-cycle-btn" title="Cycle theme">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+        </button>
+        <button class="icon-btn" onclick="location.reload()" title="Refresh">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="page-body space-y-6">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-header-text">
+          <h2>Data Sources</h2>
+          <p>Manage your news sources and content feeds</p>
+        </div>
+        <button class="btn btn-primary" id="sync-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
+          Sync from Config
+        </button>
+      </div>
+
+      <!-- Sources Grid -->
+      <div class="sources-grid" id="sources-grid">
+        <!-- Populated by JS -->
+      </div>
+
+      <!-- Summary -->
+      <div class="card" id="summary-card">
+        <div class="card-header">
+          <span class="card-title-lg">Summary</span>
+        </div>
+        <div class="card-body">
+          <div class="summary-stats" id="summary-stats">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Mock data
+const sources = [
+  { id:1, name:'TechCrunch', type:'rss', channel:'tech', feeds:3, enabled:true },
+  { id:2, name:'Hacker News', type:'hackernews', channel:'community', feeds:null, enabled:true },
+  { id:3, name:'arXiv AI', type:'arxiv', channel:'papers', feeds:null, enabled:true },
+  { id:4, name:'GitHub Trending', type:'github', channel:'github', feeds:null, enabled:true },
+  { id:5, name:'The Verge', type:'rss', channel:'tech', feeds:2, enabled:true },
+  { id:6, name:'CoinDesk', type:'rss', channel:'crypto', feeds:2, enabled:true },
+  { id:7, name:'Product Hunt', type:'producthunt', channel:'tech', feeds:null, enabled:true },
+  { id:8, name:'MIT Tech Review', type:'rss', channel:'ai', feeds:1, enabled:true },
+  { id:9, name:'OpenAI Blog', type:'rss', channel:'ai', feeds:1, enabled:true },
+  { id:10, name:'Anthropic Blog', type:'rss', channel:'ai', feeds:1, enabled:true },
+  { id:11, name:'Bloomberg Crypto', type:'rss', channel:'finance', feeds:2, enabled:false },
+  { id:12, name:'Reddit r/MachineLearning', type:'reddit', channel:'ai', feeds:null, enabled:false },
+  { id:13, name:'VentureBeat AI', type:'rss', channel:'ai', feeds:1, enabled:true },
+  { id:14, name:'Wired', type:'rss', channel:'tech', feeds:2, enabled:true },
+  { id:15, name:'DeepMind Blog', type:'rss', channel:'ai', feeds:1, enabled:true },
+];
+
+function render() {
+  const grid = document.getElementById('sources-grid');
+  grid.innerHTML = sources.map(s => `
+    <div class="card card-hover">
+      <div class="card-header" style="padding-bottom:12px;">
+        <div class="source-card-header">
+          <div style="min-width:0;flex:1;">
+            <div style="font-size:15px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.name}</div>
+            <div class="source-badges">
+              <span class="badge badge-${s.type}">${s.type}</span>
+              <span class="badge badge-ch-${s.channel}">${s.channel}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="source-card-footer">
+          <span class="source-feed-count">${s.feeds !== null ? s.feeds + ' feed' + (s.feeds !== 1 ? 's' : '') : ''}</span>
+          <div class="flex items-center">
+            <span class="source-toggle-label">${s.enabled ? 'Enabled' : 'Disabled'}</span>
+            <label class="toggle">
+              <input type="checkbox" ${s.enabled ? 'checked' : ''} data-id="${s.id}">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  // Toggle handlers
+  grid.querySelectorAll('.toggle input').forEach(input => {
+    input.addEventListener('change', function() {
+      const id = parseInt(this.dataset.id);
+      const src = sources.find(s => s.id === id);
+      if (src) {
+        src.enabled = this.checked;
+        render();
+      }
+    });
+  });
+
+  // Summary
+  const total = sources.length;
+  const enabled = sources.filter(s => s.enabled).length;
+  const disabled = total - enabled;
+  document.getElementById('summary-stats').innerHTML = `
+    <div>
+      <div class="summary-stat-value" style="color:var(--color-primary);">${total}</div>
+      <div class="summary-stat-label">Total Sources</div>
+    </div>
+    <div>
+      <div class="summary-stat-value" style="color:var(--color-success);">${enabled}</div>
+      <div class="summary-stat-label">Enabled</div>
+    </div>
+    <div>
+      <div class="summary-stat-value text-muted">${disabled}</div>
+      <div class="summary-stat-label">Disabled</div>
+    </div>
+  `;
+}
+
+render();
+
+// Sync button animation
+document.getElementById('sync-btn').addEventListener('click', function() {
+  const btn = this;
+  const svg = btn.querySelector('svg');
+  btn.disabled = true;
+  svg.classList.add('animate-spin');
+  btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg> Syncing...';
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg> Sync from Config';
+  }, 1500);
+});
+
+// Clock
+function updateClock(){document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-US',{hour12:false})}
+updateClock();setInterval(updateClock,1000);
+
+// Theme
+const themeList=['midnight-gold','arctic','forest','rose','light'];
+document.getElementById('theme-cycle-btn').addEventListener('click',function(){
+  const html=document.documentElement;const current=html.getAttribute('data-theme')||'midnight-gold';
+  const idx=themeList.indexOf(current);const next=themeList[(idx+1)%themeList.length];
+  html.setAttribute('data-theme',next);localStorage.setItem('newsloom-admin-theme',next);
+});
+(function(){const s=localStorage.getItem('newsloom-admin-theme');if(s)document.documentElement.setAttribute('data-theme',s)})();
+</script>
+</body>
+</html>

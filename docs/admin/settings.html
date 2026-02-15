@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="midnight-gold">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings — Newsloom Admin</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
+      <span>Newsloom</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div>
+        <div class="nav-section-label">OVERVIEW</div>
+        <div class="nav-items">
+          <a href="index.html" class="nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+            Dashboard
+          </a>
+          <a href="reports.html" class="nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+            Reports
+          </a>
+        </div>
+      </div>
+      <div>
+        <div class="nav-section-label">CONTENT</div>
+        <div class="nav-items">
+          <a href="sources.html" class="nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+            Data Sources
+          </a>
+          <a href="pipeline.html" class="nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+            Pipeline
+          </a>
+        </div>
+      </div>
+      <div>
+        <div class="nav-section-label">SYSTEM</div>
+        <div class="nav-items">
+          <a href="settings.html" class="nav-item active">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+            Settings
+          </a>
+        </div>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="status-row">
+        <span class="status-dot amber"></span>
+        <span>Demo Mode</span>
+      </div>
+      <a href="../showcase/" class="sidebar-gallery-link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+        Template Gallery →
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main-content">
+    <header class="header">
+      <h1>Settings</h1>
+      <div class="header-actions">
+        <span class="header-clock" id="clock"></span>
+        <button class="icon-btn" id="theme-cycle-btn" title="Cycle theme">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+        </button>
+        <button class="icon-btn" onclick="location.reload()" title="Refresh">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="page-body space-y-6">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-header-text">
+          <h2>Settings</h2>
+          <p>Configure your Newsloom preferences and pipeline settings</p>
+        </div>
+        <button class="btn btn-primary" id="save-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/></svg>
+          Save Changes
+        </button>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs" id="tabs">
+        <button class="tab-btn active" data-tab="appearance">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+          Appearance
+        </button>
+        <button class="tab-btn" data-tab="templates">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="7" x="3" y="3" rx="1"/><rect width="9" height="7" x="3" y="14" rx="1"/><rect width="5" height="7" x="16" y="14" rx="1"/></svg>
+          Report Templates
+        </button>
+        <button class="tab-btn" data-tab="report">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+          Report Generation
+        </button>
+        <button class="tab-btn" data-tab="pipeline">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+          Pipeline Config
+        </button>
+        <button class="tab-btn" data-tab="sources">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+          Sources Overview
+        </button>
+      </div>
+
+      <!-- ===== TAB: Appearance ===== -->
+      <div class="tab-content active" id="tab-appearance">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title-lg">Dashboard Theme</span>
+          </div>
+          <div class="card-body">
+            <div class="theme-cards" id="theme-cards">
+              <!-- Populated by JS -->
+            </div>
+            <p class="text-xs text-muted mt-4">Theme changes are saved automatically and apply instantly across all pages.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TAB: Templates ===== -->
+      <div class="tab-content" id="tab-templates">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title-lg">Report Templates</span>
+            <p class="text-sm text-muted mt-1">Choose from available report templates. Each template has a different layout and style.</p>
+          </div>
+          <div class="card-body">
+            <div class="grid-3" id="template-cards">
+              <!-- Populated by JS -->
+            </div>
+            <div class="info-note mt-4">
+              <strong>Current template:</strong> <span id="current-template-name">Newsletter</span> — Changes apply to future report generations.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TAB: Report Generation ===== -->
+      <div class="tab-content" id="tab-report">
+        <!-- Template Selection -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title-lg">Template Selection</span>
+          </div>
+          <div class="card-body">
+            <div class="radio-group" id="template-radio">
+              <div class="radio-item selected" data-value="newsletter">
+                <div class="radio-dot"></div>
+                <div class="radio-label">
+                  <div class="title">Newsletter Style</div>
+                  <div class="desc">Clean, modern layout with sections</div>
+                </div>
+              </div>
+              <div class="radio-item" data-value="magazine">
+                <div class="radio-dot"></div>
+                <div class="radio-label">
+                  <div class="title">Magazine Style</div>
+                  <div class="desc">Rich layout with cover and sidebar</div>
+                </div>
+              </div>
+              <div class="radio-item" data-value="minimal">
+                <div class="radio-dot"></div>
+                <div class="radio-label">
+                  <div class="title">Minimal Style</div>
+                  <div class="desc">Simple, text-focused format</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Export Formats -->
+        <div class="card" style="margin-top:24px;">
+          <div class="card-header">
+            <span class="card-title-lg">Export Formats</span>
+          </div>
+          <div class="card-body">
+            <div class="checkbox-item">
+              <div class="checkbox-label">
+                <div class="title">PDF Export</div>
+                <div class="desc">Generate print-ready PDF files</div>
+              </div>
+              <input type="checkbox" class="checkbox" checked>
+            </div>
+            <div class="checkbox-item">
+              <div class="checkbox-label">
+                <div class="title">HTML Export</div>
+                <div class="desc">Generate web-ready HTML files</div>
+              </div>
+              <input type="checkbox" class="checkbox" checked>
+            </div>
+            <div class="checkbox-item">
+              <div class="checkbox-label">
+                <div class="title">Markdown Export</div>
+                <div class="desc">Keep raw markdown source</div>
+              </div>
+              <input type="checkbox" class="checkbox">
+            </div>
+          </div>
+        </div>
+
+        <!-- Title Prefix -->
+        <div class="card" style="margin-top:24px;">
+          <div class="card-header">
+            <span class="card-title-lg">Report Title</span>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Title Prefix</label>
+              <input type="text" class="form-input" placeholder="e.g., Daily Intelligence Brief" value="AI Intelligence Brief">
+              <p class="form-hint mt-1">This prefix will be added to all generated reports</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TAB: Pipeline Config ===== -->
+      <div class="tab-content" id="tab-pipeline">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title-lg">Pipeline Layers</span>
+          </div>
+          <div class="card-body">
+            <div class="checkbox-item">
+              <div class="checkbox-label">
+                <div class="title">Fetch Layer</div>
+                <div class="desc">Collect articles from all sources</div>
+              </div>
+              <input type="checkbox" class="checkbox" checked>
+            </div>
+            <div class="checkbox-item">
+              <div class="checkbox-label">
+                <div class="title">Rank Layer</div>
+                <div class="desc">Score and prioritize articles</div>
+              </div>
+              <input type="checkbox" class="checkbox" checked>
+            </div>
+            <div class="checkbox-item">
+              <div class="checkbox-label">
+                <div class="title">Analyze Layer</div>
+                <div class="desc">Extract insights and summaries</div>
+              </div>
+              <input type="checkbox" class="checkbox" checked>
+            </div>
+            <div class="checkbox-item">
+              <div class="checkbox-label">
+                <div class="title">Generate Layer</div>
+                <div class="desc">Create final report output</div>
+              </div>
+              <input type="checkbox" class="checkbox" checked>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:24px;">
+          <div class="card-header">
+            <span class="card-title-lg">AI Model</span>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Language Model</label>
+              <select class="form-select">
+                <option value="gpt-4" selected>GPT-4</option>
+                <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                <option value="claude-3-opus">Claude 3 Opus</option>
+                <option value="claude-3-sonnet">Claude 3 Sonnet</option>
+              </select>
+              <p class="form-hint mt-1">Choose the AI model for analysis and generation</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TAB: Sources Overview ===== -->
+      <div class="tab-content" id="tab-sources">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title-lg">Sources Quick Toggle</span>
+          </div>
+          <div class="card-body">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Channel</th>
+                    <th style="text-align:right;">Enabled</th>
+                  </tr>
+                </thead>
+                <tbody id="sources-table-body">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// Clock
+function updateClock(){document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-US',{hour12:false})}
+updateClock();setInterval(updateClock,1000);
+
+// Theme data
+const themes = [
+  { id:'midnight-gold', name:'Midnight Gold', desc:'Deep navy with warm amber accents', bg:'#0B0F19', primary:'#F59E0B', secondary:'#3B82F6' },
+  { id:'arctic', name:'Arctic Blue', desc:'Ultra-deep blue with ice blue highlights', bg:'#0A0E1A', primary:'#38BDF8', secondary:'#6366F1' },
+  { id:'forest', name:'Forest Dark', desc:'Deep forest with emerald green accents', bg:'#0A1210', primary:'#10B981', secondary:'#34D399' },
+  { id:'rose', name:'Rose Quartz', desc:'Deep plum with rose pink highlights', bg:'#12090F', primary:'#F472B6', secondary:'#A78BFA' },
+  { id:'light', name:'Pure Light', desc:'Clean white with royal blue accents', bg:'#FAFBFC', primary:'#2563EB', secondary:'#3B82F6' },
+];
+
+const themeList = themes.map(t => t.id);
+
+function getCurrentTheme() {
+  return document.documentElement.getAttribute('data-theme') || 'midnight-gold';
+}
+
+function setTheme(id) {
+  document.documentElement.setAttribute('data-theme', id);
+  localStorage.setItem('newsloom-admin-theme', id);
+  renderThemeCards();
+}
+
+// Restore theme
+(function(){const s=localStorage.getItem('newsloom-admin-theme');if(s)document.documentElement.setAttribute('data-theme',s)})();
+
+// Theme cycle in header
+document.getElementById('theme-cycle-btn').addEventListener('click', function() {
+  const current = getCurrentTheme();
+  const idx = themeList.indexOf(current);
+  const next = themeList[(idx + 1) % themeList.length];
+  setTheme(next);
+});
+
+// Render theme cards
+function renderThemeCards() {
+  const current = getCurrentTheme();
+  document.getElementById('theme-cards').innerHTML = themes.map(t => `
+    <button class="theme-card ${t.id === current ? 'active' : ''}" data-theme-id="${t.id}">
+      ${t.id === current ? '<div class="active-dot"></div>' : ''}
+      <div class="theme-preview">
+        <div class="theme-preview-bg" style="background:${t.bg}"></div>
+        <div class="theme-preview-colors">
+          <div class="theme-preview-swatch" style="background:${t.primary}"></div>
+          <div class="theme-preview-swatch" style="background:${t.secondary}"></div>
+        </div>
+      </div>
+      <div class="theme-card-name">${t.name}</div>
+      <div class="theme-card-desc">${t.desc}</div>
+    </button>
+  `).join('');
+
+  document.querySelectorAll('.theme-card').forEach(card => {
+    card.addEventListener('click', function() {
+      setTheme(this.dataset.themeId);
+    });
+  });
+}
+renderThemeCards();
+
+// Template cards data
+const templateData = [
+  { name:'Newsletter', desc:'Clean, modern layout with sections and highlights', theme:'Professional', features:['Sections','Highlights','TOC'], active:true },
+  { name:'Magazine', desc:'Rich layout with cover image and sidebar elements', theme:'Editorial', features:['Cover','Sidebar','Pull quotes'] },
+  { name:'Minimal', desc:'Simple, text-focused format for quick reading', theme:'Clean', features:['Text-first','Fast load'] },
+  { name:'Executive', desc:'Board-ready summary with key metrics and charts', theme:'Corporate', features:['Metrics','Charts','Summary'] },
+  { name:'Research', desc:'Academic-style with citations and methodology', theme:'Academic', features:['Citations','Footnotes','Abstract'] },
+  { name:'Digest', desc:'Compact bullet-point format for busy readers', theme:'Compact', features:['Bullets','Categories','Links'] },
+];
+
+let activeTemplate = 'Newsletter';
+
+function renderTemplateCards() {
+  document.getElementById('template-cards').innerHTML = templateData.map(t => `
+    <button class="template-card ${t.name === activeTemplate ? 'active' : ''}" data-name="${t.name}">
+      ${t.name === activeTemplate ? '<div class="active-dot"></div>' : ''}
+      <div class="template-preview-box">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="7" x="3" y="3" rx="1"/><rect width="9" height="7" x="3" y="14" rx="1"/><rect width="5" height="7" x="16" y="14" rx="1"/></svg>
+      </div>
+      <div class="template-name">${t.name}</div>
+      <div class="template-desc">${t.desc}</div>
+      <div style="margin-bottom:8px;"><span class="tag tag-muted">${t.theme}</span></div>
+      <div class="template-tags">
+        ${t.features.map(f => `<span class="tag tag-primary">${f}</span>`).join('')}
+      </div>
+    </button>
+  `).join('');
+
+  document.getElementById('current-template-name').textContent = activeTemplate;
+
+  document.querySelectorAll('.template-card').forEach(card => {
+    card.addEventListener('click', function() {
+      activeTemplate = this.dataset.name;
+      renderTemplateCards();
+    });
+  });
+}
+renderTemplateCards();
+
+// Radio group
+document.querySelectorAll('.radio-item').forEach(item => {
+  item.addEventListener('click', function() {
+    this.closest('.radio-group').querySelectorAll('.radio-item').forEach(i => i.classList.remove('selected'));
+    this.classList.add('selected');
+  });
+});
+
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    this.classList.add('active');
+    document.getElementById('tab-' + this.dataset.tab).classList.add('active');
+  });
+});
+
+// Sources table
+const sources = [
+  { id:1, name:'TechCrunch', type:'rss', channel:'tech', enabled:true },
+  { id:2, name:'Hacker News', type:'hackernews', channel:'community', enabled:true },
+  { id:3, name:'arXiv AI', type:'arxiv', channel:'papers', enabled:true },
+  { id:4, name:'GitHub Trending', type:'github', channel:'github', enabled:true },
+  { id:5, name:'The Verge', type:'rss', channel:'tech', enabled:true },
+  { id:6, name:'CoinDesk', type:'rss', channel:'crypto', enabled:true },
+  { id:7, name:'Product Hunt', type:'producthunt', channel:'tech', enabled:true },
+  { id:8, name:'MIT Tech Review', type:'rss', channel:'ai', enabled:true },
+  { id:9, name:'OpenAI Blog', type:'rss', channel:'ai', enabled:true },
+  { id:10, name:'Anthropic Blog', type:'rss', channel:'ai', enabled:true },
+  { id:11, name:'Bloomberg Crypto', type:'rss', channel:'finance', enabled:false },
+  { id:12, name:'Reddit r/MachineLearning', type:'reddit', channel:'ai', enabled:false },
+  { id:13, name:'VentureBeat AI', type:'rss', channel:'ai', enabled:true },
+  { id:14, name:'Wired', type:'rss', channel:'tech', enabled:true },
+  { id:15, name:'DeepMind Blog', type:'rss', channel:'ai', enabled:true },
+];
+
+function renderSourcesTable() {
+  document.getElementById('sources-table-body').innerHTML = sources.map(s => `
+    <tr>
+      <td class="font-medium">${s.name}</td>
+      <td class="text-secondary text-sm">${s.type}</td>
+      <td class="text-secondary text-sm">${s.channel}</td>
+      <td style="text-align:right;">
+        <label class="toggle">
+          <input type="checkbox" ${s.enabled ? 'checked' : ''} data-id="${s.id}">
+          <span class="toggle-slider"></span>
+        </label>
+      </td>
+    </tr>
+  `).join('');
+
+  document.querySelectorAll('#sources-table-body .toggle input').forEach(input => {
+    input.addEventListener('change', function() {
+      const id = parseInt(this.dataset.id);
+      const src = sources.find(s => s.id === id);
+      if (src) src.enabled = this.checked;
+    });
+  });
+}
+renderSourcesTable();
+
+// Save button
+document.getElementById('save-btn').addEventListener('click', function() {
+  const btn = this;
+  btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-spin" width="16" height="16"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Saving...';
+  btn.disabled = true;
+  setTimeout(() => {
+    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/></svg> Saved!';
+    setTimeout(() => {
+      btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/></svg> Save Changes';
+      btn.disabled = false;
+    }, 1500);
+  }, 800);
+});
+</script>
+</body>
+</html>
