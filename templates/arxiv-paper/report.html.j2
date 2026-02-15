@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsloom Intelligence · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * ARXIV PAPER — Academic Manuscript Visual Narrative
+         * ────────────────────────────────────────────────────────────
+         * Visual Narrative: 学术论文手稿
+         *   — Cream paper texture background (CSS noise pattern)
+         *   — Header like journal first page: title, authors, abstract box
+         *   — Two-column layout at wider viewports (@media > 900px)
+         *   — Citation-style numbering: [1], [2], [3] for each brief
+         *   — Footnote area for source info
+         *   — arXiv brand red (#B31B1B) for critical annotations
+         *   — Section headers as "1. Introduction", "2. Related Work" style
+         *   — Formula-box style highlight cards (gray bg + thin border)
+         *   — Full reference list at bottom
+         * ============================================================ */
+
+        /* ─── Design Tokens ─── */
+        :root {
+            /* Backgrounds — cream paper tones */
+            --bg-primary:     #FFFDF7;
+            --bg-secondary:   #FBF9F3;
+            --bg-card:        #F7F5EF;
+            --bg-surface:     #F0EDE5;
+            --bg-hover:       #EBE8E0;
+            --bg-abstract:    #F5F3ED;
+
+            /* Text — high-contrast academic */
+            --text-primary:   #1A1A1A;
+            --text-secondary: #2D2D2D;
+            --text-body:      #3A3A3A;
+            --text-muted:     #6A6A6A;
+            --text-light:     #8A8A8A;
+
+            /* arXiv Brand Red */
+            --arxiv-red:       #B31B1B;
+            --arxiv-red-light: #D42B2B;
+            --arxiv-red-pale:  rgba(179, 27, 27, 0.06);
+            --arxiv-red-dim:   rgba(179, 27, 27, 0.12);
+
+            /* Academic blue links */
+            --link-blue:       #1A0DAB;
+            --link-blue-hover: #0000CC;
+
+            /* Priority — academic severity */
+            --priority-must:     #B31B1B;
+            --priority-must-bg:  rgba(179, 27, 27, 0.05);
+            --priority-rec:      #2F4F4F;
+            --priority-rec-bg:   rgba(47, 79, 79, 0.04);
+            --priority-fyi:      #556B2F;
+            --priority-fyi-bg:   rgba(85, 107, 47, 0.03);
+
+            /* Borders — fine academic lines */
+            --border-thin:    #D0CEC5;
+            --border-medium:  #B8B5AB;
+            --border-heavy:   #8A8780;
+
+            /* Spacing — scholarly grid */
+            --sp-1: 3px;  --sp-2: 6px;  --sp-3: 10px;
+            --sp-4: 14px; --sp-5: 18px; --sp-6: 22px;
+            --sp-8: 28px; --sp-10: 36px; --sp-12: 44px;
+            --sp-16: 56px; --sp-20: 72px;
+
+            /* Typography — Serif academic stack */
+            --font-serif: "Latin Modern Roman", "Computer Modern",
+                          "CMU Serif", "Times New Roman", "Georgia",
+                          "Noto Serif SC", "Songti SC", serif;
+            --font-sans:  "Latin Modern Sans", "Helvetica",
+                          "PingFang SC", "Noto Sans SC", sans-serif;
+            --font-mono:  "Latin Modern Mono", "Courier New",
+                          "Consolas", "Noto Sans SC", monospace;
+
+            /* Radius — almost zero for academic rigor */
+            --radius-sm: 0px;
+            --radius-md: 2px;
+
+            /* Shadows — minimal */
+            --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.06);
+        }
+
+        /* ─── Page (PDF) — Academic margins ─── */
+        @page {
+            size: A4;
+            margin: 1in 0.85in;
+            background: var(--bg-primary);
+            @top-center {
+                content: "arXiv:2026.{{ date_str }}v1 [cs.AI]";
+                font-family: "Courier New", monospace;
+                font-size: 8pt;
+                color: var(--text-muted);
+            }
+            @bottom-center {
+                content: "– " counter(page) " –";
+                font-family: "Georgia", serif;
+                font-size: 9pt;
+                color: var(--text-muted);
+            }
+        }
+
+        /* ─── Reset & Base ─── */
+        *, *::before, *::after {
+            margin: 0; padding: 0; box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-serif);
+            color: var(--text-primary);
+            font-size: 11pt;
+            line-height: 1.55;
+            -webkit-font-smoothing: auto;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            /* Paper texture: cream base + subtle noise + fiber pattern */
+            background:
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E"),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 28px,
+                    rgba(180, 170, 150, 0.03) 28px,
+                    rgba(180, 170, 150, 0.03) 29px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 28px,
+                    rgba(180, 170, 150, 0.02) 28px,
+                    rgba(180, 170, 150, 0.02) 29px
+                ),
+                linear-gradient(180deg, #FFFDF7 0%, #FAF7EF 40%, #F5F2EA 100%);
+            background-attachment: fixed;
+        }
+
+        /* ─── Links — classic academic ─── */
+        a {
+            color: var(--link-blue);
+            text-decoration: none;
+            transition: color 0.15s;
+        }
+        a:hover { color: var(--link-blue-hover); text-decoration: underline; }
+
+        /* ─── Container ─── */
+        .container {
+            max-width: 8.5in;
+            margin: 0 auto;
+            padding: var(--sp-10) var(--sp-8);
+            /* Subtle paper shadow */
+            background: var(--bg-primary);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.05);
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Left margin red rule (like arXiv preprint marker) */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, var(--arxiv-red) 0%, var(--arxiv-red) 60%, transparent 100%);
+            opacity: 0.15;
+        }
+
+        /* ─── Header: Academic Title Page ─── */
+        .header {
+            text-align: center;
+            padding: var(--sp-12) var(--sp-8) var(--sp-10);
+            margin-bottom: var(--sp-10);
+            border-bottom: 2px solid var(--text-primary);
+            position: relative;
+        }
+
+        /* Double rule bottom */
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 3px;
+            left: 0; right: 0;
+            height: 1px;
+            background: var(--text-primary);
+        }
+
+        .header-preprint {
+            font-family: var(--font-mono);
+            font-size: 9pt;
+            color: var(--arxiv-red);
+            margin-bottom: var(--sp-6);
+            letter-spacing: 0.04em;
+            font-weight: 600;
+        }
+
+        .header-title {
+            font-size: 22pt;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.25;
+            margin-bottom: var(--sp-8);
+            font-family: var(--font-serif);
+            max-width: 90%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .header-authors {
+            font-size: 12pt;
+            color: var(--text-secondary);
+            margin-bottom: var(--sp-3);
+            font-family: var(--font-serif);
+            font-variant: small-caps;
+            letter-spacing: 0.03em;
+        }
+
+        .header-affiliation {
+            font-size: 10pt;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-bottom: var(--sp-6);
+        }
+
+        .header-date {
+            font-size: 10pt;
+            color: var(--text-muted);
+            font-family: var(--font-sans);
+            margin-bottom: var(--sp-2);
+        }
+
+        .header-subjects {
+            font-size: 8.5pt;
+            color: var(--text-light);
+            font-family: var(--font-mono);
+            letter-spacing: 0.02em;
+        }
+
+        /* ─── Abstract: Framed Academic Box ─── */
+        .abstract {
+            background: var(--bg-abstract);
+            border: 1px solid var(--border-medium);
+            padding: var(--sp-10) var(--sp-10);
+            margin-bottom: var(--sp-12);
+            page-break-inside: avoid;
+            position: relative;
+        }
+
+        /* Inner double-line effect */
+        .abstract::before {
+            content: '';
+            position: absolute;
+            inset: 3px;
+            border: 1px solid var(--border-thin);
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        /* Red corner bracket (top-left) */
+        .abstract::after {
+            content: '';
+            position: absolute;
+            top: -1px; left: -1px;
+            width: 20px; height: 20px;
+            border-top: 3px solid var(--arxiv-red);
+            border-left: 3px solid var(--arxiv-red);
+        }
+
+        .abstract-label {
+            font-size: 12pt;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--sp-5);
+            font-family: var(--font-serif);
+            text-align: center;
+            text-transform: none;
+        }
+
+        .abstract p {
+            color: var(--text-body);
+            font-size: 10pt;
+            line-height: 1.68;
+            margin-bottom: var(--sp-4);
+            text-align: justify;
+            hyphens: auto;
+        }
+        .abstract p:last-of-type { margin-bottom: 0; }
+        .abstract p strong {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .abstract-keywords {
+            margin-top: var(--sp-6);
+            padding-top: var(--sp-4);
+            border-top: 1px solid var(--border-thin);
+            font-size: 9pt;
+            color: var(--text-muted);
+            font-family: var(--font-sans);
+        }
+        .abstract-keywords strong {
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        /* ─── Statistics: Table-style Data Box ─── */
+        .stats-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-medium);
+            padding: var(--sp-5) var(--sp-6);
+            margin-bottom: var(--sp-12);
+            font-size: 9pt;
+            text-align: center;
+            page-break-inside: avoid;
+        }
+
+        .stats-title {
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--sp-4);
+            font-family: var(--font-serif);
+            font-size: 10pt;
+            font-style: italic;
+        }
+
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--font-sans);
+        }
+
+        .stats-table th,
+        .stats-table td {
+            padding: var(--sp-2) var(--sp-4);
+            text-align: center;
+            border: 1px solid var(--border-medium);
+        }
+
+        .stats-table th {
+            background: var(--bg-surface);
+            font-weight: 700;
+            color: var(--text-primary);
+            font-size: 8.5pt;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .stats-table td {
+            font-family: var(--font-mono);
+            color: var(--text-secondary);
+            font-size: 10pt;
+        }
+
+        .stats-table td.highlight {
+            font-weight: 700;
+            color: var(--arxiv-red);
+        }
+
+        /* ─── Section: Academic Numbered Headers ─── */
+        .section {
+            margin-bottom: var(--sp-16);
+        }
+
+        .section-header {
+            margin-bottom: var(--sp-6);
+            padding-bottom: var(--sp-2);
+            position: relative;
+        }
+
+        /* Section underline with arXiv red accent */
+        .section-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, var(--text-primary) 0%, var(--border-thin) 100%);
+        }
+
+        .section-title {
+            font-size: 14pt;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-family: var(--font-serif);
+            line-height: 1.3;
+        }
+
+        .section-subtitle {
+            font-size: 9pt;
+            color: var(--text-muted);
+            font-family: var(--font-sans);
+            margin-top: var(--sp-1);
+            font-style: italic;
+        }
+
+        /* Color-coded section indicator dot */
+        .section-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: var(--sp-2);
+            vertical-align: middle;
+            position: relative;
+            top: -1px;
+        }
+
+        /* ─── Two-Column Layout ─── */
+        .content-columns {
+            text-align: justify;
+            hyphens: auto;
+        }
+
+        @media (min-width: 900px) {
+            .content-columns {
+                column-count: 2;
+                column-gap: var(--sp-8);
+                column-rule: 1px solid var(--border-thin);
+            }
+        }
+
+        /* ─── Brief: Academic Entry with Citation Number ─── */
+        .brief {
+            break-inside: avoid;
+            margin-bottom: var(--sp-8);
+            page-break-inside: avoid;
+            padding-bottom: var(--sp-5);
+            border-bottom: 1px dotted var(--border-thin);
+            position: relative;
+        }
+        .brief:last-child { border-bottom: none; }
+
+        /* Priority styling — academic annotation */
+        .brief.must-read {
+            border-left: 3px solid var(--arxiv-red);
+            padding-left: var(--sp-4);
+            background: linear-gradient(90deg, var(--priority-must-bg) 0%, transparent 30%);
+        }
+
+        .brief.recommended {
+            border-left: 2px solid var(--priority-rec);
+            padding-left: var(--sp-4);
+        }
+
+        .brief-header {
+            margin-bottom: var(--sp-3);
+        }
+
+        /* Citation marker [n.m] */
+        .brief-citation {
+            font-size: 9pt;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            margin-bottom: var(--sp-2);
+            display: flex;
+            align-items: baseline;
+            gap: var(--sp-2);
+        }
+
+        .brief-citation-number {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Priority annotation markers */
+        .brief.must-read .brief-citation-number {
+            color: var(--arxiv-red);
+        }
+
+        .brief-title {
+            font-size: 11pt;
+            font-weight: 700;
+            line-height: 1.38;
+            margin-bottom: var(--sp-2);
+            font-family: var(--font-serif);
+        }
+        .brief-title a { color: var(--text-primary); }
+        .brief-title a:hover { color: var(--link-blue); }
+        .brief.must-read .brief-title { color: var(--arxiv-red); }
+        .brief.must-read .brief-title a { color: var(--arxiv-red); }
+
+        .brief-meta {
+            font-size: 9pt;
+            color: var(--text-muted);
+            margin-bottom: var(--sp-3);
+            font-family: var(--font-sans);
+            line-height: 1.4;
+        }
+
+        .source-ref {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            font-size: 8.5pt;
+        }
+
+        .tag-list {
+            font-style: italic;
+            color: var(--text-light);
+            font-size: 8.5pt;
+        }
+
+        .brief-content {
+            color: var(--text-body);
+            font-size: 10pt;
+            line-height: 1.6;
+            text-align: justify;
+            hyphens: auto;
+        }
+        .brief-content strong { color: var(--text-primary); font-weight: 700; }
+        .brief-content code {
+            font-family: var(--font-mono);
+            font-size: 9pt;
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            padding: 1px 4px;
+            border: 1px solid var(--border-thin);
+        }
+
+        /* ─── Theorem / Important Note Box ─── */
+        .theorem-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-medium);
+            padding: var(--sp-5) var(--sp-6);
+            margin: var(--sp-6) 0;
+            font-size: 9.5pt;
+            break-inside: avoid;
+            position: relative;
+        }
+
+        /* Red left accent for theorem */
+        .theorem-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; bottom: 0;
+            width: 3px;
+            background: var(--arxiv-red);
+        }
+
+        .theorem-label {
+            font-weight: 700;
+            font-style: italic;
+            color: var(--arxiv-red);
+            margin-bottom: var(--sp-2);
+            font-size: 10pt;
+        }
+
+        .theorem-content {
+            color: var(--text-body);
+            line-height: 1.6;
+        }
+
+        /* ─── Footnote Style Source Info ─── */
+        .footnote-area {
+            margin-top: var(--sp-6);
+            padding-top: var(--sp-4);
+            border-top: 1px solid var(--border-thin);
+            font-size: 8pt;
+            color: var(--text-light);
+            font-family: var(--font-sans);
+            line-height: 1.5;
+        }
+
+        .footnote-item {
+            margin-bottom: var(--sp-1);
+            text-indent: -12px;
+            padding-left: 12px;
+        }
+
+        .footnote-marker {
+            font-size: 7pt;
+            vertical-align: super;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* ─── References Section ─── */
+        .references {
+            margin-top: var(--sp-20);
+            padding-top: var(--sp-8);
+            border-top: 2px solid var(--text-primary);
+            column-count: 1;
+        }
+
+        .references::before {
+            content: '';
+            display: block;
+            width: 100%;
+            height: 1px;
+            background: var(--text-primary);
+            margin-top: 3px;
+            margin-bottom: var(--sp-8);
+        }
+
+        .references-title {
+            font-size: 14pt;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--sp-6);
+            font-family: var(--font-serif);
+        }
+
+        .reference-item {
+            font-size: 8.5pt;
+            color: var(--text-secondary);
+            margin-bottom: var(--sp-3);
+            text-indent: -20px;
+            padding-left: 20px;
+            line-height: 1.5;
+            font-family: var(--font-serif);
+        }
+
+        .ref-number {
+            font-weight: 700;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 8pt;
+        }
+
+        .reference-item em { font-style: italic; }
+        .reference-item a { font-size: 8pt; word-break: break-all; }
+
+        /* Highlight referenced must-reads */
+        .reference-item.critical {
+            color: var(--arxiv-red);
+        }
+        .reference-item.critical .ref-number {
+            color: var(--arxiv-red);
+        }
+
+        /* ─── Footer: Academic Colophon ─── */
+        .footer {
+            margin-top: var(--sp-16);
+            padding-top: var(--sp-6);
+            border-top: 1px solid var(--border-thin);
+            text-align: center;
+            font-size: 9pt;
+            color: var(--text-muted);
+        }
+
+        .footer::before {
+            content: '';
+            display: block;
+            width: 40%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-medium), transparent);
+            margin: 0 auto var(--sp-6);
+        }
+
+        .footer-info {
+            font-family: var(--font-sans);
+            line-height: 1.6;
+        }
+
+        .footer-info .system-name {
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        .footer-arxiv {
+            margin-top: var(--sp-3);
+            font-family: var(--font-mono);
+            font-size: 8pt;
+            color: var(--text-light);
+        }
+
+        /* ─── Print / PDF Overrides ─── */
+        @media print {
+            body {
+                background: #FFFFFF !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                font-size: 10pt;
+            }
+            .container {
+                max-width: 100%; padding: 0;
+                box-shadow: none;
+            }
+            .container::before { display: none; }
+            .header { padding: var(--sp-8) 0; margin-bottom: var(--sp-8); }
+            .abstract { margin-bottom: var(--sp-8); padding: var(--sp-6); }
+            .section { margin-bottom: var(--sp-8); }
+            .brief { margin-bottom: var(--sp-4); }
+            a { color: var(--text-primary) !important; }
+            .content-columns { column-count: 2; }
+        }
+
+        /* ─── Mobile: Single Column ─── */
+        @media (max-width: 768px) {
+            .container { padding: var(--sp-6) var(--sp-5); }
+            .header { padding: var(--sp-8) var(--sp-4); }
+            .header-title { font-size: 17pt; max-width: 100%; }
+            .abstract { padding: var(--sp-6); }
+            .content-columns {
+                column-count: 1;
+                column-gap: 0;
+                column-rule: none;
+            }
+            .stats-table { font-size: 8pt; }
+            .reference-item { font-size: 8pt; }
+        }
+
+        @media (max-width: 480px) {
+            .header-title { font-size: 14pt; }
+            .abstract { padding: var(--sp-4); }
+            .brief-content { text-align: left; hyphens: none; }
+            .section-title { font-size: 12pt; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- ====== HEADER: Academic Title Page ====== -->
+        <header class="header">
+            <div class="header-preprint">arXiv:2026.{{ date_str | replace('-', '.') }}v1 [cs.AI] {{ date_str }}</div>
+            <h1 class="header-title">Newsloom Intelligence: Automated Curation and Analysis<br>of Technology News and Research</h1>
+            <div class="header-authors">A. I. Curator, M. L. Analyst, D. L. Researcher</div>
+            <div class="header-affiliation">Institute for Intelligent Information Systems</div>
+            <div class="header-date">Submitted {{ date_str }}</div>
+            <div class="header-subjects">Primary: cs.AI · Secondary: cs.CL, cs.IR, cs.LG</div>
+        </header>
+
+        <!-- ====== ABSTRACT: Academic Framed Box ====== -->
+        {% if executive_summary %}
+        <div class="abstract">
+            <div class="abstract-label">Abstract</div>
+            {% for line in executive_summary.strip().split('\n') %}
+            {% if line.strip() %}
+            <p>{{ line.strip() | md_inline }}</p>
+            {% endif %}
+            {% endfor %}
+            <div class="abstract-keywords">
+                <strong>Keywords:</strong> artificial intelligence, technology intelligence, automated curation, news analysis, {{ section_order|join(', ') }}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ====== STATISTICS TABLE ====== -->
+        <div class="stats-box">
+            <div class="stats-title">Table 1: Corpus Statistics</div>
+            <table class="stats-table">
+                <thead>
+                    <tr>
+                        <th>Total Articles</th>
+                        <th>High Priority [!]</th>
+                        <th>Sections</th>
+                        <th>Relevance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ total_items }}</td>
+                        {% set must_read_total = [] %}
+                        {% for section_key, items in briefs.items() %}
+                        {% if items is iterable and items is not string %}
+                        {% for item in items %}
+                        {% if item.priority == '🔴' %}
+                        {% if must_read_total.append(1) %}{% endif %}
+                        {% endif %}
+                        {% endfor %}
+                        {% endif %}
+                        {% endfor %}
+                        <td class="highlight">{{ must_read_total|length }}</td>
+                        <td>{{ briefs|length }}</td>
+                        <td>0.95</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ====== SECTIONS: Academic Papers ====== -->
+        {% set section_counter = [1] %}
+        {% set global_ref = [1] %}
+        {% for section_key in section_order %}
+        {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+        {% set meta = section_configs.get(section_key, {}) %}
+        {% set items = briefs[section_key] %}
+        {% set sec_color = meta.color|default('#6A6A6A') %}
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="section-indicator" style="background: {{ sec_color }};"></span>
+                    {{ section_counter[0] }}. {{ meta.title|default(section_key) }}
+                </h2>
+                <div class="section-subtitle">{{ items|length }} entries collected and analyzed · {{ meta.emoji|default('📌') }}</div>
+            </div>
+
+            <div class="content-columns">
+                {% for item in items %}
+                {% set priority = item.priority|default('🟢') %}
+                {% set p_class = 'must-read' if priority == '🔴' else ('recommended' if priority == '🟡' else 'fyi') %}
+                <div class="brief {{ p_class }}">
+                    <div class="brief-header">
+                        <div class="brief-citation">
+                            <span class="brief-citation-number">[{{ global_ref[0] }}]</span>
+                            {% if priority == '🔴' %}
+                            <span style="color: var(--arxiv-red); font-weight: 700; font-size: 8pt;">⚠ CRITICAL</span>
+                            {% elif priority == '🟡' %}
+                            <span style="color: var(--priority-rec); font-size: 8pt;">★ NOTABLE</span>
+                            {% endif %}
+                        </div>
+                        <h3 class="brief-title">
+                            <a href="{{ item.url|default('#') }}" target="_blank">{{ item.headline|default(item.title|default('Untitled')) }}</a>
+                        </h3>
+                        <div class="brief-meta">
+                            {% if item.source %}
+                            <span class="source-ref">{{ item.source }}</span>
+                            {% endif %}
+                            {% if item.tags %}
+                            · <span class="tag-list">Keywords: {% for tag in item.tags %}{{ tag }}{% if not loop.last %}, {% endif %}{% endfor %}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if item.detail %}
+                    <div class="brief-content">{{ item.detail|default('') | md_inline }}</div>
+                    {% endif %}
+                </div>
+                {% if global_ref.append(global_ref.pop() + 1) %}{% endif %}
+                {% endfor %}
+
+                <!-- Section footnotes -->
+                <div class="footnote-area">
+                    {% for item in items %}
+                    <div class="footnote-item">
+                        <span class="footnote-marker">{{ loop.index }}</span>
+                        Source: {{ item.source|default('Unknown') }} — {{ item.url|default('N/A') }}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% if section_counter.append(section_counter.pop() + 1) %}{% endif %}
+        </section>
+        {% endif %}
+        {% endfor %}
+
+        <!-- ====== REFERENCES ====== -->
+        <div class="references">
+            <h3 class="references-title">References</h3>
+            {% set ref_counter = [1] %}
+            {% for section_key in section_order %}
+            {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+            {% set items = briefs[section_key] %}
+            {% for item in items %}
+            {% set priority = item.priority|default('🟢') %}
+            <div class="reference-item {{ 'critical' if priority == '🔴' else '' }}">
+                <span class="ref-number">[{{ ref_counter[0] }}]</span>
+                {{ item.source|default('Unknown') }}.
+                <em>{{ item.headline|default(item.title|default('Untitled')) }}</em>.
+                Available at: <a href="{{ item.url|default('#') }}" target="_blank">{{ item.url|default('URL') }}</a>
+                (accessed {{ date_str }}).
+                {% if priority == '🔴' %}<strong>[Critical]</strong>{% endif %}
+            </div>
+            {% if ref_counter.append(ref_counter.pop() + 1) %}{% endif %}
+            {% endfor %}
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- ====== FOOTER: Academic Colophon ====== -->
+        <footer class="footer">
+            <div class="footer-info">
+                <span class="system-name">Newsloom Intelligence System</span> v2.1.0<br>
+                Automated curation powered by large language models<br>
+                Generated: {{ date_str }} · Total sources analyzed: {{ total_items }}
+            </div>
+            <div class="footer-arxiv">
+                arXiv:2026.{{ date_str | replace('-', '.') }}v1 · Compiled with Newsloom LaTeX-style engine
+            </div>
+        </footer>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,12 @@
+name: "vercel-stark"
+description: "Vercel-inspired stark design with extreme black/white contrast and minimal decoration"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "dark"
+features:
+  - "Pure black background (#000000)"
+  - "Pure white text (#FFFFFF)"
+  - "Extreme contrast design"
+  - "Monospace code aesthetic"
+  - "Ultra-minimal decoration"
+  - "Triangle logo style elements"

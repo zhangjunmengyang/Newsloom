@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsloom · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * NOTION CLEAN — "If Notion Made a Newsletter"
+         * ============================================================
+         * White #FFFFFF · Notion warm grays · Subtle dot-grid
+         * Page-icon + big title · Database card view · Toggle headers
+         * Callout blocks · To-do checkboxes · Colored tags · Breadcrumbs
+         * Inspired by: Notion, Linear, Coda, Craft
+         * ============================================================ */
+
+        /* --- Design Tokens --- */
+        :root {
+            /* Notion Palette — warm grays */
+            --bg-page:          #FFFFFF;
+            --bg-secondary:     #FBFBFA;
+            --bg-card:          #F7F6F3;
+            --bg-surface:       #F1F0ED;
+            --bg-hover:         #EEEEEC;
+            --bg-selected:      #E3E2DF;
+            --bg-cover:         linear-gradient(135deg, #F5E6D3 0%, #FADEC9 30%, #FDEBD0 60%, #F5F0E8 100%);
+
+            /* Notion Text */
+            --text-title:       #37352F;
+            --text-body:        #37352F;
+            --text-secondary:   #6B6966;
+            --text-muted:       #9B9A97;
+            --text-light:       #CBCAC7;
+            --text-inverse:     #FFFFFF;
+
+            /* Notion Blue (used sparingly) */
+            --notion-blue:      #2F80ED;
+            --notion-blue-bg:   rgba(47, 128, 237, 0.06);
+
+            /* Notion Semantic Tag Colors */
+            --tag-default:      #E8E7E4;
+            --tag-default-text: #6B6966;
+            --tag-blue:         #D3E5EF;
+            --tag-blue-text:    #2F6B89;
+            --tag-purple:       #E8DEEE;
+            --tag-purple-text:  #6940A5;
+            --tag-pink:         #F4DFEB;
+            --tag-pink-text:    #AD1A72;
+            --tag-red:          #FFE2DD;
+            --tag-red-text:     #93291E;
+            --tag-orange:       #FADEC9;
+            --tag-orange-text:  #93591E;
+            --tag-yellow:       #FBF3DB;
+            --tag-yellow-text:  #73651A;
+            --tag-green:        #DBEDDB;
+            --tag-green-text:   #1B6F47;
+            --tag-gray:         #E8E7E4;
+            --tag-gray-text:    #6B6966;
+
+            /* Notion Callout Colors */
+            --callout-yellow:   #FBF3DB;
+            --callout-blue:     #DDEBF1;
+            --callout-pink:     #F4DFEB;
+            --callout-gray:     #F1F0ED;
+
+            /* Priority */
+            --pri-must:         #EB5757;
+            --pri-must-bg:      rgba(235, 87, 87, 0.06);
+            --pri-rec:          #F2994A;
+            --pri-rec-bg:       rgba(242, 153, 74, 0.06);
+            --pri-fyi:          #6FCF97;
+            --pri-fyi-bg:       rgba(111, 207, 151, 0.04);
+
+            /* Borders */
+            --border:           #E9E9E7;
+            --border-strong:    #DDDDD9;
+            --border-accent:    rgba(47, 128, 237, 0.25);
+
+            /* Spacing */
+            --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px;
+            --sp-4: 16px; --sp-5: 20px; --sp-6: 24px;
+            --sp-8: 32px; --sp-10: 40px; --sp-12: 48px;
+            --sp-16: 64px; --sp-20: 80px;
+
+            /* Typography — Notion system fonts */
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans",
+                         "Helvetica Neue", "PingFang SC", "Noto Sans SC",
+                         "Microsoft YaHei", sans-serif;
+            --font-serif: "Georgia", "Noto Serif SC", "Songti SC", serif;
+            --font-mono: "SFMono-Regular", "Consolas", "Liberation Mono", "Menlo", monospace;
+
+            /* Radius */
+            --radius-sm: 4px;
+            --radius-md: 6px;
+            --radius-lg: 8px;
+
+            /* Shadows */
+            --shadow-sm:   0 1px 2px rgba(55, 53, 47, 0.04);
+            --shadow-card: 0 1px 3px rgba(55, 53, 47, 0.06), 0 0 0 1px rgba(55, 53, 47, 0.04);
+            --shadow-hover: 0 4px 12px rgba(55, 53, 47, 0.1), 0 0 0 1px rgba(55, 53, 47, 0.06);
+        }
+
+        /* --- PDF --- */
+        @page {
+            size: A4;
+            margin: 2cm;
+            @bottom-center {
+                content: counter(page);
+                font-family: var(--font-sans);
+                font-size: 10pt;
+                color: var(--text-muted);
+            }
+        }
+
+        /* --- Reset --- */
+        *, *::before, *::after {
+            margin: 0; padding: 0; box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            /* Notion-style: subtle dot-grid background */
+            background:
+                radial-gradient(circle, #E5E5E0 0.5px, transparent 0.5px),
+                var(--bg-page);
+            background-size: 24px 24px;
+            color: var(--text-body);
+            font-size: 16px;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        a {
+            color: var(--text-body);
+            text-decoration: none;
+            border-bottom: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+        a:hover {
+            color: var(--notion-blue);
+            border-bottom-color: var(--notion-blue);
+        }
+
+        /* --- Container: Notion page width --- */
+        .page {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 0 var(--sp-8);
+            background: var(--bg-page);
+        }
+
+        /* ============================================================
+         * COVER — Notion-style page cover gradient
+         * ============================================================ */
+        .cover {
+            height: 180px;
+            background: var(--bg-cover);
+            position: relative;
+            margin-bottom: var(--sp-16);
+        }
+
+        .cover::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 60px;
+            background: linear-gradient(to top, var(--bg-page), transparent);
+        }
+
+        /* ============================================================
+         * HEADER — Page icon + Title (Notion style)
+         * ============================================================ */
+        .header {
+            margin-top: -60px;
+            position: relative;
+            z-index: 2;
+            margin-bottom: var(--sp-12);
+            padding-bottom: var(--sp-8);
+        }
+
+        .header-icon {
+            font-size: 4.5em;
+            line-height: 1;
+            margin-bottom: var(--sp-4);
+            display: block;
+            /* Slight shadow for floating effect over cover */
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        .header-title {
+            font-size: 2.8em;
+            font-weight: 700;
+            color: var(--text-title);
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            margin-bottom: var(--sp-3);
+        }
+
+        .header-subtitle {
+            font-size: 1.1em;
+            color: var(--text-secondary);
+            font-weight: 400;
+            margin-bottom: var(--sp-6);
+        }
+
+        /* Notion-style property row */
+        .header-props {
+            display: flex;
+            flex-direction: column;
+            gap: var(--sp-2);
+            font-size: 0.88em;
+            color: var(--text-muted);
+        }
+
+        .prop-row {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            padding: var(--sp-1) 0;
+        }
+
+        .prop-label {
+            width: 100px;
+            flex-shrink: 0;
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.92em;
+        }
+
+        .prop-value {
+            color: var(--text-secondary);
+        }
+
+        .prop-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+            font-size: 0.88em;
+            font-weight: 500;
+        }
+
+        .prop-tag.red { background: var(--tag-red); color: var(--tag-red-text); }
+        .prop-tag.blue { background: var(--tag-blue); color: var(--tag-blue-text); }
+        .prop-tag.green { background: var(--tag-green); color: var(--tag-green-text); }
+
+        /* ============================================================
+         * TABLE OF CONTENTS — Notion toggle list style
+         * ============================================================ */
+        .toc {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            padding: var(--sp-5) var(--sp-6);
+            margin-bottom: var(--sp-10);
+            border: 1px solid var(--border);
+        }
+
+        .toc:hover { box-shadow: var(--shadow-sm); }
+
+        .toc-header {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+            margin-bottom: var(--sp-4);
+        }
+
+        .toc-toggle {
+            color: var(--text-muted);
+            font-size: 0.78em;
+            transition: transform 0.2s;
+        }
+
+        .toc-title {
+            font-size: 0.88em;
+            font-weight: 600;
+            color: var(--text-body);
+        }
+
+        .toc-item {
+            display: flex;
+            align-items: center;
+            padding: var(--sp-1) var(--sp-4);
+            font-size: 0.92em;
+            border-radius: var(--radius-sm);
+            transition: background 0.15s;
+        }
+
+        .toc-item:hover { background: var(--bg-hover); }
+
+        .toc-emoji {
+            width: 22px;
+            flex-shrink: 0;
+            text-align: center;
+            margin-right: var(--sp-2);
+            font-size: 0.92em;
+        }
+
+        .toc-name {
+            color: var(--text-secondary);
+            flex: 1;
+        }
+
+        .toc-dots {
+            flex: 1;
+            border-bottom: 1px dotted var(--border);
+            margin: 0 var(--sp-3);
+            min-width: 30px;
+            opacity: 0.5;
+        }
+
+        .toc-count {
+            color: var(--text-muted);
+            font-size: 0.82em;
+            background: var(--bg-card);
+            padding: 1px 6px;
+            border-radius: var(--radius-sm);
+        }
+
+        /* ============================================================
+         * CALLOUT — Notion yellow callout block
+         * ============================================================ */
+        .callout {
+            display: flex;
+            gap: var(--sp-3);
+            background: var(--callout-yellow);
+            border-radius: var(--radius-md);
+            padding: var(--sp-5) var(--sp-5);
+            margin-bottom: var(--sp-10);
+            page-break-inside: avoid;
+            border: 1px solid transparent;
+        }
+
+        .callout:hover { border-color: rgba(0,0,0,0.04); }
+
+        .callout-icon {
+            font-size: 1.3em;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .callout-body {
+            flex: 1;
+        }
+
+        .callout-title {
+            font-weight: 600;
+            color: var(--text-body);
+            margin-bottom: var(--sp-2);
+            font-size: 0.95em;
+        }
+
+        .callout-body p {
+            font-size: 0.95em;
+            line-height: 1.75;
+            color: var(--text-secondary);
+            margin-bottom: var(--sp-3);
+        }
+
+        .callout-body p:last-child { margin-bottom: 0; }
+
+        .callout-body p strong {
+            color: var(--text-body);
+            font-weight: 600;
+            background: linear-gradient(to bottom, transparent 60%, rgba(255, 196, 77, 0.35) 60%);
+            padding: 0 2px;
+        }
+
+        /* ============================================================
+         * SECTION — Toggle-style section headers
+         * ============================================================ */
+        .section {
+            margin-bottom: var(--sp-12);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            padding: var(--sp-3) var(--sp-2);
+            margin-bottom: var(--sp-5);
+            border-radius: var(--radius-sm);
+            cursor: default;
+            transition: background 0.15s;
+        }
+
+        .section-header:hover {
+            background: var(--bg-hover);
+        }
+
+        /* Toggle arrow icon */
+        .section-toggle {
+            color: var(--text-muted);
+            font-size: 0.72em;
+            flex-shrink: 0;
+            width: 18px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .section-icon {
+            font-size: 1.3em;
+            flex-shrink: 0;
+        }
+
+        .section-title {
+            font-size: 1.35em;
+            font-weight: 600;
+            color: var(--text-title);
+            flex: 1;
+        }
+
+        .section-badge {
+            font-size: 0.78em;
+            color: var(--text-muted);
+            background: var(--bg-card);
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            font-weight: 500;
+        }
+
+        /* Section divider */
+        .section-divider {
+            height: 1px;
+            background: var(--border);
+            margin-bottom: var(--sp-5);
+        }
+
+        /* ============================================================
+         * BRIEF — Notion database card / to-do item
+         * ============================================================ */
+        .brief {
+            padding: var(--sp-4) var(--sp-4);
+            border-radius: var(--radius-md);
+            page-break-inside: avoid;
+            position: relative;
+            transition: background 0.15s;
+        }
+
+        .brief + .brief {
+            border-top: 1px solid var(--border);
+            border-radius: 0;
+        }
+
+        .brief:hover {
+            background: var(--bg-hover);
+        }
+
+        .brief.must-read {
+            background: var(--pri-must-bg);
+            border-radius: var(--radius-md);
+            border-top: none !important;
+            margin-bottom: var(--sp-2);
+        }
+
+        .brief.must-read:hover { background: rgba(235, 87, 87, 0.09); }
+
+        .brief.recommended {
+            background: var(--pri-rec-bg);
+        }
+
+        .brief.recommended:hover { background: rgba(242, 153, 74, 0.09); }
+
+        /* To-do checkbox row */
+        .brief-row {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--sp-3);
+            margin-bottom: var(--sp-2);
+        }
+
+        .checkbox {
+            flex-shrink: 0;
+            width: 18px; height: 18px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 4px;
+            transition: all 0.15s;
+        }
+
+        .brief.must-read .checkbox {
+            background: var(--pri-must);
+            border: 2px solid var(--pri-must);
+        }
+        .brief.must-read .checkbox::after {
+            content: '✓'; color: white; font-size: 0.65em; font-weight: 700;
+        }
+
+        .brief.recommended .checkbox {
+            background: transparent;
+            border: 2px solid var(--pri-rec);
+        }
+        .brief.recommended .checkbox::after {
+            content: '–'; color: var(--pri-rec); font-size: 0.82em; font-weight: 700; line-height: 1;
+        }
+
+        .brief.fyi .checkbox {
+            background: transparent;
+            border: 2px solid var(--text-light);
+        }
+
+        .brief-headline {
+            flex: 1;
+            font-size: 1.05em;
+            font-weight: 600;
+            line-height: 1.45;
+        }
+
+        .brief-headline a {
+            color: var(--text-body);
+            border-bottom: none;
+        }
+
+        .brief-headline a:hover { color: var(--notion-blue); }
+
+        .brief.must-read .brief-headline a {
+            color: var(--pri-must);
+            font-weight: 700;
+        }
+
+        /* Must-read label */
+        .must-label {
+            display: inline-flex;
+            font-size: 0.65em;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--pri-must);
+            background: var(--tag-red);
+            padding: 1px 6px;
+            border-radius: var(--radius-sm);
+            margin-left: var(--sp-2);
+            vertical-align: middle;
+        }
+
+        /* Brief meta & tags */
+        .brief-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+            margin-left: 30px;
+            margin-bottom: var(--sp-3);
+            flex-wrap: wrap;
+        }
+
+        .source-label {
+            font-size: 0.82em;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .meta-dot {
+            color: var(--text-light);
+            font-size: 0.6em;
+        }
+
+        /* Notion colored tags */
+        .tag {
+            display: inline-block;
+            font-size: 0.75em;
+            font-weight: 500;
+            padding: 1px 7px;
+            border-radius: var(--radius-sm);
+        }
+
+        .tag-0 { background: var(--tag-blue); color: var(--tag-blue-text); }
+        .tag-1 { background: var(--tag-purple); color: var(--tag-purple-text); }
+        .tag-2 { background: var(--tag-green); color: var(--tag-green-text); }
+        .tag-3 { background: var(--tag-orange); color: var(--tag-orange-text); }
+        .tag-4 { background: var(--tag-pink); color: var(--tag-pink-text); }
+        .tag-5 { background: var(--tag-yellow); color: var(--tag-yellow-text); }
+
+        /* Brief detail */
+        .brief-detail {
+            color: var(--text-secondary);
+            font-size: 0.95em;
+            line-height: 1.8;
+            margin-left: 30px;
+        }
+
+        .brief-detail strong {
+            color: var(--text-body);
+            font-weight: 600;
+            background: linear-gradient(to bottom, transparent 60%, rgba(255, 196, 77, 0.25) 60%);
+            padding: 0 2px;
+        }
+
+        .brief-detail code {
+            font-family: var(--font-mono);
+            font-size: 0.88em;
+            background: var(--bg-card);
+            color: var(--pri-must);
+            padding: 2px 5px;
+            border-radius: 3px;
+            border: 1px solid var(--border);
+        }
+
+        /* ============================================================
+         * INLINE DATABASE TABLE — Section stats
+         * ============================================================ */
+        .db-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: var(--sp-6) 0;
+            font-size: 0.88em;
+        }
+
+        .db-table th {
+            text-align: left;
+            padding: var(--sp-2) var(--sp-3);
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.88em;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .db-table td {
+            padding: var(--sp-2) var(--sp-3);
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .db-table tr:hover td { background: var(--bg-hover); }
+
+        .db-table .db-emoji { width: 30px; text-align: center; }
+        .db-table .db-name { font-weight: 500; color: var(--text-body); }
+        .db-table .db-count { font-family: var(--font-mono); color: var(--text-muted); }
+
+        /* Notion-style color indicator dot */
+        .color-dot {
+            display: inline-block;
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            margin-right: var(--sp-1);
+            vertical-align: middle;
+        }
+
+        /* Section end marker */
+        .section-end {
+            text-align: center;
+            padding: var(--sp-4) 0;
+            color: var(--text-light);
+            font-size: 1.1em;
+            letter-spacing: 0.3em;
+        }
+
+        /* ============================================================
+         * FOOTER — Breadcrumb + last edited
+         * ============================================================ */
+        .footer {
+            margin-top: var(--sp-16);
+            padding: var(--sp-8) 0 var(--sp-6);
+            position: relative;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), var(--border), transparent);
+        }
+
+        /* Breadcrumb path */
+        .breadcrumb {
+            font-size: 0.78em;
+            color: var(--text-muted);
+            margin-bottom: var(--sp-4);
+        }
+
+        .breadcrumb span {
+            color: var(--text-light);
+            margin: 0 var(--sp-1);
+        }
+
+        .breadcrumb a {
+            color: var(--text-muted);
+            border-bottom: none;
+        }
+
+        .breadcrumb a:hover { color: var(--notion-blue); }
+
+        .footer-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75em;
+            color: var(--text-light);
+        }
+
+        .footer-edited {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+        }
+
+        .footer-brand {
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        /* ============================================================
+         * Print
+         * ============================================================ */
+        @media print {
+            body {
+                background: white !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .page { max-width: 100%; padding: 0; }
+            .cover { height: 80px; }
+            .brief:hover { background: transparent; }
+            .brief.must-read:hover { background: var(--pri-must-bg); }
+            .section-header:hover { background: transparent; }
+            a { color: var(--text-body) !important; border-bottom: none; }
+        }
+
+        /* ============================================================
+         * Mobile
+         * ============================================================ */
+        @media (max-width: 640px) {
+            .page { padding: 0 var(--sp-4); }
+            .cover { height: 120px; }
+            .header { margin-top: -40px; }
+            .header-icon { font-size: 3em; }
+            .header-title { font-size: 2em; }
+            .header-props { font-size: 0.82em; }
+            .prop-label { width: 80px; }
+            .section-title { font-size: 1.15em; }
+            .brief { padding: var(--sp-3); }
+            .brief-detail { margin-left: 0; margin-top: var(--sp-2); }
+            .brief-meta { margin-left: 0; }
+            .db-table { font-size: 0.82em; }
+        }
+
+        /* ============================================================
+         * Dark mode (Notion style)
+         * ============================================================ */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-page: #191919;
+                --bg-secondary: #202020;
+                --bg-card: #252525;
+                --bg-surface: #2D2D2D;
+                --bg-hover: #333333;
+                --bg-selected: #3A3A3A;
+                --text-title: #E8E6E3;
+                --text-body: #D4D4D0;
+                --text-secondary: #A0A0A0;
+                --text-muted: #6B6B6B;
+                --text-light: #4A4A4A;
+                --border: #333333;
+                --border-strong: #444444;
+            }
+            body { background: var(--bg-page); background-image: none; }
+            .cover { background: linear-gradient(135deg, #2D2820, #342C20, #3A3028, #2A2A28); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Cover gradient -->
+    <div class="cover"></div>
+
+    <div class="page">
+
+        <!-- ====== HEADER ====== -->
+        <header class="header">
+            <span class="header-icon">📡</span>
+            <h1 class="header-title">Daily Intelligence Brief</h1>
+            <div class="header-subtitle">Curated technology and market insights</div>
+            <div class="header-props">
+                <div class="prop-row">
+                    <span class="prop-label">📅 Date</span>
+                    <span class="prop-value">{{ date_str }}</span>
+                </div>
+                <div class="prop-row">
+                    <span class="prop-label">📊 Articles</span>
+                    <span class="prop-value">{{ total_items }}</span>
+                </div>
+                {% set must_total = [] %}
+                {% for section_key, items in briefs.items() %}
+                {% if items is iterable and items is not string %}
+                {% for item in items %}
+                {% if item.priority == '🔴' %}{% if must_total.append(1) %}{% endif %}{% endif %}
+                {% endfor %}
+                {% endif %}
+                {% endfor %}
+                <div class="prop-row">
+                    <span class="prop-label">🔥 Priority</span>
+                    <span class="prop-tag red">{{ must_total|length }} must-read</span>
+                </div>
+                <div class="prop-row">
+                    <span class="prop-label">🏷️ Status</span>
+                    <span class="prop-tag green">Published</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- ====== TABLE OF CONTENTS ====== -->
+        <div class="toc">
+            <div class="toc-header">
+                <span class="toc-toggle">▶</span>
+                <span class="toc-title">Table of Contents</span>
+            </div>
+            {% for section_key in section_order %}
+            {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+            {% set meta = section_configs.get(section_key, {}) %}
+            <div class="toc-item">
+                <span class="toc-emoji">{{ meta.emoji|default('📌') }}</span>
+                <span class="toc-name">{{ meta.title|default(section_key) }}</span>
+                <span class="toc-dots"></span>
+                <span class="toc-count">{{ briefs[section_key]|length }}</span>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- ====== EXECUTIVE SUMMARY: Callout ====== -->
+        {% if executive_summary %}
+        <div class="callout">
+            <span class="callout-icon">💡</span>
+            <div class="callout-body">
+                <div class="callout-title">Executive Summary</div>
+                {% for line in executive_summary.strip().split('\n') %}
+                {% if line.strip() %}
+                <p>{{ line.strip() | md_inline }}</p>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ====== INLINE DATABASE TABLE ====== -->
+        <table class="db-table">
+            <thead>
+                <tr>
+                    <th class="db-emoji"></th>
+                    <th class="db-name">Section</th>
+                    <th class="db-count">Items</th>
+                    <th>Color</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for section_key in section_order %}
+                {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+                {% set meta = section_configs.get(section_key, {}) %}
+                <tr>
+                    <td class="db-emoji">{{ meta.emoji|default('📌') }}</td>
+                    <td class="db-name">{{ meta.title|default(section_key) }}</td>
+                    <td class="db-count">{{ briefs[section_key]|length }}</td>
+                    <td><span class="color-dot" style="background: {{ meta.color|default('#6366f1') }};"></span></td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- ====== SECTIONS ====== -->
+        {% for section_key in section_order %}
+        {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+        {% set meta = section_configs.get(section_key, {}) %}
+        {% set section_color = meta.color|default('#6366f1') %}
+        {% set items = briefs[section_key] %}
+        <section class="section">
+            <div class="section-header">
+                <span class="section-toggle">▶</span>
+                <span class="section-icon">{{ meta.emoji|default('📌') }}</span>
+                <h2 class="section-title">{{ meta.title|default(section_key) }}</h2>
+                <span class="section-badge">{{ items|length }}</span>
+            </div>
+            <div class="section-divider" style="background: {{ section_color }};"></div>
+
+            {% for item in items %}
+            {% set priority = item.priority|default('🟢') %}
+            {% set p_class = 'must-read' if priority == '🔴' else ('recommended' if priority == '🟡' else 'fyi') %}
+            <div class="brief {{ p_class }}">
+                <div class="brief-row">
+                    <div class="checkbox"></div>
+                    <div class="brief-headline">
+                        <a href="{{ item.url|default('#') }}" target="_blank">{{ item.headline|default(item.title|default('Untitled')) }}</a>
+                        {% if priority == '🔴' %}
+                        <span class="must-label">Must Read</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="brief-meta">
+                    {% if item.source %}
+                    <span class="source-label">{{ item.source }}</span>
+                    {% endif %}
+                    {% if item.tags %}
+                    <span class="meta-dot">●</span>
+                    {% for tag in item.tags %}
+                    <span class="tag tag-{{ loop.index0 % 6 }}">{{ tag }}</span>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+                {% if item.detail %}
+                <div class="brief-detail">{{ item.detail | md_inline }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <div class="section-end">···</div>
+        </section>
+        {% endif %}
+        {% endfor %}
+
+        <!-- ====== FOOTER ====== -->
+        <footer class="footer">
+            <div class="breadcrumb">
+                <a href="#">Workspace</a>
+                <span>/</span>
+                <a href="#">Intelligence</a>
+                <span>/</span>
+                <a href="#">Daily Brief</a>
+                <span>/</span>
+                {{ date_str }}
+            </div>
+            <div class="footer-meta">
+                <div class="footer-edited">
+                    🕐 Last edited · {{ generated_time }}
+                </div>
+                <div class="footer-brand">Powered by Newsloom</div>
+            </div>
+        </footer>
+
+    </div>
+</body>
+</html>

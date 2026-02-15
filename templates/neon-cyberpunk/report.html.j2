@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEWSLOOM.EXE · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * NEON CYBERPUNK v3 — Cyberpunk 2077 Visual Extravaganza
+         * 
+         * Complete visual overhaul:
+         *   - Deep purple/blue gradient + perspective grid background
+         *   - Intense multi-color neon glows (pink → cyan → purple → green → orange)
+         *   - CRT scanline overlay with flickering
+         *   - City skyline CSS silhouette at bottom
+         *   - Each section uses a DIFFERENT neon accent color
+         *   - Glitch animations, data rain, holographic effects
+         *   - 4-layer glow box-shadows for extreme depth
+         *
+         * Target: 900+ lines · PDF-ready · CJK fonts · Mobile responsive
+         * ============================================================ */
+
+        /* --- Design Tokens --- */
+        :root {
+            /* === Section Neon Colors (rotating per section) === */
+            --neon-pink:    #FF2D95;
+            --neon-cyan:    #00F0FF;
+            --neon-purple:  #BF00FF;
+            --neon-green:   #39FF14;
+            --neon-orange:  #FF6B00;
+            --neon-yellow:  #FFE600;
+            --neon-red:     #FF003C;
+            --neon-blue:    #4D4DFF;
+
+            /* === Backgrounds === */
+            --void:         #0a0015;
+            --deep:         #150025;
+            --surface:      #0a0020;
+            --panel-bg:     rgba(10, 0, 25, 0.88);
+            --card-bg:      rgba(15, 0, 35, 0.92);
+
+            /* === Text === */
+            --text-primary:   #e0e0ff;
+            --text-secondary: #a0a0cc;
+            --text-dim:       #606088;
+
+            /* === Glows (4-tier depth) === */
+            --glow-pink:    0 0 5px #FF2D95, 0 0 15px #FF2D95, 0 0 30px rgba(255,45,149,0.5), 0 0 60px rgba(255,45,149,0.2);
+            --glow-cyan:    0 0 5px #00F0FF, 0 0 15px #00F0FF, 0 0 30px rgba(0,240,255,0.5), 0 0 60px rgba(0,240,255,0.2);
+            --glow-purple:  0 0 5px #BF00FF, 0 0 15px #BF00FF, 0 0 30px rgba(191,0,255,0.5), 0 0 60px rgba(191,0,255,0.2);
+            --glow-green:   0 0 5px #39FF14, 0 0 15px #39FF14, 0 0 30px rgba(57,255,20,0.5), 0 0 60px rgba(57,255,20,0.2);
+            --glow-orange:  0 0 5px #FF6B00, 0 0 15px #FF6B00, 0 0 30px rgba(255,107,0,0.5), 0 0 60px rgba(255,107,0,0.2);
+            --glow-multi:   0 0 8px #FF2D95, 0 0 16px #00F0FF, 0 0 24px #BF00FF;
+
+            /* === Fonts === */
+            --font-display: "Orbitron", "Exo 2", -apple-system, "PingFang SC", "Noto Sans SC", sans-serif;
+            --font-mono:    "Courier New", "SF Mono", "Consolas", "PingFang SC", monospace;
+            --font-body:    "Rajdhani", "Exo 2", -apple-system, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+
+            /* === Spacing === */
+            --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px;
+            --sp-5: 20px; --sp-6: 24px; --sp-8: 32px; --sp-10: 40px;
+            --sp-12: 48px; --sp-16: 64px; --sp-20: 80px;
+        }
+
+        /* --- Page Setup --- */
+        @page {
+            size: A4;
+            margin: 2cm 1.5cm;
+            @top-center {
+                content: "NEWSLOOM.EXE // CLASSIFIED INTELLIGENCE FEED";
+                font-family: var(--font-mono);
+                font-size: 7pt;
+                color: #00F0FF;
+            }
+            @bottom-right {
+                content: "PAGE " counter(page) " / " counter(pages) " // {{ date_str }}";
+                font-family: var(--font-mono);
+                font-size: 7pt;
+                color: #FF6B00;
+            }
+        }
+
+        /* --- Reset --- */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        /* ============================================================
+         * BODY — The Ultimate Cyberpunk Background
+         * Layers: scanlines + grid + perspective grid + nebula glows + base gradient
+         * ============================================================ */
+        body {
+            font-family: var(--font-body);
+            font-size: 15px;
+            line-height: 1.65;
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            position: relative;
+            overflow-x: hidden;
+            min-height: 100vh;
+
+            background:
+                /* Layer 1: Horizontal scanlines */
+                repeating-linear-gradient(
+                    0deg,
+                    transparent, transparent 2px,
+                    rgba(255,0,255,0.03) 2px, rgba(255,0,255,0.03) 4px
+                ),
+                /* Layer 2: Vertical scanlines */
+                repeating-linear-gradient(
+                    90deg,
+                    transparent, transparent 2px,
+                    rgba(0,255,255,0.03) 2px, rgba(0,255,255,0.03) 4px
+                ),
+                /* Layer 3: Top-center pink nebula */
+                radial-gradient(ellipse at 50% 0%, rgba(255,0,100,0.18) 0%, transparent 55%),
+                /* Layer 4: Bottom-right cyan nebula */
+                radial-gradient(ellipse at 85% 100%, rgba(0,200,255,0.12) 0%, transparent 45%),
+                /* Layer 5: Left purple nebula */
+                radial-gradient(ellipse at 10% 60%, rgba(191,0,255,0.10) 0%, transparent 40%),
+                /* Layer 6: Center orange subtle */
+                radial-gradient(ellipse at 50% 50%, rgba(255,107,0,0.05) 0%, transparent 50%),
+                /* Layer 7: Base gradient */
+                linear-gradient(180deg, #0a0015 0%, #150025 40%, #0a0020 70%, #050010 100%);
+            background-attachment: fixed;
+        }
+
+        /* --- CRT Scanline Overlay (full page) --- */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.12) 0px,
+                rgba(0, 0, 0, 0.12) 1px,
+                transparent 1px,
+                transparent 3px
+            );
+            pointer-events: none;
+            z-index: 9999;
+            animation: scanline-flicker 0.1s infinite;
+        }
+
+        /* --- CRT Vignette --- */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.6) 100%);
+            pointer-events: none;
+            z-index: 9998;
+        }
+
+        /* --- Keyframe Animations --- */
+        @keyframes scanline-flicker {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.28; }
+        }
+
+        @keyframes glitch-text {
+            0%, 92%, 100% { transform: translate(0,0); text-shadow: var(--glow-cyan); }
+            93% { transform: translate(-3px, 1px); text-shadow: 3px 0 #FF2D95, -3px 0 #00F0FF; }
+            95% { transform: translate(2px, -1px); text-shadow: -2px 0 #BF00FF, 2px 0 #39FF14; }
+            97% { transform: translate(-1px, 2px); text-shadow: 2px 0 #FF6B00, -2px 0 #00F0FF; }
+        }
+
+        @keyframes neon-breathe {
+            0%, 100% { opacity: 1; filter: brightness(1); }
+            50% { opacity: 0.85; filter: brightness(1.15); }
+        }
+
+        @keyframes neon-flow {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        @keyframes data-rain {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 80px; }
+        }
+
+        @keyframes border-cycle {
+            0%, 100% { border-color: var(--neon-pink); box-shadow: var(--glow-pink); }
+            25% { border-color: var(--neon-cyan); box-shadow: var(--glow-cyan); }
+            50% { border-color: var(--neon-purple); box-shadow: var(--glow-purple); }
+            75% { border-color: var(--neon-green); box-shadow: var(--glow-green); }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 5px currentColor, 0 0 10px currentColor; }
+            50% { box-shadow: 0 0 10px currentColor, 0 0 25px currentColor, 0 0 40px currentColor; }
+        }
+
+        @keyframes flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
+            20%, 24%, 55% { opacity: 0.4; }
+        }
+
+        @keyframes scan-beam {
+            0% { left: -60%; }
+            100% { left: 100%; }
+        }
+
+        @keyframes city-glow {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes corner-blink {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes critical-pulse {
+            0%, 100% { border-color: #FF003C; box-shadow: 0 0 8px #FF003C, 0 0 20px rgba(255,0,60,0.4); }
+            50% { border-color: #FF2D95; box-shadow: 0 0 15px #FF2D95, 0 0 35px rgba(255,45,149,0.3); }
+        }
+
+        /* --- Links --- */
+        a {
+            color: var(--neon-orange);
+            text-decoration: none;
+            text-shadow: 0 0 6px var(--neon-orange), 0 0 12px rgba(255,107,0,0.3);
+            transition: all 0.3s;
+        }
+        a:hover {
+            color: var(--neon-pink);
+            text-shadow: var(--glow-pink);
+        }
+
+        /* ============================================================
+         * MAIN CONTAINER
+         * ============================================================ */
+        .cyber-interface {
+            max-width: 920px;
+            margin: 0 auto;
+            padding: var(--sp-12) var(--sp-6);
+            position: relative;
+            z-index: 10;
+        }
+
+        /* --- Perspective Grid Background (behind content) --- */
+        .perspective-grid {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 40vh;
+            background:
+                repeating-linear-gradient(
+                    90deg,
+                    rgba(0,240,255,0.07) 0px,
+                    rgba(0,240,255,0.07) 1px,
+                    transparent 1px,
+                    transparent 60px
+                ),
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(255,45,149,0.05) 0px,
+                    rgba(255,45,149,0.05) 1px,
+                    transparent 1px,
+                    transparent 40px
+                );
+            transform: perspective(400px) rotateX(45deg);
+            transform-origin: bottom center;
+            pointer-events: none;
+            z-index: 1;
+            mask-image: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%);
+        }
+
+        /* --- City Skyline Silhouette (bottom) --- */
+        .city-skyline {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 180px;
+            pointer-events: none;
+            z-index: 2;
+            overflow: hidden;
+        }
+
+        .city-skyline::before {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 160px;
+            background:
+                /* Building cluster 1 - tall */
+                linear-gradient(to bottom, #0c0020 0%, #0c0020 100%) no-repeat 5% bottom / 30px 140px,
+                linear-gradient(to bottom, #0e0025 0%, #0e0025 100%) no-repeat 8% bottom / 20px 100px,
+                linear-gradient(to bottom, #0d0022 0%, #0d0022 100%) no-repeat 12% bottom / 35px 120px,
+                /* Building cluster 2 */
+                linear-gradient(to bottom, #0c0020 0%, #0c0020 100%) no-repeat 18% bottom / 25px 90px,
+                linear-gradient(to bottom, #0e0025 0%, #0e0025 100%) no-repeat 22% bottom / 40px 155px,
+                linear-gradient(to bottom, #0d0022 0%, #0d0022 100%) no-repeat 26% bottom / 18px 70px,
+                /* Building cluster 3 - central tower */
+                linear-gradient(to bottom, #100030 0%, #100030 100%) no-repeat 32% bottom / 15px 160px,
+                linear-gradient(to bottom, #0c0020 0%, #0c0020 100%) no-repeat 35% bottom / 45px 130px,
+                linear-gradient(to bottom, #0e0025 0%, #0e0025 100%) no-repeat 40% bottom / 22px 95px,
+                /* Building cluster 4 */
+                linear-gradient(to bottom, #0d0022 0%, #0d0022 100%) no-repeat 48% bottom / 50px 110px,
+                linear-gradient(to bottom, #0c0020 0%, #0c0020 100%) no-repeat 52% bottom / 15px 145px,
+                linear-gradient(to bottom, #0e0025 0%, #0e0025 100%) no-repeat 56% bottom / 28px 80px,
+                /* Building cluster 5 */
+                linear-gradient(to bottom, #0c0020 0%, #0c0020 100%) no-repeat 63% bottom / 35px 125px,
+                linear-gradient(to bottom, #100030 0%, #100030 100%) no-repeat 68% bottom / 20px 150px,
+                linear-gradient(to bottom, #0d0022 0%, #0d0022 100%) no-repeat 72% bottom / 40px 100px,
+                /* Building cluster 6 */
+                linear-gradient(to bottom, #0e0025 0%, #0e0025 100%) no-repeat 78% bottom / 25px 115px,
+                linear-gradient(to bottom, #0c0020 0%, #0c0020 100%) no-repeat 83% bottom / 35px 85px,
+                linear-gradient(to bottom, #0d0022 0%, #0d0022 100%) no-repeat 88% bottom / 18px 135px,
+                linear-gradient(to bottom, #0e0025 0%, #0e0025 100%) no-repeat 93% bottom / 30px 105px;
+        }
+
+        /* City lights — neon dots on buildings */
+        .city-skyline::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 160px;
+            background:
+                radial-gradient(circle 2px at 6% 60%, #FF2D95 0%, transparent 100%),
+                radial-gradient(circle 2px at 23% 30%, #00F0FF 0%, transparent 100%),
+                radial-gradient(circle 1.5px at 36% 20%, #FF6B00 0%, transparent 100%),
+                radial-gradient(circle 2px at 53% 45%, #BF00FF 0%, transparent 100%),
+                radial-gradient(circle 1.5px at 69% 25%, #39FF14 0%, transparent 100%),
+                radial-gradient(circle 2px at 84% 50%, #FF2D95 0%, transparent 100%),
+                radial-gradient(circle 1.5px at 13% 70%, #00F0FF 0%, transparent 100%),
+                radial-gradient(circle 2px at 45% 65%, #FFE600 0%, transparent 100%),
+                radial-gradient(circle 1.5px at 75% 40%, #FF6B00 0%, transparent 100%),
+                radial-gradient(circle 2px at 90% 35%, #00F0FF 0%, transparent 100%);
+            animation: city-glow 3s ease-in-out infinite;
+        }
+
+        /* ============================================================
+         * HEADER — Holographic Terminal
+         * ============================================================ */
+        .terminal-header {
+            background:
+                repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,240,255,0.02) 3px, rgba(0,240,255,0.02) 6px),
+                linear-gradient(135deg, rgba(10,0,25,0.95) 0%, rgba(20,0,40,0.95) 100%);
+            border: 2px solid var(--neon-cyan);
+            box-shadow: var(--glow-cyan);
+            padding: var(--sp-10) var(--sp-8);
+            margin-bottom: var(--sp-12);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Scanning beam */
+        .terminal-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -60%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0,240,255,0.08), rgba(0,240,255,0.12), rgba(0,240,255,0.08), transparent);
+            animation: scan-beam 4s linear infinite;
+        }
+
+        /* Rainbow neon top bar */
+        .terminal-header::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #FF2D95, #FF6B00, #FFE600, #39FF14, #00F0FF, #4D4DFF, #BF00FF, #FF2D95);
+            background-size: 200% 100%;
+            animation: neon-flow 3s linear infinite;
+        }
+
+        /* Corner brackets */
+        .corner-tl, .corner-tr, .corner-bl, .corner-br {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            animation: corner-blink 2s ease-in-out infinite;
+        }
+        .corner-tl { top: 6px; left: 6px; border-top: 2px solid var(--neon-pink); border-left: 2px solid var(--neon-pink); }
+        .corner-tr { top: 6px; right: 6px; border-top: 2px solid var(--neon-cyan); border-right: 2px solid var(--neon-cyan); }
+        .corner-bl { bottom: 6px; left: 6px; border-bottom: 2px solid var(--neon-green); border-left: 2px solid var(--neon-green); }
+        .corner-br { bottom: 6px; right: 6px; border-bottom: 2px solid var(--neon-orange); border-right: 2px solid var(--neon-orange); }
+
+        .system-prompt {
+            font-family: var(--font-mono);
+            font-size: 0.75em;
+            color: var(--neon-green);
+            text-shadow: 0 0 8px var(--neon-green);
+            margin-bottom: var(--sp-4);
+            position: relative;
+            z-index: 1;
+            animation: flicker 6s ease-in-out infinite;
+        }
+        .system-prompt::before { content: '> '; color: var(--neon-orange); text-shadow: 0 0 8px var(--neon-orange); }
+        .system-prompt::after { content: '█'; animation: flicker 1s step-end infinite; margin-left: 4px; }
+
+        .terminal-title {
+            font-family: var(--font-display);
+            font-size: 3em;
+            font-weight: 900;
+            color: var(--neon-cyan);
+            text-shadow: var(--glow-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: var(--sp-2);
+            position: relative;
+            z-index: 1;
+            animation: glitch-text 5s ease-in-out infinite;
+        }
+
+        .terminal-subtitle {
+            font-family: var(--font-mono);
+            font-size: 0.9em;
+            color: var(--neon-orange);
+            text-shadow: 0 0 10px var(--neon-orange), 0 0 20px rgba(255,107,0,0.3);
+            margin-bottom: var(--sp-6);
+            position: relative;
+            z-index: 1;
+            letter-spacing: 0.04em;
+        }
+
+        /* Stats bar */
+        .system-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: var(--sp-3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--sp-2) var(--sp-4);
+            background: rgba(0,0,0,0.5);
+            border: 1px solid var(--neon-pink);
+            font-family: var(--font-mono);
+            font-size: 0.78em;
+            color: var(--neon-pink);
+            text-shadow: 0 0 5px var(--neon-pink);
+            position: relative;
+        }
+        .stat-item::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+            background: var(--neon-pink);
+            box-shadow: 0 0 8px var(--neon-pink);
+        }
+        .stat-label { color: var(--neon-cyan); text-shadow: 0 0 5px var(--neon-cyan); font-weight: 700; letter-spacing: 0.06em; }
+        .stat-value { font-weight: 900; }
+        .stat-item.critical-stat { border-color: var(--neon-red); animation: critical-pulse 2s infinite; }
+        .stat-item.critical-stat .stat-value { color: var(--neon-red); text-shadow: 0 0 8px var(--neon-red); }
+
+        /* ============================================================
+         * EXECUTIVE SUMMARY — Holographic Status Panel
+         * ============================================================ */
+        .status-panel {
+            background:
+                repeating-linear-gradient(0deg, transparent, transparent 4px, rgba(255,230,0,0.015) 4px, rgba(255,230,0,0.015) 8px),
+                linear-gradient(135deg, rgba(10,0,25,0.9) 0%, rgba(20,0,40,0.9) 100%);
+            border: 2px solid var(--neon-yellow);
+            box-shadow: 0 0 8px var(--neon-yellow), 0 0 20px rgba(255,230,0,0.2), 0 0 40px rgba(255,230,0,0.1);
+            padding: var(--sp-8) var(--sp-6);
+            margin-bottom: var(--sp-10);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-panel::before {
+            content: '[ EXECUTIVE_BRIEFING // INTEL_ACTIVE ]';
+            position: absolute;
+            top: -10px; left: var(--sp-4);
+            background: var(--void);
+            color: var(--neon-yellow);
+            font-family: var(--font-mono);
+            font-size: 0.65em;
+            padding: 0 var(--sp-2);
+            text-shadow: 0 0 8px var(--neon-yellow);
+            letter-spacing: 0.1em;
+        }
+
+        /* Warning stripes at bottom */
+        .status-panel::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 3px;
+            background: repeating-linear-gradient(90deg, var(--neon-yellow) 0px, var(--neon-yellow) 6px, transparent 6px, transparent 12px);
+            opacity: 0.6;
+        }
+
+        .executive-text {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 4px rgba(0,240,255,0.3);
+            font-size: 1.02em;
+            line-height: 1.8;
+        }
+        .executive-text p {
+            margin-bottom: var(--sp-4);
+            border-left: 2px solid var(--neon-orange);
+            padding-left: var(--sp-4);
+        }
+        .executive-text p:last-child { margin-bottom: 0; }
+        .executive-text strong {
+            color: var(--neon-pink);
+            text-shadow: 0 0 8px var(--neon-pink), 0 0 16px rgba(255,45,149,0.3);
+        }
+        .executive-text code {
+            font-family: var(--font-mono);
+            background: rgba(57,255,20,0.08);
+            color: var(--neon-green);
+            border: 1px solid rgba(57,255,20,0.2);
+            padding: 1px 5px;
+        }
+
+        /* ============================================================
+         * DATA INDEX — Quick Navigation
+         * ============================================================ */
+        .data-index {
+            background: rgba(0,0,0,0.6);
+            border: 1px solid var(--neon-green);
+            box-shadow: 0 0 8px rgba(57,255,20,0.2), 0 0 20px rgba(57,255,20,0.1);
+            padding: var(--sp-6);
+            margin-bottom: var(--sp-10);
+            position: relative;
+        }
+        .data-index::before {
+            content: '[ SECTOR_MAP // DATA_INDEX ]';
+            position: absolute;
+            top: -10px; left: var(--sp-4);
+            background: var(--void);
+            color: var(--neon-green);
+            font-family: var(--font-mono);
+            font-size: 0.65em;
+            padding: 0 var(--sp-2);
+            text-shadow: 0 0 8px var(--neon-green);
+        }
+
+        .index-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--sp-3);
+            font-family: var(--font-mono);
+            font-size: 0.82em;
+        }
+
+        .index-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--sp-2) var(--sp-4);
+            background: rgba(191,0,255,0.06);
+            border: 1px solid rgba(191,0,255,0.25);
+            color: var(--neon-cyan);
+            text-shadow: 0 0 4px rgba(0,240,255,0.3);
+            transition: all 0.3s;
+        }
+        .index-entry:hover {
+            background: rgba(0,240,255,0.08);
+            border-color: var(--neon-cyan);
+            box-shadow: var(--glow-cyan);
+            transform: translateX(3px);
+        }
+        .entry-count {
+            color: var(--neon-orange);
+            text-shadow: 0 0 6px var(--neon-orange);
+            font-weight: 900;
+            background: rgba(255,107,0,0.08);
+            padding: 2px 8px;
+            border: 1px solid rgba(255,107,0,0.3);
+        }
+
+        /* ============================================================
+         * SECTION SEPARATOR — Neon Divider
+         * ============================================================ */
+        .neon-separator {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            margin: var(--sp-10) 0;
+            padding: 0 var(--sp-4);
+        }
+        .neon-separator::before, .neon-separator::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+        }
+        .neon-separator::before {
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan), transparent);
+        }
+        .neon-separator::after {
+            background: linear-gradient(270deg, var(--neon-purple), var(--neon-green), transparent);
+        }
+        .sep-icon {
+            font-family: var(--font-mono);
+            font-size: 0.7em;
+            color: var(--neon-orange);
+            text-shadow: 0 0 8px var(--neon-orange);
+            letter-spacing: 0.3em;
+        }
+
+        /* ============================================================
+         * SECTION — Each has its own neon color!
+         * Color cycling: pink → cyan → purple → green → orange → pink...
+         * ============================================================ */
+        .data-stream { margin-bottom: var(--sp-16); page-break-inside: avoid; }
+
+        .stream-header {
+            padding: var(--sp-5) var(--sp-6);
+            margin-bottom: var(--sp-6);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Diagonal hash pattern */
+        .stream-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(255,255,255,0.015) 10px, rgba(255,255,255,0.015) 20px);
+            pointer-events: none;
+        }
+
+        /* Left accent bar — color set per section via inline style */
+        .stream-header::after {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+        }
+
+        /* Section color classes */
+        .section-pink .stream-header { background: linear-gradient(90deg, rgba(255,45,149,0.1) 0%, rgba(10,0,25,0.9) 100%); border: 1px solid rgba(255,45,149,0.4); box-shadow: 0 0 15px rgba(255,45,149,0.15); }
+        .section-pink .stream-header::after { background: var(--neon-pink); box-shadow: 0 0 12px var(--neon-pink); }
+        .section-pink .stream-title { color: var(--neon-pink); text-shadow: 0 0 8px var(--neon-pink), 0 0 20px rgba(255,45,149,0.4); }
+        .section-pink .stream-icon { color: var(--neon-pink); text-shadow: 0 0 8px var(--neon-pink); }
+
+        .section-cyan .stream-header { background: linear-gradient(90deg, rgba(0,240,255,0.1) 0%, rgba(10,0,25,0.9) 100%); border: 1px solid rgba(0,240,255,0.4); box-shadow: 0 0 15px rgba(0,240,255,0.15); }
+        .section-cyan .stream-header::after { background: var(--neon-cyan); box-shadow: 0 0 12px var(--neon-cyan); }
+        .section-cyan .stream-title { color: var(--neon-cyan); text-shadow: 0 0 8px var(--neon-cyan), 0 0 20px rgba(0,240,255,0.4); }
+        .section-cyan .stream-icon { color: var(--neon-cyan); text-shadow: 0 0 8px var(--neon-cyan); }
+
+        .section-purple .stream-header { background: linear-gradient(90deg, rgba(191,0,255,0.1) 0%, rgba(10,0,25,0.9) 100%); border: 1px solid rgba(191,0,255,0.4); box-shadow: 0 0 15px rgba(191,0,255,0.15); }
+        .section-purple .stream-header::after { background: var(--neon-purple); box-shadow: 0 0 12px var(--neon-purple); }
+        .section-purple .stream-title { color: var(--neon-purple); text-shadow: 0 0 8px var(--neon-purple), 0 0 20px rgba(191,0,255,0.4); }
+        .section-purple .stream-icon { color: var(--neon-purple); text-shadow: 0 0 8px var(--neon-purple); }
+
+        .section-green .stream-header { background: linear-gradient(90deg, rgba(57,255,20,0.08) 0%, rgba(10,0,25,0.9) 100%); border: 1px solid rgba(57,255,20,0.4); box-shadow: 0 0 15px rgba(57,255,20,0.15); }
+        .section-green .stream-header::after { background: var(--neon-green); box-shadow: 0 0 12px var(--neon-green); }
+        .section-green .stream-title { color: var(--neon-green); text-shadow: 0 0 8px var(--neon-green), 0 0 20px rgba(57,255,20,0.4); }
+        .section-green .stream-icon { color: var(--neon-green); text-shadow: 0 0 8px var(--neon-green); }
+
+        .section-orange .stream-header { background: linear-gradient(90deg, rgba(255,107,0,0.1) 0%, rgba(10,0,25,0.9) 100%); border: 1px solid rgba(255,107,0,0.4); box-shadow: 0 0 15px rgba(255,107,0,0.15); }
+        .section-orange .stream-header::after { background: var(--neon-orange); box-shadow: 0 0 12px var(--neon-orange); }
+        .section-orange .stream-title { color: var(--neon-orange); text-shadow: 0 0 8px var(--neon-orange), 0 0 20px rgba(255,107,0,0.4); }
+        .section-orange .stream-icon { color: var(--neon-orange); text-shadow: 0 0 8px var(--neon-orange); }
+
+        .stream-title {
+            font-family: var(--font-display);
+            font-size: 1.35em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .stream-icon { font-size: 1.2em; flex-shrink: 0; animation: neon-breathe 2.5s ease-in-out infinite; }
+
+        .stream-count {
+            font-family: var(--font-mono);
+            font-size: 0.5em;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 6px rgba(0,240,255,0.4);
+            background: rgba(0,240,255,0.06);
+            padding: var(--sp-1) var(--sp-3);
+            border: 1px solid rgba(0,240,255,0.3);
+            letter-spacing: 0.1em;
+            margin-left: auto;
+        }
+
+        /* ============================================================
+         * DATA PACKET (Brief Card) — Neon-bordered cards
+         * ============================================================ */
+        .data-packet {
+            background: var(--card-bg);
+            border: 1px solid rgba(0,240,255,0.15);
+            margin-bottom: var(--sp-4);
+            position: relative;
+            overflow: hidden;
+            page-break-inside: avoid;
+            transition: all 0.3s;
+        }
+        .data-packet:hover {
+            border-color: rgba(0,240,255,0.4);
+            box-shadow: 0 0 12px rgba(0,240,255,0.15);
+            transform: translateX(3px);
+        }
+
+        /* Priority left strip */
+        .data-packet::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+        }
+        .data-packet.must-read::before { background: var(--neon-red); box-shadow: 0 0 8px var(--neon-red), 0 0 16px rgba(255,0,60,0.4); }
+        .data-packet.recommended::before { background: var(--neon-yellow); box-shadow: 0 0 6px var(--neon-yellow); }
+        .data-packet.fyi::before { background: var(--neon-green); box-shadow: 0 0 4px var(--neon-green); opacity: 0.6; }
+
+        /* Must-read: animated pulsing border */
+        .data-packet.must-read {
+            background: linear-gradient(135deg, rgba(255,0,60,0.08), rgba(255,45,149,0.04));
+            border-color: rgba(255,0,60,0.4);
+            animation: critical-pulse 3s ease-in-out infinite;
+        }
+        .data-packet.must-read::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 3px; right: 0;
+            height: 2px;
+            background: repeating-linear-gradient(90deg, var(--neon-red) 0px, var(--neon-red) 6px, transparent 6px, transparent 12px);
+            opacity: 0.6;
+        }
+
+        .data-packet.recommended {
+            background: rgba(255,230,0,0.03);
+            border-color: rgba(255,230,0,0.25);
+        }
+
+        .packet-header {
+            background: rgba(0,0,0,0.5);
+            border-bottom: 1px solid rgba(0,240,255,0.1);
+            padding: var(--sp-3) var(--sp-5);
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+        }
+
+        .priority-badge {
+            flex-shrink: 0;
+            padding: 2px 8px;
+            font-family: var(--font-mono);
+            font-size: 0.65em;
+            font-weight: 900;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            border: 1px solid;
+        }
+        .data-packet.must-read .priority-badge {
+            color: var(--neon-red);
+            border-color: var(--neon-red);
+            background: rgba(255,0,60,0.12);
+            text-shadow: 0 0 6px var(--neon-red);
+            box-shadow: 0 0 8px rgba(255,0,60,0.2);
+        }
+        .data-packet.recommended .priority-badge {
+            color: var(--neon-yellow);
+            border-color: rgba(255,230,0,0.4);
+            background: rgba(255,230,0,0.06);
+        }
+        .data-packet.fyi .priority-badge {
+            color: var(--neon-green);
+            border-color: rgba(57,255,20,0.3);
+            background: rgba(57,255,20,0.04);
+        }
+
+        .packet-title {
+            flex: 1;
+            font-family: var(--font-body);
+            font-size: 1.05em;
+            font-weight: 600;
+            color: var(--text-primary);
+            min-width: 0;
+        }
+        .packet-title a { color: inherit; text-shadow: none; border-bottom: none; }
+        .packet-title a:hover { color: var(--neon-pink); text-shadow: var(--glow-pink); }
+        .data-packet.must-read .packet-title { color: #FF003C; }
+        .data-packet.must-read .packet-title a { color: inherit; text-shadow: 0 0 6px rgba(255,0,60,0.4); }
+
+        .packet-id {
+            font-family: var(--font-mono);
+            font-size: 0.6em;
+            color: var(--neon-orange);
+            text-shadow: 0 0 4px var(--neon-orange);
+            background: rgba(255,107,0,0.06);
+            padding: 2px 8px;
+            border: 1px solid rgba(255,107,0,0.25);
+            flex-shrink: 0;
+        }
+
+        .packet-body {
+            padding: var(--sp-4) var(--sp-5);
+        }
+
+        .packet-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            margin-bottom: var(--sp-3);
+            font-family: var(--font-mono);
+            font-size: 0.78em;
+            flex-wrap: wrap;
+        }
+
+        .source-tag {
+            background: var(--neon-pink);
+            color: #000;
+            padding: 2px 10px;
+            font-weight: 700;
+            font-size: 0.72em;
+            text-transform: uppercase;
+            box-shadow: 0 0 8px var(--neon-pink), 0 0 16px rgba(255,45,149,0.3);
+            letter-spacing: 0.06em;
+        }
+
+        .data-tag {
+            background: rgba(0,240,255,0.06);
+            color: var(--neon-cyan);
+            border: 1px solid rgba(0,240,255,0.25);
+            padding: 2px 8px;
+            font-size: 0.68em;
+            text-shadow: 0 0 4px rgba(0,240,255,0.3);
+            transition: all 0.2s;
+        }
+        .data-tag:hover {
+            background: rgba(0,240,255,0.15);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 8px rgba(0,240,255,0.3);
+        }
+
+        .packet-content {
+            color: var(--text-primary);
+            text-shadow: 0 0 2px rgba(0,240,255,0.15);
+            font-size: 0.95em;
+            line-height: 1.72;
+            border-left: 2px solid var(--neon-purple);
+            padding-left: var(--sp-4);
+        }
+        .packet-content strong {
+            color: var(--neon-pink);
+            text-shadow: 0 0 6px var(--neon-pink);
+        }
+        .packet-content code {
+            font-family: var(--font-mono);
+            background: rgba(57,255,20,0.06);
+            color: var(--neon-green);
+            border: 1px solid rgba(57,255,20,0.18);
+            padding: 1px 5px;
+        }
+
+        /* ============================================================
+         * FOOTER — System Status with Multi-Neon
+         * ============================================================ */
+        .system-footer {
+            margin-top: var(--sp-20);
+            background:
+                repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(255,0,60,0.015) 3px, rgba(255,0,60,0.015) 6px),
+                linear-gradient(135deg, rgba(10,0,25,0.95) 0%, rgba(20,0,40,0.95) 100%);
+            border: 2px solid;
+            animation: border-cycle 8s linear infinite;
+            padding: var(--sp-10) var(--sp-6);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .system-footer::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -60%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,45,149,0.06), rgba(0,240,255,0.08), rgba(191,0,255,0.06), transparent);
+            animation: scan-beam 6s linear infinite;
+        }
+
+        /* Rainbow bar at top */
+        .system-footer::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #FF2D95, #FF6B00, #FFE600, #39FF14, #00F0FF, #BF00FF, #FF2D95);
+            background-size: 200% 100%;
+            animation: neon-flow 3s linear infinite;
+        }
+
+        .footer-logo {
+            font-family: var(--font-display);
+            font-size: 1.5em;
+            font-weight: 900;
+            color: var(--neon-pink);
+            text-shadow: var(--glow-pink);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: var(--sp-4);
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-info {
+            font-family: var(--font-mono);
+            font-size: 0.8em;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 5px rgba(0,240,255,0.3);
+            margin-bottom: var(--sp-4);
+            position: relative;
+            z-index: 1;
+        }
+        .footer-sep { color: var(--neon-orange); margin: 0 var(--sp-2); }
+
+        .footer-stats {
+            display: flex;
+            justify-content: center;
+            gap: var(--sp-4);
+            flex-wrap: wrap;
+            margin-bottom: var(--sp-4);
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-stat-item {
+            font-family: var(--font-mono);
+            font-size: 0.7em;
+            color: var(--neon-green);
+            text-shadow: 0 0 5px rgba(57,255,20,0.3);
+            padding: var(--sp-1) var(--sp-3);
+            border: 1px solid rgba(57,255,20,0.2);
+            background: rgba(57,255,20,0.04);
+        }
+
+        .system-warning {
+            font-family: var(--font-mono);
+            font-size: 0.65em;
+            color: var(--neon-yellow);
+            text-shadow: 0 0 6px rgba(255,230,0,0.3);
+            border: 1px solid rgba(255,230,0,0.25);
+            padding: var(--sp-2) var(--sp-3);
+            background: rgba(255,230,0,0.04);
+            position: relative;
+            z-index: 1;
+        }
+        .system-warning::before { content: '⚠ '; }
+
+        /* ============================================================
+         * PRINT — Kill animations, preserve colors
+         * ============================================================ */
+        @media print {
+            body {
+                background: #0a0015 !important;
+                background-image: none !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            body::before, body::after { display: none !important; }
+            .perspective-grid, .city-skyline { display: none !important; }
+            .cyber-interface { max-width: 100%; padding: var(--sp-4); }
+            .terminal-header::before { display: none; }
+            .terminal-header::after { animation: none; }
+            .status-panel::after { display: none; }
+            .system-footer::before { display: none; }
+            *, *::before, *::after {
+                animation-duration: 0s !important;
+                animation-delay: 0s !important;
+                transition-duration: 0s !important;
+            }
+            .terminal-title, .stream-title, .footer-logo, .packet-title { text-shadow: none !important; }
+            a { text-shadow: none !important; }
+            .data-stream { page-break-inside: avoid; }
+            .data-packet { page-break-inside: avoid; }
+        }
+
+        /* ============================================================
+         * MOBILE RESPONSIVE
+         * ============================================================ */
+        @media (max-width: 768px) {
+            body { font-size: 14px; }
+            .cyber-interface { padding: var(--sp-6) var(--sp-3); }
+            .terminal-header { padding: var(--sp-6) var(--sp-4); }
+            .terminal-title { font-size: 2em; }
+            .system-stats { grid-template-columns: 1fr 1fr; }
+            .index-grid { grid-template-columns: 1fr; }
+            .stream-title { font-size: 1.1em; }
+            .packet-header { flex-wrap: wrap; gap: var(--sp-2); }
+            .packet-title { font-size: 0.95em; }
+            .packet-body { padding: var(--sp-3) var(--sp-4); }
+            .system-footer { padding: var(--sp-6) var(--sp-3); margin-top: var(--sp-12); }
+            .footer-stats { gap: var(--sp-2); }
+            .city-skyline { height: 120px; }
+            .perspective-grid { height: 25vh; }
+            .corner-tl, .corner-tr, .corner-bl, .corner-br { display: none; }
+        }
+
+        @media (max-width: 420px) {
+            body { font-size: 13px; }
+            .terminal-title { font-size: 1.5em; letter-spacing: 0.04em; }
+            .system-stats { grid-template-columns: 1fr; }
+            .packet-header { flex-direction: column; align-items: flex-start; }
+            .packet-meta { flex-direction: column; align-items: flex-start; }
+            .stream-count { display: none; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            body::before { opacity: 0.15; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Perspective Grid Floor -->
+    <div class="perspective-grid"></div>
+    <!-- City Skyline Silhouette -->
+    <div class="city-skyline"></div>
+
+    <div class="cyber-interface">
+
+        <!-- ====== TERMINAL HEADER ====== -->
+        <header class="terminal-header">
+            <div class="corner-tl"></div>
+            <div class="corner-tr"></div>
+            <div class="corner-bl"></div>
+            <div class="corner-br"></div>
+
+            <div class="system-prompt">newsloom.exe --mode=intelligence --feed=live --cipher=AES256 --status=ACTIVE</div>
+            <h1 class="terminal-title">NEWSLOOM.EXE</h1>
+            <div class="terminal-subtitle">// CYBERPUNK EDITION v3.0 // AI-ENHANCED INTELLIGENCE // {{ date_str }}</div>
+            <div class="system-stats">
+                <div class="stat-item">
+                    <span class="stat-label">DATE</span>
+                    <span class="stat-value">{{ date_str }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">PACKETS</span>
+                    <span class="stat-value">{{ total_items }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">SECTORS</span>
+                    <span class="stat-value">{{ section_order|length }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">STATUS</span>
+                    <span class="stat-value">ONLINE</span>
+                </div>
+                {% set critical_count = [] %}
+                {% for section_key, items in briefs.items() %}
+                {% if items is iterable and items is not string %}
+                {% for item in items %}
+                {% if item.priority == '🔴' %}{% if critical_count.append(1) %}{% endif %}{% endif %}
+                {% endfor %}
+                {% endif %}
+                {% endfor %}
+                {% if critical_count|length > 0 %}
+                <div class="stat-item critical-stat">
+                    <span class="stat-label">CRITICAL</span>
+                    <span class="stat-value">{{ critical_count|length }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </header>
+
+        <!-- ====== DATA INDEX ====== -->
+        <div class="data-index">
+            <div class="index-grid">
+                {% for section_key in section_order %}
+                {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+                {% set meta = section_configs.get(section_key, {}) %}
+                {% set items = briefs[section_key] %}
+                <div class="index-entry">
+                    <span>{{ meta.emoji|default('⚡') }} {{ meta.title|default(section_key)|upper }}</span>
+                    <span class="entry-count">{{ items|length }}</span>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- ====== EXECUTIVE SUMMARY ====== -->
+        {% if executive_summary %}
+        <div class="status-panel">
+            <div class="executive-text">
+                {% for line in executive_summary.strip().split('\n') %}
+                {% if line.strip() %}
+                <p>{{ line.strip() | md_inline }}</p>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ====== DATA STREAMS (sections with rotating neon colors) ====== -->
+        {% set neon_colors = ['pink', 'cyan', 'purple', 'green', 'orange'] %}
+        {% set stream_ns = namespace(index=0) %}
+        {% for section_key in section_order %}
+        {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+        {% set meta = section_configs.get(section_key, {}) %}
+        {% set items = briefs[section_key] %}
+        {% set color_class = neon_colors[stream_ns.index % 5] %}
+
+        {% if stream_ns.index > 0 %}
+        <div class="neon-separator">
+            <span class="sep-icon">///</span>
+        </div>
+        {% endif %}
+
+        <section class="data-stream section-{{ color_class }}">
+            <div class="stream-header">
+                <div class="stream-title">
+                    <span class="stream-icon">{{ meta.emoji|default('⚡') }}</span>
+                    <span>{{ meta.title|default(section_key)|upper }}</span>
+                    <span class="stream-count">{{ items|length }}_PACKETS</span>
+                </div>
+            </div>
+
+            {% for item in items %}
+            {% set priority = item.priority|default('🟢') %}
+            {% set p_class = 'must-read' if priority == '🔴' else ('recommended' if priority == '🟡' else 'fyi') %}
+            <div class="data-packet {{ p_class }}">
+                <div class="packet-header">
+                    <span class="priority-badge">
+                        {% if priority == '🔴' %}!! CRITICAL{% elif priority == '🟡' %}** WARNING{% else %}-- INFO{% endif %}
+                    </span>
+                    <div class="packet-title">
+                        <a href="{{ item.url|default('#') }}" target="_blank">{{ item.headline|default(item.title|default('UNTITLED_PACKET')) }}</a>
+                    </div>
+                    <div class="packet-id">PKT_{{ '%04d'|format(stream_ns.index * 100 + loop.index) }}</div>
+                </div>
+                <div class="packet-body">
+                    <div class="packet-meta">
+                        {% if item.source %}
+                        <span class="source-tag">{{ item.source|upper }}</span>
+                        {% endif %}
+                        {% if item.tags %}
+                        {% for tag in item.tags %}
+                        <span class="data-tag">{{ tag|upper }}</span>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                    {% if item.detail %}
+                    <div class="packet-content">{{ item.detail|default('') | md_inline }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </section>
+        {% set stream_ns.index = stream_ns.index + 1 %}
+        {% endif %}
+        {% endfor %}
+
+        <!-- ====== SYSTEM FOOTER ====== -->
+        <footer class="system-footer">
+            <div class="footer-logo">NEWSLOOM.EXE</div>
+            <div class="footer-info">
+                {{ date_str }}
+                <span class="footer-sep">//</span>
+                {{ total_items }} DATA_PACKETS PROCESSED
+                <span class="footer-sep">//</span>
+                AI_INTELLIGENCE_FEED
+            </div>
+            <div class="footer-stats">
+                <span class="footer-stat-item">UPTIME: 99.97%</span>
+                <span class="footer-stat-item">LATENCY: 12ms</span>
+                <span class="footer-stat-item">ENCRYPTED: AES-256</span>
+                <span class="footer-stat-item">BUILD: {{ date_str }}</span>
+            </div>
+            <div class="system-warning">
+                CLASSIFIED INTELLIGENCE · AUTHORIZED PERSONNEL ONLY · CONNECTION ENCRYPTED · DO NOT DISTRIBUTE
+            </div>
+        </footer>
+
+    </div>
+</body>
+</html>

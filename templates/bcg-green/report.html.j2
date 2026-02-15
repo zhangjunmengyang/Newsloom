@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BCG Intelligence Dashboard · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * BCG GREEN — BCG Strategic Report Theme
+         * ────────────────────────────────────────────────────────────
+         * Visual Narrative: BCG 战略报告
+         *   — White base + BCG signature green (#00A651 → #00783C)
+         *   — Header: green gradient full-width band, white bold title
+         *   — Left vertical navigation rail effect (sticky visual)
+         *   — Section dividers: green fine line + dot ornament
+         *   — Insight box: green circle number + white card
+         *   — Must-read card: deep green bg + white text (inverse)
+         *   — Bottom: "Key Implications" summary box (BCG style)
+         *   — Chart feel: CSS indicator bars in summary area
+         *   — Subtle grid dot pattern on background
+         * ============================================================ */
+
+        /* --- Design System --- */
+        :root {
+            /* BCG Brand Colors */
+            --bcg-green:        #00A651;
+            --bcg-green-dark:   #00783C;
+            --bcg-green-deeper: #005A2D;
+            --bcg-green-light:  #00C964;
+            --bcg-green-pale:   #E6F8ED;
+            --bcg-green-dim:    rgba(0, 166, 81, 0.10);
+            --bcg-green-glow:   rgba(0, 166, 81, 0.06);
+            --bcg-teal:         #009688;
+            --bcg-gradient:     linear-gradient(135deg, #00A651 0%, #00783C 100%);
+
+            /* Backgrounds */
+            --bg-primary:       #FFFFFF;
+            --bg-secondary:     #FAFCFA;
+            --bg-accent:        #F4FAF6;
+            --bg-card:          #FFFFFF;
+            --bg-surface:       #F6F9F7;
+            --bg-hover:         #F0F7F2;
+            --bg-nav-rail:      #F4FAF6;
+
+            /* Text */
+            --text-primary:     #1C2B23;
+            --text-secondary:   #3D4F45;
+            --text-body:        #4B5E53;
+            --text-muted:       #6B7F73;
+            --text-light:       #94A69C;
+            --text-inverse:     #FFFFFF;
+
+            /* Priority Colors */
+            --priority-must:    #DC2626;
+            --priority-must-bg: rgba(220, 38, 38, 0.05);
+            --priority-must-border: rgba(220, 38, 38, 0.18);
+            --priority-rec:     #D97706;
+            --priority-rec-bg:  rgba(217, 119, 6, 0.05);
+            --priority-rec-border: rgba(217, 119, 6, 0.18);
+            --priority-fyi:     #00A651;
+            --priority-fyi-bg:  rgba(0, 166, 81, 0.05);
+            --priority-fyi-border: rgba(0, 166, 81, 0.15);
+
+            /* Borders & Shadows */
+            --border-light:     #E2E8E4;
+            --border-medium:    #CBD5CE;
+            --border-green:     rgba(0, 166, 81, 0.20);
+            --shadow-card:      0 1px 4px rgba(0, 0, 0, 0.05), 0 0 1px rgba(0, 0, 0, 0.03);
+            --shadow-elevated:  0 8px 24px -6px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+            --shadow-green:     0 4px 16px -4px rgba(0, 166, 81, 0.18);
+
+            /* Spacing */
+            --sp-1: 4px;   --sp-2: 8px;   --sp-3: 12px;
+            --sp-4: 16px;  --sp-5: 20px;  --sp-6: 24px;
+            --sp-8: 32px;  --sp-10: 40px; --sp-12: 48px;
+            --sp-16: 64px; --sp-20: 80px;
+
+            /* Typography */
+            --font-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans",
+                           "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+            --font-display: "Avenir Next", "Avenir", -apple-system, "PingFang SC",
+                           "Noto Sans SC", sans-serif;
+            --font-mono: "SF Mono", "Consolas", "Source Code Pro", monospace;
+
+            /* Radius */
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --radius-xl: 20px;
+            --radius-pill: 100px;
+        }
+
+        /* --- PDF Page Setup --- */
+        @page {
+            size: A4;
+            margin: 2cm;
+            background: white;
+            @top-center {
+                content: "BCG Intelligence Dashboard";
+                font-family: -apple-system, sans-serif;
+                font-size: 9pt;
+                color: #00A651;
+                font-weight: 600;
+            }
+            @bottom-center {
+                content: "Page " counter(page);
+                font-family: -apple-system, sans-serif;
+                font-size: 8pt;
+                color: #6B7F73;
+            }
+        }
+
+        /* --- Reset & Base --- */
+        *, *::before, *::after {
+            margin: 0; padding: 0; box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            color: var(--text-primary);
+            font-size: 16px;
+            line-height: 1.68;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            /* Dot grid pattern background */
+            background:
+                radial-gradient(circle, rgba(0, 166, 81, 0.04) 1px, transparent 1px),
+                linear-gradient(180deg, #FAFCFA 0%, #FFFFFF 5%, #FFFFFF 95%, #FAFCFA 100%);
+            background-size: 20px 20px, 100% 100%;
+            background-attachment: fixed;
+        }
+
+        a {
+            color: var(--bcg-green);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        a:hover { color: var(--bcg-green-dark); text-decoration: underline; }
+
+        /* --- Main Layout: Nav Rail + Content --- */
+        .page-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Left vertical navigation rail */
+        .nav-rail {
+            width: 56px;
+            background: var(--bg-nav-rail);
+            border-right: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: var(--sp-8) 0;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            flex-shrink: 0;
+        }
+
+        .nav-rail-logo {
+            width: 36px;
+            height: 36px;
+            background: var(--bcg-gradient);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.7em;
+            font-weight: 800;
+            letter-spacing: 0.01em;
+            margin-bottom: var(--sp-8);
+            box-shadow: var(--shadow-green);
+            font-family: var(--font-display);
+        }
+
+        .nav-rail-line {
+            width: 2px;
+            flex: 1;
+            background: linear-gradient(180deg, var(--bcg-green) 0%, var(--bcg-green-dim) 50%, transparent 100%);
+            border-radius: 1px;
+            margin-bottom: var(--sp-8);
+        }
+
+        .nav-rail-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--bcg-green-dim);
+            border: 2px solid var(--bcg-green);
+            border-radius: 50%;
+            margin-bottom: var(--sp-6);
+        }
+
+        .nav-rail-dot:last-child { margin-bottom: 0; }
+        .nav-rail-dot.active {
+            background: var(--bcg-green);
+        }
+
+        /* Content area */
+        .content-area {
+            flex: 1;
+            min-width: 0;
+            background: var(--bg-primary);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.04);
+        }
+
+        /* --- Header: Green Gradient Full-Width Band --- */
+        .header {
+            background:
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='m36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm-30 30v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"),
+                linear-gradient(135deg, #00A651 0%, #00783C 50%, #005A2D 100%);
+            color: white;
+            padding: var(--sp-12) var(--sp-12);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Radial light */
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -15%;
+            width: 55%;
+            height: 180%;
+            background: radial-gradient(ellipse, rgba(255, 255, 255, 0.08) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        /* Bottom gradient edge */
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #005A2D, var(--bcg-green), var(--bcg-green-light), var(--bcg-green), #005A2D);
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--sp-8);
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+        }
+
+        .header-brand-text {
+            font-size: 1.1em;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            font-family: var(--font-display);
+        }
+
+        .header-date {
+            background: rgba(255, 255, 255, 0.12);
+            padding: var(--sp-2) var(--sp-5);
+            border-radius: var(--radius-sm);
+            font-size: 0.88em;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            font-family: var(--font-mono);
+            letter-spacing: 0.02em;
+        }
+
+        .header-main-title {
+            font-size: 3em;
+            font-weight: 700;
+            line-height: 1.08;
+            margin-bottom: var(--sp-4);
+            letter-spacing: -0.025em;
+            font-family: var(--font-display);
+        }
+
+        .header-subtitle {
+            font-size: 1.15em;
+            opacity: 0.85;
+            margin-bottom: var(--sp-10);
+            font-weight: 400;
+        }
+
+        /* KPI Cards */
+        .header-kpis {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: var(--sp-5);
+        }
+
+        .kpi-card {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: var(--radius-md);
+            padding: var(--sp-5) var(--sp-4);
+            text-align: center;
+            backdrop-filter: blur(8px);
+            transition: all 0.2s ease;
+        }
+        .kpi-card:hover {
+            background: rgba(255, 255, 255, 0.18);
+            transform: translateY(-2px);
+        }
+
+        .kpi-number {
+            font-size: 2.4em;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: var(--sp-1);
+            font-family: var(--font-display);
+        }
+
+        .kpi-label {
+            font-size: 0.72em;
+            opacity: 0.7;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        /* --- Page Body --- */
+        .page-body {
+            padding: var(--sp-12) var(--sp-12);
+        }
+
+        /* --- Executive Summary: Analytics Card --- */
+        .exec-summary {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: var(--sp-10);
+            margin-bottom: var(--sp-16);
+            box-shadow: var(--shadow-card);
+            position: relative;
+            page-break-inside: avoid;
+        }
+
+        /* Green top bar */
+        .exec-summary::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: var(--bcg-gradient);
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        }
+
+        .exec-header {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-4);
+            margin-bottom: var(--sp-8);
+        }
+
+        .exec-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--bcg-gradient);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2em;
+            box-shadow: var(--shadow-green);
+        }
+
+        .exec-title {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-family: var(--font-display);
+        }
+
+        .exec-label {
+            margin-left: auto;
+            font-size: 0.68em;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--bcg-green);
+            background: var(--bcg-green-dim);
+            padding: var(--sp-1) var(--sp-4);
+            border-radius: var(--radius-pill);
+            border: 1px solid var(--border-green);
+        }
+
+        .exec-content {
+            font-size: 1.06em;
+            line-height: 1.78;
+            color: var(--text-body);
+        }
+        .exec-content p { margin-bottom: var(--sp-5); }
+        .exec-content p:last-child { margin-bottom: 0; }
+        .exec-content strong { color: var(--bcg-green-dark); font-weight: 600; }
+
+        /* --- Section Divider: Green Line + Dot --- */
+        .section-divider {
+            display: flex;
+            align-items: center;
+            margin: var(--sp-12) 0;
+        }
+
+        .section-divider::before,
+        .section-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--bcg-green), transparent);
+            opacity: 0.25;
+        }
+
+        .section-divider-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--bcg-green);
+            border-radius: 50%;
+            margin: 0 var(--sp-4);
+            flex-shrink: 0;
+        }
+
+        /* --- Section --- */
+        .section {
+            margin-bottom: var(--sp-12);
+        }
+
+        .section-header {
+            background: var(--bg-accent);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: var(--sp-6) var(--sp-8);
+            margin-bottom: var(--sp-8);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Green left accent */
+        .section-header::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+            background: var(--bcg-gradient);
+            border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+        }
+
+        .section-title-group {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-4);
+        }
+
+        .section-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3em;
+            color: white;
+            box-shadow: var(--shadow-green);
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-family: var(--font-display);
+            letter-spacing: -0.01em;
+        }
+
+        .section-metrics {
+            display: flex;
+            gap: var(--sp-4);
+        }
+
+        .metric-badge {
+            background: white;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            padding: var(--sp-2) var(--sp-4);
+            text-align: center;
+            box-shadow: var(--shadow-card);
+        }
+
+        .metric-number {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: var(--bcg-green);
+            line-height: 1;
+            margin-bottom: 2px;
+            font-family: var(--font-display);
+        }
+
+        .metric-label {
+            font-size: 0.68em;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        /* --- Indicator Bar (Chart feel) --- */
+        .indicator-bar {
+            display: flex;
+            gap: 2px;
+            height: 5px;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: var(--sp-8);
+            background: var(--border-light);
+        }
+
+        .indicator-segment {
+            border-radius: 3px;
+            transition: flex 0.3s ease;
+        }
+        .indicator-must { background: var(--priority-must); }
+        .indicator-rec { background: var(--priority-rec); }
+        .indicator-fyi { background: var(--bcg-green); }
+
+        /* --- Brief Cards --- */
+        .brief {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: var(--sp-6) var(--sp-6);
+            margin-bottom: var(--sp-4);
+            box-shadow: var(--shadow-card);
+            transition: all 0.25s ease;
+            page-break-inside: avoid;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Green left accent */
+        .brief::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 4px; height: 100%;
+            border-radius: var(--radius-md) 0 0 var(--radius-md);
+        }
+
+        .brief:hover {
+            box-shadow: var(--shadow-elevated);
+            transform: translateY(-2px);
+        }
+        .brief:last-child { margin-bottom: 0; }
+
+        /* Must-read: Deep Green Inverse Card */
+        .brief.must-read {
+            background: linear-gradient(135deg, #00783C 0%, #005A2D 100%);
+            color: var(--text-inverse);
+            border-color: var(--bcg-green-dark);
+        }
+        .brief.must-read::before { background: #00C964; }
+        .brief.must-read:hover {
+            box-shadow: var(--shadow-elevated), var(--shadow-green);
+        }
+
+        .brief.recommended::before {
+            background: var(--priority-rec);
+        }
+
+        .brief.fyi::before {
+            background: var(--bcg-green);
+            opacity: 0.5;
+        }
+
+        /* Brief Header */
+        .brief-header {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--sp-4);
+            margin-bottom: var(--sp-4);
+        }
+
+        /* Green circle number badge */
+        .brief-number {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72em;
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .brief.fyi .brief-number,
+        .brief.recommended .brief-number {
+            background: var(--bcg-green-dim);
+            color: var(--bcg-green-dark);
+            border: 1px solid var(--border-green);
+        }
+
+        .brief.must-read .brief-number {
+            background: rgba(255, 255, 255, 0.18);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .brief-headline {
+            flex: 1;
+            font-size: 1.1em;
+            font-weight: 600;
+            line-height: 1.4;
+            font-family: var(--font-display);
+        }
+        .brief-headline a {
+            color: var(--text-primary);
+            transition: color 0.2s;
+        }
+        .brief-headline a:hover { color: var(--bcg-green); }
+        .brief.must-read .brief-headline a {
+            color: white;
+            font-weight: 700;
+        }
+        .brief.must-read .brief-headline a:hover { opacity: 0.85; }
+
+        .brief-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            margin-bottom: var(--sp-4);
+            flex-wrap: wrap;
+        }
+
+        .source-badge {
+            background: var(--bcg-green-pale);
+            color: var(--bcg-green-dark);
+            padding: var(--sp-1) var(--sp-4);
+            border-radius: var(--radius-pill);
+            font-size: 0.72em;
+            font-weight: 600;
+            border: 1px solid rgba(0, 166, 81, 0.10);
+        }
+        .brief.must-read .source-badge {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .tag {
+            background: var(--bg-surface);
+            color: var(--text-muted);
+            border: 1px solid var(--border-light);
+            padding: var(--sp-1) var(--sp-3);
+            border-radius: var(--radius-pill);
+            font-size: 0.68em;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .tag:hover { background: var(--bcg-green-pale); color: var(--bcg-green-dark); }
+        .brief.must-read .tag {
+            background: rgba(255, 255, 255, 0.10);
+            color: rgba(255, 255, 255, 0.8);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .brief-detail {
+            color: var(--text-body);
+            font-size: 0.95em;
+            line-height: 1.72;
+        }
+        .brief.must-read .brief-detail { color: rgba(255, 255, 255, 0.88); }
+        .brief-detail strong { color: var(--text-primary); font-weight: 600; }
+        .brief.must-read .brief-detail strong { color: white; }
+        .brief-detail code {
+            background: var(--bg-accent);
+            color: var(--bcg-green-dark);
+            padding: 2px 6px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            font-size: 0.86em;
+            border: 1px solid var(--bcg-green-pale);
+        }
+        .brief.must-read .brief-detail code {
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--bcg-green-light);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        /* ==========================================================
+         * KEY IMPLICATIONS: BCG Summary Box
+         * ========================================================== */
+        .implications-box {
+            background: linear-gradient(135deg, var(--bg-accent) 0%, var(--bg-primary) 100%);
+            border: 2px solid var(--bcg-green);
+            border-radius: var(--radius-lg);
+            padding: var(--sp-10);
+            margin: var(--sp-16) 0;
+            position: relative;
+        }
+
+        .implications-box::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px;
+            height: 5px;
+            background: var(--bcg-gradient);
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        }
+
+        .implications-title {
+            font-family: var(--font-display);
+            font-size: 1.3em;
+            font-weight: 700;
+            color: var(--bcg-green-dark);
+            margin-bottom: var(--sp-6);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .implications-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: var(--sp-5);
+        }
+
+        .implication-item {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--sp-3);
+        }
+
+        .implication-num {
+            width: 28px;
+            height: 28px;
+            background: var(--bcg-gradient);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75em;
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .implication-text {
+            font-size: 0.92em;
+            color: var(--text-body);
+            line-height: 1.55;
+        }
+
+        /* --- Summary Indicator Bars (Chart feel) --- */
+        .summary-bars {
+            margin-top: var(--sp-8);
+            padding-top: var(--sp-6);
+            border-top: 1px solid var(--border-light);
+        }
+
+        .summary-bar-label {
+            font-size: 0.72em;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: var(--sp-2);
+        }
+
+        .summary-bar-track {
+            height: 8px;
+            background: var(--border-light);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: var(--sp-4);
+        }
+
+        .summary-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.6s ease;
+        }
+
+        /* --- Footer --- */
+        .footer {
+            background: var(--bg-accent);
+            border-top: 1px solid var(--border-light);
+            padding: var(--sp-12) var(--sp-12);
+            text-align: center;
+            position: relative;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: -1px; left: 0; right: 0;
+            height: 4px;
+            background: var(--bcg-gradient);
+        }
+
+        .footer-brand {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--bcg-green);
+            margin-bottom: var(--sp-3);
+            letter-spacing: 0.08em;
+            font-family: var(--font-display);
+        }
+
+        .footer-tagline {
+            font-size: 1em;
+            color: var(--text-body);
+            margin-bottom: var(--sp-5);
+        }
+
+        .footer-meta {
+            font-size: 0.82em;
+            color: var(--text-muted);
+        }
+
+        .footer-confidential {
+            margin-top: var(--sp-6);
+            font-size: 0.68em;
+            color: var(--text-light);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding-top: var(--sp-4);
+            border-top: 1px solid var(--border-light);
+        }
+
+        /* --- Print --- */
+        @media print {
+            body {
+                background: white !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .page-wrapper { display: block; }
+            .nav-rail { display: none; }
+            .content-area { box-shadow: none; }
+            .header { padding: var(--sp-8); }
+            .header::before, .header::after { display: none; }
+            .page-body { padding: var(--sp-8); }
+            .brief {
+                break-inside: avoid;
+                box-shadow: none;
+                margin-bottom: var(--sp-3);
+            }
+            .brief:hover { transform: none; box-shadow: none; }
+            a { color: var(--text-primary) !important; }
+        }
+
+        /* --- Mobile --- */
+        @media (max-width: 768px) {
+            .page-wrapper { display: block; }
+            .nav-rail { display: none; }
+            .header { padding: var(--sp-8) var(--sp-6); }
+            .header-main-title { font-size: 2.2em; }
+            .header-top { flex-direction: column; align-items: flex-start; gap: var(--sp-3); }
+            .header-kpis { grid-template-columns: repeat(2, 1fr); }
+            .page-body { padding: var(--sp-6) var(--sp-4); }
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--sp-3);
+                padding: var(--sp-5) var(--sp-5);
+            }
+            .brief { padding: var(--sp-5); }
+            .implications-grid { grid-template-columns: 1fr; }
+            .footer { padding: var(--sp-8) var(--sp-6); }
+        }
+
+        @media (max-width: 480px) {
+            .header-main-title { font-size: 1.8em; }
+            .header-kpis { grid-template-columns: 1fr 1fr; }
+            .kpi-number { font-size: 1.8em; }
+            .section-title { font-size: 1.25em; }
+            .brief-headline { font-size: 1em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+
+        <!-- ====== LEFT NAV RAIL ====== -->
+        <nav class="nav-rail" aria-hidden="true">
+            <div class="nav-rail-logo">BCG</div>
+            <div class="nav-rail-line"></div>
+            {% for section_key in section_order %}
+            {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+            <div class="nav-rail-dot {{ 'active' if loop.first else '' }}"></div>
+            {% endif %}
+            {% endfor %}
+        </nav>
+
+        <!-- ====== CONTENT AREA ====== -->
+        <main class="content-area">
+
+            <!-- ====== HEADER: Green Gradient Band ====== -->
+            <header class="header">
+                <div class="header-content">
+                    <div class="header-top">
+                        <div class="header-brand">
+                            <span class="header-brand-text">BCG Intelligence</span>
+                        </div>
+                        <div class="header-date">{{ date_str }}</div>
+                    </div>
+                    <h1 class="header-main-title">Market Intelligence Dashboard</h1>
+                    <div class="header-subtitle">Data-driven strategic insights and analysis</div>
+                    <div class="header-kpis">
+                        <div class="kpi-card">
+                            <div class="kpi-number">{{ total_items }}</div>
+                            <div class="kpi-label">Reports</div>
+                        </div>
+                        {% set must_read_total = [] %}
+                        {% for section_key, items in briefs.items() %}
+                        {% if items is iterable and items is not string %}
+                        {% for item in items %}
+                        {% if item.priority == '🔴' %}
+                        {% if must_read_total.append(1) %}{% endif %}
+                        {% endif %}
+                        {% endfor %}
+                        {% endif %}
+                        {% endfor %}
+                        {% if must_read_total|length > 0 %}
+                        <div class="kpi-card">
+                            <div class="kpi-number">{{ must_read_total|length }}</div>
+                            <div class="kpi-label">Critical</div>
+                        </div>
+                        {% endif %}
+                        <div class="kpi-card">
+                            <div class="kpi-number">{{ section_order|length }}</div>
+                            <div class="kpi-label">Sectors</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-number">{{ generated_time.split(' ')[1][:5] if generated_time else 'Now' }}</div>
+                            <div class="kpi-label">Updated</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- ====== PAGE BODY ====== -->
+            <div class="page-body">
+
+                <!-- ====== EXECUTIVE SUMMARY ====== -->
+                {% if executive_summary %}
+                <div class="exec-summary">
+                    <div class="exec-header">
+                        <div class="exec-icon">📊</div>
+                        <h2 class="exec-title">Key Market Insights</h2>
+                        <span class="exec-label">Executive Brief</span>
+                    </div>
+                    <div class="exec-content">
+                        {% for line in executive_summary.strip().split('\n') %}
+                        {% if line.strip() %}
+                        <p>{{ line.strip() | md_inline }}</p>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- ====== SECTIONS ====== -->
+                {% for section_key in section_order %}
+                {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+                {% set meta = section_configs.get(section_key, {}) %}
+                {% set items = briefs[section_key] %}
+                {% set sec_color = meta.color|default('#00A651') %}
+
+                {% if not loop.first %}
+                <div class="section-divider">
+                    <div class="section-divider-dot"></div>
+                </div>
+                {% endif %}
+
+                <section class="section">
+                    <div class="section-header">
+                        <div class="section-title-group">
+                            <div class="section-icon" style="background: linear-gradient(135deg, {{ sec_color }}, {{ sec_color }}cc);">
+                                {{ meta.emoji|default('📈') }}
+                            </div>
+                            <h2 class="section-title">{{ meta.title|default(section_key|title) }}</h2>
+                        </div>
+                        <div class="section-metrics">
+                            <div class="metric-badge">
+                                <div class="metric-number">{{ items|length }}</div>
+                                <div class="metric-label">Items</div>
+                            </div>
+                            {% set section_critical = items|selectattr('priority', 'equalto', '🔴')|list|length %}
+                            {% if section_critical > 0 %}
+                            <div class="metric-badge">
+                                <div class="metric-number" style="color: var(--priority-must);">{{ section_critical }}</div>
+                                <div class="metric-label">Critical</div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Priority Distribution Bar -->
+                    {% set sec_must = items|selectattr('priority', 'equalto', '🔴')|list|length %}
+                    {% set sec_rec = items|selectattr('priority', 'equalto', '🟡')|list|length %}
+                    {% set sec_fyi = items|length - sec_must - sec_rec %}
+                    <div class="indicator-bar">
+                        {% if sec_must > 0 %}<div class="indicator-segment indicator-must" style="flex: {{ sec_must }};"></div>{% endif %}
+                        {% if sec_rec > 0 %}<div class="indicator-segment indicator-rec" style="flex: {{ sec_rec }};"></div>{% endif %}
+                        {% if sec_fyi > 0 %}<div class="indicator-segment indicator-fyi" style="flex: {{ sec_fyi }};"></div>{% endif %}
+                    </div>
+
+                    {% for item in items %}
+                    {% set priority = item.priority|default('🟢') %}
+                    {% set p_class = 'must-read' if priority == '🔴' else ('recommended' if priority == '🟡' else 'fyi') %}
+                    <div class="brief {{ p_class }}">
+                        <div class="brief-header">
+                            <div class="brief-number">{{ loop.index }}</div>
+                            <div class="brief-headline">
+                                <a href="{{ item.url|default('#') }}" target="_blank">{{ item.headline|default(item.title|default('Untitled')) }}</a>
+                            </div>
+                        </div>
+                        <div class="brief-meta">
+                            {% if item.source %}
+                            <span class="source-badge">{{ item.source }}</span>
+                            {% endif %}
+                            {% if item.tags %}
+                            {% for tag in item.tags %}
+                            <span class="tag">{{ tag }}</span>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                        {% if item.detail %}
+                        <div class="brief-detail">{{ item.detail|default('') | md_inline }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </section>
+                {% endif %}
+                {% endfor %}
+
+                <!-- ====== KEY IMPLICATIONS BOX ====== -->
+                <div class="implications-box">
+                    <div class="implications-title">📋 Key Implications</div>
+                    <div class="implications-grid">
+                        <div class="implication-item">
+                            <div class="implication-num">1</div>
+                            <div class="implication-text">{{ total_items }} data points analyzed across {{ section_order|length }} strategic sectors</div>
+                        </div>
+                        <div class="implication-item">
+                            <div class="implication-num">2</div>
+                            <div class="implication-text">{{ must_read_total|length }} critical signals require immediate executive attention</div>
+                        </div>
+                        <div class="implication-item">
+                            <div class="implication-num">3</div>
+                            <div class="implication-text">Cross-sector intelligence reveals emerging patterns for portfolio positioning</div>
+                        </div>
+                    </div>
+
+                    <!-- Summary indicator bars -->
+                    <div class="summary-bars">
+                        <div class="summary-bar-label">Intelligence Coverage</div>
+                        <div class="summary-bar-track">
+                            <div class="summary-bar-fill" style="width: 92%; background: var(--bcg-gradient);"></div>
+                        </div>
+                        <div class="summary-bar-label">Critical Alert Rate</div>
+                        <div class="summary-bar-track">
+                            <div class="summary-bar-fill" style="width: {{ (must_read_total|length / total_items * 100) if total_items > 0 else 15 }}%; background: linear-gradient(90deg, var(--priority-must), var(--priority-rec));"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ====== FOOTER ====== -->
+            <footer class="footer">
+                <div class="footer-brand">BCG Intelligence Platform</div>
+                <div class="footer-tagline">Strategic insights powered by advanced analytics</div>
+                <div class="footer-meta">{{ date_str }} · {{ total_items }} data points analyzed</div>
+                <div class="footer-confidential">Confidential · For internal use only</div>
+            </footer>
+
+        </main>
+    </div>
+</body>
+</html>

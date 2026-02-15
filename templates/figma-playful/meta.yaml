@@ -1,0 +1,11 @@
+name: "figma-playful"
+description: "Figma-inspired playful design with multi-color accents and rounded button style"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "light"
+features:
+  - "Figma purple primary color (#A259FF)"
+  - "Multi-color section accents (green/blue/red/yellow)"
+  - "Playful rounded button style"
+  - "White background with colorful highlights"
+  - "Modern design tool aesthetic"

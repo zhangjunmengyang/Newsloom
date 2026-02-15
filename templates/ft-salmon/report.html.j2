@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Intelligence · {{ date_str }} · Newsloom</title>
+    <style>
+        /* ============================================================
+         * FT SALMON — Financial Times Inspired Theme
+         *
+         * Visual Narrative: The tactile warmth of salmon-pink newsprint.
+         * Not a flat color — it's a living, breathing paper surface
+         * with subtle color gradation, like an actual FT broadsheet.
+         *
+         * Enhancements:
+         *   - Radial gradient background (center bright, edges warm)
+         *   - Masthead with salmon-to-white gradient band
+         *   - Financial quote-board style stats cards
+         *   - Section headers with gradient section-color wash
+         *   - Card hover: subtle lift effect (translateY + shadow)
+         *   - Decorative dividers with FT gray rules + symbols
+         *   - Paper color variation across the page
+         * ============================================================ */
+
+        /* --- Design Tokens --- */
+        :root {
+            /* FT Salmon Brand Colors — with paper variation */
+            --bg-primary:     #FFF1E5;
+            --bg-center:      #FFF5ED;
+            --bg-edge:        #F5E4D4;
+            --bg-secondary:   #FDF7F0;
+            --bg-card:        #FFFFFF;
+            --bg-hover:       #FFF8F0;
+            --bg-section:     #F9EDE0;
+            --bg-subtle:      #FBF3EB;
+            --bg-warm:        #FFF5EC;
+            --bg-cream:       #FFFAF5;
+
+            /* Text Colors */
+            --text-primary:   #1A1A1A;
+            --text-secondary: #33302E;
+            --text-muted:     #6D6560;
+            --text-subtle:    #8A827C;
+            --text-light:     #B5ADA7;
+            --text-inverse:   #FFFFFF;
+
+            /* FT Red System */
+            --ft-red:         #990F3D;
+            --ft-red-dark:    #7A0C31;
+            --ft-red-light:   #CC1452;
+            --ft-red-pale:    #FFE6ED;
+            --ft-red-bg:      rgba(153, 15, 61, 0.06);
+            --ft-red-dim:     rgba(153, 15, 61, 0.1);
+            --ft-red-border:  rgba(153, 15, 61, 0.2);
+
+            /* Priority Colors */
+            --priority-must:     #990F3D;
+            --priority-must-bg:  rgba(153, 15, 61, 0.06);
+            --priority-must-border: rgba(153, 15, 61, 0.18);
+            --priority-rec:      #C25400;
+            --priority-rec-bg:   rgba(194, 84, 0, 0.05);
+            --priority-rec-border: rgba(194, 84, 0, 0.15);
+            --priority-fyi:      #0D7680;
+            --priority-fyi-bg:   rgba(13, 118, 128, 0.04);
+
+            /* Markets / Data colors */
+            --data-green:     #00994D;
+            --data-red:       #CC0000;
+            --data-neutral:   #666666;
+
+            /* Borders & Rules */
+            --border-light:   #EBE0D5;
+            --border-medium:  #D9CFC2;
+            --border-strong:  #C7B9A8;
+            --border-ft:      var(--ft-red);
+            --border-hairline: #F0E6DB;
+            --rule-dark:      #2E2520;
+
+            /* Shadows — warm tones */
+            --shadow-subtle:  0 1px 3px rgba(100, 60, 30, 0.08);
+            --shadow-soft:    0 2px 8px rgba(100, 60, 30, 0.1);
+            --shadow-medium:  0 4px 16px rgba(100, 60, 30, 0.12);
+            --shadow-lifted:  0 8px 24px rgba(100, 60, 30, 0.14), 0 2px 6px rgba(100, 60, 30, 0.06);
+
+            /* Spacing (8pt grid) */
+            --space-1:  4px;   --space-2:  8px;   --space-3:  12px;
+            --space-4:  16px;  --space-5:  20px;  --space-6:  24px;
+            --space-8:  32px;  --space-10: 40px;  --space-12: 48px;
+            --space-16: 64px;  --space-20: 80px;
+
+            /* Typography — FT serif system */
+            --font-serif: "Georgia", "Times New Roman", "Songti SC", "SimSun",
+                         "Noto Serif SC", "Times", serif;
+            --font-display: "Georgia", "Times New Roman", serif;
+            --font-sans: "Helvetica Neue", Arial, -apple-system, BlinkMacSystemFont,
+                        "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei",
+                        sans-serif;
+            --font-mono: "Courier New", "SF Mono", "Monaco", monospace;
+
+            /* Radius */
+            --radius-sm: 2px;
+            --radius-md: 4px;
+            --radius-lg: 6px;
+        }
+
+        /* --- Page Setup (PDF) --- */
+        @page {
+            size: A4;
+            margin: 1.5cm 2cm;
+            background: var(--bg-primary);
+            @top-center {
+                content: "FINANCIAL TIMES";
+                font-family: var(--font-display);
+                font-size: 9pt;
+                color: var(--ft-red);
+                font-weight: bold;
+                letter-spacing: 3px;
+            }
+            @bottom-left {
+                content: "© Newsloom · Financial Intelligence";
+                font-family: var(--font-sans);
+                font-size: 7pt;
+                color: var(--text-muted);
+            }
+            @bottom-right {
+                content: "Page " counter(page);
+                font-family: var(--font-sans);
+                font-size: 7pt;
+                color: var(--text-muted);
+            }
+        }
+
+        /* --- Base Styles --- */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-serif);
+            color: var(--text-primary);
+            font-size: 15px;
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            /* Paper texture: center bright, edges warm — like real FT newsprint */
+            background:
+                radial-gradient(ellipse at 50% 30%, var(--bg-center) 0%, var(--bg-primary) 50%, var(--bg-edge) 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        /* Paper fiber / grain texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image:
+                /* subtle paper noise */
+                radial-gradient(circle at 20% 40%, rgba(150,100,50,0.015) 1px, transparent 1px),
+                radial-gradient(circle at 60% 20%, rgba(150,100,50,0.012) 1px, transparent 1px),
+                radial-gradient(circle at 40% 80%, rgba(150,100,50,0.018) 1px, transparent 1px),
+                radial-gradient(circle at 80% 60%, rgba(150,100,50,0.01) 1px, transparent 1px),
+                radial-gradient(circle at 10% 70%, rgba(150,100,50,0.014) 1px, transparent 1px),
+                radial-gradient(circle at 90% 30%, rgba(150,100,50,0.011) 1px, transparent 1px),
+                radial-gradient(circle at 50% 50%, rgba(150,100,50,0.008) 1px, transparent 1px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Links — FT style */
+        a {
+            color: var(--ft-red);
+            text-decoration: underline;
+            text-decoration-color: rgba(153, 15, 61, 0.25);
+            text-underline-offset: 2px;
+            transition: all 0.2s ease;
+        }
+        a:hover {
+            color: var(--ft-red-dark);
+            text-decoration-color: var(--ft-red-dark);
+        }
+
+        /* --- Layout Container --- */
+        .container {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: var(--space-8) var(--space-6);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ========================================================
+         * HEADER: FT Masthead with salmon-white gradient band
+         * ======================================================== */
+        .header {
+            text-align: center;
+            padding: var(--space-10) var(--space-8);
+            margin-bottom: var(--space-12);
+            background: var(--bg-card);
+            box-shadow: var(--shadow-subtle);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Top FT red bar */
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--ft-red);
+        }
+
+        /* Salmon-to-white gradient band below header content */
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: linear-gradient(
+                180deg,
+                var(--bg-card) 0%,
+                var(--bg-primary) 100%
+            );
+        }
+
+        /* Fine double rule */
+        .header-bottom-rule {
+            position: absolute;
+            bottom: 40px;
+            left: var(--space-8);
+            right: var(--space-8);
+            height: 4px;
+            background:
+                linear-gradient(to bottom,
+                    var(--rule-dark) 0px, var(--rule-dark) 1px,
+                    transparent 1px, transparent 3px,
+                    var(--border-medium) 3px, var(--border-medium) 4px);
+        }
+
+        .masthead-date-line {
+            font-family: var(--font-sans);
+            font-size: 0.72em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: var(--space-4);
+            font-weight: 500;
+        }
+
+        .masthead {
+            font-family: var(--font-display);
+            font-size: 2.8rem;
+            font-weight: bold;
+            color: var(--ft-red);
+            letter-spacing: 0.1em;
+            margin-bottom: var(--space-3);
+            text-transform: uppercase;
+            line-height: 1.1;
+        }
+
+        .publication-line {
+            font-family: var(--font-sans);
+            font-size: 0.78em;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: var(--space-8);
+        }
+
+        .masthead-rule {
+            width: 100px;
+            height: 1px;
+            background: var(--ft-red);
+            margin: 0 auto var(--space-6);
+        }
+
+        .headline {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            font-weight: 400;
+            color: var(--text-primary);
+            line-height: 1.35;
+            margin-bottom: var(--space-4);
+            font-style: italic;
+        }
+
+        .publication-meta {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--space-6);
+            font-family: var(--font-sans);
+            font-size: 0.78em;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        .meta-separator {
+            color: var(--ft-red);
+            font-weight: bold;
+            font-size: 0.6em;
+        }
+
+        .meta-highlight {
+            color: var(--ft-red);
+            font-weight: 700;
+        }
+
+        /* ========================================================
+         * KEY FIGURES — Financial quote board style
+         * ======================================================== */
+        .key-figures {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--space-3);
+            margin-bottom: var(--space-12);
+        }
+
+        .key-figure {
+            background: var(--bg-card);
+            padding: var(--space-5) var(--space-4);
+            text-align: center;
+            border: 1px solid var(--border-medium);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-subtle);
+            transition: all 0.25s ease;
+            position: relative;
+        }
+
+        /* Top colored accent line */
+        .key-figure::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--ft-red);
+            border-radius: var(--radius-md) var(--radius-md) 0 0;
+        }
+
+        .key-figure:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .key-figure-value {
+            font-family: var(--font-mono);
+            font-size: 1.4em;
+            font-weight: bold;
+            color: var(--ft-red);
+            margin-bottom: var(--space-1);
+            letter-spacing: 0.02em;
+        }
+
+        .key-figure-label {
+            font-family: var(--font-sans);
+            font-size: 0.62em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+        }
+
+        /* ========================================================
+         * SECTION DIVIDER — FT gray rule with decoration
+         * ======================================================== */
+        .ft-divider {
+            position: relative;
+            text-align: center;
+            margin: var(--space-10) 0 var(--space-8);
+            height: 16px;
+        }
+        .ft-divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--border-medium);
+        }
+        .ft-divider-symbol {
+            display: inline-block;
+            background: var(--bg-primary);
+            padding: 0 var(--space-4);
+            position: relative;
+            font-size: 0.75em;
+            color: var(--text-light);
+            z-index: 1;
+            line-height: 16px;
+            font-family: var(--font-serif);
+        }
+
+        /* ========================================================
+         * EXECUTIVE SUMMARY — Editorial Box
+         * ======================================================== */
+        .executive-summary {
+            background: var(--bg-card);
+            border: 1px solid var(--border-medium);
+            padding: var(--space-8);
+            margin-bottom: var(--space-12);
+            box-shadow: var(--shadow-soft);
+            position: relative;
+            page-break-inside: avoid;
+            transition: box-shadow 0.25s ease;
+        }
+
+        .executive-summary:hover {
+            box-shadow: var(--shadow-medium);
+        }
+
+        /* Top FT red gradient bar */
+        .executive-summary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--ft-red), var(--ft-red-light), var(--ft-red));
+        }
+
+        /* Left decorative rule */
+        .executive-summary::after {
+            content: '';
+            position: absolute;
+            top: var(--space-8);
+            left: 0;
+            width: 3px;
+            height: calc(100% - var(--space-16));
+            background: var(--ft-red);
+        }
+
+        .summary-header {
+            text-align: center;
+            margin-bottom: var(--space-6);
+            padding-bottom: var(--space-4);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .summary-kicker {
+            font-family: var(--font-sans);
+            font-size: 0.65em;
+            color: var(--ft-red);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            font-weight: 700;
+            margin-bottom: var(--space-2);
+        }
+
+        .summary-title {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .summary-subtitle {
+            font-family: var(--font-sans);
+            font-size: 0.82em;
+            color: var(--text-subtle);
+            font-style: italic;
+        }
+
+        .summary-content {
+            columns: 2;
+            column-gap: var(--space-8);
+            column-rule: 1px solid var(--border-light);
+        }
+
+        .summary-content p {
+            color: var(--text-secondary);
+            margin-bottom: var(--space-4);
+            line-height: 1.75;
+            text-align: justify;
+            break-inside: avoid;
+        }
+        .summary-content p:last-child { margin-bottom: 0; }
+        .summary-content strong {
+            color: var(--text-primary);
+            font-weight: bold;
+        }
+
+        /* ========================================================
+         * SECTION — with section-color gradient header
+         * ======================================================== */
+        .section {
+            margin-bottom: var(--space-16);
+        }
+
+        .section-header {
+            border-top: 3px solid var(--section-color, var(--ft-red));
+            border-bottom: 1px solid var(--border-medium);
+            padding: var(--space-5) var(--space-6);
+            margin-bottom: var(--space-6);
+            text-align: center;
+            position: relative;
+            /* Section color gradient: fade in from left, fade out to right */
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                var(--section-color-bg, rgba(153, 15, 61, 0.04)) 20%,
+                var(--section-color-bg, rgba(153, 15, 61, 0.06)) 50%,
+                var(--section-color-bg, rgba(153, 15, 61, 0.04)) 80%,
+                transparent 100%
+            );
+        }
+
+        .section-kicker {
+            font-family: var(--font-sans);
+            font-size: 0.68em;
+            font-weight: 700;
+            color: var(--section-color, var(--ft-red));
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: var(--space-2);
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+            letter-spacing: 0.01em;
+        }
+
+        .section-meta {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--space-3);
+            font-family: var(--font-sans);
+            font-size: 0.75em;
+            color: var(--text-subtle);
+            margin-top: var(--space-2);
+        }
+
+        .section-meta .count {
+            color: var(--section-color, var(--ft-red));
+            font-weight: 700;
+        }
+
+        /* ========================================================
+         * BRIEF ARTICLES — Cards with hover lift
+         * ======================================================== */
+        .section-content {
+            columns: 2;
+            column-gap: var(--space-6);
+            column-rule: 1px solid var(--border-light);
+        }
+
+        .brief {
+            break-inside: avoid;
+            margin-bottom: var(--space-6);
+            padding: var(--space-5);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            background: var(--bg-card);
+            page-break-inside: avoid;
+            position: relative;
+            box-shadow: var(--shadow-subtle);
+            /* Hover lift transition */
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .brief:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Hover: card lifts up */
+        .brief:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lifted);
+        }
+
+        /* Priority Styling */
+        .brief.must-read {
+            background: var(--priority-must-bg);
+            border: 1px solid var(--priority-must-border);
+            border-left: 3px solid var(--ft-red);
+        }
+
+        .brief.must-read::before {
+            content: 'BREAKING';
+            position: absolute;
+            top: var(--space-2);
+            right: var(--space-3);
+            font-family: var(--font-sans);
+            font-size: 0.55em;
+            font-weight: 800;
+            color: var(--ft-red);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .brief.must-read .brief-headline {
+            color: var(--ft-red-dark);
+            font-size: 1.05em;
+        }
+
+        .brief.recommended {
+            border-left: 3px solid var(--priority-rec);
+        }
+
+        .brief.fyi {
+            opacity: 0.88;
+        }
+
+        /* Brief Header */
+        .brief-header {
+            margin-bottom: var(--space-3);
+        }
+
+        .brief-priority {
+            font-size: 0.82em;
+            margin-bottom: var(--space-1);
+            display: inline-block;
+        }
+
+        .brief-headline {
+            font-family: var(--font-display);
+            font-size: 0.98em;
+            font-weight: bold;
+            line-height: 1.35;
+            margin-bottom: var(--space-2);
+            color: var(--text-primary);
+        }
+        .brief-headline a {
+            color: inherit;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .brief-headline a:hover {
+            color: var(--ft-red);
+        }
+
+        /* Brief Meta — Newspaper Byline */
+        .brief-meta {
+            font-family: var(--font-sans);
+            font-size: 0.78em;
+            color: var(--text-muted);
+            margin-bottom: var(--space-3);
+        }
+
+        .byline {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            flex-wrap: wrap;
+            font-style: italic;
+        }
+
+        .source {
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-style: normal;
+            letter-spacing: 0.03em;
+        }
+
+        .dateline {
+            color: var(--text-subtle);
+        }
+
+        .tags {
+            display: flex;
+            gap: var(--space-1);
+            flex-wrap: wrap;
+            margin-top: var(--space-2);
+        }
+
+        .tag {
+            font-size: 0.7em;
+            padding: 1px var(--space-2);
+            background: var(--bg-section);
+            color: var(--text-muted);
+            border-radius: var(--radius-sm);
+            font-style: normal;
+            text-transform: lowercase;
+            border: 1px solid var(--border-light);
+            letter-spacing: 0.02em;
+            transition: background 0.2s ease;
+        }
+        .tag:hover {
+            background: var(--bg-warm);
+        }
+
+        /* Brief Content */
+        .brief-detail {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-size: 0.92em;
+            text-align: justify;
+            hyphens: auto;
+        }
+        .brief-detail strong {
+            color: var(--text-primary);
+            font-weight: bold;
+        }
+        .brief-detail em {
+            font-style: italic;
+        }
+        .brief-detail code {
+            font-family: var(--font-mono);
+            background: var(--bg-section);
+            color: var(--text-primary);
+            padding: 1px var(--space-1);
+            border-radius: var(--radius-sm);
+            font-size: 0.88em;
+            border: 1px solid var(--border-light);
+        }
+
+        /* ========================================================
+         * FOOTER — Newspaper Credits with gradient band
+         * ======================================================== */
+        .footer {
+            margin-top: var(--space-16);
+            background: var(--bg-card);
+            box-shadow: var(--shadow-subtle);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Top FT red bar */
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--ft-red);
+        }
+
+        /* Bottom salmon-to-card gradient */
+        .footer::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: linear-gradient(180deg, transparent, var(--bg-primary));
+        }
+
+        .footer-inner {
+            padding: var(--space-8) var(--space-8) var(--space-12);
+        }
+
+        .footer-masthead {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--ft-red);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: var(--space-3);
+        }
+
+        .footer-rule {
+            width: 60px;
+            height: 1px;
+            background: var(--ft-red);
+            margin: 0 auto var(--space-4);
+            opacity: 0.4;
+        }
+
+        .footer-credits {
+            font-family: var(--font-sans);
+            font-size: 0.78em;
+            color: var(--text-muted);
+            line-height: 1.55;
+            margin-bottom: var(--space-3);
+        }
+
+        /* Footer info bar — edition details */
+        .footer-info-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--space-4);
+            flex-wrap: wrap;
+            font-size: 0.62em;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-family: var(--font-sans);
+            padding-top: var(--space-3);
+            border-top: 1px solid var(--border-light);
+            margin-top: var(--space-4);
+        }
+        .footer-info-bar .sep { color: var(--ft-red); opacity: 0.4; }
+
+        .footer-disclaimer {
+            font-family: var(--font-sans);
+            font-size: 0.7em;
+            color: var(--text-subtle);
+            font-style: italic;
+            max-width: 560px;
+            margin: var(--space-3) auto 0;
+            line-height: 1.5;
+        }
+
+        /* ========================================================
+         * PRINT STYLES
+         * ======================================================== */
+        @media print {
+            body {
+                background: var(--bg-primary) !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            body::before { display: none; }
+            .container {
+                max-width: 100%;
+                padding: 0;
+            }
+            .header {
+                padding: var(--space-6) 0;
+                margin-bottom: var(--space-8);
+                box-shadow: none;
+            }
+            .section { margin-bottom: var(--space-10); }
+            .section-content { columns: 2; }
+            .brief {
+                break-inside: avoid;
+                margin-bottom: var(--space-4);
+                padding: var(--space-4);
+                box-shadow: none;
+                transition: none;
+            }
+            .brief:hover { transform: none; box-shadow: none; }
+            .brief.must-read::before { display: none; }
+            .executive-summary { box-shadow: none; }
+            .executive-summary:hover { box-shadow: none; }
+            .key-figures { page-break-inside: avoid; }
+            .key-figure:hover { transform: none; box-shadow: var(--shadow-subtle); }
+            a { color: var(--text-primary) !important; text-decoration: none !important; }
+        }
+
+        /* ========================================================
+         * RESPONSIVE
+         * ======================================================== */
+        @media (max-width: 768px) {
+            .container {
+                padding: var(--space-6) var(--space-4);
+            }
+            .masthead {
+                font-size: 2.2rem;
+            }
+            .headline {
+                font-size: 1.3rem;
+            }
+            .summary-content {
+                columns: 1;
+            }
+            .section-content {
+                columns: 1;
+            }
+            .key-figures {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .header {
+                padding: var(--space-8) var(--space-4);
+            }
+            .executive-summary {
+                padding: var(--space-6);
+            }
+        }
+
+        @media (max-width: 480px) {
+            body { font-size: 14px; }
+            .container { padding: var(--space-4) var(--space-3); }
+            .masthead {
+                font-size: 1.8rem;
+                letter-spacing: 0.06em;
+            }
+            .headline { font-size: 1.15rem; }
+            .section-title { font-size: 1.15rem; }
+            .publication-meta {
+                gap: var(--space-3);
+                flex-direction: column;
+            }
+            .key-figures {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- ====== HEADER: FT Masthead with gradient band ====== -->
+        <header class="header">
+            <div class="masthead-date-line">{{ date_str }} · Intelligence Edition</div>
+            <h1 class="masthead">Financial Times</h1>
+            <div class="publication-line">Powered by Newsloom Intelligence</div>
+            <div class="masthead-rule"></div>
+            <h2 class="headline">Daily Market Intelligence Report</h2>
+            <div class="publication-meta">
+                <span>{{ date_str }}</span>
+                <span class="meta-separator">●</span>
+                <span>Generated {{ generated_time }}</span>
+                <span class="meta-separator">●</span>
+                <span><span class="meta-highlight">{{ total_items }}</span> stories</span>
+                {% set must_read_count = [] %}
+                {% for section_key, items in briefs.items() %}
+                {% if items is iterable and items is not string %}
+                {% for item in items %}
+                {% if item.priority == '🔴' %}
+                {% if must_read_count.append(1) %}{% endif %}
+                {% endif %}
+                {% endfor %}
+                {% endif %}
+                {% endfor %}
+                {% if must_read_count|length > 0 %}
+                <span class="meta-separator">●</span>
+                <span><span class="meta-highlight">{{ must_read_count|length }}</span> breaking</span>
+                {% endif %}
+            </div>
+            <div class="header-bottom-rule"></div>
+        </header>
+
+        <!-- ====== KEY FIGURES — Quote board cards ====== -->
+        <div class="key-figures">
+            <div class="key-figure">
+                <div class="key-figure-value">{{ total_items }}</div>
+                <div class="key-figure-label">Stories Filed</div>
+            </div>
+            <div class="key-figure">
+                <div class="key-figure-value">{{ section_order|length }}</div>
+                <div class="key-figure-label">Sections</div>
+            </div>
+            <div class="key-figure">
+                <div class="key-figure-value">{{ must_read_count|length }}</div>
+                <div class="key-figure-label">Breaking</div>
+            </div>
+            <div class="key-figure">
+                <div class="key-figure-value">AI</div>
+                <div class="key-figure-label">Curated</div>
+            </div>
+        </div>
+
+        <!-- ====== EXECUTIVE SUMMARY ====== -->
+        {% if executive_summary %}
+        <section class="executive-summary">
+            <div class="summary-header">
+                <div class="summary-kicker">Editor's Briefing</div>
+                <h2 class="summary-title">Today's Intelligence</h2>
+                <div class="summary-subtitle">Key developments shaping markets and industry</div>
+            </div>
+            <div class="summary-content">
+                {% for line in executive_summary.strip().split('\n') %}
+                {% if line.strip() %}
+                <p>{{ line.strip() | md_inline }}</p>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- ====== SECTIONS ====== -->
+        {% for section_key in section_order %}
+        {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+        {% set meta = section_configs.get(section_key, {}) %}
+        {% set items = briefs[section_key] %}
+        {% set section_color = meta.color|default('#990F3D') %}
+
+        {% if not loop.first %}
+        <div class="ft-divider">
+            <span class="ft-divider-symbol">{% if loop.index is odd %}◆{% else %}·  ·  ·{% endif %}</span>
+        </div>
+        {% endif %}
+
+        <section class="section">
+            <div class="section-header" style="--section-color: {{ section_color }}; --section-color-bg: {{ section_color }}10">
+                <div class="section-kicker" style="color: {{ section_color }}">{{ meta.emoji|default('📰') }} Section</div>
+                <h2 class="section-title">{{ meta.title|default(section_key) }}</h2>
+                <div class="section-meta">
+                    <span class="count" style="color: {{ section_color }}">{{ items|length }}</span> articles in this section
+                </div>
+            </div>
+
+            <div class="section-content">
+                {% for item in items %}
+                {% set priority = item.priority|default('🟢') %}
+                {% set p_class = 'must-read' if priority == '🔴' else ('recommended' if priority == '🟡' else 'fyi') %}
+                <article class="brief {{ p_class }}">
+                    <div class="brief-header">
+                        <div class="brief-priority">{{ priority }}</div>
+                        <h3 class="brief-headline">
+                            <a href="{{ item.url|default('#') }}" target="_blank">
+                                {{ item.headline|default(item.title|default('Untitled')) }}
+                            </a>
+                        </h3>
+                    </div>
+
+                    {% if item.source or item.tags %}
+                    <div class="brief-meta">
+                        <div class="byline">
+                            {% if item.source %}
+                            <span class="source">{{ item.source }}</span>
+                            {% endif %}
+                            <span class="dateline">{{ generated_time }}</span>
+                        </div>
+                        {% if item.tags %}
+                        <div class="tags">
+                            {% for tag in item.tags %}
+                            <span class="tag">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    {% if item.detail %}
+                    <div class="brief-detail">{{ item.detail|default('') | md_inline }}</div>
+                    {% endif %}
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+        {% endfor %}
+
+        <!-- ====== FOOTER ====== -->
+        <footer class="footer">
+            <div class="footer-inner">
+                <div class="footer-masthead">Financial Times</div>
+                <div class="footer-rule"></div>
+                <div class="footer-credits">
+                    Powered by Newsloom Intelligence · {{ date_str }} · {{ total_items }} sources analyzed
+                </div>
+                <div class="footer-info-bar">
+                    <span>{{ date_str }}</span>
+                    <span class="sep">|</span>
+                    <span>Intelligence Edition</span>
+                    <span class="sep">|</span>
+                    <span>Vol. I</span>
+                    <span class="sep">|</span>
+                    <span>{{ total_items }} Stories</span>
+                </div>
+                <div class="footer-disclaimer">
+                    This report is compiled from publicly available sources and is for informational purposes only.
+                    The Financial Times name and style are used for thematic purposes. Content is AI-curated by Newsloom.
+                </div>
+            </div>
+        </footer>
+
+    </div>
+</body>
+</html>

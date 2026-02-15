@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>𝕏 Feed · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * TWITTER CARD — Twitter/X Feed Interface
+         * ============================================================
+         * White base · X black #0F1419 · X blue #1DA1F2
+         * Full X/Twitter visual experience with feed, sidebar, nav
+         * ============================================================ */
+
+        /* --- PDF Page Setup --- */
+        @page {
+            size: A4;
+            margin: 1.2cm 1.5cm;
+            @bottom-right {
+                content: "𝕏 Feed · " counter(page) " / " counter(pages);
+                font-family: -apple-system, BlinkMacSystemFont, "PingFang SC",
+                             "Noto Sans SC", "Microsoft YaHei", sans-serif;
+                font-size: 7pt;
+                color: #536471;
+            }
+        }
+
+        /* --- Reset --- */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* --- Body --- */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                         Helvetica, Arial, "PingFang SC", "Noto Sans SC",
+                         "Hiragino Sans GB", "Microsoft YaHei",
+                         "WenQuanYi Micro Hei", sans-serif;
+            font-size: 15px;
+            line-height: 1.5;
+            color: #0F1419;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            /* X-style minimal background with subtle blue radials */
+            background:
+                radial-gradient(ellipse at 15% 0%, rgba(29,161,242,0.018) 0%, transparent 45%),
+                radial-gradient(ellipse at 85% 100%, rgba(29,161,242,0.012) 0%, transparent 45%),
+                linear-gradient(180deg, #F7F9FA 0%, #FFFFFF 3%, #FFFFFF 97%, #F7F9FA 100%);
+            min-height: 100vh;
+        }
+
+        a {
+            color: #1DA1F2;
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+        a:hover {
+            color: #1A8CD8;
+        }
+
+        /* --- 3-Column X Layout --- */
+        .x-shell {
+            max-width: 1080px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 68px 600px 1fr;
+            min-height: 100vh;
+        }
+
+        /* ============================================================
+         * LEFT NAV — Icon sidebar
+         * ============================================================ */
+        .x-nav {
+            border-right: 1px solid #EFF3F4;
+            padding: 12px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            /* Subtle left-edge gradient */
+            background:
+                linear-gradient(90deg, rgba(247,249,250,0.5) 0%, transparent 100%);
+        }
+
+        .nav-logo {
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6em;
+            font-weight: 900;
+            color: #0F1419;
+            margin-bottom: 14px;
+            border-radius: 9999px;
+            transition: background 0.15s;
+        }
+        .nav-logo:hover {
+            background: rgba(29,161,242,0.1);
+        }
+
+        .nav-btn {
+            width: 46px;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px;
+            font-size: 1.2em;
+            color: #0F1419;
+            cursor: pointer;
+            transition: background 0.15s;
+            position: relative;
+        }
+        .nav-btn:hover {
+            background: rgba(15,20,25,0.05);
+        }
+        .nav-btn.active {
+            font-weight: 900;
+        }
+
+        /* Notification badge */
+        .nav-btn .badge {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 18px;
+            height: 18px;
+            background: #1DA1F2;
+            color: #FFFFFF;
+            border-radius: 9999px;
+            font-size: 0.55em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #FFFFFF;
+        }
+
+        .compose-btn {
+            width: 46px;
+            height: 46px;
+            background: #1DA1F2;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFFFFF;
+            font-size: 1.3em;
+            margin-top: 14px;
+            cursor: pointer;
+            transition: background 0.15s;
+            box-shadow: 0 2px 8px rgba(29,161,242,0.3);
+        }
+        .compose-btn:hover {
+            background: #1A8CD8;
+        }
+
+        /* ============================================================
+         * FEED COLUMN
+         * ============================================================ */
+        .x-feed {
+            border-right: 1px solid #EFF3F4;
+            min-width: 0;
+        }
+
+        /* Sticky header with blur */
+        .feed-top {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid #EFF3F4;
+        }
+
+        .feed-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+        }
+
+        .feed-title {
+            font-size: 1.25em;
+            font-weight: 800;
+            color: #0F1419;
+        }
+
+        .feed-gear {
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: background 0.15s;
+            font-size: 1.1em;
+        }
+        .feed-gear:hover {
+            background: rgba(15,20,25,0.05);
+        }
+
+        /* Tabs: For You / Following */
+        .tabs-row {
+            display: flex;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 14px 0;
+            font-size: 0.95em;
+            font-weight: 500;
+            color: #536471;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+        }
+        .tab:hover {
+            background: rgba(15,20,25,0.03);
+        }
+        .tab.on {
+            color: #0F1419;
+            font-weight: 700;
+        }
+        .tab.on::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 56px;
+            height: 4px;
+            background: #1DA1F2;
+            border-radius: 4px;
+        }
+
+        /* ============================================================
+         * TWEET — common styles
+         * ============================================================ */
+        .tw {
+            border-bottom: 1px solid #EFF3F4;
+            transition: background 0.15s;
+            page-break-inside: avoid;
+        }
+        .tw:hover {
+            background: #F7F7F7;
+        }
+
+        .tw-pin-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 16px 0;
+            padding-left: calc(48px + 12px + 16px);
+            font-size: 0.78em;
+            font-weight: 700;
+            color: #536471;
+        }
+
+        .tw-row {
+            display: flex;
+            padding: 10px 16px;
+            gap: 12px;
+        }
+
+        /* Avatar */
+        .tw-ava {
+            width: 48px;
+            height: 48px;
+            border-radius: 9999px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #FFFFFF;
+            /* Decorative ring on hover */
+            transition: box-shadow 0.15s;
+        }
+        .tw:hover .tw-ava {
+            box-shadow: 0 0 0 2px rgba(29,161,242,0.15);
+        }
+
+        .tw-main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* User row */
+        .tw-usr {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 2px;
+            flex-wrap: wrap;
+        }
+
+        .tw-name {
+            font-weight: 700;
+            color: #0F1419;
+            font-size: 0.95em;
+        }
+
+        .tw-check {
+            color: #1DA1F2;
+            font-size: 0.92em;
+        }
+
+        .tw-handle {
+            color: #536471;
+            font-size: 0.88em;
+        }
+
+        .tw-dot {
+            color: #536471;
+            font-size: 0.55em;
+        }
+
+        .tw-time {
+            color: #536471;
+            font-size: 0.88em;
+        }
+
+        /* Tweet text */
+        .tw-txt {
+            line-height: 1.55;
+            margin-bottom: 10px;
+            color: #0F1419;
+            word-wrap: break-word;
+        }
+        .tw-txt p {
+            margin-bottom: 6px;
+        }
+        .tw-txt p:last-child {
+            margin-bottom: 0;
+        }
+        .tw-txt strong {
+            font-weight: 700;
+        }
+        .tw-txt code {
+            font-family: "SF Mono", "Consolas", "Noto Sans Mono CJK SC", monospace;
+            font-size: 0.9em;
+            background: #F7F9F9;
+            color: #1DA1F2;
+            padding: 1px 5px;
+            border-radius: 4px;
+        }
+
+        /* Link preview card */
+        .tw-card {
+            display: block;
+            border: 1px solid #EFF3F4;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 10px;
+            transition: background 0.15s;
+        }
+        .tw-card:hover {
+            background: #F7F7F7;
+        }
+
+        .tw-card-color {
+            height: 4px;
+        }
+
+        .tw-card-body {
+            padding: 12px 14px;
+        }
+
+        .tw-card-domain {
+            font-size: 0.78em;
+            color: #536471;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 2px;
+        }
+
+        .tw-card-title {
+            font-weight: 700;
+            font-size: 0.95em;
+            color: #0F1419;
+            line-height: 1.3;
+            margin-bottom: 2px;
+        }
+
+        .tw-card-desc {
+            font-size: 0.82em;
+            color: #536471;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Hashtags */
+        .tw-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .tw-tag {
+            color: #1DA1F2;
+            font-size: 0.92em;
+            font-weight: 500;
+        }
+        .tw-tag:hover {
+            text-decoration: underline;
+        }
+
+        /* Engagement bar — 💬 🔄 ❤️ 📊 */
+        .tw-acts {
+            display: flex;
+            justify-content: space-between;
+            max-width: 420px;
+        }
+
+        .tw-act {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #536471;
+            font-size: 0.82em;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 9999px;
+            transition: color 0.15s;
+        }
+
+        .tw-act-icon {
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px;
+            transition: background 0.15s;
+            font-size: 1.05em;
+        }
+
+        .tw-act.reply:hover {
+            color: #1DA1F2;
+        }
+        .tw-act.reply:hover .tw-act-icon {
+            background: rgba(29,161,242,0.1);
+        }
+        .tw-act.repost:hover {
+            color: #00BA7C;
+        }
+        .tw-act.repost:hover .tw-act-icon {
+            background: rgba(0,186,124,0.1);
+        }
+        .tw-act.like:hover {
+            color: #F4212E;
+        }
+        .tw-act.like:hover .tw-act-icon {
+            background: rgba(244,33,46,0.1);
+        }
+        .tw-act.views:hover {
+            color: #1DA1F2;
+        }
+        .tw-act.views:hover .tw-act-icon {
+            background: rgba(29,161,242,0.1);
+        }
+
+        /* ============================================================
+         * PINNED TWEET — Executive Summary
+         * ============================================================ */
+        .pinned .tw-ava {
+            background: linear-gradient(135deg, #1DA1F2, #0D8BD9);
+            box-shadow: 0 0 0 2px rgba(29,161,242,0.2);
+        }
+
+        /* ============================================================
+         * TWEET CARDS — Priorities
+         * ============================================================ */
+        .tw.must-read .tw-ava {
+            background: #F4212E;
+            box-shadow: 0 0 0 2px rgba(244,33,46,0.15);
+        }
+        .tw.recommended .tw-ava {
+            background: #FFD400;
+            color: #0F1419;
+        }
+        .tw.fyi .tw-ava {
+            background: #00BA7C;
+        }
+
+        /* Must-read pinned tag */
+        .tw.must-read .pin-tag {
+            display: flex;
+        }
+        .pin-tag {
+            display: none;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 16px 0;
+            padding-left: calc(48px + 12px + 16px);
+            font-size: 0.78em;
+            font-weight: 700;
+            color: #536471;
+        }
+
+        /* ============================================================
+         * SECTION HEADER (in feed)
+         * ============================================================ */
+        .sec-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            border-bottom: 1px solid #EFF3F4;
+            background:
+                linear-gradient(90deg, #F7F9F9 0%, #FFFFFF 100%);
+        }
+
+        .sec-color {
+            width: 3px;
+            height: 22px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .sec-emoji {
+            font-size: 1.05em;
+        }
+
+        .sec-title {
+            font-size: 1em;
+            font-weight: 800;
+            color: #0F1419;
+            flex: 1;
+        }
+
+        .sec-badge {
+            background: #1DA1F2;
+            color: #FFFFFF;
+            font-size: 0.66em;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 9999px;
+        }
+
+        /* ============================================================
+         * RIGHT SIDEBAR
+         * ============================================================ */
+        .x-side {
+            padding: 12px 16px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            /* Subtle pattern background */
+            background:
+                radial-gradient(circle at 50% 30%, rgba(29,161,242,0.02) 0%, transparent 50%),
+                linear-gradient(180deg, #FFFFFF 0%, #FAFBFC 100%);
+        }
+
+        /* Search box */
+        .side-search {
+            background: #F7F9F9;
+            border: 1px solid #EFF3F4;
+            border-radius: 9999px;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            font-size: 0.88em;
+            color: #536471;
+            transition: border-color 0.15s;
+        }
+        .side-search:hover {
+            border-color: #1DA1F2;
+        }
+
+        /* Card containers */
+        .side-card {
+            background: #F7F9F9;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .side-card-h {
+            font-size: 1.2em;
+            font-weight: 800;
+            color: #0F1419;
+            padding: 14px 16px;
+        }
+
+        /* Trending item */
+        .trend {
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .trend:hover {
+            background: rgba(0,0,0,0.03);
+        }
+
+        .trend-cat {
+            font-size: 0.76em;
+            color: #536471;
+        }
+
+        .trend-name {
+            font-size: 0.95em;
+            font-weight: 700;
+            color: #0F1419;
+            margin: 1px 0;
+        }
+
+        .trend-count {
+            font-size: 0.76em;
+            color: #536471;
+        }
+
+        .side-more {
+            padding: 14px 16px;
+            color: #1DA1F2;
+            font-size: 0.88em;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .side-more:hover {
+            background: rgba(0,0,0,0.03);
+        }
+
+        /* Who to follow */
+        .follow {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            transition: background 0.15s;
+        }
+        .follow:hover {
+            background: rgba(0,0,0,0.03);
+        }
+
+        .follow-ava {
+            width: 40px;
+            height: 40px;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1em;
+            color: #FFFFFF;
+            flex-shrink: 0;
+        }
+
+        .follow-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .follow-name {
+            font-size: 0.88em;
+            font-weight: 700;
+            color: #0F1419;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .follow-handle {
+            font-size: 0.78em;
+            color: #536471;
+        }
+
+        .follow-go {
+            background: #0F1419;
+            color: #FFFFFF;
+            font-size: 0.78em;
+            font-weight: 700;
+            padding: 7px 16px;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: opacity 0.15s;
+            flex-shrink: 0;
+        }
+        .follow-go:hover {
+            opacity: 0.8;
+        }
+
+        /* ============================================================
+         * SIDEBAR FOOTER
+         * ============================================================ */
+        .side-footer {
+            padding: 12px 4px;
+        }
+
+        .side-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 0.7em;
+            color: #536471;
+            margin-bottom: 6px;
+        }
+
+        .side-link {
+            color: #536471;
+        }
+        .side-link:hover {
+            text-decoration: underline;
+            color: #0F1419;
+        }
+
+        .side-copy {
+            font-size: 0.7em;
+            color: #536471;
+        }
+
+        /* ============================================================
+         * PRINT OVERRIDES
+         * ============================================================ */
+        @media print {
+            body {
+                background: #FFFFFF !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .x-shell {
+                grid-template-columns: 1fr;
+            }
+            .x-nav,
+            .x-side {
+                display: none;
+            }
+            .feed-top {
+                position: static;
+            }
+            .tw:hover {
+                background: transparent;
+            }
+            .tw-card:hover {
+                background: transparent;
+            }
+            a {
+                color: #0F1419 !important;
+            }
+        }
+
+        /* ============================================================
+         * MOBILE
+         * ============================================================ */
+        @media (max-width: 1080px) {
+            .x-shell {
+                grid-template-columns: 1fr;
+            }
+            .x-nav {
+                display: none;
+            }
+            .x-side {
+                display: none;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .feed-title {
+                font-size: 1.1em;
+            }
+            .tw-row {
+                padding: 8px 12px;
+                gap: 10px;
+            }
+            .tw-ava {
+                width: 40px;
+                height: 40px;
+                font-size: 1.1em;
+            }
+            .tw-pin-label,
+            .pin-tag {
+                padding-left: calc(40px + 10px + 12px);
+            }
+            .tw-acts {
+                max-width: 100%;
+            }
+            .tw-card {
+                border-radius: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="x-shell">
+
+        <!-- ======================================================
+             LEFT NAV — Icon sidebar
+             ====================================================== -->
+        <nav class="x-nav">
+            <div class="nav-logo">𝕏</div>
+            <div class="nav-btn active" title="Home">🏠</div>
+            <div class="nav-btn" title="Explore">🔍</div>
+            <div class="nav-btn" title="Notifications">
+                🔔
+                <span class="badge">{{ total_items }}</span>
+            </div>
+            <div class="nav-btn" title="Messages">✉️</div>
+            <div class="nav-btn" title="Lists">📋</div>
+            <div class="nav-btn" title="Bookmarks">🔖</div>
+            <div class="nav-btn" title="Profile">👤</div>
+            <div class="compose-btn" title="Post">✏️</div>
+        </nav>
+
+        <!-- ======================================================
+             FEED COLUMN
+             ====================================================== -->
+        <main class="x-feed">
+
+            <!-- Sticky header -->
+            <div class="feed-top">
+                <div class="feed-bar">
+                    <h1 class="feed-title">Home</h1>
+                    <div class="feed-gear" title="Timeline settings">⚙️</div>
+                </div>
+                <div class="tabs-row">
+                    <div class="tab on">For you</div>
+                    <div class="tab">Following</div>
+                </div>
+            </div>
+
+            <!-- ======================================================
+                 PINNED TWEET — Executive Summary
+                 ====================================================== -->
+            {% if executive_summary %}
+            <div class="tw pinned">
+                <div class="tw-pin-label">📌 Pinned</div>
+                <div class="tw-row">
+                    <div class="tw-ava">🤖</div>
+                    <div class="tw-main">
+                        <div class="tw-usr">
+                            <span class="tw-name">Newsloom AI</span>
+                            <span class="tw-check">✓</span>
+                            <span class="tw-handle">@newsloom_ai</span>
+                            <span class="tw-dot">·</span>
+                            <span class="tw-time">{{ generated_time }}</span>
+                        </div>
+                        <div class="tw-txt">
+                            {% for line in executive_summary.strip().split('\n') %}
+                            {% if line.strip() %}
+                            <p>{{ line.strip() | md_inline }}</p>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                        <div class="tw-acts">
+                            <div class="tw-act reply">
+                                <span class="tw-act-icon">💬</span>
+                                <span>{{ total_items }}</span>
+                            </div>
+                            <div class="tw-act repost">
+                                <span class="tw-act-icon">🔄</span>
+                                <span>{{ (total_items * 8)|int }}</span>
+                            </div>
+                            <div class="tw-act like">
+                                <span class="tw-act-icon">❤️</span>
+                                <span>{{ (total_items * 22)|int }}</span>
+                            </div>
+                            <div class="tw-act views">
+                                <span class="tw-act-icon">📊</span>
+                                <span>{{ (total_items * 150)|int }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- ======================================================
+                 SECTIONS — Tweet Feed
+                 ====================================================== -->
+            {% set counter = namespace(n=0) %}
+            {% for section_key in section_order %}
+            {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+            {% set meta = section_configs.get(section_key, {}) %}
+            {% set section_color = meta.color|default('#1DA1F2') %}
+            {% set items = briefs[section_key] %}
+
+            <!-- Section header bar -->
+            <div class="sec-bar">
+                <div class="sec-color" style="background:{{ section_color }};"></div>
+                <span class="sec-emoji">{{ meta.emoji|default('📌') }}</span>
+                <h2 class="sec-title">{{ meta.title|default(section_key) }}</h2>
+                <span class="sec-badge" style="background:{{ section_color }};">{{ items|length }}</span>
+            </div>
+
+            {% for item in items %}
+            {% set counter.n = counter.n + 1 %}
+            {% set priority = item.priority|default('🟢') %}
+            {% set p_class = 'must-read' if priority == '🔴' else ('recommended' if priority == '🟡' else 'fyi') %}
+            <div class="tw {{ p_class }}">
+                {# Must-read items get a 📌 Pinned tag #}
+                <div class="pin-tag">📌 Pinned tweet</div>
+
+                <div class="tw-row">
+                    <div class="tw-ava">{{ priority }}</div>
+                    <div class="tw-main">
+                        <div class="tw-usr">
+                            <span class="tw-name">{{ item.source|default('Anonymous') }}</span>
+                            {% if p_class == 'must-read' %}
+                            <span class="tw-check">✓</span>
+                            {% endif %}
+                            <span class="tw-handle">@{{ item.source|default('anon')|lower|replace(' ', '_')|replace('.', '_') }}</span>
+                            <span class="tw-dot">·</span>
+                            <span class="tw-time">{{ generated_time }}</span>
+                        </div>
+
+                        {% if item.detail %}
+                        <div class="tw-txt">
+                            <p>{{ item.detail | md_inline }}</p>
+                        </div>
+                        {% endif %}
+
+                        {# Link preview card with section color accent #}
+                        <a href="{{ item.url|default('#') }}" target="_blank" class="tw-card">
+                            <div class="tw-card-color" style="background:linear-gradient(90deg, {{ section_color }}, transparent);"></div>
+                            <div class="tw-card-body">
+                                <div class="tw-card-domain">🔗 {{ item.source|default('newsloom.ai') }}</div>
+                                <div class="tw-card-title">{{ item.headline }}</div>
+                                {% if item.detail %}
+                                <div class="tw-card-desc">{{ item.detail|truncate(120, true, '…') }}</div>
+                                {% endif %}
+                            </div>
+                        </a>
+
+                        {% if item.tags %}
+                        <div class="tw-tags">
+                            {% for tag in item.tags %}
+                            <span class="tw-tag">{{ tag if tag.startswith('#') else '#' ~ tag }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <div class="tw-acts">
+                            <div class="tw-act reply">
+                                <span class="tw-act-icon">💬</span>
+                                <span>{{ (counter.n * 3 + 2) }}</span>
+                            </div>
+                            <div class="tw-act repost">
+                                <span class="tw-act-icon">🔄</span>
+                                <span>{{ (counter.n * 7 + 5) }}</span>
+                            </div>
+                            <div class="tw-act like">
+                                <span class="tw-act-icon">❤️</span>
+                                <span>{{ (counter.n * 13 + 11) }}</span>
+                            </div>
+                            <div class="tw-act views">
+                                <span class="tw-act-icon">📊</span>
+                                <span>{{ (counter.n * 89 + 100) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            {% endif %}
+            {% endfor %}
+
+        </main>
+
+        <!-- ======================================================
+             RIGHT SIDEBAR — Search, Trending, Who to Follow
+             ====================================================== -->
+        <aside class="x-side">
+
+            <!-- Search -->
+            <div class="side-search">🔍 Search</div>
+
+            <!-- ======================================================
+                 TRENDING — from section data
+                 ====================================================== -->
+            <div class="side-card">
+                <div class="side-card-h">Trends for you</div>
+                {% set trend_ns = namespace(idx=0) %}
+                {% for sk in section_order %}
+                {% if sk in briefs and briefs[sk] is iterable and briefs[sk] is not string and briefs[sk]|length > 0 and trend_ns.idx < 6 %}
+                {% set meta = section_configs.get(sk, {}) %}
+                {% set trend_ns.idx = trend_ns.idx + 1 %}
+                <div class="trend">
+                    <div class="trend-cat">{{ meta.emoji|default('') }} Trending in {{ meta.title|default(sk) }}</div>
+                    <div class="trend-name">{{ meta.title|default(sk) }}</div>
+                    <div class="trend-count">{{ briefs[sk]|length * 1200 }} posts</div>
+                </div>
+                {% endif %}
+                {% endfor %}
+                <div class="side-more">Show more</div>
+            </div>
+
+            <!-- ======================================================
+                 WHO TO FOLLOW
+                 ====================================================== -->
+            <div class="side-card">
+                <div class="side-card-h">Who to follow</div>
+
+                <div class="follow">
+                    <div class="follow-ava" style="background:linear-gradient(135deg,#1DA1F2,#0D8BD9);">🤖</div>
+                    <div class="follow-info">
+                        <div class="follow-name">Newsloom AI <span style="color:#1DA1F2;font-size:0.9em;">✓</span></div>
+                        <div class="follow-handle">@newsloom_ai</div>
+                    </div>
+                    <div class="follow-go">Follow</div>
+                </div>
+
+                <div class="follow">
+                    <div class="follow-ava" style="background:linear-gradient(135deg,#6366f1,#4f46e5);">🧠</div>
+                    <div class="follow-info">
+                        <div class="follow-name">AI Research</div>
+                        <div class="follow-handle">@ai_research</div>
+                    </div>
+                    <div class="follow-go">Follow</div>
+                </div>
+
+                <div class="follow">
+                    <div class="follow-ava" style="background:linear-gradient(135deg,#10b981,#059669);">📈</div>
+                    <div class="follow-info">
+                        <div class="follow-name">Market Watch</div>
+                        <div class="follow-handle">@market_watch</div>
+                    </div>
+                    <div class="follow-go">Follow</div>
+                </div>
+
+                <div class="follow">
+                    <div class="follow-ava" style="background:linear-gradient(135deg,#f97316,#ea580c);">💎</div>
+                    <div class="follow-info">
+                        <div class="follow-name">Crypto Pulse</div>
+                        <div class="follow-handle">@crypto_pulse</div>
+                    </div>
+                    <div class="follow-go">Follow</div>
+                </div>
+
+                <div class="side-more">Show more</div>
+            </div>
+
+            <!-- Footer links -->
+            <div class="side-footer">
+                <div class="side-links">
+                    <a href="#" class="side-link">Terms of Service</a>
+                    <a href="#" class="side-link">Privacy Policy</a>
+                    <a href="#" class="side-link">Cookie Policy</a>
+                    <a href="#" class="side-link">Accessibility</a>
+                    <a href="#" class="side-link">Ads info</a>
+                </div>
+                <div class="side-copy">© {{ date_str[:4] }} Newsloom · {{ total_items }} stories · {{ generated_time }}</div>
+            </div>
+
+        </aside>
+
+    </div><!-- /.x-shell -->
+</body>
+</html>

@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IEEE Technical Brief · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         *  IEEE TECHNICAL PAPER — Conference Proceedings Style
+         * ============================================================
+         *  Visual Language:
+         *    — Pure white substrate + IEEE Blue (#00629B) accent system
+         *    — Engineering grid paper background (subtle blue lines)
+         *    — Strict two-column layout with column rule divider
+         *    — Paper frontpage: centered title, author line, abstract
+         *    — Citation numbering [1]-[n] across all items
+         *    — Algorithm/code blocks with grey background + labels
+         *    — Roman numeral section numbering (I. II. III. IV.)
+         *    — IEEE-standard Table I / Fig. 1 numbering
+         *    — Full reference list footer in two-column format
+         *    — Dense academic serif typography (Times New Roman)
+         *    — CJK-ready with Noto Serif SC / Source Han Serif fallback
+         * ============================================================ */
+
+        /* ── Design Tokens ── */
+        :root {
+            /* IEEE Blue System */
+            --ieee-blue:          #00629B;
+            --ieee-blue-dark:     #004B78;
+            --ieee-blue-deeper:   #003456;
+            --ieee-blue-light:    #1E88C7;
+            --ieee-blue-pale:     #E8F4FC;
+            --ieee-blue-wash:     rgba(0, 98, 155, 0.06);
+            --ieee-blue-dim:      rgba(0, 98, 155, 0.10);
+            --ieee-blue-accent:   rgba(0, 98, 155, 0.18);
+
+            /* Grey Auxiliary Palette */
+            --grey-50:  #FAFBFC;  --grey-100: #F0F2F5;
+            --grey-150: #EAECF0;  --grey-200: #E2E6EB;
+            --grey-250: #D5DAE1;  --grey-300: #CDD3DA;
+            --grey-400: #9CA5B0;  --grey-500: #6B7685;
+            --grey-600: #4A5568;  --grey-700: #333D4A;
+            --grey-800: #1E2530;  --grey-900: #0F141A;
+
+            /* Surfaces */
+            --bg-primary:    #FFFFFF;
+            --bg-secondary:  #FAFBFD;
+            --bg-card:       #F7F8FA;
+            --bg-code:       #F0F2F6;
+            --bg-highlight:  #FFFDE8;
+            --bg-hover:      #EDF1F7;
+
+            /* Text Hierarchy */
+            --text-primary:    #1A1A2E;
+            --text-secondary:  #333344;
+            --text-body:       #3D3D56;
+            --text-muted:      #666680;
+            --text-light:      #8890A0;
+            --text-caption:    #A0A8B8;
+            --text-inverse:    #FFFFFF;
+
+            /* Priority System */
+            --priority-must:    #C62828;
+            --priority-must-bg: rgba(198, 40, 40, 0.05);
+            --priority-must-border: rgba(198, 40, 40, 0.35);
+            --priority-rec:     #E65100;
+            --priority-rec-bg:  rgba(230, 81, 0, 0.04);
+            --priority-rec-border: rgba(230, 81, 0, 0.30);
+            --priority-fyi:     #2E7D32;
+            --priority-fyi-bg:  rgba(46, 125, 50, 0.03);
+            --priority-fyi-border: rgba(46, 125, 50, 0.25);
+
+            /* Borders */
+            --border:        #E0E4EB;
+            --border-strong: #C0C8D6;
+            --border-rule:   #D5DAE3;
+            --border-accent: var(--ieee-blue-accent);
+
+            /* Spacing — 8pt grid */
+            --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px;
+            --sp-4: 16px; --sp-5: 20px; --sp-6: 24px;
+            --sp-8: 32px; --sp-10: 40px; --sp-12: 48px;
+            --sp-16: 64px; --sp-20: 80px;
+
+            /* Typography — Academic Serif + CJK */
+            --font-serif: "Times New Roman", "Georgia", "Noto Serif SC",
+                          "Source Han Serif SC", "SimSun", "STSong", serif;
+            --font-sans:  "Helvetica Neue", "Arial", "PingFang SC",
+                          "Noto Sans SC", "Microsoft YaHei", sans-serif;
+            --font-mono:  "Courier New", "Monaco", "Consolas",
+                          "Noto Sans Mono", monospace;
+
+            /* Radius — Minimal academic */
+            --radius-sm: 2px;
+            --radius-md: 3px;
+            --radius-lg: 5px;
+
+            /* Shadows */
+            --shadow-subtle:   0 1px 2px rgba(0,0,0,0.04);
+            --shadow-card:     0 1px 4px rgba(0,0,0,0.06), 0 0 1px rgba(0,0,0,0.04);
+            --shadow-elevated: 0 4px 16px rgba(0,0,0,0.08);
+        }
+
+        /* ── PDF Page Setup ── */
+        @page {
+            size: A4;
+            margin: 2cm 1.8cm;
+            @top-center {
+                content: "IEEE Newsloom Technical Brief — Vol. 1, {{ date_str }}";
+                font-family: "Helvetica Neue", Arial, "PingFang SC", sans-serif;
+                font-size: 8pt;
+                color: var(--text-light);
+                border-bottom: 0.5pt solid var(--border);
+                padding-bottom: 6pt;
+            }
+            @bottom-left {
+                content: "DOI: 10.1109/NEWSLOOM.{{ date_str | replace('-','') }}";
+                font-family: "Courier New", monospace;
+                font-size: 7pt;
+                color: var(--text-caption);
+            }
+            @bottom-right {
+                content: "— " counter(page) " —";
+                font-family: "Times New Roman", serif;
+                font-size: 8pt;
+                color: var(--text-light);
+            }
+        }
+
+        /* ── Reset & Base ── */
+        *, *::before, *::after {
+            margin: 0; padding: 0; box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-serif);
+            background: var(--bg-primary);
+            /* Engineering graph paper — subtle blue grid lines */
+            background-image:
+                linear-gradient(rgba(0, 98, 155, 0.018) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 98, 155, 0.018) 1px, transparent 1px),
+                linear-gradient(rgba(0, 98, 155, 0.008) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 98, 155, 0.008) 1px, transparent 1px);
+            background-size: 80px 80px, 80px 80px, 16px 16px, 16px 16px;
+            color: var(--text-primary);
+            font-size: 10.5pt;
+            line-height: 1.55;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        a {
+            color: var(--ieee-blue-light);
+            text-decoration: none;
+            border-bottom: 0.5px solid transparent;
+            transition: color 0.15s, border-color 0.15s;
+        }
+        a:hover {
+            color: var(--ieee-blue-dark);
+            border-bottom-color: var(--ieee-blue-dark);
+        }
+
+        /* ── Page Container ── */
+        .page-container {
+            max-width: 780px;
+            margin: 0 auto;
+            padding: var(--sp-8) var(--sp-6);
+            background: var(--bg-primary);
+            box-shadow: 0 0 60px rgba(0, 0, 0, 0.04);
+            position: relative;
+        }
+
+        /* Decorative corner brackets — engineering drawing style */
+        .page-container::before,
+        .page-container::after {
+            content: '';
+            position: absolute;
+            width: 20px; height: 20px;
+            border-color: var(--ieee-blue-dim);
+            border-style: solid;
+            pointer-events: none;
+        }
+        .page-container::before {
+            top: 12px; left: 12px;
+            border-width: 2px 0 0 2px;
+        }
+        .page-container::after {
+            bottom: 12px; right: 12px;
+            border-width: 0 2px 2px 0;
+        }
+
+        /* ============================================================
+         * HEADER — IEEE Paper Frontpage (Title + Authors + Affil.)
+         * ============================================================ */
+        .header {
+            text-align: center;
+            padding: var(--sp-12) var(--sp-8) var(--sp-8);
+            margin-bottom: var(--sp-4);
+            position: relative;
+        }
+
+        /* Top IEEE blue gradient rule */
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg,
+                var(--ieee-blue-deeper),
+                var(--ieee-blue),
+                var(--ieee-blue-light),
+                var(--ieee-blue),
+                var(--ieee-blue-deeper)
+            );
+        }
+
+        /* Subtle radial glow behind header */
+        .header::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 50%; transform: translateX(-50%);
+            width: 600px; height: 200px;
+            background: radial-gradient(ellipse, rgba(0, 98, 155, 0.035) 0%, transparent 70%);
+            pointer-events: none; z-index: 0;
+        }
+
+        .header > * { position: relative; z-index: 1; }
+
+        /* IEEE conference banner */
+        .header-conf-banner {
+            display: inline-block;
+            font-family: var(--font-sans);
+            font-size: 7.5pt;
+            font-weight: 700;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--ieee-blue);
+            padding: var(--sp-1) var(--sp-5);
+            border: 1.5px solid var(--ieee-blue);
+            background: linear-gradient(180deg, var(--ieee-blue-pale), #F0F8FF);
+            margin-bottom: var(--sp-5);
+        }
+
+        .header h1 {
+            font-family: var(--font-serif);
+            font-size: 22pt;
+            font-weight: 700;
+            letter-spacing: -0.015em;
+            line-height: 1.2;
+            color: var(--grey-900);
+            margin-bottom: var(--sp-2);
+        }
+
+        .header-subtitle {
+            font-family: var(--font-serif);
+            font-size: 12pt;
+            font-weight: 400;
+            font-style: italic;
+            color: var(--grey-500);
+            margin-bottom: var(--sp-6);
+        }
+
+        /* Author block — IEEE multi-author format */
+        .header-authors {
+            font-family: var(--font-sans);
+            font-size: 10.5pt;
+            font-weight: 600;
+            color: var(--grey-700);
+            margin-bottom: var(--sp-1);
+            letter-spacing: 0.01em;
+        }
+        .header-affiliation {
+            font-family: var(--font-sans);
+            font-size: 8.5pt;
+            font-style: italic;
+            color: var(--grey-400);
+            margin-bottom: var(--sp-2);
+        }
+        .header-email {
+            font-family: var(--font-mono);
+            font-size: 7.5pt;
+            color: var(--ieee-blue-light);
+            letter-spacing: 0.02em;
+        }
+
+        /* Bottom double rule — IEEE signature */
+        .header-rule {
+            margin-top: var(--sp-6);
+            border: none;
+            height: 0;
+            border-top: 2.5pt solid var(--ieee-blue);
+            border-bottom: 0.5pt solid var(--ieee-blue);
+            padding-top: 2px;
+        }
+
+        /* ── Paper Metadata Line ── */
+        .paper-meta {
+            text-align: center;
+            padding: var(--sp-3) 0;
+            margin-bottom: var(--sp-5);
+            font-family: var(--font-sans);
+            font-size: 8pt;
+            color: var(--grey-400);
+            letter-spacing: 0.02em;
+        }
+        .paper-meta .sep {
+            margin: 0 var(--sp-3);
+            color: var(--grey-250);
+        }
+        .paper-meta .must-count {
+            color: var(--priority-must);
+            font-weight: 700;
+        }
+
+        /* ============================================================
+         * ABSTRACT — IEEE Formal Abstract Box
+         * ============================================================ */
+        .abstract {
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
+            border: 1px solid var(--border);
+            padding: var(--sp-6) var(--sp-6) var(--sp-5);
+            margin-bottom: var(--sp-8);
+            page-break-inside: avoid;
+            position: relative;
+            box-shadow: var(--shadow-subtle);
+        }
+
+        /* IEEE blue left accent + top accent */
+        .abstract::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 3px; height: 100%;
+            background: linear-gradient(180deg, var(--ieee-blue), var(--ieee-blue-light));
+        }
+        .abstract::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 3px; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, var(--ieee-blue-dim), transparent 80%);
+        }
+
+        .abstract-label {
+            font-family: var(--font-sans);
+            font-size: 9.5pt;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--ieee-blue);
+            margin-bottom: var(--sp-3);
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+        }
+        .abstract-label::after {
+            content: '';
+            flex: 1;
+            height: 0.5px;
+            background: var(--border);
+        }
+
+        .abstract-body p {
+            font-family: var(--font-serif);
+            text-align: justify;
+            text-indent: 2em;
+            font-size: 10pt;
+            line-height: 1.65;
+            color: var(--text-body);
+            margin-bottom: var(--sp-2);
+        }
+        .abstract-body p:first-of-type { text-indent: 0; }
+        .abstract-body p strong {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+        .abstract-body p em {
+            color: var(--ieee-blue-dark);
+        }
+
+        /* Index Terms / Keywords */
+        .keywords {
+            font-family: var(--font-sans);
+            font-size: 8pt;
+            color: var(--grey-500);
+            margin-top: var(--sp-4);
+            padding-top: var(--sp-3);
+            border-top: 0.5pt dashed var(--border);
+            line-height: 1.5;
+        }
+        .keywords strong {
+            font-weight: 700;
+            color: var(--ieee-blue);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-size: 7.5pt;
+        }
+
+        /* ============================================================
+         * ALGORITHM BOX — Algorithm 1: xxx (global)
+         * ============================================================ */
+        .algorithm-box {
+            background: var(--bg-code);
+            border: 1px solid var(--grey-200);
+            border-top: 2px solid var(--ieee-blue);
+            padding: var(--sp-4) var(--sp-5);
+            margin: var(--sp-5) 0;
+            font-family: var(--font-mono);
+            font-size: 8pt;
+            line-height: 1.6;
+            position: relative;
+            page-break-inside: avoid;
+        }
+        .algorithm-box .alg-label {
+            font-family: var(--font-sans);
+            font-size: 8.5pt;
+            font-weight: 700;
+            color: var(--ieee-blue);
+            margin-bottom: var(--sp-2);
+            letter-spacing: 0.04em;
+        }
+        .algorithm-box .alg-line {
+            color: var(--text-secondary);
+            padding-left: 1.5em;
+            text-indent: -1.5em;
+        }
+        .algorithm-box .alg-keyword {
+            color: var(--ieee-blue-dark);
+            font-weight: 700;
+        }
+
+        /* ============================================================
+         * TWO-COLUMN LAYOUT — IEEE Paper Body (>800px)
+         * ============================================================ */
+        .main-content {
+            column-count: 2;
+            column-gap: 26px;
+            column-rule: 0.5pt solid var(--grey-200);
+        }
+
+        /* ============================================================
+         * SECTION — Roman Numeral Headers (I. II. III.)
+         * ============================================================ */
+        .section {
+            break-inside: avoid-column;
+            margin-bottom: var(--sp-8);
+        }
+
+        .section-header {
+            margin-bottom: var(--sp-4);
+            padding-bottom: var(--sp-2);
+            border-bottom: 1.5pt solid var(--ieee-blue);
+            position: relative;
+            display: flex;
+            align-items: baseline;
+            gap: var(--sp-2);
+        }
+
+        /* Section color bar from config */
+        .section-header::after {
+            content: '';
+            position: absolute;
+            bottom: -1.5pt; left: 0;
+            width: 40px; height: 3px;
+        }
+
+        .section-numeral {
+            font-family: var(--font-serif);
+            font-size: 12pt;
+            font-weight: 700;
+            font-style: italic;
+            color: var(--ieee-blue-dark);
+            flex-shrink: 0;
+            min-width: 28px;
+        }
+
+        .section-title-text {
+            font-family: var(--font-sans);
+            font-size: 11pt;
+            font-weight: 700;
+            color: var(--ieee-blue);
+            letter-spacing: 0.02em;
+            flex: 1;
+        }
+
+        .section-color-dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-right: var(--sp-1);
+            box-shadow: 0 0 4px currentColor;
+        }
+
+        .section-item-count {
+            font-family: var(--font-serif);
+            font-size: 8pt;
+            color: var(--grey-400);
+            font-style: italic;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        /* Section intro note — Algorithm box for section overview */
+        .section-overview {
+            background: linear-gradient(135deg, var(--bg-code), var(--grey-100));
+            border: 1px solid var(--grey-200);
+            border-left: 3px solid;
+            padding: var(--sp-3) var(--sp-4);
+            margin-bottom: var(--sp-4);
+            font-family: var(--font-mono);
+            font-size: 7.5pt;
+            line-height: 1.5;
+            color: var(--grey-600);
+            break-inside: avoid;
+        }
+        .section-overview .ov-label {
+            font-family: var(--font-sans);
+            font-weight: 700;
+            color: var(--ieee-blue);
+            font-size: 7.5pt;
+            letter-spacing: 0.05em;
+            margin-bottom: var(--sp-1);
+        }
+
+        /* ============================================================
+         * BRIEF ITEMS — Academic Reference Cards [n]
+         * ============================================================ */
+        .brief {
+            margin-bottom: var(--sp-4);
+            padding: var(--sp-3) var(--sp-4);
+            border-left: 2.5pt solid var(--border-rule);
+            background: var(--bg-secondary);
+            break-inside: avoid;
+            page-break-inside: avoid;
+            position: relative;
+            transition: background 0.15s ease, box-shadow 0.15s ease;
+        }
+        .brief:hover {
+            background: var(--bg-hover);
+            box-shadow: var(--shadow-subtle);
+        }
+
+        /* Priority variants */
+        .brief.must-read {
+            border-left-color: var(--priority-must-border);
+            background: linear-gradient(95deg, var(--priority-must-bg) 0%, var(--bg-secondary) 60%);
+        }
+        .brief.recommended {
+            border-left-color: var(--priority-rec-border);
+            background: linear-gradient(95deg, var(--priority-rec-bg) 0%, var(--bg-secondary) 60%);
+        }
+        .brief.fyi {
+            border-left-color: var(--priority-fyi-border);
+            background: linear-gradient(95deg, var(--priority-fyi-bg) 0%, var(--bg-secondary) 60%);
+        }
+
+        /* Must-read annotation */
+        .brief.must-read::after {
+            content: '★ MUST-READ';
+            position: absolute;
+            top: var(--sp-1); right: var(--sp-2);
+            color: var(--priority-must);
+            font-family: var(--font-sans);
+            font-size: 6pt;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            padding: 1px var(--sp-2);
+            background: var(--priority-must-bg);
+            border: 0.5px solid var(--priority-must-border);
+            border-radius: var(--radius-sm);
+        }
+
+        /* Recommended marker */
+        .brief.recommended::after {
+            content: '◆ RECOMMENDED';
+            position: absolute;
+            top: var(--sp-1); right: var(--sp-2);
+            color: var(--priority-rec);
+            font-family: var(--font-sans);
+            font-size: 6pt;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+        }
+
+        .brief-header {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--sp-2);
+            margin-bottom: var(--sp-2);
+        }
+
+        .brief-ref {
+            font-family: var(--font-mono);
+            font-size: 8pt;
+            font-weight: 700;
+            color: var(--ieee-blue);
+            flex-shrink: 0;
+            margin-top: 1pt;
+            min-width: 30px;
+        }
+
+        .brief-title-block { flex: 1; min-width: 0; }
+
+        .brief-title-block a {
+            font-family: var(--font-serif);
+            font-size: 10pt;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.35;
+            display: block;
+            border-bottom: none;
+        }
+        .brief-title-block a:hover {
+            color: var(--ieee-blue);
+        }
+        .brief.must-read .brief-title-block a {
+            color: var(--priority-must);
+        }
+
+        .brief-detail {
+            color: var(--text-body);
+            margin-bottom: var(--sp-3);
+            line-height: 1.55;
+            font-size: 9pt;
+            text-align: justify;
+        }
+        .brief-detail strong { color: var(--text-primary); font-weight: 700; }
+        .brief-detail em { color: var(--ieee-blue-dark); font-style: italic; }
+        .brief-detail code {
+            background: var(--bg-code);
+            color: var(--grey-700);
+            padding: 1pt 3pt;
+            border-radius: 2pt;
+            font-family: var(--font-mono);
+            font-size: 8pt;
+            border: 0.5pt solid var(--border);
+        }
+
+        .brief-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 7.5pt;
+            color: var(--grey-400);
+            border-top: 0.5pt dotted var(--border);
+            padding-top: var(--sp-2);
+            gap: var(--sp-2);
+        }
+
+        .brief-source {
+            color: var(--ieee-blue);
+            font-family: var(--font-sans);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-size: 7pt;
+            flex-shrink: 0;
+        }
+
+        .brief-tags {
+            display: flex;
+            gap: 3px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+        .tag {
+            font-family: var(--font-sans);
+            background: var(--bg-code);
+            color: var(--grey-500);
+            padding: 1pt var(--sp-2);
+            border-radius: 8pt;
+            font-size: 6.5pt;
+            font-weight: 500;
+            border: 0.5pt solid var(--border);
+            white-space: nowrap;
+        }
+
+        /* ============================================================
+         * TABLE I — IEEE Category Distribution Table
+         * ============================================================ */
+        .stats-section {
+            column-span: all;
+            margin: var(--sp-10) 0 var(--sp-8);
+            page-break-inside: avoid;
+        }
+
+        .table-label {
+            font-family: var(--font-sans);
+            font-size: 9pt;
+            font-weight: 700;
+            color: var(--ieee-blue);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: var(--sp-1);
+            text-align: center;
+        }
+        .table-caption {
+            font-family: var(--font-serif);
+            font-size: 8.5pt;
+            color: var(--grey-500);
+            text-align: center;
+            font-style: italic;
+            margin-bottom: var(--sp-4);
+        }
+
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--font-sans);
+            font-size: 8.5pt;
+        }
+        .stats-table th,
+        .stats-table td {
+            border: 0.75pt solid var(--border-strong);
+            padding: var(--sp-2) var(--sp-3);
+            text-align: center;
+        }
+        .stats-table thead th {
+            background: linear-gradient(180deg, var(--ieee-blue), var(--ieee-blue-dark));
+            color: var(--text-inverse);
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            font-size: 8pt;
+        }
+        .stats-table tbody td {
+            background: var(--grey-50);
+            color: var(--text-secondary);
+        }
+        .stats-table tbody tr:nth-child(even) td {
+            background: var(--bg-card);
+        }
+        .stats-table tbody tr:hover td {
+            background: var(--bg-hover);
+        }
+        .stats-table .cat-name {
+            text-align: left;
+            font-weight: 600;
+        }
+        .stats-table .cat-color {
+            display: inline-block;
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            margin-right: 4px;
+            vertical-align: middle;
+        }
+        .stats-table .num-must { color: var(--priority-must); font-weight: 700; }
+        .stats-table .num-rec  { color: var(--priority-rec); font-weight: 600; }
+        .stats-table .num-fyi  { color: var(--priority-fyi); }
+
+        /* Totals row */
+        .stats-table tfoot td {
+            background: var(--ieee-blue-pale);
+            font-weight: 700;
+            color: var(--ieee-blue-dark);
+            border-top: 2pt solid var(--ieee-blue);
+        }
+
+        .fig-note {
+            font-family: var(--font-sans);
+            font-size: 7.5pt;
+            color: var(--grey-400);
+            text-align: center;
+            margin-top: var(--sp-2);
+            font-style: italic;
+        }
+        .fig-note strong {
+            color: var(--ieee-blue);
+            font-style: normal;
+        }
+
+        /* ============================================================
+         * PROCESSING PIPELINE — Algorithm 1 Box
+         * ============================================================ */
+        .pipeline-algo {
+            column-span: all;
+            margin: var(--sp-6) 0 var(--sp-8);
+        }
+
+        /* ============================================================
+         * REFERENCES — IEEE Reference List Footer
+         * ============================================================ */
+        .references {
+            column-span: all;
+            margin-top: var(--sp-10);
+            padding-top: var(--sp-6);
+            border-top: 2.5pt solid var(--ieee-blue);
+            position: relative;
+        }
+        .references::before {
+            content: '';
+            position: absolute;
+            top: -6px; left: 50%; transform: translateX(-50%);
+            width: 40px; height: 3px;
+            background: var(--ieee-blue);
+        }
+
+        .references-title {
+            font-family: var(--font-sans);
+            font-size: 11pt;
+            font-weight: 700;
+            color: var(--ieee-blue);
+            text-align: center;
+            margin-bottom: var(--sp-5);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .references-list {
+            column-count: 2;
+            column-gap: 22px;
+            column-rule: 0.5pt solid var(--grey-200);
+        }
+
+        .ref-entry {
+            font-family: var(--font-serif);
+            font-size: 7.5pt;
+            color: var(--grey-500);
+            line-height: 1.45;
+            margin-bottom: var(--sp-2);
+            text-indent: -18px;
+            padding-left: 18px;
+            break-inside: avoid;
+        }
+        .ref-num {
+            font-weight: 700;
+            color: var(--ieee-blue);
+            font-family: var(--font-mono);
+            font-size: 7pt;
+        }
+        .ref-entry em { font-style: italic; }
+        .ref-entry a {
+            color: var(--ieee-blue-light);
+            font-size: 0.9em;
+            word-break: break-all;
+            border-bottom: none;
+        }
+
+        /* ============================================================
+         * DOCUMENT FOOTER — Academic Paper Colophon
+         * ============================================================ */
+        .document-footer {
+            column-span: all;
+            margin-top: var(--sp-10);
+            padding-top: var(--sp-6);
+            border-top: 2pt double var(--ieee-blue);
+            text-align: center;
+            color: var(--grey-400);
+            font-size: 8pt;
+            position: relative;
+        }
+        .document-footer p {
+            font-family: var(--font-sans);
+            margin-bottom: var(--sp-1);
+            line-height: 1.5;
+        }
+        .document-footer .citation-line {
+            font-family: var(--font-serif);
+            font-style: italic;
+            font-size: 8pt;
+            color: var(--grey-500);
+            margin-top: var(--sp-2);
+        }
+        .document-footer .doi-line {
+            font-family: var(--font-mono);
+            font-size: 7pt;
+            color: var(--ieee-blue-light);
+            margin-top: var(--sp-2);
+            letter-spacing: 0.03em;
+        }
+        .document-footer .copyright {
+            font-size: 6.5pt;
+            color: var(--grey-300);
+            margin-top: var(--sp-3);
+        }
+
+        /* ============================================================
+         * PRINT / PDF Overrides
+         * ============================================================ */
+        @media print {
+            body {
+                background: var(--bg-primary) !important;
+                background-image: none !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .page-container {
+                max-width: 100%;
+                padding: 0;
+                box-shadow: none;
+            }
+            .page-container::before,
+            .page-container::after { display: none; }
+            .header::after { display: none; }
+            .section { break-inside: avoid-page; }
+            .brief {
+                break-inside: avoid;
+                page-break-inside: avoid;
+                box-shadow: none !important;
+            }
+            .brief:hover { background: inherit; }
+            .main-content { column-fill: balance; }
+            a {
+                color: var(--text-primary) !important;
+                border-bottom: none !important;
+            }
+            .stats-table thead th {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+
+        /* ============================================================
+         * MOBILE — Single Column (<800px)
+         * ============================================================ */
+        @media (max-width: 800px) {
+            .main-content { column-count: 1; }
+            .references-list { column-count: 1; }
+            body { font-size: 11pt; }
+            .page-container { padding: var(--sp-4); }
+            .page-container::before,
+            .page-container::after { display: none; }
+            .header { padding: var(--sp-8) var(--sp-4) var(--sp-6); }
+            .header h1 { font-size: 18pt; }
+            .header-subtitle { font-size: 11pt; }
+            .abstract { padding: var(--sp-4); }
+            .brief { padding: var(--sp-3); }
+            .brief-footer { flex-direction: column; align-items: flex-start; }
+            .stats-table { font-size: 7.5pt; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+
+        <!-- ══════ HEADER: IEEE Paper Frontpage ══════ -->
+        <header class="header">
+            <div class="header-conf-banner">IEEE Newsloom Technical Brief · Proceedings</div>
+            <h1>Daily Intelligence Technical Brief</h1>
+            <div class="header-subtitle">A Comprehensive Analysis of Multi-Domain Information Streams</div>
+            <div class="header-authors">Newsloom Automated Intelligence System</div>
+            <div class="header-affiliation">Newsloom Research Labs — Automated Curation Division</div>
+            <div class="header-email">system@newsloom.ai · {{ date_str }}</div>
+            <hr class="header-rule">
+        </header>
+
+        <!-- Paper metadata line -->
+        <div class="paper-meta">
+            <span>Vol. 1, No. {{ date_str.split('-')[2] }}</span>
+            <span class="sep">·</span>
+            <span>Published: {{ generated_time }}</span>
+            <span class="sep">·</span>
+            <span>N = {{ total_items }} items</span>
+            {% set ns = namespace(must_total=0) %}
+            {% for sk in section_order %}
+                {% if sk in briefs and briefs[sk] %}
+                    {% for it in briefs[sk] %}
+                        {% if it.priority == '🔴' %}
+                            {% set ns.must_total = ns.must_total + 1 %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+            {% if ns.must_total > 0 %}
+            <span class="sep">·</span>
+            <span class="must-count">{{ ns.must_total }} Critical Items</span>
+            {% endif %}
+        </div>
+
+        <!-- ══════ ABSTRACT ══════ -->
+        {% if executive_summary %}
+        <section class="abstract">
+            <div class="abstract-label">Abstract</div>
+            <div class="abstract-body">
+                {% for line in executive_summary.strip().split('\n') %}
+                    {% if line.strip() %}
+                <p>{{ line.strip() | md_inline }}</p>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <div class="keywords">
+                <strong>Index Terms —</strong>
+                {% for sk in section_order %}
+                    {%- if sk in briefs and briefs[sk] -%}
+                        {{ section_configs.get(sk, {}).get('title', sk) }}{% if not loop.last %}, {% endif %}
+                    {%- endif -%}
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- ══════ ALGORITHM 1: Processing Pipeline ══════ -->
+        <div class="pipeline-algo">
+            <div class="algorithm-box">
+                <div class="alg-label">Algorithm 1: Daily Intelligence Processing Pipeline</div>
+                <div class="alg-line"><span class="alg-keyword">INPUT:</span> Multi-source feed streams (RSS, API, Scraper)</div>
+                <div class="alg-line"><span class="alg-keyword">OUTPUT:</span> Ranked brief set B = {b₁, b₂, ..., b_{{ total_items }}}</div>
+                <div class="alg-line"><span class="alg-keyword">FOR EACH</span> source s ∈ Sources <span class="alg-keyword">DO</span></div>
+                <div class="alg-line">&nbsp;&nbsp;items ← Fetch(s); Filter(items, relevance > θ)</div>
+                <div class="alg-line"><span class="alg-keyword">FOR EACH</span> section k ∈ {
+                    {%- for sk in section_order -%}
+                        {%- if sk in briefs and briefs[sk] -%}
+                            {{ sk }}{{ ", " if not loop.last }}
+                        {%- endif -%}
+                    {%- endfor -%}
+                } <span class="alg-keyword">DO</span></div>
+                <div class="alg-line">&nbsp;&nbsp;Rank(items_k, priority); Assign [ref] numbers</div>
+                <div class="alg-line"><span class="alg-keyword">RETURN</span> B sorted by priority ∈ {🔴, 🟡, 🟢}</div>
+            </div>
+        </div>
+
+        <!-- ══════ MAIN CONTENT: Two-Column Body ══════ -->
+        <main class="main-content">
+            {% set roman = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'] %}
+            {% set ns = namespace(ref=0, sec_idx=0) %}
+
+            {% for section_key in section_order %}
+                {% if section_key in briefs and briefs[section_key] %}
+                    {% set meta = section_configs.get(section_key, {}) %}
+                    {% set items = briefs[section_key] %}
+                    {% set ns.sec_idx = ns.sec_idx + 1 %}
+                    {% set sec_color = meta.color | default('#00629B') %}
+
+                    <section class="section">
+                        <!-- Section Header: Roman numeral + title -->
+                        <header class="section-header" style="border-bottom-color: {{ sec_color }};">
+                            <span class="section-numeral">{{ roman[ns.sec_idx - 1] if ns.sec_idx <= 12 else ns.sec_idx }}.</span>
+                            <span class="section-color-dot" style="background: {{ sec_color }}; color: {{ sec_color }};"></span>
+                            <span class="section-title-text">{{ meta.get('emoji', '📌') }} {{ meta.get('title', section_key | title) }}</span>
+                            <span class="section-item-count">(n={{ items | length }})</span>
+                        </header>
+
+                        <!-- Section overview algorithm box -->
+                        <div class="section-overview" style="border-left-color: {{ sec_color }};">
+                            <div class="ov-label">Algorithm {{ ns.sec_idx + 1 }}: {{ meta.get('title', section_key | title) }} Analysis Summary</div>
+                            <div>Processed {{ items | length }} items · Priority distribution:
+                                🔴{{ items | selectattr('priority', 'equalto', '🔴') | list | length }}
+                                🟡{{ items | selectattr('priority', 'equalto', '🟡') | list | length }}
+                                🟢{{ items | selectattr('priority', 'equalto', '🟢') | list | length }}
+                            </div>
+                        </div>
+
+                        <!-- Brief items -->
+                        {% for brief in items %}
+                            {% set ns.ref = ns.ref + 1 %}
+                            {% set pc = 'must-read' if brief.priority == '🔴' else ('recommended' if brief.priority == '🟡' else 'fyi') %}
+
+                            <article class="brief {{ pc }}">
+                                <header class="brief-header">
+                                    <span class="brief-ref">[{{ ns.ref }}]</span>
+                                    <div class="brief-title-block">
+                                        <a href="{{ brief.url }}" target="_blank">{{ brief.headline }}</a>
+                                    </div>
+                                </header>
+
+                                {% if brief.detail %}
+                                <div class="brief-detail">{{ brief.detail | md_inline }}</div>
+                                {% endif %}
+
+                                <footer class="brief-footer">
+                                    <span class="brief-source">{{ brief.source }}</span>
+                                    {% if brief.tags %}
+                                    <div class="brief-tags">
+                                        {% for t in brief.tags %}
+                                        <span class="tag">{{ t }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </footer>
+                            </article>
+                        {% endfor %}
+                    </section>
+                {% endif %}
+            {% endfor %}
+
+            <!-- ══════ TABLE I: Category Distribution ══════ -->
+            <div class="stats-section">
+                <div class="table-label">Table I</div>
+                <div class="table-caption">Category Distribution and Priority Analysis (N={{ total_items }})</div>
+                <table class="stats-table">
+                    <thead>
+                        <tr>
+                            <th>Section</th>
+                            <th>Items</th>
+                            <th>🔴 Critical</th>
+                            <th>🟡 Important</th>
+                            <th>🟢 Routine</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set ns_stat = namespace(t_all=0, t_must=0, t_rec=0, t_fyi=0) %}
+                        {% for sk in section_order %}
+                            {% if sk in briefs and briefs[sk] %}
+                                {% set m = section_configs.get(sk, {}) %}
+                                {% set si = briefs[sk] %}
+                                {% set mc = si | selectattr('priority', 'equalto', '🔴') | list | length %}
+                                {% set rc = si | selectattr('priority', 'equalto', '🟡') | list | length %}
+                                {% set fc = si | selectattr('priority', 'equalto', '🟢') | list | length %}
+                                {% set ns_stat.t_all = ns_stat.t_all + si|length %}
+                                {% set ns_stat.t_must = ns_stat.t_must + mc %}
+                                {% set ns_stat.t_rec = ns_stat.t_rec + rc %}
+                                {% set ns_stat.t_fyi = ns_stat.t_fyi + fc %}
+                                <tr>
+                                    <td class="cat-name">
+                                        <span class="cat-color" style="background: {{ m.color|default('#00629B') }};"></span>
+                                        {{ m.get('title', sk | title) }}
+                                    </td>
+                                    <td>{{ si | length }}</td>
+                                    <td class="num-must">{{ mc }}</td>
+                                    <td class="num-rec">{{ rc }}</td>
+                                    <td class="num-fyi">{{ fc }}</td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td class="cat-name">Σ Total</td>
+                            <td>{{ ns_stat.t_all }}</td>
+                            <td class="num-must">{{ ns_stat.t_must }}</td>
+                            <td class="num-rec">{{ ns_stat.t_rec }}</td>
+                            <td class="num-fyi">{{ ns_stat.t_fyi }}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <div class="fig-note"><strong>Table I.</strong> Priority distribution across {{ section_order | length }} monitored domains. Critical items require immediate attention.</div>
+            </div>
+
+            <!-- ══════ REFERENCES ══════ -->
+            <div class="references">
+                <div class="references-title">References</div>
+                <div class="references-list">
+                    {% set ns_ref = namespace(n=0) %}
+                    {% for sk in section_order %}
+                        {% if sk in briefs and briefs[sk] %}
+                            {% for b in briefs[sk] %}
+                                {% set ns_ref.n = ns_ref.n + 1 %}
+                                <div class="ref-entry">
+                                    <span class="ref-num">[{{ ns_ref.n }}]</span>
+                                    {{ b.headline }},
+                                    <em>{{ b.source }}</em>,
+                                    {{ date_str }}.
+                                    {% if b.url %}<a href="{{ b.url }}" target="_blank">[Online]</a>{% endif %}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- ══════ FOOTER ══════ -->
+            <footer class="document-footer">
+                <p><strong>IEEE Newsloom Technical Brief</strong> · Vol. 1, No. {{ date_str.split('-')[2] }}</p>
+                <p>{{ total_items }} items across {{ section_order | length }} categories · Generated {{ generated_time }}</p>
+                <p class="citation-line">Proceedings of the Newsloom Automated Intelligence System, {{ date_str }}</p>
+                <p class="doi-line">DOI: 10.1109/NEWSLOOM.{{ date_str | replace('-', '') }}.DAILY</p>
+                <p class="copyright">© {{ date_str.split('-')[0] }} Newsloom Research Labs. All rights reserved. Authorized use limited to automated intelligence distribution.</p>
+            </footer>
+        </main>
+
+    </div>
+</body>
+</html>

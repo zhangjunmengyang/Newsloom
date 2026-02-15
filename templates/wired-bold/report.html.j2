@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEWSLOOM WIRED · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * WIRED BOLD — Futuristic Tech Magazine
+         * ────────────────────────────────────────────────────────────
+         * Pitch-black canvas + neon green (#26FF80), hot pink (#FF4365),
+         * electric blue (#00D4FF). Circuit-board texture via CSS
+         * repeating patterns. Extra-bold condensed type. Neon accents.
+         * "WIRED RECOMMENDS" badge on must-reads.
+         *
+         * Design System:
+         *   - 5-level dark background scale (void → elevated)
+         *   - 4-level text opacity scale
+         *   - 6-neon accent palette with glow variants
+         *   - Monospace kickers + condensed display headings
+         *   - Circuit-board repeating SVG-less texture
+         *   - Cards with neon left-bar keyed to section_configs.color
+         *   - namespace() counters for Jinja2 correctness
+         *   - CJK font stack throughout
+         * ============================================================ */
+
+        /* ── Design Tokens ── */
+        :root {
+            /* Background scale — 5 levels, darkest to lightest */
+            --bg-void:        #050505;
+            --bg-primary:     #0A0A0A;
+            --bg-card:        #111111;
+            --bg-surface:     #181818;
+            --bg-elevated:    #1E1E1E;
+
+            /* Text scale — 4 levels */
+            --text-primary:   #F5F5F5;
+            --text-secondary: #CCCCCC;
+            --text-muted:     #888888;
+            --text-dim:       #555555;
+
+            /* Neon palette — 6 accent colors */
+            --neon-green:     #26FF80;
+            --neon-pink:      #FF4365;
+            --neon-blue:      #00D4FF;
+            --neon-yellow:    #FFE566;
+            --neon-purple:    #B24BF3;
+            --neon-orange:    #FF8A3D;
+
+            /* Neon dim backgrounds */
+            --neon-green-dim:  rgba(38,255,128,0.06);
+            --neon-pink-dim:   rgba(255,67,101,0.06);
+            --neon-blue-dim:   rgba(0,212,255,0.05);
+            --neon-purple-dim: rgba(178,75,243,0.05);
+
+            /* Neon glow shadows */
+            --glow-green:  0 0 16px rgba(38,255,128,0.45), 0 0 35px rgba(38,255,128,0.15);
+            --glow-pink:   0 0 16px rgba(255,67,101,0.45), 0 0 35px rgba(255,67,101,0.15);
+            --glow-blue:   0 0 16px rgba(0,212,255,0.45),  0 0 35px rgba(0,212,255,0.15);
+            --glow-purple: 0 0 16px rgba(178,75,243,0.45), 0 0 35px rgba(178,75,243,0.15);
+
+            /* Borders */
+            --border:         rgba(255,255,255,0.06);
+            --border-strong:  rgba(255,255,255,0.12);
+            --border-accent:  rgba(255,255,255,0.18);
+
+            /* Typography — CJK-aware stacks */
+            --font-display:   "Impact", "Arial Black", "Haettenschweiler",
+                              "PingFang SC", "Noto Sans SC", sans-serif;
+            --font-body:      -apple-system, "Helvetica Neue", "Arial",
+                              "PingFang SC", "Noto Sans SC", "Microsoft YaHei",
+                              sans-serif;
+            --font-mono:      "SF Mono", "Fira Code", "Consolas",
+                              "Courier New", monospace;
+            --font-cjk:       "PingFang SC", "Noto Sans SC", "Microsoft YaHei",
+                              "Source Han Sans SC", sans-serif;
+
+            /* Spacing scale */
+            --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px;
+            --sp-4: 16px; --sp-5: 20px; --sp-6: 24px;
+            --sp-8: 32px; --sp-10: 40px; --sp-12: 48px;
+            --sp-16: 64px; --sp-20: 80px;
+
+            /* Radius */
+            --radius-sm: 2px;
+            --radius-md: 3px;
+            --radius-lg: 6px;
+
+            /* Shadows */
+            --shadow-card:     0 2px 12px rgba(0,0,0,0.5),
+                               0 0 1px rgba(255,255,255,0.04);
+            --shadow-elevated: 0 8px 30px rgba(0,0,0,0.6),
+                               0 0 2px rgba(255,255,255,0.06);
+        }
+
+        /* ── Page (PDF) ── */
+        @page {
+            size: A4;
+            margin: 1.8cm 1.5cm;
+            @top-left {
+                content: "NEWSLOOM WIRED";
+                font-family: "Impact", "Arial Black", sans-serif;
+                font-size: 9pt;
+                color: #26FF80;
+                letter-spacing: 0.2em;
+            }
+            @top-right {
+                content: "{{ date_str }}";
+                font-family: "SF Mono", "Consolas", monospace;
+                font-size: 8pt;
+                color: #888;
+            }
+            @bottom-center {
+                content: "page " counter(page);
+                font-family: "SF Mono", "Consolas", monospace;
+                font-size: 7pt;
+                color: #00D4FF;
+                letter-spacing: 0.15em;
+            }
+        }
+
+        /* ── Reset ── */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* ── Body: Circuit-Board Background Texture ── */
+        body {
+            font-family: var(--font-body);
+            font-size: 15px;
+            line-height: 1.7;
+            color: var(--text-primary);
+            background-color: var(--bg-primary);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+
+            /*
+             * Circuit-board texture built from pure CSS repeating
+             * gradients — horizontal traces, vertical traces,
+             * diagonal crosshatch, and soft radial glows.
+             * No SVG or external images needed.
+             */
+            background-image:
+                /* fine horizontal circuit traces every 40px */
+                repeating-linear-gradient(
+                    0deg,
+                    transparent 0px, transparent 39px,
+                    rgba(38,255,128,0.018) 39px,
+                    rgba(38,255,128,0.018) 40px
+                ),
+                /* fine vertical circuit traces every 40px */
+                repeating-linear-gradient(
+                    90deg,
+                    transparent 0px, transparent 39px,
+                    rgba(0,212,255,0.014) 39px,
+                    rgba(0,212,255,0.014) 40px
+                ),
+                /* 45° diagonal crosshatch nodes every 80px */
+                repeating-linear-gradient(
+                    45deg,
+                    transparent 0px, transparent 78px,
+                    rgba(255,67,101,0.01) 78px,
+                    rgba(255,67,101,0.01) 80px
+                ),
+                /* -45° diagonal crosshatch */
+                repeating-linear-gradient(
+                    -45deg,
+                    transparent 0px, transparent 78px,
+                    rgba(178,75,243,0.008) 78px,
+                    rgba(178,75,243,0.008) 80px
+                ),
+                /* top-center neon green glow */
+                radial-gradient(
+                    ellipse 70% 35% at 50% 0%,
+                    rgba(38,255,128,0.04) 0%, transparent 70%
+                ),
+                /* bottom-right pink glow */
+                radial-gradient(
+                    ellipse 50% 25% at 80% 100%,
+                    rgba(255,67,101,0.025) 0%, transparent 70%
+                );
+            background-attachment: fixed;
+        }
+
+        /* Links */
+        a {
+            color: var(--neon-blue);
+            text-decoration: none;
+            transition: color 0.2s ease, text-shadow 0.2s ease;
+        }
+        a:hover {
+            color: var(--neon-pink);
+            text-shadow: 0 0 8px rgba(255,67,101,0.35);
+        }
+
+        /* ── Container ── */
+        .wrap {
+            max-width: 920px;
+            margin: 0 auto;
+            padding: var(--sp-10) var(--sp-6);
+            position: relative;
+        }
+
+        /* ============================================================
+         * MASTHEAD — Giant WIRED-style Header
+         * ============================================================ */
+        .masthead {
+            position: relative;
+            padding: var(--sp-12) 0 var(--sp-10);
+            margin-bottom: var(--sp-10);
+        }
+
+        /* Neon rainbow rule at bottom */
+        .masthead::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg,
+                var(--neon-pink), var(--neon-purple),
+                var(--neon-blue), var(--neon-green));
+            box-shadow: 0 0 18px rgba(0,212,255,0.25);
+        }
+
+        /* Mono kicker line */
+        .masthead-kicker {
+            font-family: var(--font-mono);
+            font-size: 0.68em;
+            color: var(--neon-green);
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            margin-bottom: var(--sp-3);
+            text-shadow: 0 0 8px rgba(38,255,128,0.35);
+        }
+        .masthead-kicker::before {
+            content: '// ';
+            color: var(--text-dim);
+        }
+
+        /* Giant brand name */
+        .masthead-title {
+            font-family: var(--font-display);
+            font-size: 6em;
+            font-weight: 900;
+            line-height: 0.88;
+            letter-spacing: -0.02em;
+            text-transform: uppercase;
+            color: var(--text-primary);
+            margin-bottom: var(--sp-4);
+        }
+        .masthead-title .neon-accent {
+            color: var(--neon-pink);
+            text-shadow:
+                0 0 15px rgba(255,67,101,0.5),
+                0 0 40px rgba(255,67,101,0.15);
+        }
+
+        /* Subtitle / tagline */
+        .masthead-sub {
+            font-size: 1.05em;
+            font-weight: 300;
+            color: var(--text-secondary);
+            max-width: 620px;
+            margin-bottom: var(--sp-6);
+            line-height: 1.6;
+        }
+
+        /* Stats row — oversized mono numbers */
+        .masthead-stats {
+            display: flex;
+            gap: var(--sp-8);
+            flex-wrap: wrap;
+        }
+        .mstat {
+            display: flex;
+            flex-direction: column;
+            font-family: var(--font-mono);
+            font-size: 0.65em;
+            letter-spacing: 0.08em;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+        .mstat-val {
+            font-size: 2.4em;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1;
+            margin-bottom: 2px;
+        }
+        .mstat:nth-child(1) .mstat-val {
+            color: var(--neon-green);
+            text-shadow: 0 0 10px rgba(38,255,128,0.35);
+        }
+        .mstat:nth-child(2) .mstat-val {
+            color: var(--neon-pink);
+            text-shadow: 0 0 10px rgba(255,67,101,0.35);
+        }
+        .mstat:nth-child(3) .mstat-val {
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px rgba(0,212,255,0.35);
+        }
+        .mstat:nth-child(4) .mstat-val {
+            color: var(--neon-yellow);
+        }
+
+        /* ============================================================
+         * EXECUTIVE SUMMARY — Neon-Bordered Feature Box
+         * ============================================================ */
+        .exec-box {
+            position: relative;
+            background:
+                linear-gradient(135deg, var(--bg-card) 0%, rgba(17,17,17,0.97) 100%);
+            border: 1px solid var(--border-strong);
+            border-left: 4px solid var(--neon-purple);
+            border-radius: var(--radius-md);
+            padding: var(--sp-8) var(--sp-8) var(--sp-6);
+            margin-bottom: var(--sp-12);
+            box-shadow:
+                var(--shadow-card),
+                0 0 30px rgba(178,75,243,0.06);
+            page-break-inside: avoid;
+            overflow: hidden;
+        }
+
+        /* Top-right glow orb */
+        .exec-box::before {
+            content: '';
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 200px; height: 200px;
+            background: radial-gradient(
+                circle,
+                rgba(178,75,243,0.06) 0%,
+                transparent 70%
+            );
+            pointer-events: none;
+        }
+
+        /* Bottom-left subtle glow */
+        .exec-box::after {
+            content: '';
+            position: absolute;
+            bottom: -40px; left: -40px;
+            width: 150px; height: 150px;
+            background: radial-gradient(
+                circle,
+                rgba(0,212,255,0.04) 0%,
+                transparent 70%
+            );
+            pointer-events: none;
+        }
+
+        .exec-label {
+            position: relative;
+            z-index: 1;
+            font-family: var(--font-display);
+            font-size: 0.78em;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.22em;
+            color: var(--neon-purple);
+            text-shadow: 0 0 10px rgba(178,75,243,0.45);
+            margin-bottom: var(--sp-5);
+            padding-bottom: var(--sp-3);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .exec-box p {
+            position: relative;
+            z-index: 1;
+            color: var(--text-secondary);
+            font-size: 0.96em;
+            line-height: 1.85;
+            margin-bottom: var(--sp-4);
+        }
+        .exec-box p:last-of-type { margin-bottom: 0; }
+        .exec-box strong { color: var(--text-primary); font-weight: 700; }
+        .exec-box em { color: var(--text-primary); font-style: italic; }
+        .exec-box code {
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+            background: rgba(38,255,128,0.08);
+            color: var(--neon-green);
+            padding: 2px 6px;
+            border: 1px solid rgba(38,255,128,0.15);
+            border-radius: var(--radius-sm);
+        }
+
+        /* ============================================================
+         * SECTION — Oversized Neon Section Headers
+         * ============================================================ */
+        .sec {
+            margin-bottom: var(--sp-12);
+        }
+
+        .sec-head {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            padding: var(--sp-3) 0 var(--sp-5);
+            margin-bottom: var(--sp-6);
+            position: relative;
+        }
+
+        /* Section color underline */
+        .sec-head::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 2px;
+            background: currentColor;
+            opacity: 0.25;
+        }
+
+        .sec-emoji {
+            font-size: 1.6em;
+            line-height: 1;
+        }
+
+        .sec-name {
+            font-family: var(--font-display);
+            font-size: 2.8em;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            line-height: 1;
+        }
+
+        .sec-count {
+            margin-left: auto;
+            font-family: var(--font-mono);
+            font-size: 0.65em;
+            padding: var(--sp-1) var(--sp-3);
+            border: 1px solid;
+            border-radius: var(--radius-sm);
+            opacity: 0.7;
+            letter-spacing: 0.05em;
+        }
+
+        /* Section divider line between sections */
+        .sec-divider {
+            height: 1px;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                var(--border-strong) 20%,
+                var(--border-strong) 80%,
+                transparent 100%
+            );
+            margin: var(--sp-6) 0;
+        }
+
+        /* ============================================================
+         * BRIEF CARD — Dark Glass + Neon Left Bar
+         * ============================================================ */
+        .card {
+            position: relative;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: var(--sp-6) var(--sp-6) var(--sp-5);
+            padding-left: calc(var(--sp-6) + 8px);
+            margin-bottom: var(--sp-5);
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.25s ease,
+                background 0.2s ease,
+                border-color 0.2s ease;
+            page-break-inside: avoid;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            background: var(--bg-surface);
+            border-color: var(--border-strong);
+            box-shadow: var(--shadow-elevated);
+        }
+        .card:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Neon left bar — uses section_configs[key].color */
+        .card-bar {
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+            border-radius: var(--radius-md) 0 0 var(--radius-md);
+            transition: width 0.2s ease;
+        }
+        .card:hover .card-bar {
+            width: 5px;
+        }
+
+        /* ── Priority: must-read (🔴) ── */
+        .card.must-read {
+            border-color: rgba(255,67,101,0.25);
+            background:
+                linear-gradient(135deg,
+                    rgba(255,67,101,0.04) 0%,
+                    var(--bg-card) 60%
+                );
+        }
+        .card.must-read:hover {
+            box-shadow:
+                var(--shadow-elevated),
+                0 0 25px rgba(255,67,101,0.12);
+        }
+
+        /* WIRED RECOMMENDS badge — only on must-read cards */
+        .card.must-read::after {
+            content: 'WIRED RECOMMENDS';
+            position: absolute;
+            top: var(--sp-2); right: var(--sp-3);
+            font-family: var(--font-display);
+            font-size: 0.5em;
+            font-weight: 900;
+            color: var(--neon-pink);
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            text-shadow: 0 0 8px rgba(255,67,101,0.4);
+            background: rgba(255,67,101,0.08);
+            border: 1px solid rgba(255,67,101,0.2);
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+            line-height: 1.4;
+        }
+
+        /* ── Priority: recommended (🟡) ── */
+        .card.recommended {
+            border-color: rgba(0,212,255,0.18);
+            background:
+                linear-gradient(135deg,
+                    rgba(0,212,255,0.03) 0%,
+                    var(--bg-card) 60%
+                );
+        }
+        .card.recommended:hover {
+            box-shadow:
+                var(--shadow-elevated),
+                0 0 20px rgba(0,212,255,0.08);
+        }
+
+        /* ── Priority: fyi (🟢) ── */
+        .card.fyi {
+            opacity: 0.92;
+        }
+        .card.fyi:hover {
+            opacity: 1;
+        }
+
+        /* Headline row */
+        .card-top {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--sp-3);
+            margin-bottom: var(--sp-3);
+        }
+
+        /* Priority glow dot */
+        .card-glow {
+            flex-shrink: 0;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            margin-top: 9px;
+            transition: box-shadow 0.2s ease;
+        }
+        .card.must-read .card-glow {
+            background: var(--neon-pink);
+            box-shadow: var(--glow-pink);
+        }
+        .card.recommended .card-glow {
+            background: var(--neon-blue);
+            box-shadow: var(--glow-blue);
+        }
+        .card.fyi .card-glow {
+            background: var(--neon-green);
+            box-shadow: 0 0 8px rgba(38,255,128,0.35);
+        }
+
+        /* Giant headline — WIRED magazine style */
+        .card-headline {
+            flex: 1;
+            font-family: var(--font-display);
+            font-size: 1.45em;
+            font-weight: 900;
+            line-height: 1.15;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+        .card-headline a {
+            color: var(--text-primary);
+            transition: color 0.2s ease, text-shadow 0.2s ease;
+        }
+        .card-headline a:hover {
+            color: var(--neon-pink);
+            text-shadow: 0 0 12px rgba(255,67,101,0.3);
+        }
+
+        .card.must-read .card-headline a {
+            color: var(--neon-pink);
+            text-shadow: 0 0 6px rgba(255,67,101,0.2);
+        }
+        .card.recommended .card-headline a:hover {
+            color: var(--neon-blue);
+            text-shadow: 0 0 12px rgba(0,212,255,0.3);
+        }
+
+        /* Ultra-small meta row — extreme contrast with headline */
+        .card-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+            flex-wrap: wrap;
+            font-family: var(--font-mono);
+            font-size: 0.64em;
+            margin-bottom: var(--sp-4);
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .src-badge {
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--neon-yellow);
+            background: rgba(255,229,102,0.06);
+            border: 1px solid rgba(255,229,102,0.15);
+            padding: 1px 7px;
+            border-radius: var(--radius-sm);
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .src-badge:hover {
+            border-color: rgba(255,229,102,0.35);
+            box-shadow: 0 0 6px rgba(255,229,102,0.15);
+        }
+
+        .tag-chip {
+            color: var(--text-dim);
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            padding: 1px 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-size: 0.92em;
+            transition: color 0.15s ease;
+        }
+        .tag-chip:hover {
+            color: var(--text-muted);
+            border-color: var(--border-strong);
+        }
+
+        .sep {
+            color: var(--neon-blue);
+            opacity: 0.45;
+            user-select: none;
+        }
+
+        /* Detail text */
+        .card-body {
+            color: var(--text-secondary);
+            font-size: 0.92em;
+            line-height: 1.85;
+        }
+        .card-body strong {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+        .card-body em {
+            color: var(--text-primary);
+            font-style: italic;
+        }
+        .card-body code {
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+            color: var(--neon-green);
+            background: rgba(38,255,128,0.06);
+            border: 1px solid rgba(38,255,128,0.12);
+            padding: 1px 5px;
+            border-radius: var(--radius-sm);
+        }
+
+        /* ============================================================
+         * STATS GRID — Quick-glance metrics (if stats exist)
+         * ============================================================ */
+        .stats-strip {
+            display: flex;
+            gap: var(--sp-4);
+            flex-wrap: wrap;
+            margin-bottom: var(--sp-12);
+            padding: var(--sp-4) 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        .stats-strip .sbox {
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+            padding: var(--sp-3);
+        }
+        .sbox-label {
+            font-family: var(--font-mono);
+            font-size: 0.58em;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: var(--sp-1);
+        }
+        .sbox-val {
+            font-family: var(--font-display);
+            font-size: 1.4em;
+            font-weight: 900;
+            color: var(--neon-blue);
+        }
+
+        /* ============================================================
+         * SUBSCRIBE CTA — Magazine Promo Strip
+         * ============================================================ */
+        .promo {
+            position: relative;
+            background:
+                linear-gradient(135deg,
+                    var(--bg-card) 0%,
+                    var(--bg-surface) 100%
+                );
+            border: 1px solid var(--border-strong);
+            border-radius: var(--radius-md);
+            padding: var(--sp-8);
+            margin: var(--sp-12) 0;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        /* Top neon rainbow bar */
+        .promo::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg,
+                var(--neon-green), var(--neon-blue), var(--neon-pink));
+        }
+
+        /* Background glow */
+        .promo::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 300px; height: 300px;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(
+                circle,
+                rgba(38,255,128,0.03) 0%,
+                transparent 70%
+            );
+            pointer-events: none;
+        }
+
+        .promo-title {
+            position: relative;
+            z-index: 1;
+            font-family: var(--font-display);
+            font-size: 1.9em;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-primary);
+            margin-bottom: var(--sp-3);
+        }
+        .promo-title .neon-accent {
+            color: var(--neon-green);
+            text-shadow: 0 0 10px rgba(38,255,128,0.35);
+        }
+
+        .promo-text {
+            position: relative;
+            z-index: 1;
+            font-size: 0.88em;
+            color: var(--text-muted);
+            margin-bottom: var(--sp-5);
+        }
+
+        .promo-btn {
+            position: relative;
+            z-index: 1;
+            display: inline-block;
+            font-family: var(--font-display);
+            font-size: 0.82em;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            color: var(--bg-void);
+            background: var(--neon-green);
+            padding: var(--sp-3) var(--sp-8);
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+        }
+        .promo-btn:hover {
+            background: var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0,212,255,0.4);
+            color: var(--bg-void);
+        }
+
+        /* ============================================================
+         * FOOTER
+         * ============================================================ */
+        .foot {
+            text-align: center;
+            padding: var(--sp-10) 0 var(--sp-8);
+            margin-top: var(--sp-16);
+            position: relative;
+        }
+
+        /* Full-spectrum neon top rule */
+        .foot::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg,
+                var(--neon-pink), var(--neon-purple), var(--neon-blue),
+                var(--neon-green), var(--neon-yellow));
+            box-shadow: 0 0 12px rgba(0,212,255,0.2);
+        }
+
+        .foot-brand {
+            font-family: var(--font-display);
+            font-size: 2.4em;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-primary);
+            margin-bottom: var(--sp-2);
+        }
+
+        .foot-quote {
+            font-size: 0.85em;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-bottom: var(--sp-2);
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .foot-signal {
+            font-family: var(--font-mono);
+            font-size: 0.7em;
+            color: var(--neon-green);
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            text-shadow: 0 0 6px rgba(38,255,128,0.3);
+            margin-bottom: var(--sp-4);
+        }
+
+        .foot-meta {
+            font-family: var(--font-mono);
+            font-size: 0.62em;
+            color: var(--text-dim);
+            letter-spacing: 0.06em;
+        }
+
+        /* ============================================================
+         * PRINT / PDF OVERRIDES
+         * ============================================================ */
+        @media print {
+            body {
+                background: var(--bg-primary) !important;
+                background-image: none !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                font-size: 12px;
+            }
+            .wrap {
+                max-width: 100%;
+                padding: 0;
+            }
+            .masthead {
+                padding: var(--sp-5) 0;
+                margin-bottom: var(--sp-6);
+            }
+            .masthead-title { font-size: 3.5em; }
+            .masthead-kicker { text-shadow: none; }
+            .exec-box {
+                margin-bottom: var(--sp-6);
+                padding: var(--sp-5);
+                box-shadow: none;
+            }
+            .exec-box::before,
+            .exec-box::after { display: none; }
+            .sec { margin-bottom: var(--sp-6); }
+            .sec-name { font-size: 2em; }
+            .card {
+                margin-bottom: var(--sp-3);
+                padding: var(--sp-4);
+                padding-left: calc(var(--sp-4) + 8px);
+                box-shadow: none;
+                transform: none !important;
+            }
+            .card:hover {
+                transform: none;
+                box-shadow: none;
+            }
+            .card.must-read::after { text-shadow: none; }
+            .promo { display: none; }
+            .stats-strip { border-color: var(--border); }
+            a {
+                color: var(--neon-blue) !important;
+                text-shadow: none !important;
+            }
+        }
+
+        /* ============================================================
+         * RESPONSIVE — Mobile (< 680px)
+         * ============================================================ */
+        @media (max-width: 680px) {
+            .wrap {
+                padding: var(--sp-5) var(--sp-4);
+            }
+            .masthead {
+                padding: var(--sp-6) 0 var(--sp-5);
+            }
+            .masthead-title {
+                font-size: 3.2em;
+            }
+            .masthead-sub {
+                font-size: 0.92em;
+            }
+            .masthead-stats {
+                gap: var(--sp-4);
+            }
+            .mstat-val {
+                font-size: 1.8em;
+            }
+            .exec-box {
+                padding: var(--sp-5);
+            }
+            .exec-box::after { display: none; }
+            .sec-name {
+                font-size: 1.9em;
+            }
+            .sec-head {
+                flex-wrap: wrap;
+                gap: var(--sp-2);
+            }
+            .sec-count {
+                margin-left: 0;
+            }
+            .card {
+                padding: var(--sp-4);
+                padding-left: calc(var(--sp-4) + 8px);
+            }
+            .card-headline {
+                font-size: 1.15em;
+            }
+            .card.must-read::after {
+                font-size: 0.42em;
+                padding: 1px 5px;
+                letter-spacing: 0.1em;
+            }
+            .promo {
+                padding: var(--sp-5);
+            }
+            .promo-title {
+                font-size: 1.4em;
+            }
+            .foot-brand {
+                font-size: 1.6em;
+            }
+            .stats-strip {
+                gap: var(--sp-2);
+            }
+            .sbox-val {
+                font-size: 1.1em;
+            }
+        }
+
+        /* ============================================================
+         * RESPONSIVE — Tablet (681px – 800px)
+         * ============================================================ */
+        @media (min-width: 681px) and (max-width: 800px) {
+            .masthead-title {
+                font-size: 4.5em;
+            }
+            .sec-name {
+                font-size: 2.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+
+        <!-- ═══════ MASTHEAD ═══════ -->
+        <header class="masthead">
+            <div class="masthead-kicker">AI_INTELLIGENCE_BRIEFING {{ date_str }}</div>
+            <h1 class="masthead-title">
+                NEWSLOOM<br><span class="neon-accent">WIRED</span>
+            </h1>
+            <p class="masthead-sub">
+                The future is already here — it's just not evenly distributed.
+                Your AI-curated intelligence briefing for what matters in tech.
+            </p>
+
+            <div class="masthead-stats">
+                {% set ns = namespace(must=0) %}
+                {% for sk, sitems in briefs.items() %}
+                    {% if sitems is iterable and sitems is not string %}
+                        {% for it in sitems %}
+                            {% if it.priority == '🔴' %}{% set ns.must = ns.must + 1 %}{% endif %}
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+                <div class="mstat">
+                    <span class="mstat-val">{{ total_items }}</span>
+                    <span>articles</span>
+                </div>
+                <div class="mstat">
+                    <span class="mstat-val">{{ ns.must }}</span>
+                    <span>critical</span>
+                </div>
+                <div class="mstat">
+                    <span class="mstat-val">{{ section_order|length }}</span>
+                    <span>channels</span>
+                </div>
+                <div class="mstat">
+                    <span class="mstat-val">{{ date_str }}</span>
+                    <span>issue</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- ═══════ EXECUTIVE SUMMARY ═══════ -->
+        {% if executive_summary %}
+        <div class="exec-box">
+            <div class="exec-label">&gt;&gt; The Big Story</div>
+            {% for line in executive_summary.strip().split('\n') %}
+                {% if line.strip() %}
+                <p>{{ line.strip() | md_inline }}</p>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- ═══════ STATS STRIP (if stats available) ═══════ -->
+        {% if stats %}
+        <div class="stats-strip">
+            {% if stats.get('source_count') %}
+            <div class="sbox">
+                <div class="sbox-label">Sources</div>
+                <div class="sbox-val">{{ stats.source_count }}</div>
+            </div>
+            {% endif %}
+            {% if stats.get('avg_priority') %}
+            <div class="sbox">
+                <div class="sbox-label">Avg Priority</div>
+                <div class="sbox-val">{{ stats.avg_priority }}</div>
+            </div>
+            {% endif %}
+            {% if stats.get('top_tag') %}
+            <div class="sbox">
+                <div class="sbox-label">Top Tag</div>
+                <div class="sbox-val">{{ stats.top_tag }}</div>
+            </div>
+            {% endif %}
+            <div class="sbox">
+                <div class="sbox-label">Sections</div>
+                <div class="sbox-val">{{ section_order|length }}</div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ═══════ SECTIONS ═══════ -->
+        {% set neon_cycle = ['#FF4365','#00D4FF','#26FF80','#B24BF3','#FFE566','#FF8A3D'] %}
+
+        {% for section_key in section_order %}
+        {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+            {% set meta = section_configs.get(section_key, {}) %}
+            {% set sec_color = meta.color | default('#26FF80') %}
+            {% set neon_c = neon_cycle[loop.index0 % 6] %}
+            {% set items = briefs[section_key] %}
+
+            <section class="sec">
+                <div class="sec-head" style="color: {{ neon_c }};">
+                    <span class="sec-emoji">{{ meta.emoji | default('▶') }}</span>
+                    <h2 class="sec-name" style="color: {{ neon_c }}; text-shadow: 0 0 14px {{ neon_c }}30;">
+                        {{ meta.title | default(section_key) }}
+                    </h2>
+                    <span class="sec-count" style="color: {{ neon_c }}; border-color: {{ neon_c }}50;">
+                        {{ items|length }}
+                    </span>
+                </div>
+
+                {% set ns_card = namespace(idx=0) %}
+                {% for item in items %}
+                {% set ns_card.idx = ns_card.idx + 1 %}
+                {% set priority = item.priority | default('🟢') %}
+                {% set p_class = 'must-read' if priority == '🔴' else ('recommended' if priority == '🟡' else 'fyi') %}
+
+                <div class="card {{ p_class }}">
+                    <span class="card-bar" style="background: {{ sec_color }}; box-shadow: 0 0 8px {{ sec_color }}40;"></span>
+
+                    <div class="card-top">
+                        <span class="card-glow"></span>
+                        <h3 class="card-headline">
+                            <a href="{{ item.url | default('#') }}" target="_blank" rel="noopener">
+                                {{ item.headline | default('UNTITLED') }}
+                            </a>
+                        </h3>
+                    </div>
+
+                    <div class="card-meta">
+                        {% if item.source %}
+                        <span class="src-badge">{{ item.source }}</span>
+                        {% endif %}
+                        {% if item.tags %}
+                            {% for tag in item.tags %}
+                            <span class="sep">/</span>
+                            <span class="tag-chip">{{ tag }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    {% if item.detail %}
+                    <div class="card-body">{{ item.detail | md_inline }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </section>
+        {% endif %}
+        {% endfor %}
+
+        <!-- ═══════ PROMO CTA ═══════ -->
+        <div class="promo">
+            <div class="promo-title">STAY <span class="neon-accent">WIRED</span></div>
+            <p class="promo-text">Get tomorrow's intelligence briefing delivered. AI-curated, human-reviewed.</p>
+            <a href="#" class="promo-btn">Subscribe Now</a>
+        </div>
+
+        <!-- ═══════ FOOTER ═══════ -->
+        <footer class="foot">
+            <div class="foot-brand">Newsloom</div>
+            <div class="foot-quote">"The future is already here — it's just not evenly distributed."</div>
+            <div class="foot-signal">&gt; End_Transmission</div>
+            <div class="foot-meta">{{ date_str }} · v4.0 · AI-curated intelligence · {{ generated_time }}</div>
+        </footer>
+
+    </div>
+</body>
+</html>

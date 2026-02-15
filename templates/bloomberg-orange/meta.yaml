@@ -1,0 +1,17 @@
+name: "Bloomberg Orange"
+description: "Bloomberg Terminal inspired design with dark background and signature orange data styling"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "dark"
+features:
+  - "Deep gray #1E1E1E background like Bloomberg Terminal"
+  - "Signature orange #FF6F00 accent for data highlights"
+  - "Dense data-oriented layout with high information density"
+  - "Monospace typography for terminal aesthetics"
+  - "Ticker-style header with real-time feel"
+  - "Financial terminal inspired design"
+category: "finance"
+color_scheme:
+  primary: "#1E1E1E"
+  accent: "#FF6F00"
+  text: "#FFFFFF"

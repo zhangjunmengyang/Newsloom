@@ -1,0 +1,12 @@
+name: "Instagram Gradient"
+description: "Instagram风格的日报模板，采用经典Instagram渐变配色和卡片式布局"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "light"
+features:
+  - "Instagram经典渐变配色（橙→粉→紫→蓝）"
+  - "Instagram帖子风格卡片布局"
+  - "Stories进度条风格header"
+  - "圆角头像占位符"
+  - "互动按钮样式设计"
+  - "轻盈的浅灰底色"

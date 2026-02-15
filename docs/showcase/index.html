@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Newsloom Template Showcase</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, sans-serif; background: #0a0a0a; color: #eee; padding: 40px; }
+        h1 { text-align: center; font-size: 2em; margin-bottom: 10px; }
+        .subtitle { text-align: center; color: #888; margin-bottom: 40px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .card { background: #1a1a1a; border-radius: 12px; overflow: hidden; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-4px); }
+        .card a { text-decoration: none; color: inherit; }
+        .card .preview { height: 200px; background: #222; display: flex; align-items: center; justify-content: center; font-size: 3em; }
+        .card .info { padding: 16px; }
+        .card .name { font-size: 1.1em; font-weight: 600; margin-bottom: 4px; }
+        .card .desc { font-size: 0.85em; color: #888; }
+    </style>
+</head>
+<body>
+    <h1>🎨 Newsloom Template Showcase</h1>
+    <p class="subtitle">51 commercial-grade newsletter templates · 2026-02-15</p>
+    <div class="grid">
+    </div>
+    <script>
+        const templates = [
+            {name:'premium', emoji:'💎', desc:'Flagship dark theme · Mesh gradient'},
+            {name:'ink-wash', emoji:'🖌️', desc:'Chinese ink wash · Rice paper texture'},
+            {name:'ukiyo-e', emoji:'🌊', desc:'Japanese ukiyo-e · Waves & Mt. Fuji'},
+            {name:'nyt-times', emoji:'📰', desc:'New York Times · 3-column newspaper'},
+            {name:'ft-salmon', emoji:'🐟', desc:'Financial Times · Salmon pink'},
+            {name:'art-deco', emoji:'🏛️', desc:'1920s Art Deco · Gold geometric'},
+            {name:'midnight-gold', emoji:'✨', desc:'Midnight navy + amber gold'},
+            {name:'glassmorphism', emoji:'🫧', desc:'Frosted glass · Floating orbs'},
+            {name:'stripe-gradient', emoji:'🌈', desc:'Stripe mesh gradient'},
+            {name:'bauhaus', emoji:'🔴', desc:'Bauhaus · Red/Yellow/Blue blocks'},
+            {name:'deep-space', emoji:'🚀', desc:'Space HUD · Stars & nebula'},
+            {name:'retro-terminal', emoji:'💻', desc:'CRT terminal · Green phosphor'},
+            {name:'bloomberg-orange', emoji:'📊', desc:'Bloomberg Terminal · Data grid'},
+            {name:'spotify-green', emoji:'🎵', desc:'Spotify · Stage lighting'},
+            {name:'neon-cyberpunk', emoji:'🌃', desc:'Cyberpunk · Neon city'},
+        ];
+        const grid = document.querySelector('.grid');
+        templates.forEach(t => {
+            grid.innerHTML += `<div class="card"><a href="${t.name}.html"><div class="preview">${t.emoji}</div><div class="info"><div class="name">${t.name}</div><div class="desc">${t.desc}</div></div></a></div>`;
+        });
+    </script>
+</body>
+</html>

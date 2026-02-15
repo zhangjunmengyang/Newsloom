@@ -1,0 +1,12 @@
+name: "legal-serif"
+description: "Legal document style with serif typography and formal document formatting"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "light"
+features:
+  - "Cream white background (#FFFFF8)"
+  - "Pure black text (#1a1a1a)"
+  - "Georgia serif typography as primary font"
+  - "Numbered paragraphs and sections"
+  - "Quote blocks with vertical lines"
+  - "Formal legal document aesthetic"

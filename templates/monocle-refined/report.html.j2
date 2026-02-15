@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsloom Intelligence · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * MONOCLE REFINED v2 — European Magazine Sophistication
+         *
+         * Design Language:
+         *   - Clean white base with subtle paper texture
+         *   - Monocle Yellow (#F5D300) as primary accent
+         *   - Deep charcoal text (#1A1A1A) for gravitas
+         *   - Yellow ribbon header with black uppercase title
+         *   - Issue number/volume styling
+         *   - "Editor's Pick" sidebar boxes
+         *   - Refined dividers: thin line + centered dot
+         *   - Magazine subscription CTA footer
+         *   - Serif headings + sans body (editorial contrast)
+         *   - Ultra-generous whitespace
+         *
+         * References: monocle.com, Kinfolk, Cereal Magazine,
+         *             The Forecast, Konfekt, Port Magazine
+         * ============================================================ */
+
+        /* --- Design Tokens --- */
+        :root {
+            /* Backgrounds — Paper texture warm whites */
+            --bg-primary:     #FDFCF8;
+            --bg-card:        #FFFFFF;
+            --bg-surface:     #F7F6F1;
+            --bg-hover:       #F0EFE9;
+            --bg-aside:       #FAF9F4;
+
+            /* Monocle Yellow (5 tones) */
+            --mono-yellow:       #F5D300;
+            --mono-yellow-light: #FBE94D;
+            --mono-yellow-pale:  #FFF8CC;
+            --mono-yellow-dim:   rgba(245, 211, 0, 0.12);
+            --mono-yellow-soft:  rgba(245, 211, 0, 0.06);
+
+            /* Text — Charcoal hierarchy */
+            --text-primary:   #1A1A1A;
+            --text-secondary: #3D3D3D;
+            --text-body:      #4A4A4A;
+            --text-muted:     #7A7A7A;
+            --text-light:     #A5A5A0;
+            --text-caption:   #999999;
+
+            /* Priority — muted, editorial tones */
+            --priority-must:        #C43333;
+            --priority-must-bg:     rgba(196, 51, 51, 0.05);
+            --priority-must-border: rgba(196, 51, 51, 0.20);
+            --priority-rec:         #B8860B;
+            --priority-rec-bg:      rgba(184, 134, 11, 0.05);
+            --priority-rec-border:  rgba(184, 134, 11, 0.15);
+            --priority-fyi:         #4A7C59;
+            --priority-fyi-bg:      rgba(74, 124, 89, 0.04);
+            --priority-fyi-border:  rgba(74, 124, 89, 0.12);
+
+            /* Borders */
+            --border:         #E5E4DF;
+            --border-medium:  #D4D3CC;
+            --border-strong:  #1A1A1A;
+
+            /* Spacing (8pt) */
+            --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px;
+            --sp-4: 16px; --sp-5: 20px; --sp-6: 24px;
+            --sp-8: 32px; --sp-10: 40px; --sp-12: 48px;
+            --sp-16: 64px; --sp-20: 80px; --sp-24: 96px;
+
+            /* Typography */
+            --font-serif: "Georgia", "Noto Serif SC", "Source Han Serif SC", "STSong", "Times New Roman", serif;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", Arial, sans-serif;
+            --font-mono: "SF Mono", "JetBrains Mono", "Consolas", "Noto Sans Mono CJK SC", monospace;
+            --font-display: "Didot", "Bodoni MT", "Georgia", "Noto Serif SC", serif;
+
+            /* Radius */
+            --radius-sm: 3px;
+            --radius-md: 6px;
+            --radius-lg: 10px;
+            --radius-xl: 16px;
+
+            /* Shadows — Very subtle, paper-like */
+            --shadow-card:     0 1px 4px rgba(0,0,0,0.04), 0 0 1px rgba(0,0,0,0.06);
+            --shadow-elevated: 0 4px 16px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04);
+        }
+
+        /* --- Page (PDF) --- */
+        @page {
+            size: A4;
+            margin: 2cm 2.2cm;
+            @bottom-center {
+                content: "Newsloom Intelligence · " "{{ date_str }}" " · Page " counter(page);
+                font-size: 7.5pt;
+                color: #999999;
+                font-family: -apple-system, "PingFang SC", sans-serif;
+                letter-spacing: 0.05em;
+            }
+        }
+
+        /* --- Reset --- */
+        *, *::before, *::after {
+            margin: 0; padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            color: var(--text-body);
+            line-height: 1.7;
+            /* Paper texture background — subtle noise + warm base */
+            background:
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0,0,0,0.008) 2px,
+                    rgba(0,0,0,0.008) 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0,0,0,0.005) 2px,
+                    rgba(0,0,0,0.005) 4px
+                ),
+                linear-gradient(170deg, #FDFCF8 0%, #F9F8F3 50%, #FDFCF8 100%);
+            min-height: 100vh;
+        }
+
+        a {
+            color: var(--text-primary);
+            text-decoration: none;
+            border-bottom: 1px solid var(--mono-yellow);
+            transition: border-color 0.2s, color 0.2s;
+        }
+        a:hover {
+            border-bottom-color: var(--text-primary);
+        }
+
+        /* --- Container (Magazine column width) --- */
+        .container {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: var(--sp-8) var(--sp-6);
+        }
+
+        /* ==========================================================
+         * HEADER — Monocle Yellow Ribbon + Black Uppercase Title
+         * ========================================================== */
+        .header {
+            margin-bottom: var(--sp-16);
+            position: relative;
+        }
+
+        /* Yellow ribbon bar */
+        .ribbon {
+            background: var(--mono-yellow);
+            padding: var(--sp-3) var(--sp-6);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--sp-8);
+        }
+
+        .ribbon-brand {
+            font-family: var(--font-sans);
+            font-size: 0.68em;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--text-primary);
+        }
+
+        .ribbon-issue {
+            font-family: var(--font-sans);
+            font-size: 0.62em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--text-secondary);
+        }
+
+        /* Main title */
+        .header-title {
+            font-family: var(--font-display);
+            font-size: 2.8em;
+            font-weight: 400;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            line-height: 1.15;
+            margin-bottom: var(--sp-4);
+        }
+
+        .header-subtitle {
+            font-family: var(--font-sans);
+            font-size: 0.78em;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--text-muted);
+            margin-bottom: var(--sp-6);
+        }
+
+        /* Meta line with yellow bullets */
+        .header-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            font-family: var(--font-sans);
+            font-size: 0.72em;
+            color: var(--text-muted);
+            letter-spacing: 0.04em;
+        }
+
+        .meta-dot {
+            width: 4px;
+            height: 4px;
+            background: var(--mono-yellow);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* Refined divider: thin line + centered dot */
+        .refined-divider {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            margin: var(--sp-8) 0;
+        }
+
+        .refined-divider .line {
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .refined-divider .dot {
+            width: 6px;
+            height: 6px;
+            background: var(--mono-yellow);
+            border-radius: 50%;
+            margin: 0 var(--sp-4);
+            flex-shrink: 0;
+        }
+
+        /* ==========================================================
+         * EXECUTIVE SUMMARY — Editor's Note Box
+         * ========================================================== */
+        .editors-note {
+            margin-bottom: var(--sp-16);
+            padding: var(--sp-8);
+            background: var(--bg-card);
+            border-left: 4px solid var(--mono-yellow);
+            box-shadow: var(--shadow-card);
+            position: relative;
+        }
+
+        .editors-note::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--mono-yellow-pale) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .editors-note-label {
+            font-family: var(--font-sans);
+            font-size: 0.62em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--text-muted);
+            margin-bottom: var(--sp-4);
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+        }
+
+        .editors-note-label::before {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 2px;
+            background: var(--mono-yellow);
+        }
+
+        .editors-note p {
+            font-family: var(--font-serif);
+            font-size: 0.95em;
+            color: var(--text-secondary);
+            line-height: 1.85;
+            margin-bottom: var(--sp-3);
+        }
+
+        .editors-note p:last-child { margin-bottom: 0; }
+
+        .editors-note strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .editors-note code {
+            font-family: var(--font-mono);
+            background: var(--mono-yellow-dim);
+            padding: 1px 6px;
+            border-radius: 3px;
+            font-size: 0.88em;
+            color: var(--text-primary);
+        }
+
+        /* ==========================================================
+         * SECTION — Magazine Chapter Heading
+         * ========================================================== */
+        .section {
+            margin-bottom: var(--sp-16);
+        }
+
+        .section-header {
+            margin-bottom: var(--sp-6);
+            padding-bottom: var(--sp-4);
+            border-bottom: 2px solid var(--text-primary);
+            display: flex;
+            align-items: baseline;
+            gap: var(--sp-3);
+        }
+
+        .section-number {
+            font-family: var(--font-display);
+            font-size: 2.2em;
+            font-weight: 400;
+            color: var(--mono-yellow);
+            line-height: 1;
+            min-width: 40px;
+        }
+
+        .section-title-group {
+            flex: 1;
+        }
+
+        .section-title {
+            font-family: var(--font-sans);
+            font-size: 0.88em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--text-primary);
+            margin-bottom: var(--sp-1);
+        }
+
+        .section-subtitle {
+            font-family: var(--font-sans);
+            font-size: 0.65em;
+            color: var(--text-muted);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .section-count {
+            font-family: var(--font-sans);
+            font-size: 0.65em;
+            font-weight: 600;
+            color: var(--text-primary);
+            background: var(--mono-yellow);
+            padding: 2px 10px;
+            letter-spacing: 0.06em;
+        }
+
+        /* ==========================================================
+         * ARTICLE — Monocle Editorial Article Card
+         * ========================================================== */
+        .article-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--sp-6);
+        }
+
+        .article {
+            padding: var(--sp-5) 0;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+        }
+
+        .article:last-child {
+            border-bottom: none;
+        }
+
+        /* Must-read articles */
+        .article.must-read {
+            padding: var(--sp-5) var(--sp-5);
+            margin: 0 calc(-1 * var(--sp-5));
+            background: var(--priority-must-bg);
+            border: 1px solid var(--priority-must-border);
+            border-bottom: 1px solid var(--priority-must-border);
+        }
+
+        /* Article number reference (Monocle style) */
+        .article-ref {
+            font-family: var(--font-display);
+            font-size: 0.72em;
+            color: var(--text-light);
+            margin-bottom: var(--sp-2);
+            letter-spacing: 0.04em;
+        }
+
+        .article-headline {
+            font-family: var(--font-serif);
+            font-size: 1.12em;
+            font-weight: 700;
+            line-height: 1.45;
+            margin-bottom: var(--sp-3);
+            color: var(--text-primary);
+        }
+
+        .article-headline a {
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--mono-yellow);
+            transition: border-color 0.2s;
+        }
+        .article-headline a:hover {
+            border-bottom-color: var(--text-primary);
+        }
+
+        .must-read .article-headline a {
+            color: var(--priority-must);
+            border-bottom-color: var(--priority-must-border);
+        }
+
+        .editors-pick-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-family: var(--font-sans);
+            font-size: 0.55em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--priority-must);
+            background: var(--bg-card);
+            border: 1px solid var(--priority-must-border);
+            padding: 2px 10px;
+            margin-left: var(--sp-2);
+            vertical-align: middle;
+        }
+
+        .editors-pick-badge .pick-dot {
+            width: 5px; height: 5px;
+            background: var(--priority-must);
+            border-radius: 50%;
+        }
+
+        .article-detail {
+            font-family: var(--font-sans);
+            font-size: 0.88em;
+            color: var(--text-body);
+            line-height: 1.75;
+            margin-bottom: var(--sp-3);
+        }
+
+        .article-detail strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .article-detail code {
+            font-family: var(--font-mono);
+            background: var(--mono-yellow-dim);
+            padding: 1px 6px;
+            border-radius: 3px;
+            font-size: 0.88em;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        /* Article meta footer */
+        .article-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            font-size: 0.7em;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+        }
+
+        .article-source {
+            font-family: var(--font-sans);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-secondary);
+            background: var(--mono-yellow-dim);
+            padding: 2px 8px;
+        }
+
+        .article-tags {
+            display: flex;
+            gap: var(--sp-2);
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            font-family: var(--font-sans);
+            font-size: 0.95em;
+            color: var(--text-muted);
+            padding: 1px 0;
+            border-bottom: 1px dotted var(--border-medium);
+        }
+
+        .article-priority {
+            font-size: 1.1em;
+        }
+
+        /* ==========================================================
+         * EDITOR'S PICK SIDEBAR — Featured Article Callout
+         * ========================================================== */
+        .editors-pick-box {
+            background: var(--bg-card);
+            border: 2px solid var(--mono-yellow);
+            padding: var(--sp-6);
+            margin: var(--sp-6) 0;
+            position: relative;
+        }
+
+        .editors-pick-box::before {
+            content: "EDITOR'S PICK";
+            position: absolute;
+            top: -10px;
+            left: var(--sp-5);
+            background: var(--mono-yellow);
+            padding: 2px 14px;
+            font-family: var(--font-sans);
+            font-size: 0.6em;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--text-primary);
+        }
+
+        .editors-pick-box .pick-headline {
+            font-family: var(--font-serif);
+            font-size: 1.05em;
+            font-weight: 700;
+            line-height: 1.45;
+            color: var(--text-primary);
+            margin-bottom: var(--sp-2);
+        }
+
+        .editors-pick-box .pick-headline a {
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--mono-yellow);
+        }
+
+        .editors-pick-box .pick-detail {
+            font-size: 0.85em;
+            color: var(--text-body);
+            line-height: 1.72;
+            margin-bottom: var(--sp-3);
+        }
+
+        .editors-pick-box .pick-detail strong {
+            color: var(--text-primary);
+        }
+
+        .editors-pick-box .pick-detail code {
+            font-family: var(--font-mono);
+            background: var(--mono-yellow-dim);
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-size: 0.88em;
+        }
+
+        .editors-pick-box .pick-source {
+            font-family: var(--font-sans);
+            font-size: 0.68em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+        }
+
+        /* Image placeholder (rounded rectangle) */
+        .img-placeholder {
+            width: 100%;
+            height: 120px;
+            background:
+                linear-gradient(135deg, var(--bg-surface) 0%, var(--bg-hover) 100%);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--sp-4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            color: var(--text-light);
+            border: 1px dashed var(--border);
+        }
+
+        /* ==========================================================
+         * SECTION DIVIDER — Refined line + dot
+         * ========================================================== */
+        .section-break {
+            display: flex;
+            align-items: center;
+            margin: var(--sp-12) 0;
+        }
+
+        .section-break .line {
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .section-break .dot {
+            width: 6px;
+            height: 6px;
+            background: var(--mono-yellow);
+            border-radius: 50%;
+            margin: 0 var(--sp-5);
+            flex-shrink: 0;
+        }
+
+        /* ==========================================================
+         * FOOTER — Magazine Subscription CTA
+         * ========================================================== */
+        .footer {
+            margin-top: var(--sp-20);
+            text-align: center;
+        }
+
+        .footer-divider {
+            display: flex;
+            align-items: center;
+            margin-bottom: var(--sp-10);
+        }
+
+        .footer-divider .line {
+            flex: 1;
+            height: 1px;
+            background: var(--border-medium);
+        }
+
+        .footer-divider .diamond {
+            width: 8px;
+            height: 8px;
+            background: var(--mono-yellow);
+            transform: rotate(45deg);
+            margin: 0 var(--sp-4);
+        }
+
+        /* Subscription CTA box */
+        .subscribe-box {
+            background: var(--bg-card);
+            border: 2px solid var(--text-primary);
+            padding: var(--sp-10) var(--sp-8);
+            margin-bottom: var(--sp-8);
+            position: relative;
+        }
+
+        .subscribe-box::before {
+            content: '';
+            position: absolute;
+            top: -1px; left: var(--sp-6); right: var(--sp-6);
+            height: 4px;
+            background: var(--mono-yellow);
+        }
+
+        .subscribe-title {
+            font-family: var(--font-display);
+            font-size: 1.6em;
+            font-weight: 400;
+            color: var(--text-primary);
+            margin-bottom: var(--sp-3);
+            letter-spacing: -0.01em;
+        }
+
+        .subscribe-text {
+            font-family: var(--font-sans);
+            font-size: 0.82em;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: var(--sp-6);
+            max-width: 420px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .subscribe-stats {
+            display: flex;
+            justify-content: center;
+            gap: var(--sp-8);
+            margin-bottom: var(--sp-6);
+        }
+
+        .sub-stat {
+            text-align: center;
+        }
+
+        .sub-stat-num {
+            font-family: var(--font-display);
+            font-size: 1.5em;
+            font-weight: 400;
+            color: var(--text-primary);
+            display: block;
+        }
+
+        .sub-stat-label {
+            font-family: var(--font-sans);
+            font-size: 0.6em;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--text-muted);
+        }
+
+        .subscribe-btn {
+            display: inline-block;
+            padding: var(--sp-3) var(--sp-8);
+            background: var(--text-primary);
+            color: var(--bg-primary);
+            font-family: var(--font-sans);
+            font-size: 0.78em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .subscribe-btn:hover {
+            background: var(--mono-yellow);
+            color: var(--text-primary);
+        }
+
+        /* Colophon */
+        .colophon {
+            font-family: var(--font-sans);
+            font-size: 0.65em;
+            color: var(--text-light);
+            letter-spacing: 0.06em;
+            margin-bottom: var(--sp-2);
+        }
+
+        .colophon-brand {
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--text-muted);
+        }
+
+        .colophon-powered {
+            font-size: 0.58em;
+            color: var(--text-light);
+        }
+
+        /* ==========================================================
+         * PRINT / PDF
+         * ========================================================== */
+        @media print {
+            body {
+                background: #FFFFFF !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .container {
+                max-width: 100%;
+                padding: 0;
+            }
+            .article {
+                break-inside: avoid;
+            }
+            .article.must-read {
+                background: var(--priority-must-bg) !important;
+            }
+            .editors-pick-box {
+                break-inside: avoid;
+            }
+            .subscribe-box {
+                break-inside: avoid;
+            }
+            .ribbon {
+                background: var(--mono-yellow) !important;
+            }
+            a {
+                color: var(--text-primary) !important;
+                border-bottom: 1px solid var(--border) !important;
+            }
+            *, *::before, *::after {
+                animation-duration: 0s !important;
+                transition-duration: 0s !important;
+            }
+        }
+
+        /* ==========================================================
+         * RESPONSIVE
+         * ========================================================== */
+        @media (max-width: 700px) {
+            .container {
+                padding: var(--sp-5) var(--sp-4);
+            }
+            .header-title {
+                font-size: 2.1em;
+            }
+            .ribbon {
+                padding: var(--sp-2) var(--sp-4);
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--sp-1);
+            }
+            .section-header {
+                flex-wrap: wrap;
+                gap: var(--sp-2);
+            }
+            .section-number {
+                font-size: 1.8em;
+                min-width: 32px;
+            }
+            .article.must-read {
+                margin: 0 calc(-1 * var(--sp-3));
+                padding: var(--sp-4) var(--sp-3);
+            }
+            .editors-pick-box {
+                padding: var(--sp-4);
+            }
+            .subscribe-box {
+                padding: var(--sp-6) var(--sp-4);
+            }
+            .subscribe-stats { gap: var(--sp-5); }
+        }
+
+        @media (max-width: 380px) {
+            html { font-size: 14px; }
+            .header-title { font-size: 1.8em; }
+            .section-number { font-size: 1.5em; }
+            .article-headline { font-size: 1em; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- ====== HEADER: Monocle Yellow Ribbon + Title ====== -->
+        <header class="header">
+            <!-- Yellow ribbon -->
+            <div class="ribbon">
+                <span class="ribbon-brand">◆ Newsloom</span>
+                <span class="ribbon-issue">Issue {{ date_str.replace('-', '') }} · Daily Intelligence</span>
+            </div>
+
+            <h1 class="header-title">Intelligence<br>Briefing</h1>
+            <div class="header-subtitle">Technology · Markets · Global Affairs</div>
+
+            {% set ns = namespace(must_count=0, section_count=0) %}
+            {% for section in section_order %}
+                {% if section in briefs and briefs[section] is iterable and briefs[section] is not string and briefs[section]|length > 0 %}
+                    {% set ns.section_count = ns.section_count + 1 %}
+                    {% for item in briefs[section] %}
+                        {% if item.priority == '🔴' %}
+                            {% set ns.must_count = ns.must_count + 1 %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+
+            <div class="header-meta">
+                <span>{{ date_str }}</span>
+                <span class="meta-dot"></span>
+                <span>{{ generated_time }}</span>
+                <span class="meta-dot"></span>
+                <span>{{ total_items }} articles curated</span>
+                {% if ns.must_count > 0 %}
+                <span class="meta-dot"></span>
+                <span>{{ ns.must_count }} editor's picks</span>
+                {% endif %}
+            </div>
+        </header>
+
+        <!-- Refined divider -->
+        <div class="refined-divider">
+            <span class="line"></span>
+            <span class="dot"></span>
+            <span class="line"></span>
+        </div>
+
+        <!-- ====== EDITOR'S NOTE (Executive Summary) ====== -->
+        {% if executive_summary %}
+        <section class="editors-note">
+            <div class="editors-note-label">Editor's Note</div>
+            {% for line in executive_summary.strip().split('\n') %}
+                {% if line.strip() %}
+                <p>{{ line.strip() | md_inline }}</p>
+                {% endif %}
+            {% endfor %}
+        </section>
+        {% endif %}
+
+        <!-- ====== SECTIONS ====== -->
+        {% set counter = namespace(section_num=0, article_num=0, first_must_shown=false) %}
+        {% for section in section_order %}
+            {% if section in briefs and briefs[section] is iterable and briefs[section] is not string and briefs[section]|length > 0 %}
+                {% set meta = section_configs.get(section, {}) %}
+                {% set section_color = meta.get('color', '#F5D300') %}
+                {% set section_briefs = briefs[section] %}
+                {% set counter.section_num = counter.section_num + 1 %}
+
+                <!-- Section break (between sections) -->
+                {% if counter.section_num > 1 %}
+                <div class="section-break">
+                    <span class="line"></span>
+                    <span class="dot"></span>
+                    <span class="line"></span>
+                </div>
+                {% endif %}
+
+                <section class="section">
+                    <!-- Chapter heading -->
+                    <header class="section-header">
+                        <span class="section-number" style="color: {{ section_color }};">
+                            {{ '%02d' | format(counter.section_num) }}
+                        </span>
+                        <div class="section-title-group">
+                            <div class="section-title">{{ meta.get('emoji', '📌') }} {{ meta.get('title', section|title) }}</div>
+                            <div class="section-subtitle">{{ section_briefs|length }} article{{ 's' if section_briefs|length > 1 else '' }} in this section</div>
+                        </div>
+                        <span class="section-count">{{ section_briefs|length }}</span>
+                    </header>
+
+                    <div class="article-list">
+                        {% for brief in section_briefs %}
+                            {% set counter.article_num = counter.article_num + 1 %}
+                            {% set priority_class = 'must-read' if brief.priority == '🔴' else ('recommended' if brief.priority == '🟡' else 'fyi') %}
+
+                            {# Editor's Pick box for first must-read in each section #}
+                            {% if brief.priority == '🔴' and not counter.first_must_shown %}
+                                {% set counter.first_must_shown = true %}
+                                <div class="editors-pick-box">
+                                    <div class="img-placeholder">{{ meta.get('emoji', '📌') }}</div>
+                                    <div class="pick-headline">
+                                        <a href="{{ brief.url }}" target="_blank">{{ brief.headline }}</a>
+                                    </div>
+                                    {% if brief.detail %}
+                                    <div class="pick-detail">{{ brief.detail | md_inline }}</div>
+                                    {% endif %}
+                                    <div class="pick-source">
+                                        {{ brief.source }}
+                                        {% if brief.tags %}
+                                        · {% for tag in brief.tags %}{{ tag }}{% if not loop.last %} {% endif %}{% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% else %}
+                                <article class="article {{ priority_class }}">
+                                    <div class="article-ref">№ {{ counter.article_num }}</div>
+                                    <h3 class="article-headline">
+                                        <a href="{{ brief.url }}" target="_blank">{{ brief.headline }}</a>
+                                        {% if brief.priority == '🔴' %}
+                                        <span class="editors-pick-badge"><span class="pick-dot"></span> Editor's Pick</span>
+                                        {% endif %}
+                                    </h3>
+                                    {% if brief.detail %}
+                                    <div class="article-detail">
+                                        {{ brief.detail | md_inline }}
+                                    </div>
+                                    {% endif %}
+                                    <footer class="article-meta">
+                                        <span class="article-priority">{{ brief.priority }}</span>
+                                        <span class="article-source">{{ brief.source }}</span>
+                                        {% if brief.tags %}
+                                        <div class="article-tags">
+                                            {% for tag in brief.tags %}
+                                            <span class="tag">{{ tag }}</span>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </footer>
+                                </article>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endif %}
+        {% endfor %}
+
+        <!-- ====== FOOTER: Magazine CTA + Colophon ====== -->
+        <footer class="footer">
+            <div class="footer-divider">
+                <span class="line"></span>
+                <span class="diamond"></span>
+                <span class="line"></span>
+            </div>
+
+            <!-- Subscription CTA -->
+            <div class="subscribe-box">
+                <div class="subscribe-title">Subscribe to Newsloom</div>
+                <div class="subscribe-text">
+                    A daily intelligence briefing curated for discerning readers.
+                    Technology, markets, and the ideas shaping our world — distilled to what matters.
+                </div>
+                <div class="subscribe-stats">
+                    {% if stats and stats.sections %}
+                    <div class="sub-stat">
+                        <span class="sub-stat-num">{{ stats.get('total_input', '—') }}</span>
+                        <span class="sub-stat-label">Sources Scanned</span>
+                    </div>
+                    {% endif %}
+                    <div class="sub-stat">
+                        <span class="sub-stat-num">{{ total_items }}</span>
+                        <span class="sub-stat-label">Articles Curated</span>
+                    </div>
+                    <div class="sub-stat">
+                        <span class="sub-stat-num">{{ ns.section_count }}</span>
+                        <span class="sub-stat-label">Sections</span>
+                    </div>
+                </div>
+                <div class="subscribe-btn">Subscribe Now</div>
+            </div>
+
+            <div class="colophon">
+                <span class="colophon-brand">◆ Newsloom Intelligence</span>
+            </div>
+            <div class="colophon">
+                Generated {{ generated_time }} · Monocle Refined v2.0
+            </div>
+            <div class="colophon-powered">
+                Powered by Newsloom · AI-curated intelligence
+            </div>
+        </footer>
+
+    </div>
+</body>
+</html>

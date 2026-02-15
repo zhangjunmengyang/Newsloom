@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>r/newsloom · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * REDDIT THREAD — Reddit Post Browsing Interface
+         * ============================================================
+         * Reddit gray #DAE0E6 · Reddit orange #FF4500 · Dark nav #1A1A1B
+         * Post cards with vote columns · Hot/New/Top sort tabs
+         * Award icons for must-read · Subreddit sections · Sidebar
+         * Authentic new.reddit.com light mode aesthetic
+         * ============================================================ */
+
+        /* --- Design Tokens --- */
+        :root {
+            /* Reddit Background */
+            --bg-canvas:        #DAE0E6;
+            --bg-card:          #FFFFFF;
+            --bg-card-hover:    #FAFAFA;
+            --bg-nav:           #FFFFFF;
+            --bg-nav-dark:      #1A1A1B;
+            --bg-input:         #F6F7F8;
+            --bg-sidebar:       #FFFFFF;
+            --bg-vote:          #F8F9FA;
+
+            /* Reddit Brand */
+            --reddit-orange:    #FF4500;
+            --reddit-orange-lt: #FF6314;
+            --reddit-orange-dim: rgba(255, 69, 0, 0.08);
+            --reddit-blue:      #0079D3;
+            --reddit-blue-dim:  rgba(0, 121, 211, 0.08);
+            --reddit-green:     #46D160;
+            --reddit-purple:    #7C3AED;
+            --reddit-gold:      #FFB000;
+
+            /* Text */
+            --text-primary:     #1C1C1C;
+            --text-secondary:   #3C3C3C;
+            --text-muted:       #7C7C7C;
+            --text-dim:         #ABABAB;
+            --text-white:       #FFFFFF;
+            --text-link:        #0079D3;
+            --text-meta:        #878A8C;
+
+            /* Voting */
+            --upvote:           #FF4500;
+            --upvote-bg:        rgba(255, 69, 0, 0.06);
+            --downvote:         #7193FF;
+            --downvote-bg:      rgba(113, 147, 255, 0.06);
+            --vote-neutral:     #878A8C;
+
+            /* Borders */
+            --border-card:      #EDEFF1;
+            --border-light:     #EDEFF1;
+            --border-dark:      #343536;
+
+            /* Awards */
+            --award-gold:       #FFB000;
+            --award-silver:     #C0C0C0;
+            --award-plat:       #A0E7E5;
+
+            /* Radius */
+            --radius-card:      4px;
+            --radius-btn:       20px;
+            --radius-sm:        4px;
+            --radius-tag:       12px;
+
+            /* Spacing */
+            --sp-xs:            4px;
+            --sp-sm:            8px;
+            --sp-md:            12px;
+            --sp-lg:            16px;
+            --sp-xl:            20px;
+            --sp-xxl:           24px;
+        }
+
+        /* --- Reset --- */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 14px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family:
+                -apple-system, BlinkMacSystemFont, "Segoe UI",
+                "Noto Sans SC", "PingFang SC", "Hiragino Sans GB",
+                "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+
+            /* Reddit canvas with subtle noise texture */
+            background-color: var(--bg-canvas);
+            background-image:
+                /* Subtle dot grid pattern */
+                radial-gradient(
+                    circle,
+                    rgba(0, 0, 0, 0.03) 1px,
+                    transparent 1px
+                ),
+                /* Gentle vertical stripes */
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 79px,
+                    rgba(0, 0, 0, 0.008) 79px,
+                    rgba(0, 0, 0, 0.008) 80px
+                );
+            background-size: 20px 20px, 80px 80px;
+        }
+
+        a {
+            color: var(--text-link);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* ============================================================
+         * TOP NAVIGATION BAR — Reddit-style header
+         * ============================================================ */
+        .reddit-nav {
+            background: var(--bg-nav);
+            border-bottom: 1px solid var(--border-light);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            padding: 0 var(--sp-xl);
+            gap: var(--sp-lg);
+        }
+
+        /* Reddit logo area */
+        .reddit-logo {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-sm);
+            flex-shrink: 0;
+        }
+
+        .reddit-logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--reddit-orange);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .reddit-logo-text {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        /* Search bar */
+        .reddit-search {
+            flex: 1;
+            max-width: 600px;
+            height: 36px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-btn);
+            display: flex;
+            align-items: center;
+            padding: 0 var(--sp-lg);
+            gap: var(--sp-sm);
+            color: var(--text-muted);
+            font-size: 0.92rem;
+        }
+
+        .reddit-search-icon {
+            font-size: 1rem;
+            opacity: 0.5;
+        }
+
+        .reddit-search-text {
+            color: var(--text-dim);
+        }
+
+        /* Nav actions */
+        .reddit-nav-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-md);
+            flex-shrink: 0;
+        }
+
+        .reddit-nav-btn {
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: var(--sp-xs) var(--sp-sm);
+            border-radius: var(--radius-sm);
+        }
+
+        .reddit-user-btn {
+            background: var(--reddit-orange);
+            color: white;
+            border: none;
+            padding: 4px 14px;
+            border-radius: var(--radius-btn);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            letter-spacing: 0.02em;
+        }
+
+        /* ============================================================
+         * SUBREDDIT HEADER — r/newsloom community header
+         * ============================================================ */
+        .subreddit-header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-light);
+            padding: 0;
+        }
+
+        .subreddit-banner {
+            height: 80px;
+            background: linear-gradient(
+                135deg,
+                var(--reddit-orange),
+                #FF6B35,
+                #FF8C42
+            );
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Banner texture pattern */
+        .subreddit-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 20px,
+                    rgba(255, 255, 255, 0.03) 20px,
+                    rgba(255, 255, 255, 0.03) 21px
+                );
+        }
+
+        .subreddit-info {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0 var(--sp-lg);
+            display: flex;
+            align-items: flex-end;
+            gap: var(--sp-lg);
+            transform: translateY(-16px);
+        }
+
+        .subreddit-avatar {
+            width: 72px;
+            height: 72px;
+            background: var(--bg-card);
+            border: 4px solid var(--bg-card);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+
+        .subreddit-details {
+            padding-bottom: var(--sp-sm);
+            flex: 1;
+        }
+
+        .subreddit-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+
+        .subreddit-fullname {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .subreddit-stats {
+            display: flex;
+            gap: var(--sp-xl);
+            margin-top: var(--sp-sm);
+            font-size: 0.85rem;
+            color: var(--text-meta);
+        }
+
+        .subreddit-stat-val {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .subreddit-join-btn {
+            background: var(--reddit-blue);
+            color: white;
+            border: none;
+            padding: 6px 20px;
+            border-radius: var(--radius-btn);
+            font-size: 0.92rem;
+            font-weight: 700;
+            cursor: pointer;
+            flex-shrink: 0;
+            align-self: center;
+            letter-spacing: 0.02em;
+        }
+
+        /* ============================================================
+         * PAGE LAYOUT — Feed + Sidebar
+         * ============================================================ */
+        .page-layout {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: var(--sp-xl) var(--sp-lg);
+            display: flex;
+            gap: var(--sp-xxl);
+            align-items: flex-start;
+        }
+
+        .feed-column {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .sidebar-column {
+            width: 312px;
+            flex-shrink: 0;
+        }
+
+        /* ============================================================
+         * SORT TABS — Hot / New / Top / Rising
+         * ============================================================ */
+        .sort-tabs {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-card);
+            padding: var(--sp-md) var(--sp-lg);
+            margin-bottom: var(--sp-lg);
+            display: flex;
+            gap: var(--sp-sm);
+        }
+
+        .sort-tab {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: var(--radius-btn);
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .sort-tab:hover {
+            background: var(--bg-input);
+        }
+
+        .sort-tab--active {
+            background: var(--reddit-blue-dim);
+            color: var(--reddit-blue);
+        }
+
+        .sort-tab-icon {
+            font-size: 1.1rem;
+        }
+
+        /* ============================================================
+         * EXECUTIVE SUMMARY — Pinned mod post
+         * ============================================================ */
+        .pinned-post {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-card);
+            margin-bottom: var(--sp-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pinned-post::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--reddit-green);
+        }
+
+        .pinned-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--reddit-green);
+            padding: var(--sp-md) var(--sp-lg);
+            padding-bottom: 0;
+        }
+
+        .pinned-badge-icon {
+            font-size: 0.9rem;
+        }
+
+        .pinned-content {
+            padding: var(--sp-sm) var(--sp-lg) var(--sp-lg);
+        }
+
+        .pinned-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--sp-sm);
+        }
+
+        .pinned-text {
+            font-size: 0.92rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+
+        .pinned-meta {
+            padding: var(--sp-sm) var(--sp-lg);
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            gap: var(--sp-lg);
+            font-size: 0.78rem;
+            color: var(--text-meta);
+            font-weight: 700;
+        }
+
+        .pinned-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* ============================================================
+         * SECTION HEADER — Subreddit section divider
+         * ============================================================ */
+        .section-divider {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-card);
+            padding: var(--sp-md) var(--sp-lg);
+            margin-bottom: var(--sp-md);
+            margin-top: var(--sp-xl);
+            display: flex;
+            align-items: center;
+            gap: var(--sp-md);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-divider::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+        }
+
+        .section-icon {
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+
+        .section-info {
+            flex: 1;
+        }
+
+        .section-name {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .section-sub {
+            font-size: 0.78rem;
+            color: var(--text-meta);
+            margin-top: 2px;
+        }
+
+        .section-flair {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: var(--radius-tag);
+            color: white;
+        }
+
+        /* ============================================================
+         * POST CARD — The core Reddit post unit
+         * ============================================================ */
+        .post-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-card);
+            margin-bottom: var(--sp-sm);
+            display: flex;
+            transition: border-color 0.15s;
+            overflow: hidden;
+        }
+
+        .post-card:hover {
+            border-color: #898989;
+        }
+
+        /* --- Vote Column --- */
+        .post-vote {
+            width: 40px;
+            background: var(--bg-vote);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: var(--sp-md) var(--sp-xs);
+            gap: 2px;
+            flex-shrink: 0;
+            border-right: 1px solid var(--border-light);
+        }
+
+        .vote-btn {
+            font-size: 1.1rem;
+            cursor: pointer;
+            user-select: none;
+            color: var(--vote-neutral);
+            transition: color 0.15s;
+            line-height: 1;
+            padding: 2px;
+        }
+
+        .vote-btn--up:hover {
+            color: var(--upvote);
+        }
+
+        .vote-btn--down:hover {
+            color: var(--downvote);
+        }
+
+        .vote-count {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            min-width: 20px;
+            text-align: center;
+            line-height: 1;
+            padding: 2px 0;
+        }
+
+        /* --- Post Body --- */
+        .post-body {
+            flex: 1;
+            padding: var(--sp-md);
+            min-width: 0;
+        }
+
+        /* Post header meta */
+        .post-header {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--sp-xs);
+            margin-bottom: var(--sp-sm);
+            font-size: 0.78rem;
+            color: var(--text-meta);
+        }
+
+        .post-subreddit {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .post-subreddit:hover {
+            text-decoration: underline;
+        }
+
+        .post-author {
+            color: var(--text-meta);
+        }
+
+        .post-time {
+            color: var(--text-dim);
+        }
+
+        /* Post flair / priority tag */
+        .post-flair {
+            font-size: 0.71rem;
+            font-weight: 600;
+            padding: 1px 8px;
+            border-radius: var(--radius-tag);
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .post-flair--hot {
+            background: var(--reddit-orange-dim);
+            color: var(--reddit-orange);
+        }
+
+        .post-flair--mid {
+            background: rgba(255, 176, 0, 0.1);
+            color: #D4920A;
+        }
+
+        .post-flair--low {
+            background: rgba(70, 209, 96, 0.08);
+            color: #2E8B40;
+        }
+
+        /* Award badge for must-read */
+        .post-award {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 0.78rem;
+            color: var(--award-gold);
+            margin-left: var(--sp-xs);
+        }
+
+        .post-award-icon {
+            font-size: 0.92rem;
+        }
+
+        /* Post title */
+        .post-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            line-height: 1.45;
+            margin-bottom: var(--sp-sm);
+            word-wrap: break-word;
+        }
+
+        .post-title a {
+            color: inherit;
+        }
+
+        .post-title a:hover {
+            text-decoration: none;
+            color: var(--reddit-blue);
+        }
+
+        /* Post detail/body */
+        .post-detail {
+            font-size: 0.92rem;
+            line-height: 1.65;
+            color: var(--text-secondary);
+            margin-bottom: var(--sp-md);
+            word-wrap: break-word;
+        }
+
+        .post-detail strong {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .post-detail em {
+            font-style: italic;
+        }
+
+        .post-detail code {
+            font-family: "SF Mono", "Fira Code", monospace;
+            font-size: 0.88em;
+            background: var(--bg-input);
+            padding: 1px 4px;
+            border-radius: 3px;
+            color: var(--reddit-orange);
+        }
+
+        /* Source link */
+        .post-source-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.78rem;
+            color: var(--text-link);
+            margin-bottom: var(--sp-md);
+        }
+
+        .post-source-link:hover {
+            text-decoration: underline;
+        }
+
+        .post-domain {
+            color: var(--text-meta);
+            font-size: 0.78rem;
+        }
+
+        /* Post tags */
+        .post-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--sp-xs);
+            margin-bottom: var(--sp-md);
+        }
+
+        .post-tag {
+            font-size: 0.71rem;
+            color: var(--text-meta);
+            background: var(--bg-input);
+            padding: 2px 8px;
+            border-radius: var(--radius-tag);
+            display: inline-block;
+        }
+
+        /* --- Action Bar --- */
+        .post-actions {
+            display: flex;
+            gap: var(--sp-xs);
+            margin-top: var(--sp-sm);
+            border-top: 1px solid var(--border-light);
+            padding-top: var(--sp-sm);
+        }
+
+        .post-action-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 2px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-meta);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .post-action-btn:hover {
+            background: var(--bg-input);
+        }
+
+        .post-action-icon {
+            font-size: 1rem;
+        }
+
+        /* ============================================================
+         * SIDEBAR — Community info, rules, links
+         * ============================================================ */
+        .sidebar-card {
+            background: var(--bg-sidebar);
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-card);
+            margin-bottom: var(--sp-lg);
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            background: var(--reddit-blue);
+            color: var(--text-white);
+            padding: var(--sp-md) var(--sp-lg);
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        .sidebar-header--orange {
+            background: var(--reddit-orange);
+        }
+
+        .sidebar-body {
+            padding: var(--sp-lg);
+        }
+
+        .sidebar-description {
+            font-size: 0.92rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            margin-bottom: var(--sp-lg);
+        }
+
+        .sidebar-stat-row {
+            display: flex;
+            justify-content: space-around;
+            padding: var(--sp-md) 0;
+            border-top: 1px solid var(--border-light);
+            margin-top: var(--sp-md);
+        }
+
+        .sidebar-stat {
+            text-align: center;
+        }
+
+        .sidebar-stat-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: block;
+        }
+
+        .sidebar-stat-label {
+            font-size: 0.71rem;
+            color: var(--text-meta);
+            display: block;
+            margin-top: 2px;
+        }
+
+        .sidebar-rule {
+            padding: var(--sp-sm) var(--sp-lg);
+            border-bottom: 1px solid var(--border-light);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: flex-start;
+            gap: var(--sp-sm);
+        }
+
+        .sidebar-rule:last-child {
+            border-bottom: none;
+        }
+
+        .sidebar-rule-num {
+            font-weight: 700;
+            color: var(--text-meta);
+            flex-shrink: 0;
+            min-width: 18px;
+        }
+
+        /* Sidebar section list */
+        .sidebar-sections {
+            list-style: none;
+        }
+
+        .sidebar-section-item {
+            padding: var(--sp-sm) var(--sp-lg);
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            gap: var(--sp-sm);
+            font-size: 0.85rem;
+        }
+
+        .sidebar-section-item:last-child {
+            border-bottom: none;
+        }
+
+        .sidebar-section-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .sidebar-section-name {
+            flex: 1;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .sidebar-section-count {
+            font-size: 0.78rem;
+            color: var(--text-meta);
+        }
+
+        /* ============================================================
+         * FOOTER — Reddit bottom bar
+         * ============================================================ */
+        .reddit-footer {
+            text-align: center;
+            padding: var(--sp-xxl) var(--sp-lg);
+            color: var(--text-dim);
+            font-size: 0.78rem;
+        }
+
+        .reddit-footer-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: var(--sp-md);
+            margin-bottom: var(--sp-md);
+        }
+
+        .reddit-footer-link {
+            color: var(--text-meta);
+            font-size: 0.78rem;
+        }
+
+        .reddit-footer-link:hover {
+            color: var(--text-primary);
+        }
+
+        .reddit-footer-brand {
+            color: var(--text-dim);
+            margin-top: var(--sp-sm);
+        }
+
+        /* ============================================================
+         * PRINT STYLES
+         * ============================================================ */
+        @media print {
+            @page {
+                margin: 1.5cm;
+                size: A4;
+            }
+
+            body {
+                background: white !important;
+                background-image: none !important;
+                font-size: 10pt;
+            }
+
+            .reddit-nav {
+                position: static;
+                border-bottom: 2px solid #333;
+            }
+
+            .subreddit-banner {
+                height: 20px;
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+
+            .page-layout {
+                display: block;
+                max-width: 100%;
+            }
+
+            .sidebar-column {
+                display: none;
+            }
+
+            .post-card {
+                break-inside: avoid;
+                page-break-inside: avoid;
+                border: 1px solid #ccc !important;
+                margin-bottom: 8px;
+            }
+
+            .post-card:hover {
+                border-color: #ccc !important;
+            }
+
+            .post-vote {
+                background: #f5f5f5 !important;
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+
+            .sort-tabs {
+                display: none;
+            }
+
+            a {
+                color: #000 !important;
+            }
+
+            .post-title a::after {
+                content: none;
+            }
+
+            .reddit-footer {
+                page-break-before: always;
+            }
+        }
+
+        /* ============================================================
+         * RESPONSIVE
+         * ============================================================ */
+        @media (max-width: 960px) {
+            .sidebar-column {
+                display: none;
+            }
+
+            .page-layout {
+                padding: var(--sp-md);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .reddit-nav {
+                padding: 0 var(--sp-md);
+                gap: var(--sp-sm);
+            }
+
+            .reddit-search {
+                display: none;
+            }
+
+            .reddit-logo-text {
+                display: none;
+            }
+
+            .subreddit-info {
+                padding: 0 var(--sp-md);
+                gap: var(--sp-sm);
+            }
+
+            .subreddit-avatar {
+                width: 52px;
+                height: 52px;
+                font-size: 1.5rem;
+            }
+
+            .subreddit-name {
+                font-size: 1.3rem;
+            }
+
+            .subreddit-stats {
+                display: none;
+            }
+
+            .page-layout {
+                padding: var(--sp-sm);
+            }
+
+            .sort-tabs {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .post-vote {
+                width: 32px;
+                padding: var(--sp-sm) 2px;
+            }
+
+            .vote-btn {
+                font-size: 0.92rem;
+            }
+
+            .vote-count {
+                font-size: 0.71rem;
+            }
+
+            .post-body {
+                padding: var(--sp-sm);
+            }
+
+            .post-title {
+                font-size: 1rem;
+            }
+
+            .post-actions {
+                flex-wrap: wrap;
+            }
+
+            .section-divider {
+                padding: var(--sp-sm) var(--sp-md);
+            }
+        }
+
+        @media (max-width: 380px) {
+            .post-vote {
+                width: 28px;
+            }
+
+            .post-title {
+                font-size: 0.92rem;
+            }
+
+            .post-detail {
+                font-size: 0.85rem;
+            }
+
+            .post-actions {
+                gap: 0;
+            }
+
+            .post-action-btn {
+                font-size: 0.71rem;
+                padding: 4px 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================================
+         TOP NAVIGATION BAR
+         ============================================================ -->
+    <nav class="reddit-nav">
+        <div class="reddit-logo">
+            <div class="reddit-logo-icon">r</div>
+            <span class="reddit-logo-text">newsloom</span>
+        </div>
+
+        <div class="reddit-search">
+            <span class="reddit-search-icon">🔍</span>
+            <span class="reddit-search-text">Search r/newsloom</span>
+        </div>
+
+        <div class="reddit-nav-actions">
+            <span class="reddit-nav-btn">📊</span>
+            <span class="reddit-nav-btn">💬</span>
+            <span class="reddit-nav-btn">🔔</span>
+            <span class="reddit-user-btn">{{ date_str }}</span>
+        </div>
+    </nav>
+
+    <!-- ============================================================
+         SUBREDDIT HEADER
+         ============================================================ -->
+    <div class="subreddit-header">
+        <div class="subreddit-banner"></div>
+        <div class="subreddit-info">
+            <div class="subreddit-avatar">📰</div>
+            <div class="subreddit-details">
+                <h1 class="subreddit-name">r/newsloom</h1>
+                <div class="subreddit-fullname">Daily Intelligence Brief · {{ date_str }}</div>
+                <div class="subreddit-stats">
+                    <span>
+                        <span class="subreddit-stat-val">{{ total_items }}</span> posts today
+                    </span>
+                    <span>
+                        <span class="subreddit-stat-val">{{ section_order | length }}</span> sections
+                    </span>
+                    <span>
+                        {%- set ns_must = namespace(count=0) -%}
+                        {%- for sec_key in section_order -%}
+                            {%- for item in briefs.get(sec_key, []) -%}
+                                {%- if item.priority == '🔴' -%}
+                                    {%- set ns_must.count = ns_must.count + 1 -%}
+                                {%- endif -%}
+                            {%- endfor -%}
+                        {%- endfor -%}
+                        <span class="subreddit-stat-val">{{ ns_must.count }}</span> 🏆 awarded
+                    </span>
+                </div>
+            </div>
+            <button class="subreddit-join-btn">Joined</button>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         PAGE LAYOUT — Feed + Sidebar
+         ============================================================ -->
+    <div class="page-layout">
+
+        <!-- ==================== FEED COLUMN ==================== -->
+        <main class="feed-column">
+
+            <!-- Sort Tabs -->
+            <div class="sort-tabs">
+                <span class="sort-tab sort-tab--active">
+                    <span class="sort-tab-icon">🔥</span> Hot
+                </span>
+                <span class="sort-tab">
+                    <span class="sort-tab-icon">✨</span> New
+                </span>
+                <span class="sort-tab">
+                    <span class="sort-tab-icon">📈</span> Top
+                </span>
+                <span class="sort-tab">
+                    <span class="sort-tab-icon">🚀</span> Rising
+                </span>
+            </div>
+
+            <!-- ========== EXECUTIVE SUMMARY — Pinned Post ========== -->
+            {%- if executive_summary %}
+            <div class="pinned-post">
+                <div class="pinned-badge">
+                    <span class="pinned-badge-icon">📌</span>
+                    Pinned by Moderators
+                </div>
+                <div class="pinned-content">
+                    <h2 class="pinned-title">
+                        Daily Brief Executive Summary — {{ date_str }}
+                    </h2>
+                    <div class="pinned-text">
+                        {{ executive_summary | md_inline }}
+                    </div>
+                </div>
+                <div class="pinned-meta">
+                    <span class="pinned-meta-item">
+                        💬 {{ section_order | length }} sections
+                    </span>
+                    <span class="pinned-meta-item">
+                        🔄 Share
+                    </span>
+                    <span class="pinned-meta-item">
+                        ⭐ Save
+                    </span>
+                </div>
+            </div>
+            {%- endif %}
+
+            <!-- ========== SECTIONS & POST CARDS ========== -->
+            {%- set ns_global = namespace(item_num=0, vote_base=180) -%}
+
+            {%- for section_key in section_order -%}
+                {%- set items = briefs.get(section_key, []) -%}
+                {%- if items -%}
+                    {%- set cfg = section_configs.get(section_key, {}) -%}
+                    {%- set sec_color = cfg.color | default('#FF4500') -%}
+
+                    <!-- Section Divider -->
+                    <div class="section-divider" style="border-left: none;" id="section-{{ section_key }}">
+                        <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: {{ sec_color }}; border-radius: var(--radius-card) 0 0 var(--radius-card);"></div>
+                        <span class="section-icon">{{ cfg.emoji | default('📌') }}</span>
+                        <div class="section-info">
+                            <div class="section-name">
+                                r/newsloom · {{ cfg.title | default(section_key) }}
+                            </div>
+                            <div class="section-sub">
+                                {{ items | length }} posts · sorted by Hot
+                            </div>
+                        </div>
+                        <span class="section-flair" style="background: {{ sec_color }};">
+                            {{ items | length }}
+                        </span>
+                    </div>
+
+                    <!-- Post Cards -->
+                    {%- for item in items -%}
+                        {%- set ns_global.item_num = ns_global.item_num + 1 -%}
+                        {%- set is_must_read = (item.priority == '🔴') -%}
+                        {%- set is_mid = (item.priority == '🟡') -%}
+
+                        {# Simulate vote count based on priority #}
+                        {%- if is_must_read -%}
+                            {%- set vote_num = ns_global.vote_base + 100 + (loop.index * 17) -%}
+                        {%- elif is_mid -%}
+                            {%- set vote_num = ns_global.vote_base + 30 + (loop.index * 13) -%}
+                        {%- else -%}
+                            {%- set vote_num = ns_global.vote_base - 20 + (loop.index * 11) -%}
+                        {%- endif -%}
+                        {%- set ns_global.vote_base = ns_global.vote_base - 8 -%}
+
+                        <article class="post-card">
+                            <!-- Vote Column -->
+                            <div class="post-vote"{% if is_must_read %} style="background: {{ sec_color }}08;"{% endif %}>
+                                <span class="vote-btn vote-btn--up">▲</span>
+                                <span class="vote-count"{% if is_must_read %} style="color: var(--upvote);"{% endif %}>
+                                    {{ vote_num }}
+                                </span>
+                                <span class="vote-btn vote-btn--down">▼</span>
+                            </div>
+
+                            <!-- Post Body -->
+                            <div class="post-body">
+
+                                <!-- Post Header -->
+                                <div class="post-header">
+                                    <span class="post-subreddit">r/{{ section_key }}</span>
+                                    <span>·</span>
+                                    <span class="post-author">
+                                        Posted by u/{{ item.source | default('anonymous') | replace(' ', '_') | lower }}
+                                    </span>
+                                    <span>·</span>
+                                    <span class="post-time">{{ date_str }}</span>
+
+                                    {# Priority flair #}
+                                    {%- if is_must_read %}
+                                    <span class="post-flair post-flair--hot">🔴 Must Read</span>
+                                    {%- elif is_mid %}
+                                    <span class="post-flair post-flair--mid">🟡 Notable</span>
+                                    {%- else %}
+                                    <span class="post-flair post-flair--low">🟢 FYI</span>
+                                    {%- endif %}
+
+                                    {# Award for must-read #}
+                                    {%- if is_must_read %}
+                                    <span class="post-award">
+                                        <span class="post-award-icon">🏆</span>
+                                        Award
+                                    </span>
+                                    {%- endif %}
+                                </div>
+
+                                <!-- Post Title -->
+                                <h3 class="post-title">
+                                    {%- if item.url %}
+                                    <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer">
+                                        {{ item.headline }}
+                                    </a>
+                                    {%- else %}
+                                    {{ item.headline }}
+                                    {%- endif %}
+                                </h3>
+
+                                <!-- Source domain -->
+                                {%- if item.url %}
+                                <a href="{{ item.url }}" class="post-source-link" target="_blank" rel="noopener noreferrer">
+                                    🔗 {{ item.source | default('link') }}
+                                    <span class="post-domain">({{ item.url | truncate(40, True) }})</span>
+                                </a>
+                                {%- endif %}
+
+                                <!-- Detail -->
+                                {%- if item.detail %}
+                                <div class="post-detail">
+                                    {{ item.detail | md_inline }}
+                                </div>
+                                {%- endif %}
+
+                                <!-- Tags -->
+                                {%- if item.tags %}
+                                <div class="post-tags">
+                                    {%- for tag in item.tags %}
+                                    <span class="post-tag">{{ tag }}</span>
+                                    {%- endfor %}
+                                </div>
+                                {%- endif %}
+
+                                <!-- Action Bar -->
+                                <div class="post-actions">
+                                    <span class="post-action-btn">
+                                        <span class="post-action-icon">💬</span>
+                                        {{ (vote_num * 0.3) | int }} Comments
+                                    </span>
+                                    <span class="post-action-btn">
+                                        <span class="post-action-icon">🔄</span>
+                                        Share
+                                    </span>
+                                    <span class="post-action-btn">
+                                        <span class="post-action-icon">⭐</span>
+                                        Save
+                                    </span>
+                                    <span class="post-action-btn">
+                                        <span class="post-action-icon">🫣</span>
+                                        Hide
+                                    </span>
+                                    <span class="post-action-btn">
+                                        <span class="post-action-icon">⚑</span>
+                                        Report
+                                    </span>
+                                </div>
+                            </div>
+                        </article>
+                    {%- endfor -%}
+
+                {%- endif -%}
+            {%- endfor -%}
+
+        </main>
+
+        <!-- ==================== SIDEBAR COLUMN ==================== -->
+        <aside class="sidebar-column">
+
+            <!-- About Community -->
+            <div class="sidebar-card">
+                <div class="sidebar-header">
+                    About Community
+                </div>
+                <div class="sidebar-body">
+                    <div class="sidebar-description">
+                        📰 <strong>r/newsloom</strong> — Your daily curated intelligence feed.
+                        AI-powered news analysis covering tech, AI, finance, crypto,
+                        and everything in between.
+                    </div>
+
+                    <div style="font-size: 0.78rem; color: var(--text-meta);">
+                        🎂 Created {{ date_str }}
+                    </div>
+
+                    <div class="sidebar-stat-row">
+                        <div class="sidebar-stat">
+                            <span class="sidebar-stat-value">{{ total_items }}</span>
+                            <span class="sidebar-stat-label">Posts Today</span>
+                        </div>
+                        <div class="sidebar-stat">
+                            <span class="sidebar-stat-value">{{ section_order | length }}</span>
+                            <span class="sidebar-stat-label">Sections</span>
+                        </div>
+                        <div class="sidebar-stat">
+                            <span class="sidebar-stat-value">{{ ns_must.count }}</span>
+                            <span class="sidebar-stat-label">🏆 Awards</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sections Directory -->
+            <div class="sidebar-card">
+                <div class="sidebar-header sidebar-header--orange">
+                    📋 Sections
+                </div>
+                <ul class="sidebar-sections">
+                    {%- for section_key in section_order -%}
+                        {%- set items = briefs.get(section_key, []) -%}
+                        {%- if items -%}
+                            {%- set cfg = section_configs.get(section_key, {}) -%}
+                            <li class="sidebar-section-item">
+                                <span class="sidebar-section-dot" style="background: {{ cfg.color | default('#FF4500') }};"></span>
+                                <a href="#section-{{ section_key }}" class="sidebar-section-name" style="text-decoration: none; color: inherit;">
+                                    {{ cfg.emoji | default('📌') }} {{ cfg.title | default(section_key) }}
+                                </a>
+                                <span class="sidebar-section-count">{{ items | length }}</span>
+                            </li>
+                        {%- endif -%}
+                    {%- endfor -%}
+                </ul>
+            </div>
+
+            <!-- Community Rules -->
+            <div class="sidebar-card">
+                <div class="sidebar-header">
+                    r/newsloom Rules
+                </div>
+                <div class="sidebar-rule">
+                    <span class="sidebar-rule-num">1.</span>
+                    🔴 = Must Read — high impact, actionable intelligence
+                </div>
+                <div class="sidebar-rule">
+                    <span class="sidebar-rule-num">2.</span>
+                    🟡 = Notable — worth knowing, moderate impact
+                </div>
+                <div class="sidebar-rule">
+                    <span class="sidebar-rule-num">3.</span>
+                    🟢 = FYI — background context, low urgency
+                </div>
+                <div class="sidebar-rule">
+                    <span class="sidebar-rule-num">4.</span>
+                    🏆 Awards highlight the day's most critical items
+                </div>
+                <div class="sidebar-rule">
+                    <span class="sidebar-rule-num">5.</span>
+                    All posts include source links and analysis
+                </div>
+            </div>
+
+            <!-- Stats Card -->
+            {%- if stats %}
+            <div class="sidebar-card">
+                <div class="sidebar-header">
+                    📊 Today's Stats
+                </div>
+                <div class="sidebar-body">
+                    {%- for stat_key, stat_val in stats.items() %}
+                    <div style="display: flex; justify-content: space-between; padding: 4px 0; font-size: 0.85rem; border-bottom: 1px solid var(--border-light);">
+                        <span style="color: var(--text-meta);">{{ stat_key }}</span>
+                        <span style="font-weight: 600; color: var(--text-primary);">{{ stat_val }}</span>
+                    </div>
+                    {%- endfor %}
+                </div>
+            </div>
+            {%- endif %}
+
+        </aside>
+
+    </div>
+
+    <!-- ============================================================
+         FOOTER
+         ============================================================ -->
+    <footer class="reddit-footer">
+        <div class="reddit-footer-links">
+            <a href="#" class="reddit-footer-link">Help</a>
+            <a href="#" class="reddit-footer-link">About</a>
+            <a href="#" class="reddit-footer-link">Careers</a>
+            <a href="#" class="reddit-footer-link">Press</a>
+            <a href="#" class="reddit-footer-link">Advertise</a>
+            <a href="#" class="reddit-footer-link">Blog</a>
+            <a href="#" class="reddit-footer-link">Terms</a>
+            <a href="#" class="reddit-footer-link">Content Policy</a>
+            <a href="#" class="reddit-footer-link">Privacy Policy</a>
+        </div>
+        <div class="reddit-footer-brand">
+            r/newsloom · Generated {{ generated_time }} · {{ total_items }} posts · Powered by Newsloom
+        </div>
+    </footer>
+
+</body>
+</html>

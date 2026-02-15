@@ -1,0 +1,12 @@
+name: "Reddit Thread"
+description: "Reddit讨论串风格的日报模板，采用深色主题和Reddit橙色accent"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "dark"
+features:
+  - "Reddit暗色模式设计"
+  - "嵌套缩进卡片布局"
+  - "投票箭头样式优先级指示"
+  - "username风格的source标签"
+  - "Reddit橙色配色方案"
+  - "讨论串式信息组织"

@@ -1,0 +1,12 @@
+name: "BCG Green"
+description: "Boston Consulting Group inspired template with signature green color scheme and data visualization aesthetics"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "light"
+features:
+  - "BCG signature green #009A44"
+  - "Modern sans-serif typography"
+  - "Chart-inspired data layouts"
+  - "Green gradient headers"
+  - "Rounded card design"
+  - "Analytics dashboard feel"

@@ -1,0 +1,11 @@
+name: "stripe-gradient"
+description: "Stripe-inspired gradient design with colorful accent stripes and elegant card shadows"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "light"
+features:
+  - "Stripe-style gradient stripes (#635BFF → #80E9FF → #FF80B5)"
+  - "Light gray background (#F6F9FC)"
+  - "Sans-serif typography with rounded corners"
+  - "Elegant card shadows and payment-success aesthetic"
+  - "Premium fintech design language"

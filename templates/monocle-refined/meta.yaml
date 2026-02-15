@@ -1,0 +1,12 @@
+name: "Monocle Refined"
+description: "Sophisticated European design inspired by Monocle magazine with minimal accent colors, elegant typography, and abundant white space"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "light"
+features:
+  - "Cream white background"
+  - "Deep charcoal text"
+  - "Minimal accent colors (numbers only)"
+  - "Serif and sans-serif mix"
+  - "European elegance"
+  - "PDF-optimized"

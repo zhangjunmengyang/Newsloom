@@ -1,0 +1,12 @@
+name: "Retro Terminal"
+description: "CRT终端风格的日报模板，采用磷光绿配色和复古终端效果"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "dark"
+features:
+  - "CRT终端复古风格"
+  - "磷光绿文字配色"
+  - "CRT弯曲效果和扫描线"
+  - "打字机动画效果"
+  - "命令行提示符风格"
+  - "Monospace字体"

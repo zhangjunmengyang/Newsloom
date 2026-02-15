@@ -1,0 +1,12 @@
+name: "The Information"
+description: "Premium subscription newsletter style inspired by The Information's clean, professional aesthetic"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "light"
+features:
+  - "Clean minimalist design"
+  - "Orange-red accent colors"
+  - "Sans-serif typography"
+  - "Newsletter subscription feel"
+  - "Minimal card layout"
+  - "PDF-optimized"

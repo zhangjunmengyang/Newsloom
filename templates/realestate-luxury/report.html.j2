@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luxury Intelligence · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * REALESTATE LUXURY — 高端地产画册
+         * ────────────────────────────────────────────────────────────
+         * Deep charcoal #1A1A1A · Gold #C9A96E · Pure white
+         * Marble texture via CSS radial-gradient
+         * Full-bleed hero · Gold borders · Generous whitespace
+         * Featured listing cards · Brokerage footer
+         * ============================================================ */
+
+        /* --- Design Tokens --- */
+        :root {
+            /* Luxury Dark Palette */
+            --bg-marble:       #1A1A1A;
+            --bg-card:         #222222;
+            --bg-card-hover:   #2A2A2A;
+            --bg-surface:      #1E1E1E;
+            --bg-elevated:     #2D2D2D;
+
+            /* Gold System */
+            --gold:            #C9A96E;
+            --gold-light:      #E2CA9A;
+            --gold-dark:       #9A7B48;
+            --gold-dim:        rgba(201, 169, 110, 0.12);
+            --gold-glow:       rgba(201, 169, 110, 0.06);
+            --gold-border:     rgba(201, 169, 110, 0.25);
+            --gold-gradient:   linear-gradient(135deg, #C9A96E 0%, #E2CA9A 50%, #9A7B48 100%);
+            --gold-line:       linear-gradient(90deg, transparent, #C9A96E, transparent);
+
+            /* Text */
+            --text-white:      #FFFFFF;
+            --text-pearl:      #F5F0E8;
+            --text-cream:      #D4CBBB;
+            --text-muted:      #8A8279;
+            --text-dim:        #5C564E;
+
+            /* Priority — Jewel Tones */
+            --priority-ruby:       #B91C1C;
+            --priority-ruby-bg:    rgba(185, 28, 28, 0.08);
+            --priority-ruby-glow:  rgba(185, 28, 28, 0.15);
+            --priority-topaz:      #C9A96E;
+            --priority-topaz-bg:   rgba(201, 169, 110, 0.08);
+            --priority-emerald:    #059669;
+            --priority-emerald-bg: rgba(5, 150, 105, 0.06);
+
+            /* Borders */
+            --border:          rgba(201, 169, 110, 0.12);
+            --border-strong:   rgba(201, 169, 110, 0.25);
+            --border-subtle:   rgba(255, 255, 255, 0.06);
+
+            /* Spacing */
+            --sp-1: 4px;   --sp-2: 8px;   --sp-3: 12px;
+            --sp-4: 16px;  --sp-5: 20px;  --sp-6: 24px;
+            --sp-8: 32px;  --sp-10: 40px; --sp-12: 48px;
+            --sp-16: 64px; --sp-20: 80px; --sp-24: 96px;
+
+            /* Typography */
+            --font-display: "Didot", "Playfair Display", "Georgia", "Noto Serif SC", "STSong", serif;
+            --font-serif:   "Georgia", "Times New Roman", "Noto Serif SC", "SimSun", serif;
+            --font-sans:    "Optima", "Avenir", -apple-system, "PingFang SC", "Noto Sans SC", sans-serif;
+            --font-mono:    "SF Mono", "Consolas", monospace;
+
+            /* Radius */
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+
+            /* Shadows */
+            --shadow-card:     0 4px 24px rgba(0, 0, 0, 0.4);
+            --shadow-elevated: 0 12px 48px rgba(0, 0, 0, 0.5);
+            --shadow-gold:     0 4px 20px rgba(201, 169, 110, 0.15);
+        }
+
+        /* --- Page (PDF) --- */
+        @page {
+            size: A4;
+            margin: 2.5cm 2cm;
+            background: #1A1A1A;
+            @top-center {
+                content: "LUXURY INTELLIGENCE";
+                font-size: 8pt;
+                color: var(--gold);
+                letter-spacing: 0.3em;
+            }
+            @bottom-right {
+                content: "Page " counter(page);
+                font-size: 8pt;
+                color: var(--text-muted);
+            }
+        }
+
+        /* --- Reset --- */
+        *, *::before, *::after {
+            margin: 0; padding: 0; box-sizing: border-box;
+        }
+
+        /* --- Body: Marble Texture Background --- */
+        body {
+            font-family: var(--font-serif);
+            color: var(--text-pearl);
+            font-size: 16px;
+            line-height: 1.8;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            /* Marble texture: overlapping radial gradients */
+            background-color: #1A1A1A;
+            background-image:
+                radial-gradient(ellipse at 15% 20%, rgba(201, 169, 110, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 85% 30%, rgba(255, 255, 255, 0.02) 0%, transparent 40%),
+                radial-gradient(ellipse at 50% 80%, rgba(201, 169, 110, 0.03) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 10%, rgba(255, 255, 255, 0.015) 0%, transparent 35%),
+                radial-gradient(ellipse at 30% 60%, rgba(154, 123, 72, 0.04) 0%, transparent 45%),
+                linear-gradient(170deg, rgba(255,255,255,0.01) 0%, transparent 30%, rgba(201,169,110,0.02) 70%, transparent 100%);
+        }
+
+        /* --- Links --- */
+        a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        a:hover {
+            color: var(--gold-light);
+            text-shadow: 0 0 12px var(--gold-glow);
+        }
+
+        /* --- Container --- */
+        .luxury-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: var(--sp-16) var(--sp-8);
+            position: relative;
+        }
+
+        /* ============================================================
+         * HERO HEADER — Full-width gradient
+         * ============================================================ */
+        .hero-header {
+            text-align: center;
+            padding: var(--sp-24) var(--sp-8);
+            margin: calc(-1 * var(--sp-16)) calc(-1 * var(--sp-8)) var(--sp-20) calc(-1 * var(--sp-8));
+            position: relative;
+            overflow: hidden;
+            /* Hero gradient */
+            background:
+                radial-gradient(ellipse at 50% 0%, rgba(201, 169, 110, 0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 20% 80%, rgba(201, 169, 110, 0.06) 0%, transparent 50%),
+                linear-gradient(180deg, #1F1F1F 0%, #1A1A1A 100%);
+        }
+
+        /* Top gold line */
+        .hero-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--gold-gradient);
+        }
+
+        /* Bottom gold line */
+        .hero-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 10%; right: 10%;
+            height: 1px;
+            background: var(--gold-line);
+        }
+
+        .hero-crest {
+            font-size: 3em;
+            margin-bottom: var(--sp-6);
+            filter: drop-shadow(0 4px 8px rgba(201, 169, 110, 0.3));
+        }
+
+        .hero-eyebrow {
+            font-family: var(--font-sans);
+            font-size: 0.72em;
+            font-weight: 700;
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: var(--sp-6);
+        }
+
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: 3.2em;
+            font-weight: 400;
+            color: var(--text-white);
+            line-height: 1.1;
+            margin-bottom: var(--sp-4);
+            letter-spacing: -0.02em;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .hero-subtitle {
+            font-family: var(--font-serif);
+            font-size: 1.15em;
+            color: var(--text-cream);
+            font-style: italic;
+            margin-bottom: var(--sp-10);
+            line-height: 1.6;
+        }
+
+        .hero-meta {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--sp-8);
+            font-family: var(--font-sans);
+            font-size: 0.82em;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+        }
+
+        .hero-meta-item {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+        }
+
+        .meta-gold {
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        .hero-divider {
+            width: 1px;
+            height: 20px;
+            background: var(--gold-border);
+        }
+
+        /* ============================================================
+         * GOLD ORNAMENT DIVIDER
+         * ============================================================ */
+        .gold-ornament {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--sp-4);
+            margin: var(--sp-16) 0;
+        }
+
+        .gold-ornament::before,
+        .gold-ornament::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--gold-line);
+        }
+
+        .gold-ornament-icon {
+            color: var(--gold);
+            font-size: 0.9em;
+            letter-spacing: 0.5em;
+        }
+
+        /* ============================================================
+         * EXECUTIVE SUMMARY — Premium Card
+         * ============================================================ */
+        .exec-showcase {
+            background: linear-gradient(145deg, #252525 0%, #1E1E1E 100%);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--sp-12) var(--sp-10);
+            margin-bottom: var(--sp-16);
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
+        }
+
+        .exec-showcase::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: var(--gold-gradient);
+        }
+
+        /* Corner glow */
+        .exec-showcase::after {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(201, 169, 110, 0.06) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .exec-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--sp-2);
+            font-family: var(--font-sans);
+            font-size: 0.72em;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: var(--sp-6);
+            padding-bottom: var(--sp-4);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .exec-content {
+            font-size: 1.05em;
+            line-height: 1.85;
+            color: var(--text-cream);
+        }
+
+        .exec-content p {
+            margin-bottom: var(--sp-5);
+        }
+        .exec-content p:last-child { margin-bottom: 0; }
+
+        .exec-content p:first-of-type::first-letter {
+            float: left;
+            font-family: var(--font-display);
+            font-size: 3.5em;
+            line-height: 0.8;
+            margin: 0.06em 0.15em 0 0;
+            color: var(--gold);
+            text-shadow: 0 2px 8px rgba(201, 169, 110, 0.3);
+        }
+
+        .exec-content strong {
+            color: var(--text-white);
+            font-weight: 700;
+        }
+
+        /* ============================================================
+         * TABLE OF CONTENTS
+         * ============================================================ */
+        .toc-panel {
+            background: linear-gradient(145deg, #252525, #1F1F1F);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: var(--sp-10) var(--sp-8);
+            margin-bottom: var(--sp-16);
+        }
+
+        .toc-title {
+            font-family: var(--font-sans);
+            font-size: 0.72em;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--gold);
+            text-align: center;
+            margin-bottom: var(--sp-6);
+        }
+
+        .toc-item {
+            display: flex;
+            align-items: center;
+            padding: var(--sp-3) 0;
+            border-bottom: 1px solid var(--border-subtle);
+            transition: padding-left 0.2s ease;
+        }
+        .toc-item:last-child { border-bottom: none; }
+        .toc-item:hover { padding-left: var(--sp-2); }
+
+        .toc-emoji {
+            width: 28px;
+            text-align: center;
+            margin-right: var(--sp-3);
+        }
+
+        .toc-name {
+            color: var(--text-cream);
+            flex: 1;
+            font-size: 0.95em;
+        }
+
+        .toc-dots {
+            flex-grow: 1;
+            border-bottom: 1px dotted var(--text-dim);
+            margin: 0 var(--sp-3);
+            min-width: 40px;
+        }
+
+        .toc-count {
+            color: var(--gold);
+            font-family: var(--font-sans);
+            font-weight: 700;
+            font-size: 0.85em;
+        }
+
+        /* ============================================================
+         * SECTION HEADER — Full-width gold line
+         * ============================================================ */
+        .section-luxury {
+            margin-bottom: var(--sp-16);
+            page-break-inside: avoid;
+        }
+
+        .section-header-lux {
+            margin-bottom: var(--sp-10);
+            padding-bottom: var(--sp-5);
+            position: relative;
+        }
+
+        /* Full-width gold line */
+        .section-header-lux::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 2px;
+            background: var(--gold-line);
+        }
+
+        .section-title-row {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-4);
+        }
+
+        .section-emblem {
+            font-size: 1.6em;
+            filter: drop-shadow(0 2px 4px rgba(201, 169, 110, 0.2));
+        }
+
+        .section-heading {
+            font-family: var(--font-display);
+            font-size: 1.8em;
+            font-weight: 400;
+            color: var(--text-white);
+            flex: 1;
+            letter-spacing: 0.01em;
+        }
+
+        .section-count-badge {
+            font-family: var(--font-sans);
+            font-size: 0.72em;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            color: var(--gold);
+            border: 1px solid var(--gold-border);
+            padding: var(--sp-1) var(--sp-3);
+            border-radius: 20px;
+        }
+
+        /* Section color indicator */
+        .section-color-bar {
+            width: 100%;
+            height: 3px;
+            border-radius: 2px;
+            margin-top: var(--sp-3);
+            opacity: 0.6;
+        }
+
+        /* ============================================================
+         * BRIEF CARD — Dark + Gold Border
+         * ============================================================ */
+        .brief-card {
+            background: linear-gradient(145deg, #252525, #1F1F1F);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: var(--sp-8);
+            margin-bottom: var(--sp-5);
+            position: relative;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            page-break-inside: avoid;
+            box-shadow: var(--shadow-card);
+        }
+
+        .brief-card:hover {
+            border-color: var(--gold-border);
+            box-shadow: var(--shadow-gold);
+            transform: translateY(-2px);
+        }
+
+        /* Left priority bar */
+        .brief-card::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+            border-radius: var(--radius-md) 0 0 var(--radius-md);
+        }
+
+        .brief-card.must-read::before {
+            background: linear-gradient(180deg, var(--priority-ruby), #7F1D1D);
+            box-shadow: 2px 0 12px var(--priority-ruby-glow);
+        }
+        .brief-card.recommended::before {
+            background: linear-gradient(180deg, var(--gold), var(--gold-dark));
+            box-shadow: 2px 0 12px var(--gold-glow);
+        }
+        .brief-card.fyi::before {
+            background: linear-gradient(180deg, var(--priority-emerald), #065F46);
+        }
+
+        /* Must-read background glow */
+        .brief-card.must-read {
+            background:
+                radial-gradient(ellipse at top left, var(--priority-ruby-bg), transparent 60%),
+                linear-gradient(145deg, #252525, #1F1F1F);
+            border-color: var(--priority-ruby-glow);
+        }
+
+        /* Featured first card */
+        .brief-card.featured {
+            padding: var(--sp-10);
+            border: 1px solid var(--gold-border);
+            background:
+                radial-gradient(ellipse at top right, rgba(201, 169, 110, 0.06), transparent 50%),
+                linear-gradient(145deg, #2A2A2A, #222222);
+        }
+
+        .brief-card.featured::after {
+            content: 'FEATURED LISTING';
+            position: absolute;
+            top: var(--sp-4); right: var(--sp-4);
+            font-family: var(--font-sans);
+            font-size: 0.6em;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            color: var(--bg-marble);
+            background: var(--gold-gradient);
+            padding: var(--sp-1) var(--sp-3);
+            border-radius: var(--radius-sm);
+        }
+
+        /* Image placeholder: B&W architectural gradient */
+        .featured-image-placeholder {
+            width: 100%;
+            height: 180px;
+            border-radius: var(--radius-sm);
+            margin-bottom: var(--sp-6);
+            background:
+                linear-gradient(135deg, #333 0%, #2A2A2A 25%, #1E1E1E 50%, #2A2A2A 75%, #333 100%),
+                repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(255,255,255,0.02) 40px, rgba(255,255,255,0.02) 80px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .featured-image-placeholder::before {
+            content: '🏛️';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3em;
+            opacity: 0.15;
+        }
+
+        .brief-header-lux {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--sp-4);
+            margin-bottom: var(--sp-4);
+        }
+
+        /* Gold star for must-read */
+        .priority-star {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1em;
+            margin-top: 2px;
+        }
+
+        .brief-card.must-read .priority-star::before {
+            content: '★';
+            color: var(--gold);
+            font-size: 1.3em;
+            text-shadow: 0 0 8px rgba(201, 169, 110, 0.5);
+            animation: goldPulse 3s ease-in-out infinite;
+        }
+
+        .brief-card.recommended .priority-star::before {
+            content: '◆';
+            color: var(--gold-dark);
+        }
+
+        .brief-card.fyi .priority-star::before {
+            content: '○';
+            color: var(--text-dim);
+        }
+
+        @keyframes goldPulse {
+            0%, 100% { text-shadow: 0 0 8px rgba(201, 169, 110, 0.3); }
+            50%      { text-shadow: 0 0 16px rgba(201, 169, 110, 0.6); }
+        }
+
+        .brief-headline-lux {
+            flex: 1;
+            font-family: var(--font-display);
+            font-size: 1.2em;
+            font-weight: 400;
+            line-height: 1.4;
+        }
+
+        .brief-headline-lux a {
+            color: var(--text-white);
+            transition: color 0.3s ease;
+        }
+        .brief-headline-lux a:hover {
+            color: var(--gold);
+        }
+        .brief-card.must-read .brief-headline-lux a {
+            color: var(--gold-light);
+            font-weight: 600;
+        }
+        .brief-card.featured .brief-headline-lux {
+            font-size: 1.5em;
+        }
+
+        .brief-meta-lux {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            margin-bottom: var(--sp-4);
+            font-family: var(--font-sans);
+            font-size: 0.82em;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+        }
+
+        .source-gold {
+            color: var(--gold);
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+
+        .meta-dot {
+            width: 3px; height: 3px;
+            background: var(--gold-border);
+            border-radius: 50%;
+        }
+
+        .tag-dark {
+            background: rgba(201, 169, 110, 0.08);
+            color: var(--text-cream);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            border: 1px solid var(--border);
+        }
+
+        .brief-detail-lux {
+            font-size: 1em;
+            line-height: 1.75;
+            color: var(--text-cream);
+        }
+
+        .brief-detail-lux strong {
+            color: var(--text-white);
+            font-weight: 700;
+        }
+
+        .brief-detail-lux code {
+            font-family: var(--font-mono);
+            font-size: 0.88em;
+            background: rgba(201, 169, 110, 0.08);
+            color: var(--gold);
+            padding: 2px 6px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+
+        /* ============================================================
+         * FOOTER — Brokerage Style
+         * ============================================================ */
+        .footer-brokerage {
+            text-align: center;
+            padding: var(--sp-16) 0 var(--sp-12);
+            margin-top: var(--sp-20);
+            position: relative;
+        }
+
+        /* Top gold line */
+        .footer-brokerage::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 5%; right: 5%;
+            height: 1px;
+            background: var(--gold-line);
+        }
+
+        .footer-crest {
+            font-size: 2.5em;
+            margin-bottom: var(--sp-5);
+            filter: drop-shadow(0 2px 8px rgba(201, 169, 110, 0.25));
+        }
+
+        .footer-firm-name {
+            font-family: var(--font-display);
+            font-size: 1.2em;
+            color: var(--gold);
+            letter-spacing: 0.15em;
+            margin-bottom: var(--sp-2);
+        }
+
+        .footer-tagline {
+            font-family: var(--font-serif);
+            font-size: 0.92em;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-bottom: var(--sp-8);
+        }
+
+        .footer-info-grid {
+            display: flex;
+            justify-content: center;
+            gap: var(--sp-12);
+            margin-bottom: var(--sp-8);
+            flex-wrap: wrap;
+        }
+
+        .footer-info-col {
+            text-align: center;
+        }
+
+        .footer-info-label {
+            font-family: var(--font-sans);
+            font-size: 0.62em;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--gold-dark);
+            margin-bottom: var(--sp-1);
+        }
+
+        .footer-info-value {
+            font-size: 0.85em;
+            color: var(--text-cream);
+        }
+
+        /* Bottom gold thin line */
+        .footer-bottom-line {
+            width: 80px;
+            height: 1px;
+            background: var(--gold);
+            margin: var(--sp-8) auto var(--sp-5);
+            opacity: 0.4;
+        }
+
+        .footer-legal {
+            font-family: var(--font-sans);
+            font-size: 0.65em;
+            color: var(--text-dim);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        /* ============================================================
+         * MARBLE TEXTURE OVERLAY
+         * ============================================================ */
+        .marble-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 0;
+            background:
+                radial-gradient(ellipse at 10% 40%, rgba(201, 169, 110, 0.025) 0%, transparent 40%),
+                radial-gradient(ellipse at 90% 60%, rgba(255, 255, 255, 0.015) 0%, transparent 35%),
+                radial-gradient(ellipse at 60% 20%, rgba(154, 123, 72, 0.02) 0%, transparent 50%);
+        }
+
+        .luxury-container {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ============================================================
+         * PROPERTY STATS ROW — Premium metrics
+         * ============================================================ */
+        .property-stats {
+            display: flex;
+            justify-content: center;
+            gap: var(--sp-12);
+            padding: var(--sp-6) 0;
+            margin-bottom: var(--sp-12);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .prop-stat {
+            text-align: center;
+        }
+
+        .prop-stat-value {
+            font-family: var(--font-display);
+            font-size: 2em;
+            font-weight: 300;
+            color: var(--text-white);
+            line-height: 1.2;
+        }
+
+        .prop-stat-value.gold {
+            color: var(--gold);
+        }
+
+        .prop-stat-label {
+            font-family: var(--font-sans);
+            font-size: 0.62em;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-top: var(--sp-1);
+        }
+
+        /* ============================================================
+         * PROPERTY GALLERY PLACEHOLDER
+         * ============================================================ */
+        .gallery-placeholder {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 3px;
+            margin: var(--sp-8) 0;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        .gallery-item {
+            height: 120px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gallery-item:first-child {
+            grid-row: span 2;
+            height: 100%;
+        }
+
+        .gallery-item::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #2A2A2A, #1E1E1E);
+        }
+
+        .gallery-item::after {
+            content: '🏛️';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5em;
+            opacity: 0.1;
+        }
+
+        /* ============================================================
+         * GOLD RIBBON ACCENT
+         * ============================================================ */
+        .gold-ribbon {
+            width: 100%;
+            height: 1px;
+            background: var(--gold-line);
+            margin: var(--sp-4) 0;
+        }
+
+        /* ============================================================
+         * LUXURY QUOTE BLOCK
+         * ============================================================ */
+        .luxury-quote {
+            border-left: 2px solid var(--gold);
+            padding: var(--sp-5) var(--sp-8);
+            margin: var(--sp-8) 0;
+            font-family: var(--font-display);
+            font-size: 1.2em;
+            font-style: italic;
+            color: var(--gold-light);
+            line-height: 1.6;
+            position: relative;
+        }
+
+        .luxury-quote::before {
+            content: '"';
+            position: absolute;
+            top: -10px; left: var(--sp-4);
+            font-size: 3em;
+            color: var(--gold-dim);
+            font-style: normal;
+        }
+
+        /* ============================================================
+         * SECTION BRIEF COUNTER
+         * ============================================================ */
+        .brief-number {
+            font-family: var(--font-sans);
+            font-size: 0.65em;
+            font-weight: 700;
+            color: var(--text-dim);
+            letter-spacing: 0.1em;
+            margin-bottom: var(--sp-2);
+        }
+
+        /* ============================================================
+         * INVESTMENT GRADE BADGE
+         * ============================================================ */
+        .investment-grade {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--sp-2);
+            font-family: var(--font-sans);
+            font-size: 0.65em;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 3px 10px;
+            border-radius: var(--radius-sm);
+            margin-top: var(--sp-2);
+        }
+
+        .grade-premium {
+            background: rgba(201, 169, 110, 0.12);
+            color: var(--gold);
+            border: 1px solid var(--gold-border);
+        }
+
+        .grade-standard {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+
+        /* ============================================================
+         * PRINT
+         * ============================================================ */
+        @media print {
+            body {
+                background: #1A1A1A !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .luxury-container { max-width: 100%; padding: 0; }
+            .hero-header { padding: var(--sp-12) var(--sp-6); margin-bottom: var(--sp-10); }
+            .brief-card { box-shadow: none; padding: var(--sp-5); }
+            .brief-card:hover { transform: none; box-shadow: none; }
+            a { color: var(--gold) !important; }
+        }
+
+        /* ============================================================
+         * MOBILE
+         * ============================================================ */
+        @media (max-width: 640px) {
+            .luxury-container { padding: var(--sp-8) var(--sp-4); }
+            .hero-header {
+                padding: var(--sp-12) var(--sp-4);
+                margin: calc(-1 * var(--sp-8)) calc(-1 * var(--sp-4)) var(--sp-10) calc(-1 * var(--sp-4));
+            }
+            .hero-title { font-size: 2em; }
+            .hero-meta { flex-direction: column; gap: var(--sp-2); }
+            .hero-divider { display: none; }
+            .exec-showcase { padding: var(--sp-6) var(--sp-5); }
+            .section-heading { font-size: 1.4em; }
+            .brief-card { padding: var(--sp-5); }
+            .brief-card.featured { padding: var(--sp-6); }
+            .featured-image-placeholder { height: 120px; }
+            .brief-headline-lux { font-size: 1.05em; }
+            .brief-card.featured .brief-headline-lux { font-size: 1.2em; }
+            .footer-info-grid { flex-direction: column; gap: var(--sp-5); }
+        }
+
+        @media (max-width: 400px) {
+            .hero-title { font-size: 1.7em; }
+            .section-heading { font-size: 1.2em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="marble-overlay"></div>
+    <div class="luxury-container">
+
+        <!-- ====== HERO HEADER ====== -->
+        <header class="hero-header">
+            <div class="hero-crest">🏛️</div>
+            <div class="hero-eyebrow">Luxury Intelligence</div>
+            <h1 class="hero-title">Premium Property Brief</h1>
+            <div class="hero-subtitle">Curated insights for the discerning investor</div>
+            <div class="hero-meta">
+                <div class="hero-meta-item">
+                    <span class="meta-gold">{{ date_str }}</span>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-meta-item">
+                    <span>{{ total_items }} curated insights</span>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-meta-item">
+                    {% set must_read_count = [] %}
+                    {% for section_key, items in briefs.items() %}
+                    {% if items is iterable and items is not string %}
+                    {% for item in items %}
+                    {% if item.priority == '🔴' %}
+                    {% if must_read_count.append(1) %}{% endif %}
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
+                    {% endfor %}
+                    <span class="meta-gold">{{ must_read_count|length }}</span>
+                    <span>must-read</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- ====== TABLE OF CONTENTS ====== -->
+        <div class="toc-panel">
+            <div class="toc-title">This Edition</div>
+            {% for section_key in section_order %}
+            {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+            {% set meta = section_configs.get(section_key, {}) %}
+            {% set items = briefs[section_key] %}
+            <div class="toc-item">
+                <span class="toc-emoji">{{ meta.emoji|default('📌') }}</span>
+                <span class="toc-name">{{ meta.title|default(section_key) }}</span>
+                <span class="toc-dots"></span>
+                <span class="toc-count">{{ items|length }}</span>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- ====== EXECUTIVE SUMMARY ====== -->
+        {% if executive_summary %}
+        <div class="exec-showcase">
+            <div class="exec-badge">
+                <span>💎</span>
+                <span>Executive Overview</span>
+            </div>
+            <div class="exec-content">
+                {% for line in executive_summary.strip().split('\n') %}
+                {% if line.strip() %}
+                <p>{{ line.strip() | md_inline }}</p>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="gold-ornament">
+            <span class="gold-ornament-icon">◆ ◆ ◆</span>
+        </div>
+
+        <!-- ====== SECTIONS ====== -->
+        {% for section_key in section_order %}
+        {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+        {% set meta = section_configs.get(section_key, {}) %}
+        {% set section_color = meta.color|default('#C9A96E') %}
+        {% set items = briefs[section_key] %}
+        <section class="section-luxury">
+            <div class="section-header-lux">
+                <div class="section-title-row">
+                    <span class="section-emblem">{{ meta.emoji|default('📌') }}</span>
+                    <h2 class="section-heading">{{ meta.title|default(section_key) }}</h2>
+                    <span class="section-count-badge">{{ items|length }}</span>
+                </div>
+                <div class="section-color-bar" style="background: linear-gradient(90deg, {{ section_color }}, transparent);"></div>
+            </div>
+
+            {% for item in items %}
+            {% set priority = item.priority|default('🟢') %}
+            {% set p_class = 'must-read' if priority == '🔴' else ('recommended' if priority == '🟡' else 'fyi') %}
+            {% set is_featured = (loop.first and loop.index0 == 0 and priority == '🔴') %}
+            <article class="brief-card {{ p_class }}{% if is_featured %} featured{% endif %}">
+                {% if is_featured %}
+                <div class="featured-image-placeholder"></div>
+                {% endif %}
+                <div class="brief-header-lux">
+                    <div class="priority-star"></div>
+                    <div class="brief-headline-lux">
+                        <a href="{{ item.url|default('#') }}" target="_blank">{{ item.headline|default(item.title|default('Untitled')) }}</a>
+                    </div>
+                </div>
+                <div class="brief-meta-lux">
+                    {% if item.source %}
+                    <span class="source-gold">{{ item.source }}</span>
+                    {% endif %}
+                    {% if item.source and item.tags %}<span class="meta-dot"></span>{% endif %}
+                    {% if item.tags %}
+                    {% for tag in item.tags %}
+                    <span class="tag-dark">{{ tag }}</span>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+                {% if item.detail %}
+                <div class="brief-detail-lux">{{ item.detail|default('') | md_inline }}</div>
+                {% endif %}
+            </article>
+            {% endfor %}
+        </section>
+
+        {% if not loop.last %}
+        <div class="gold-ornament">
+            <span class="gold-ornament-icon">◆</span>
+        </div>
+        {% endif %}
+
+        {% endif %}
+        {% endfor %}
+
+        <!-- ====== FOOTER — Brokerage Style ====== -->
+        <footer class="footer-brokerage">
+            <div class="footer-crest">🏛️</div>
+            <div class="footer-firm-name">LUXURY INTELLIGENCE</div>
+            <div class="footer-tagline">Where insight meets investment</div>
+            <div class="footer-info-grid">
+                <div class="footer-info-col">
+                    <div class="footer-info-label">Edition</div>
+                    <div class="footer-info-value">{{ date_str }}</div>
+                </div>
+                <div class="footer-info-col">
+                    <div class="footer-info-label">Insights</div>
+                    <div class="footer-info-value">{{ total_items }} curated</div>
+                </div>
+                <div class="footer-info-col">
+                    <div class="footer-info-label">Powered By</div>
+                    <div class="footer-info-value">Newsloom AI</div>
+                </div>
+            </div>
+            <div class="footer-bottom-line"></div>
+            <div class="footer-legal">Privileged & Confidential · For Authorized Recipients Only</div>
+        </footer>
+
+    </div>
+</body>
+</html>

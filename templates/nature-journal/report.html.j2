@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nature Intelligence · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * NATURE JOURNAL — Authentic Scientific Publication
+         * ============================================================
+         * Nature Red (#C8102E) · White paper · Deep gray body text
+         * Strict serif typography · Abstract boxes · DOI references
+         * Citation numbering · Figure-style sources · Editor's Note
+         * Inspired by: Nature, Science, Cell, The Lancet
+         * ============================================================ */
+
+        /* --- Design Tokens --- */
+        :root {
+            /* Nature Brand */
+            --nature-red:       #C8102E;
+            --nature-red-dark:  #A00D24;
+            --nature-red-light: #E8334D;
+            --nature-red-dim:   rgba(200, 16, 46, 0.06);
+            --nature-red-glow:  rgba(200, 16, 46, 0.12);
+
+            /* Paper Backgrounds — scientific white hierarchy */
+            --bg-paper:         #FFFFFF;
+            --bg-abstract:      #F8F9FA;
+            --bg-figure:        #F5F6F8;
+            --bg-sidebar:       #F0F2F5;
+            --bg-code:          #F7F8FA;
+            --bg-hover:         #FAFBFC;
+            --bg-editors-note:  #F0F6FF;
+
+            /* Scientific Text Hierarchy */
+            --text-title:       #1A1A1A;
+            --text-body:        #333333;
+            --text-secondary:   #555555;
+            --text-caption:     #777777;
+            --text-muted:       #999999;
+            --text-light:       #BBBBBB;
+            --text-inverse:     #FFFFFF;
+
+            /* Academic Colors */
+            --blue-ref:         #2E6DA4;
+            --blue-editor:      #1A73E8;
+            --blue-editor-dim:  rgba(26, 115, 232, 0.08);
+            --green-accept:     #2E7D32;
+            --amber-review:     #F57F17;
+
+            /* Priority — Impact Factor Style */
+            --impact-high:      #C8102E;
+            --impact-high-bg:   rgba(200, 16, 46, 0.04);
+            --impact-mid:       #E67E22;
+            --impact-mid-bg:    rgba(230, 126, 34, 0.04);
+            --impact-low:       #27AE60;
+            --impact-low-bg:    rgba(39, 174, 96, 0.03);
+
+            /* Rules & Borders */
+            --rule-heavy:       #1A1A1A;
+            --rule-medium:      #CCCCCC;
+            --rule-light:       #E0E0E0;
+            --rule-faint:       #EEEEEE;
+
+            /* Spacing — Academic Margins */
+            --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px;
+            --sp-4: 16px; --sp-5: 20px; --sp-6: 24px;
+            --sp-8: 32px; --sp-10: 40px; --sp-12: 48px;
+            --sp-16: 64px; --sp-20: 80px;
+
+            /* Typography — Strict Serif System */
+            --font-serif:    "Georgia", "Times New Roman", "Noto Serif SC", "Source Han Serif SC", "Songti SC", serif;
+            --font-sans:     "Helvetica Neue", "Arial", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+            --font-mono:     "Courier New", "Monaco", "Consolas", monospace;
+            --font-display:  "Helvetica Neue", "Arial", sans-serif;
+
+            /* Radius — Minimal */
+            --radius-sm: 2px;
+            --radius-md: 4px;
+            --radius-lg: 6px;
+
+            /* Shadows — Paper stack */
+            --shadow-card:     0 1px 3px rgba(0,0,0,0.06);
+            --shadow-elevated: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        /* --- PDF / Page --- */
+        @page {
+            size: A4;
+            margin: 2.5cm 2cm;
+            @top-left {
+                content: "NATURE INTELLIGENCE";
+                font-family: "Helvetica Neue", Arial, sans-serif;
+                font-size: 7pt;
+                font-weight: 700;
+                color: var(--nature-red);
+                letter-spacing: 0.15em;
+                text-transform: uppercase;
+            }
+            @top-right {
+                content: "Published {{ date_str }}";
+                font-family: "Helvetica Neue", Arial, sans-serif;
+                font-size: 7pt;
+                color: var(--text-caption);
+            }
+            @bottom-center {
+                content: counter(page);
+                font-family: "Helvetica Neue", Arial, sans-serif;
+                font-size: 8pt;
+                color: var(--text-caption);
+            }
+        }
+
+        /* --- Reset --- */
+        *, *::before, *::after {
+            margin: 0; padding: 0; box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-serif);
+            /* Subtle paper texture background — not pure white */
+            background:
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 28px,
+                    rgba(0,0,0,0.008) 28px,
+                    rgba(0,0,0,0.008) 29px
+                ),
+                linear-gradient(180deg, #FFFFFF 0%, #FEFEFE 50%, #FCFCFC 100%);
+            color: var(--text-body);
+            font-size: 15px;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        a {
+            color: var(--blue-ref);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        a:hover { color: var(--nature-red); text-decoration: underline; }
+
+        /* --- Container --- */
+        .container {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: var(--sp-12) var(--sp-8);
+            background: var(--bg-paper);
+        }
+
+        /* ============================================================
+         * NATURE RED STRIPE HEADER
+         * ============================================================ */
+        .nature-stripe {
+            background: var(--nature-red);
+            padding: var(--sp-3) var(--sp-6);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0;
+        }
+
+        .nature-stripe-title {
+            font-family: var(--font-display);
+            font-size: 1.1em;
+            font-weight: 800;
+            color: var(--text-inverse);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .nature-stripe-issue {
+            font-family: var(--font-sans);
+            font-size: 0.72em;
+            color: rgba(255,255,255,0.85);
+            letter-spacing: 0.06em;
+        }
+
+        /* --- Masthead under stripe --- */
+        .masthead {
+            padding: var(--sp-10) 0 var(--sp-8);
+            border-bottom: 3px solid var(--rule-heavy);
+            margin-bottom: var(--sp-10);
+            position: relative;
+        }
+
+        /* Thin red accent below the heavy rule */
+        .masthead::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0; right: 0;
+            height: 1px;
+            background: var(--nature-red);
+        }
+
+        .masthead-vol {
+            font-family: var(--font-sans);
+            font-size: 0.72em;
+            font-weight: 600;
+            color: var(--text-caption);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: var(--sp-4);
+        }
+
+        .masthead-article-title {
+            font-family: var(--font-sans);
+            font-size: 1.8em;
+            font-weight: 800;
+            color: var(--text-title);
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            margin-bottom: var(--sp-4);
+        }
+
+        .masthead-article-subtitle {
+            font-family: var(--font-serif);
+            font-size: 1.05em;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            font-style: italic;
+            margin-bottom: var(--sp-6);
+            max-width: 620px;
+        }
+
+        .masthead-byline {
+            font-family: var(--font-sans);
+            font-size: 0.82em;
+            color: var(--text-caption);
+            display: flex;
+            align-items: center;
+            gap: var(--sp-4);
+            flex-wrap: wrap;
+        }
+
+        .byline-author {
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        .byline-separator {
+            color: var(--rule-medium);
+        }
+
+        .byline-doi {
+            font-family: var(--font-mono);
+            font-size: 0.9em;
+            color: var(--blue-ref);
+        }
+
+        .byline-date {
+            color: var(--text-muted);
+        }
+
+        /* ============================================================
+         * ARTICLE METRICS STRIP
+         * ============================================================ */
+        .metrics-strip {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0;
+            border: 1px solid var(--rule-light);
+            border-radius: var(--radius-sm);
+            margin-bottom: var(--sp-12);
+            background: var(--bg-figure);
+        }
+
+        .metric-cell {
+            text-align: center;
+            padding: var(--sp-4) var(--sp-3);
+            position: relative;
+        }
+
+        .metric-cell + .metric-cell {
+            border-left: 1px solid var(--rule-light);
+        }
+
+        .metric-value {
+            font-family: var(--font-sans);
+            font-size: 1.6em;
+            font-weight: 800;
+            color: var(--nature-red);
+            display: block;
+            line-height: 1.1;
+            margin-bottom: var(--sp-1);
+        }
+
+        .metric-label {
+            font-family: var(--font-sans);
+            font-size: 0.62em;
+            font-weight: 600;
+            color: var(--text-caption);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* ============================================================
+         * ABSTRACT BOX
+         * ============================================================ */
+        .abstract-box {
+            background: var(--bg-abstract);
+            border: 1px solid var(--rule-light);
+            border-radius: var(--radius-md);
+            padding: var(--sp-8);
+            margin-bottom: var(--sp-12);
+            page-break-inside: avoid;
+            position: relative;
+        }
+
+        /* "Abstract" label — Nature style */
+        .abstract-label {
+            font-family: var(--font-sans);
+            font-size: 0.78em;
+            font-weight: 800;
+            color: var(--nature-red);
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            margin-bottom: var(--sp-5);
+            padding-bottom: var(--sp-3);
+            border-bottom: 2px solid var(--nature-red);
+            display: inline-block;
+        }
+
+        .abstract-box p {
+            font-family: var(--font-serif);
+            color: var(--text-body);
+            font-size: 0.94em;
+            line-height: 1.8;
+            margin-bottom: var(--sp-4);
+            text-align: justify;
+        }
+
+        .abstract-box p:last-of-type { margin-bottom: 0; }
+
+        .abstract-box p strong {
+            color: var(--text-title);
+            font-weight: 700;
+        }
+
+        .abstract-box p code {
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+            background: var(--bg-code);
+            padding: 1px 5px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--rule-faint);
+            color: var(--nature-red-dark);
+        }
+
+        /* ============================================================
+         * EDITOR'S NOTE — Blue left-line box
+         * ============================================================ */
+        .editors-note {
+            background: var(--bg-editors-note);
+            border-left: 4px solid var(--blue-editor);
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            padding: var(--sp-6);
+            margin-bottom: var(--sp-12);
+            position: relative;
+        }
+
+        .editors-note-label {
+            font-family: var(--font-sans);
+            font-size: 0.72em;
+            font-weight: 700;
+            color: var(--blue-editor);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: var(--sp-3);
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+        }
+
+        .editors-note-label::before {
+            content: '✎';
+            font-size: 1.1em;
+        }
+
+        .editors-note p {
+            font-family: var(--font-serif);
+            font-size: 0.9em;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        /* ============================================================
+         * SECTION — Scientific Numbered Sections
+         * ============================================================ */
+        .section {
+            margin-bottom: var(--sp-16);
+        }
+
+        .section-header {
+            margin-bottom: var(--sp-8);
+            padding-bottom: var(--sp-4);
+            border-bottom: 2px solid var(--rule-heavy);
+            position: relative;
+        }
+
+        /* Section color indicator bar */
+        .section-header::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 60px;
+            height: 2px;
+        }
+
+        .section-number-line {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+        }
+
+        .section-num {
+            font-family: var(--font-sans);
+            font-size: 1.5em;
+            font-weight: 900;
+            color: var(--nature-red);
+            min-width: 32px;
+        }
+
+        .section-title {
+            font-family: var(--font-sans);
+            font-size: 1.25em;
+            font-weight: 700;
+            color: var(--text-title);
+            letter-spacing: -0.01em;
+        }
+
+        .section-subtitle {
+            font-family: var(--font-sans);
+            font-size: 0.72em;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-top: var(--sp-2);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        /* ============================================================
+         * BRIEF — Research Article Card
+         * ============================================================ */
+        .article-item {
+            padding: var(--sp-6) 0;
+            border-bottom: 1px solid var(--rule-faint);
+            page-break-inside: avoid;
+            position: relative;
+        }
+
+        .article-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Priority color strip on left */
+        .article-item.must-read {
+            border-left: 3px solid var(--impact-high);
+            padding-left: var(--sp-5);
+            background: linear-gradient(90deg, var(--impact-high-bg) 0%, transparent 30%);
+        }
+
+        .article-item.recommended {
+            border-left: 3px solid var(--impact-mid);
+            padding-left: var(--sp-5);
+            background: linear-gradient(90deg, var(--impact-mid-bg) 0%, transparent 30%);
+        }
+
+        .article-item.fyi {
+            border-left: 3px solid var(--impact-low);
+            padding-left: var(--sp-5);
+            background: linear-gradient(90deg, var(--impact-low-bg) 0%, transparent 20%);
+        }
+
+        /* HIGH IMPACT badge */
+        .impact-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--sp-1);
+            font-family: var(--font-sans);
+            font-size: 0.58em;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: var(--radius-sm);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            vertical-align: middle;
+            margin-left: var(--sp-2);
+        }
+
+        .article-item.must-read .impact-badge {
+            background: var(--impact-high);
+            color: var(--text-inverse);
+        }
+
+        .article-item.recommended .impact-badge {
+            background: var(--impact-mid);
+            color: var(--text-inverse);
+        }
+
+        .article-title {
+            font-family: var(--font-sans);
+            font-size: 1.05em;
+            font-weight: 700;
+            line-height: 1.4;
+            margin-bottom: var(--sp-3);
+            color: var(--text-title);
+        }
+
+        .article-title a {
+            color: inherit;
+            border-bottom: none;
+        }
+
+        .article-title a:hover {
+            color: var(--nature-red);
+        }
+
+        .article-item.must-read .article-title a {
+            color: var(--impact-high);
+        }
+
+        /* Figure-style source citation */
+        .article-citation {
+            font-family: var(--font-sans);
+            font-size: 0.75em;
+            color: var(--text-caption);
+            margin-bottom: var(--sp-3);
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            flex-wrap: wrap;
+        }
+
+        .citation-source {
+            font-weight: 700;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .citation-ref {
+            font-family: var(--font-mono);
+            font-size: 0.88em;
+            color: var(--blue-ref);
+        }
+
+        .citation-tag {
+            background: var(--bg-figure);
+            color: var(--text-caption);
+            padding: 1px 6px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--rule-light);
+            font-size: 0.92em;
+        }
+
+        /* Article body — scholarly text */
+        .article-body {
+            font-family: var(--font-serif);
+            font-size: 0.92em;
+            line-height: 1.75;
+            color: var(--text-body);
+            text-align: justify;
+        }
+
+        .article-body strong {
+            color: var(--text-title);
+            font-weight: 700;
+        }
+
+        .article-body code {
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+            background: var(--bg-code);
+            padding: 1px 5px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--rule-faint);
+            color: var(--nature-red-dark);
+        }
+
+        /* ============================================================
+         * RESEARCH HIGHLIGHT BOX
+         * ============================================================ */
+        .research-highlight {
+            background: var(--nature-red-dim);
+            border: 1px solid rgba(200, 16, 46, 0.12);
+            border-radius: var(--radius-md);
+            padding: var(--sp-6);
+            margin: var(--sp-8) 0;
+            position: relative;
+        }
+
+        .research-highlight::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 3px; height: 100%;
+            background: linear-gradient(180deg, var(--nature-red), var(--nature-red-light));
+            border-radius: var(--radius-md) 0 0 var(--radius-md);
+        }
+
+        .research-highlight-label {
+            font-family: var(--font-sans);
+            font-size: 0.68em;
+            font-weight: 800;
+            color: var(--nature-red);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: var(--sp-3);
+        }
+
+        /* ============================================================
+         * FIGURE CAPTION STYLE
+         * ============================================================ */
+        .figure-caption {
+            font-family: var(--font-sans);
+            font-size: 0.72em;
+            color: var(--text-caption);
+            line-height: 1.5;
+            padding: var(--sp-2) 0;
+        }
+
+        .figure-caption strong {
+            color: var(--text-secondary);
+            font-weight: 700;
+        }
+
+        /* ============================================================
+         * REFERENCES FOOTER
+         * ============================================================ */
+        .references-section {
+            margin-top: var(--sp-16);
+            padding-top: var(--sp-8);
+            border-top: 2px solid var(--rule-heavy);
+        }
+
+        .references-title {
+            font-family: var(--font-sans);
+            font-size: 1em;
+            font-weight: 800;
+            color: var(--text-title);
+            margin-bottom: var(--sp-6);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .reference-item {
+            font-family: var(--font-serif);
+            font-size: 0.78em;
+            color: var(--text-caption);
+            line-height: 1.6;
+            margin-bottom: var(--sp-3);
+            padding-left: var(--sp-6);
+            text-indent: calc(-1 * var(--sp-6));
+        }
+
+        .reference-item .ref-num {
+            font-family: var(--font-sans);
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        .reference-item a {
+            color: var(--blue-ref);
+            font-size: 0.95em;
+            word-break: break-all;
+        }
+
+        /* ============================================================
+         * FOOTER — Journal Colophon
+         * ============================================================ */
+        .journal-footer {
+            margin-top: var(--sp-16);
+            padding-top: var(--sp-8);
+            border-top: 3px solid var(--rule-heavy);
+            text-align: center;
+            position: relative;
+        }
+
+        .journal-footer::after {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 0; right: 0;
+            height: 1px;
+            background: var(--nature-red);
+        }
+
+        .footer-journal-name {
+            font-family: var(--font-display);
+            font-size: 1.1em;
+            font-weight: 800;
+            color: var(--nature-red);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: var(--sp-2);
+        }
+
+        .footer-tagline {
+            font-family: var(--font-serif);
+            font-size: 0.85em;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-bottom: var(--sp-5);
+        }
+
+        .footer-citation-box {
+            font-family: var(--font-mono);
+            font-size: 0.68em;
+            color: var(--text-caption);
+            background: var(--bg-figure);
+            border: 1px solid var(--rule-light);
+            border-radius: var(--radius-sm);
+            padding: var(--sp-3) var(--sp-5);
+            display: inline-block;
+            line-height: 1.6;
+            margin-bottom: var(--sp-4);
+        }
+
+        .footer-license {
+            font-family: var(--font-sans);
+            font-size: 0.6em;
+            color: var(--text-light);
+            letter-spacing: 0.03em;
+        }
+
+        /* ============================================================
+         * KEYWORD HIGHLIGHTS — Inline reference markers
+         * ============================================================ */
+        .ref-marker {
+            font-family: var(--font-sans);
+            font-size: 0.7em;
+            font-weight: 700;
+            color: var(--blue-ref);
+            vertical-align: super;
+            cursor: default;
+            margin: 0 1px;
+        }
+
+        .ref-marker:hover {
+            color: var(--nature-red);
+        }
+
+        /* ============================================================
+         * SUPPLEMENTARY INFO BOX
+         * ============================================================ */
+        .supplementary-box {
+            background: var(--bg-figure);
+            border: 1px solid var(--rule-light);
+            border-radius: var(--radius-md);
+            padding: var(--sp-5);
+            margin: var(--sp-8) 0;
+        }
+
+        .supplementary-label {
+            font-family: var(--font-sans);
+            font-size: 0.68em;
+            font-weight: 700;
+            color: var(--text-caption);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: var(--sp-3);
+        }
+
+        .supplementary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--sp-4);
+        }
+
+        .supplementary-item {
+            padding: var(--sp-3);
+            background: var(--bg-paper);
+            border: 1px solid var(--rule-faint);
+            border-radius: var(--radius-sm);
+        }
+
+        .supplementary-item-label {
+            font-family: var(--font-sans);
+            font-size: 0.68em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: var(--sp-1);
+        }
+
+        .supplementary-item-value {
+            font-family: var(--font-sans);
+            font-size: 0.92em;
+            font-weight: 700;
+            color: var(--text-body);
+        }
+
+        /* ============================================================
+         * DATA TABLE — For statistics display
+         * ============================================================ */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: var(--sp-6) 0;
+            font-family: var(--font-sans);
+            font-size: 0.82em;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: var(--sp-3) var(--sp-4);
+            background: var(--bg-figure);
+            border-bottom: 2px solid var(--nature-red);
+            font-weight: 700;
+            color: var(--text-title);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-size: 0.88em;
+        }
+
+        .data-table td {
+            padding: var(--sp-2) var(--sp-4);
+            border-bottom: 1px solid var(--rule-faint);
+            color: var(--text-body);
+        }
+
+        .data-table tr:hover td {
+            background: var(--bg-hover);
+        }
+
+        .data-table .cell-number {
+            font-family: var(--font-mono);
+            font-weight: 600;
+            color: var(--nature-red);
+        }
+
+        .data-table .cell-source {
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+
+        /* ============================================================
+         * METHODS SECTION — Brief methodology note
+         * ============================================================ */
+        .methods-note {
+            background: linear-gradient(135deg, var(--bg-figure) 0%, var(--bg-abstract) 100%);
+            border: 1px solid var(--rule-light);
+            border-radius: var(--radius-md);
+            padding: var(--sp-6);
+            margin: var(--sp-10) 0;
+            page-break-inside: avoid;
+        }
+
+        .methods-label {
+            font-family: var(--font-sans);
+            font-size: 0.72em;
+            font-weight: 800;
+            color: var(--text-caption);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: var(--sp-3);
+        }
+
+        .methods-text {
+            font-family: var(--font-serif);
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* ============================================================
+         * CORRESPONDENCE FOOTER
+         * ============================================================ */
+        .correspondence {
+            background: var(--bg-figure);
+            border: 1px solid var(--rule-light);
+            border-radius: var(--radius-md);
+            padding: var(--sp-5);
+            margin-top: var(--sp-8);
+            margin-bottom: var(--sp-6);
+        }
+
+        .correspondence-label {
+            font-family: var(--font-sans);
+            font-size: 0.68em;
+            font-weight: 700;
+            color: var(--text-caption);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: var(--sp-2);
+        }
+
+        .correspondence-text {
+            font-family: var(--font-serif);
+            font-size: 0.82em;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ============================================================
+         * ARTICLE HOVER & INTERACTIVE STATES
+         * ============================================================ */
+        .article-item {
+            transition: all 0.2s ease;
+        }
+
+        .article-item:hover {
+            background: var(--bg-hover);
+            border-radius: var(--radius-sm);
+        }
+
+        .article-title a {
+            transition: color 0.2s ease;
+        }
+
+        .section-header {
+            transition: border-color 0.3s ease;
+        }
+
+        /* ============================================================
+         * PAGINATION NOTE
+         * ============================================================ */
+        .pagination-note {
+            font-family: var(--font-sans);
+            font-size: 0.72em;
+            color: var(--text-light);
+            text-align: center;
+            margin: var(--sp-6) 0;
+            letter-spacing: 0.06em;
+        }
+
+        /* ============================================================
+         * Print Overrides
+         * ============================================================ */
+        @media print {
+            body {
+                background: white !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                font-size: 11pt;
+            }
+            .container { max-width: 100%; padding: 0; }
+            .nature-stripe { -webkit-print-color-adjust: exact; }
+            .article-item { page-break-inside: avoid; }
+            .article-item:hover { transform: none; }
+            a { color: var(--text-body) !important; }
+        }
+
+        /* ============================================================
+         * Mobile Responsive
+         * ============================================================ */
+        @media (max-width: 640px) {
+            .container { padding: var(--sp-6) var(--sp-4); }
+            .nature-stripe { flex-direction: column; gap: var(--sp-1); text-align: center; }
+            .masthead-article-title { font-size: 1.4em; }
+            .metrics-strip { grid-template-columns: repeat(2, 1fr); }
+            .metric-cell + .metric-cell { border-left: none; border-top: 1px solid var(--rule-light); }
+            .metric-cell:nth-child(2n) { border-left: 1px solid var(--rule-light); }
+            .section-num { font-size: 1.2em; }
+            .section-title { font-size: 1.1em; }
+            .abstract-box { padding: var(--sp-5); }
+            .article-citation { flex-direction: column; align-items: flex-start; gap: var(--sp-1); }
+            .masthead-byline { flex-direction: column; gap: var(--sp-2); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- ====== NATURE RED STRIPE ====== -->
+        <div class="nature-stripe">
+            <span class="nature-stripe-title">Nature Intelligence</span>
+            <span class="nature-stripe-issue">Vol. {{ date_str[:4] }} · Issue {{ date_str[5:7] }}{{ date_str[8:10] }}</span>
+        </div>
+
+        <!-- ====== MASTHEAD ====== -->
+        <header class="masthead">
+            <div class="masthead-vol">
+                Original Research Brief · {{ date_str }} · pp. 1–{{ total_items }}
+            </div>
+            <h1 class="masthead-article-title">Comprehensive Analysis of Emerging Technology Trends and Strategic Intelligence</h1>
+            <div class="masthead-article-subtitle">
+                A systematic review of {{ total_items }} primary sources across {{ section_order|length }} domains, with priority-weighted impact assessment and cross-sectoral correlation analysis.
+            </div>
+            <div class="masthead-byline">
+                <span class="byline-author">Newsloom Intelligence System</span>
+                <span class="byline-separator">|</span>
+                <span class="byline-date">Received & Published {{ date_str }}</span>
+                <span class="byline-separator">|</span>
+                <span class="byline-doi">doi:10.1000/ni.{{ date_str | replace('-', '') }}</span>
+            </div>
+        </header>
+
+        <!-- ====== ARTICLE METRICS ====== -->
+        <div class="metrics-strip">
+            <div class="metric-cell">
+                <span class="metric-value">{{ total_items }}</span>
+                <span class="metric-label">Sources Reviewed</span>
+            </div>
+            {% set must_count = [] %}
+            {% for section_key, items in briefs.items() %}
+            {% if items is iterable and items is not string %}
+            {% for item in items %}
+            {% if item.priority == '🔴' %}{% if must_count.append(1) %}{% endif %}{% endif %}
+            {% endfor %}
+            {% endif %}
+            {% endfor %}
+            <div class="metric-cell">
+                <span class="metric-value">{{ must_count|length }}</span>
+                <span class="metric-label">High Impact</span>
+            </div>
+            <div class="metric-cell">
+                <span class="metric-value">{{ section_order|length }}</span>
+                <span class="metric-label">Research Areas</span>
+            </div>
+            <div class="metric-cell">
+                <span class="metric-value">AI</span>
+                <span class="metric-label">Curation Method</span>
+            </div>
+        </div>
+
+        <!-- ====== ABSTRACT ====== -->
+        {% if executive_summary %}
+        <div class="abstract-box">
+            <div class="abstract-label">Abstract</div>
+            {% for line in executive_summary.strip().split('\n') %}
+            {% if line.strip() %}
+            <p>{{ line.strip() | md_inline }}</p>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- ====== EDITOR'S NOTE ====== -->
+        <div class="editors-note">
+            <div class="editors-note-label">Editor's Note</div>
+            <p>This intelligence brief synthesises {{ total_items }} sources from multiple domains. High-impact items (🔴) require immediate attention; recommended items (🟡) merit careful review. All citations follow the journal's standard numbering system.</p>
+        </div>
+        {% endif %}
+
+        <!-- ====== METHODOLOGY ====== -->
+        <div class="methods-note">
+            <div class="methods-label">Methods</div>
+            <div class="methods-text">
+                Sources were collected from {{ section_order|length }} primary research domains via automated multi-feed aggregation. Each article underwent AI-assisted impact assessment, priority classification (High/Recommended/FYI), and cross-domain relevance scoring. Results are presented in descending priority order within each section. Citation numbers are assigned sequentially and correspond to the References section. n = {{ total_items }}.
+            </div>
+        </div>
+
+        <!-- ====== SECTION OVERVIEW TABLE ====== -->
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Section</th>
+                    <th>Articles</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% set tbl_counter = [1] %}
+                {% for section_key in section_order %}
+                {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+                {% set meta = section_configs.get(section_key, {}) %}
+                <tr>
+                    <td class="cell-number">{{ tbl_counter[0] }}</td>
+                    <td>{{ meta.emoji|default('') }} {{ meta.title|default(section_key) }}</td>
+                    <td class="cell-number">{{ briefs[section_key]|length }}</td>
+                </tr>
+                {% if tbl_counter.append(tbl_counter.pop() + 1) %}{% endif %}
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- ====== SECTIONS ====== -->
+        {% set global_ref_counter = [1] %}
+        {% set section_counter = [1] %}
+        {% for section_key in section_order %}
+        {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+        {% set meta = section_configs.get(section_key, {}) %}
+        {% set section_color = meta.color|default('#6366f1') %}
+        {% set items = briefs[section_key] %}
+        <section class="section">
+            <div class="section-header" style="border-bottom-color: {{ section_color }};">
+                <div class="section-number-line">
+                    <span class="section-num" style="color: {{ section_color }};">{{ section_counter[0] }}.</span>
+                    <h2 class="section-title">{{ meta.title|default(section_key) }}</h2>
+                </div>
+                <div class="section-subtitle">{{ items|length }} articles · Section {{ section_counter[0] }} of {{ section_order|length }}</div>
+            </div>
+
+            {% for item in items %}
+            {% set priority = item.priority|default('🟢') %}
+            {% set p_class = 'must-read' if priority == '🔴' else ('recommended' if priority == '🟡' else 'fyi') %}
+            <article class="article-item {{ p_class }}" style="border-left-color: {{ section_color }};">
+                <h3 class="article-title">
+                    <a href="{{ item.url|default('#') }}" target="_blank">{{ item.headline|default(item.title|default('Untitled')) }}</a>
+                    {% if priority == '🔴' %}
+                    <span class="impact-badge">High Impact</span>
+                    {% elif priority == '🟡' %}
+                    <span class="impact-badge" style="background: var(--impact-mid);">Recommended</span>
+                    {% endif %}
+                </h3>
+                <div class="article-citation">
+                    {% if item.source %}
+                    <span class="citation-source">{{ item.source }}</span>
+                    {% endif %}
+                    <span class="citation-ref">[{{ global_ref_counter[0] }}]</span>
+                    {% if item.tags %}
+                    {% for tag in item.tags %}
+                    <span class="citation-tag">{{ tag }}</span>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+                {% if item.detail %}
+                <div class="article-body">{{ item.detail | md_inline }}</div>
+                {% endif %}
+                <div class="figure-caption">
+                    <strong>Fig. {{ section_counter[0] }}.{{ loop.index }}.</strong> Source: {{ item.source|default('Various') }} · Access: <a href="{{ item.url|default('#') }}" target="_blank">{{ item.url|default('#')|truncate(50, True) }}</a>
+                </div>
+                {% if global_ref_counter.append(global_ref_counter.pop() + 1) %}{% endif %}
+            </article>
+            {% endfor %}
+        </section>
+        {% if section_counter.append(section_counter.pop() + 1) %}{% endif %}
+        {% endif %}
+        {% endfor %}
+
+        <!-- ====== REFERENCES ====== -->
+        <div class="references-section">
+            <h2 class="references-title">References</h2>
+            {% set ref_counter = [1] %}
+            {% for section_key in section_order %}
+            {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+            {% set items = briefs[section_key] %}
+            {% for item in items %}
+            <div class="reference-item">
+                <span class="ref-num">[{{ ref_counter[0] }}]</span>
+                {{ item.source|default('Unknown') }}. "{{ item.headline|default(item.title|default('Untitled')) }}."
+                <em>{{ section_configs.get(section_key, {}).title|default(section_key) }}</em>,
+                {{ date_str }}.
+                {% if item.url %}<a href="{{ item.url }}" target="_blank">{{ item.url|truncate(60, True) }}</a>{% endif %}
+            </div>
+            {% if ref_counter.append(ref_counter.pop() + 1) %}{% endif %}
+            {% endfor %}
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- ====== FOOTER ====== -->
+        <footer class="journal-footer">
+            <div class="footer-journal-name">Nature Intelligence</div>
+            <div class="footer-tagline">Advancing knowledge through artificial intelligence</div>
+            <div class="footer-citation-box">
+                Newsloom Intelligence ({{ date_str }}).<br>
+                Technology &amp; Innovation Research Brief, {{ total_items }} sources.<br>
+                doi:10.1000/ni.{{ date_str | replace('-', '') }}
+            </div>
+            <div class="footer-license">
+                © {{ date_str[:4] }} Nature Intelligence · Automated curation system · All rights reserved
+            </div>
+        </footer>
+
+    </div>
+</body>
+</html>

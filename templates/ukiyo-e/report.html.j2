@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>浮世絵 報告書 · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * UKIYO-E 浮世絵 — Japanese Woodblock Print Newsletter
+         * 
+         * Design Philosophy:
+         *   Inspired by Hokusai's "Great Wave" & Hiroshige's landscapes
+         *   Washi paper texture · Indigo-vermillion palette · Gold accents
+         *   Woodblock print grain · Traditional Japanese design (和風デザイン)
+         *   Visual Narrative: Mt. Fuji silhouette, layered ocean waves,
+         *   Ichimatsu & Seigaiha patterns, wave-shaped section dividers
+         *
+         * Palette:
+         *   - 靛藍 (Indigo)     — #264653
+         *   - 朱赤 (Vermillion)  — #C1440E
+         *   - 金箔 (Gold Leaf)   — #C9A961
+         *   - 和紙 (Washi Paper) — #F5F0E1
+         *   - 墨色 (Sumi Ink)    — #2D2B28
+         * ============================================================ */
+
+        /* --- Design Tokens (CSS Custom Properties) --- */
+        :root {
+            /* Core palette — indigo/vermillion/gold */
+            --indigo:           #264653;
+            --indigo-light:     #3A6B7E;
+            --indigo-dark:      #1A3340;
+            --indigo-dim:       rgba(38, 70, 83, 0.12);
+            --indigo-glow:      rgba(38, 70, 83, 0.06);
+
+            --vermillion:       #C1440E;
+            --vermillion-light: #E05A28;
+            --vermillion-dark:  #A03508;
+            --vermillion-dim:   rgba(193, 68, 14, 0.10);
+
+            --gold:             #C9A961;
+            --gold-light:       #D4B872;
+            --gold-dark:        #A88B3D;
+            --gold-dim:         rgba(201, 169, 97, 0.15);
+
+            /* Backgrounds — washi paper tones */
+            --bg-washi:         #F5F0E1;
+            --bg-washi-warm:    #F0E8D5;
+            --bg-card:          #FFFEF7;
+            --bg-surface:       #FAF0E6;
+            --bg-hover:         #FFF8ED;
+            --cloud-white:      #FFFEF7;
+
+            /* Text — ink density */
+            --text-primary:     #2D2B28;
+            --text-secondary:   #4A4742;
+            --text-muted:       #6B6760;
+            --text-inverse:     #FFFEF7;
+
+            /* Natural tones */
+            --bamboo-green:     #6B8E3D;
+            --cherry-pink:      #E8A5A5;
+
+            /* Priority */
+            --priority-must:    #C1440E;
+            --priority-must-bg: rgba(193, 68, 14, 0.07);
+            --priority-rec:     #6B8E3D;
+            --priority-rec-bg:  rgba(107, 142, 61, 0.07);
+            --priority-fyi:     #264653;
+            --priority-fyi-bg:  rgba(38, 70, 83, 0.05);
+
+            /* Borders */
+            --border:           rgba(45, 43, 40, 0.10);
+            --border-strong:    rgba(45, 43, 40, 0.20);
+            --border-accent:    rgba(38, 70, 83, 0.25);
+
+            /* Spacing — 8pt grid */
+            --sp-1: 4px;   --sp-2: 8px;   --sp-3: 12px;
+            --sp-4: 16px;  --sp-5: 20px;  --sp-6: 24px;
+            --sp-8: 32px;  --sp-10: 40px; --sp-12: 48px;
+            --sp-16: 64px;
+
+            /* Typography */
+            --font-serif:  "Noto Serif CJK SC", "Noto Serif SC", "STSong", "SimSun", "Hiragino Mincho ProN", Georgia, serif;
+            --font-sans:   "Noto Sans CJK SC", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Hiragino Sans", sans-serif;
+            --font-mono:   "SF Mono", "Fira Code", "Noto Sans Mono CJK SC", monospace;
+
+            /* Radius & Shadows */
+            --radius-sm:   4px;
+            --radius-md:   8px;
+            --radius-lg:   12px;
+            --shadow-card:     0 2px 8px rgba(38, 70, 83, 0.08), 0 1px 3px rgba(0,0,0,0.06);
+            --shadow-elevated: 0 8px 24px rgba(38, 70, 83, 0.12), 0 2px 8px rgba(0,0,0,0.08);
+
+            /* Wave colors for layered ocean */
+            --wave-1: #264653;
+            --wave-2: #2A5A6A;
+            --wave-3: #3A7B8E;
+            --wave-4: #5199A8;
+        }
+
+        /* --- Page Setup (PDF / WeasyPrint) --- */
+        @page {
+            size: A4;
+            margin: 2cm 2cm;
+            background: var(--bg-washi);
+            @bottom-center {
+                content: "浮世絵 報告書 · " counter(page) " 頁";
+                font-family: var(--font-serif);
+                font-size: 8pt;
+                color: var(--text-muted);
+            }
+        }
+
+        /* --- Reset & Base --- */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-washi);
+            color: var(--text-primary);
+            font-size: 16px;
+            line-height: 1.8;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* --- Washi paper texture: subtle fiber pattern --- */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image:
+                radial-gradient(ellipse at 20% 80%, rgba(38, 70, 83, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(193, 68, 14, 0.02) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(201, 169, 97, 0.025) 0%, transparent 60%),
+                /* washi fiber dots */
+                radial-gradient(circle at 10% 10%, rgba(45,43,40,0.015) 1px, transparent 1px),
+                radial-gradient(circle at 30% 50%, rgba(45,43,40,0.012) 1px, transparent 1px),
+                radial-gradient(circle at 70% 30%, rgba(45,43,40,0.018) 1px, transparent 1px),
+                radial-gradient(circle at 90% 70%, rgba(45,43,40,0.01) 1px, transparent 1px),
+                radial-gradient(circle at 50% 90%, rgba(45,43,40,0.014) 1px, transparent 1px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* --- Woodblock grain texture --- */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image:
+                repeating-linear-gradient(
+                    87deg,
+                    transparent,
+                    transparent 3px,
+                    rgba(45, 43, 40, 0.007) 3px,
+                    rgba(45, 43, 40, 0.007) 4px
+                );
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.5;
+        }
+
+        a {
+            color: var(--indigo);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: all 0.25s ease;
+        }
+        a:hover {
+            color: var(--indigo-dark);
+            border-bottom-color: var(--indigo);
+        }
+
+        /* --- Container --- */
+        .container {
+            max-width: 780px;
+            margin: 0 auto;
+            padding: var(--sp-16) var(--sp-8);
+            position: relative;
+            z-index: 2;
+            background: var(--cloud-white);
+            box-shadow: var(--shadow-elevated);
+            border-left: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+        }
+
+        /* --- Ichimatsu (市松) checkered pattern strip at top --- */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 8px;
+            background-image: repeating-linear-gradient(
+                90deg,
+                var(--indigo) 0px, var(--indigo) 8px,
+                var(--gold) 8px, var(--gold) 16px
+            );
+            opacity: 0.85;
+        }
+
+        /* ============================================================
+         * MOUNT FUJI — CSS silhouette in header background
+         * ============================================================ */
+        .fuji-scene {
+            position: relative;
+            width: 100%;
+            height: 160px;
+            overflow: hidden;
+            margin-bottom: -20px;
+            background: linear-gradient(
+                180deg,
+                #D4E4ED 0%,
+                #E8D5C4 40%,
+                var(--bg-washi) 100%
+            );
+        }
+
+        /* Distant mountain range */
+        .fuji-scene::before {
+            content: '';
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background:
+                /* small hill left */
+                radial-gradient(ellipse 120px 50px at 15% 100%, rgba(38,70,83,0.15) 0%, transparent 70%),
+                /* small hill right */
+                radial-gradient(ellipse 150px 45px at 80% 100%, rgba(38,70,83,0.12) 0%, transparent 70%),
+                /* distant mountain left */
+                radial-gradient(ellipse 200px 55px at 30% 100%, rgba(38,70,83,0.1) 0%, transparent 70%);
+        }
+
+        /* Mt Fuji — the iconic conical shape */
+        .fuji-mountain {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 110px solid transparent;
+            border-right: 110px solid transparent;
+            border-bottom: 105px solid var(--indigo);
+            opacity: 0.18;
+            filter: blur(0.5px);
+        }
+
+        /* Snow cap on Fuji */
+        .fuji-snow {
+            position: absolute;
+            bottom: 92px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 28px solid transparent;
+            border-right: 28px solid transparent;
+            border-bottom: 28px solid rgba(255,255,255,0.7);
+            opacity: 0.9;
+            z-index: 1;
+        }
+
+        /* Clouds drifting across */
+        .fuji-cloud {
+            position: absolute;
+            background: rgba(255,255,255,0.5);
+            border-radius: 50%;
+            height: 14px;
+        }
+        .fuji-cloud:nth-child(3) {
+            width: 80px;
+            top: 50px;
+            left: 20%;
+        }
+        .fuji-cloud:nth-child(4) {
+            width: 60px;
+            top: 40px;
+            right: 25%;
+            opacity: 0.4;
+        }
+
+        /* ============================================================
+         * HEADER: Traditional Japanese Masthead
+         * ============================================================ */
+        .header {
+            text-align: center;
+            padding: var(--sp-12) var(--sp-6);
+            margin-bottom: var(--sp-12);
+            position: relative;
+            border-bottom: 2px solid var(--border-strong);
+        }
+
+        /* Seigaiha (青海波) wave pattern border below header */
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -24px;
+            left: 0;
+            right: 0;
+            height: 24px;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='24' viewBox='0 0 100 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,24 Q12.5,0 25,24 T50,24 T75,24 T100,24' stroke='%23264653' stroke-width='1.5' fill='none' opacity='0.3'/%3E%3Cpath d='M0,24 Q12.5,4 25,24 T50,24 T75,24 T100,24' stroke='%23C9A961' stroke-width='0.8' fill='none' opacity='0.25'/%3E%3Cpath d='M0,24 Q12.5,8 25,24 T50,24 T75,24 T100,24' stroke='%23264653' stroke-width='0.5' fill='none' opacity='0.15'/%3E%3C/svg%3E");
+            background-repeat: repeat-x;
+            background-size: 100px 24px;
+        }
+
+        /* Red seal stamp — 印 */
+        .header-seal {
+            position: absolute;
+            top: var(--sp-6);
+            right: var(--sp-6);
+            width: 52px;
+            height: 52px;
+            background: var(--vermillion);
+            color: var(--cloud-white);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4em;
+            font-weight: 700;
+            font-family: var(--font-serif);
+            box-shadow:
+                0 2px 8px rgba(193, 68, 14, 0.35),
+                inset 0 1px 0 rgba(255,255,255,0.15);
+            transform: rotate(-5deg);
+            border: 2px solid var(--vermillion-dark);
+        }
+
+        /* Gold corner ornament (top-left) — 麻の葉 inspired */
+        .header-ornament {
+            position: absolute;
+            top: var(--sp-4);
+            left: var(--sp-4);
+            width: 40px;
+            height: 40px;
+            border-top: 3px solid var(--gold);
+            border-left: 3px solid var(--gold);
+            opacity: 0.5;
+        }
+        .header-ornament::after {
+            content: '';
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            width: 20px;
+            height: 20px;
+            border-top: 1px solid var(--gold);
+            border-left: 1px solid var(--gold);
+            opacity: 0.6;
+        }
+
+        .header-brand {
+            font-size: 0.75em;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: var(--sp-4);
+            font-family: var(--font-sans);
+        }
+
+        .header-title {
+            font-size: 2.6em;
+            font-weight: 400;
+            color: var(--indigo);
+            margin-bottom: var(--sp-3);
+            font-family: var(--font-serif);
+            letter-spacing: 0.12em;
+            line-height: 1.2;
+        }
+
+        .header-subtitle {
+            font-size: 1em;
+            color: var(--text-secondary);
+            margin-bottom: var(--sp-6);
+            font-family: var(--font-sans);
+            letter-spacing: 0.02em;
+        }
+
+        .header-date {
+            font-size: 0.88em;
+            color: var(--text-muted);
+            font-family: var(--font-serif);
+            margin-bottom: var(--sp-2);
+        }
+
+        .header-meta {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--sp-3);
+            font-size: 0.82em;
+            color: var(--text-muted);
+            font-family: var(--font-sans);
+            flex-wrap: wrap;
+        }
+
+        .header-meta .sep { opacity: 0.4; }
+        .header-meta .must-read-count {
+            color: var(--vermillion);
+            font-weight: 600;
+        }
+
+        /* ============================================================
+         * EXECUTIVE SUMMARY: Scroll / Makimono Style
+         * ============================================================ */
+        .exec-summary {
+            background: linear-gradient(135deg, var(--bg-surface) 0%, var(--bg-washi-warm) 100%);
+            border: 1px solid var(--border-accent);
+            border-left: 4px solid var(--indigo);
+            border-radius: var(--radius-md);
+            padding: var(--sp-8) var(--sp-8);
+            margin-bottom: var(--sp-12);
+            position: relative;
+            page-break-inside: avoid;
+            box-shadow: var(--shadow-card);
+        }
+
+        /* Corner brackets (「」) */
+        .exec-summary::before {
+            content: '「';
+            position: absolute;
+            top: var(--sp-3);
+            left: var(--sp-4);
+            font-size: 2.2em;
+            color: var(--vermillion);
+            font-family: var(--font-serif);
+            line-height: 1;
+            opacity: 0.6;
+        }
+        .exec-summary::after {
+            content: '」';
+            position: absolute;
+            bottom: var(--sp-3);
+            right: var(--sp-4);
+            font-size: 2.2em;
+            color: var(--vermillion);
+            font-family: var(--font-serif);
+            line-height: 1;
+            opacity: 0.6;
+        }
+
+        .exec-label {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--sp-2);
+            font-size: 0.72em;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--indigo);
+            margin-bottom: var(--sp-5);
+            padding: var(--sp-1) var(--sp-3);
+            background: var(--indigo-dim);
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(38, 70, 83, 0.15);
+            font-family: var(--font-sans);
+        }
+
+        .exec-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--indigo);
+            margin-bottom: var(--sp-5);
+            text-align: center;
+            font-family: var(--font-serif);
+            letter-spacing: 0.05em;
+        }
+
+        .exec-content {
+            font-size: 1em;
+            line-height: 2;
+            color: var(--text-secondary);
+            font-family: var(--font-serif);
+        }
+        .exec-content p {
+            margin-bottom: var(--sp-4);
+            text-indent: 2em;
+        }
+        .exec-content p:last-child { margin-bottom: 0; }
+        .exec-content strong {
+            color: var(--vermillion);
+            font-weight: 600;
+        }
+
+        /* ============================================================
+         * WAVE DIVIDER — Seigaiha pattern between sections
+         * ============================================================ */
+        .wave-divider {
+            text-align: center;
+            margin: var(--sp-10) 0;
+            position: relative;
+            height: 32px;
+        }
+
+        .wave-divider::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 32px;
+            background-image: url("data:image/svg+xml,%3Csvg width='200' height='32' viewBox='0 0 200 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,16 Q25,2 50,16 T100,16 T150,16 T200,16' stroke='%23264653' stroke-width='1.5' fill='none' opacity='0.25'/%3E%3Cpath d='M0,20 Q25,8 50,20 T100,20 T150,20 T200,20' stroke='%23C9A961' stroke-width='1' fill='none' opacity='0.2'/%3E%3Cpath d='M0,24 Q25,14 50,24 T100,24 T150,24 T200,24' stroke='%23264653' stroke-width='0.7' fill='none' opacity='0.15'/%3E%3C/svg%3E");
+            background-repeat: repeat-x;
+            background-size: 200px 32px;
+            background-position: center;
+        }
+
+        .wave-divider-icon {
+            display: inline-block;
+            background: var(--cloud-white);
+            padding: 0 var(--sp-4);
+            position: relative;
+            font-size: 1.2em;
+            color: var(--gold);
+            z-index: 1;
+            line-height: 32px;
+        }
+
+        /* ============================================================
+         * SECTION: Chapter dividers with section color
+         * ============================================================ */
+        .section {
+            margin-bottom: var(--sp-12);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-4);
+            margin-bottom: var(--sp-6);
+            padding-bottom: var(--sp-4);
+            border-bottom: 1px solid var(--border);
+            position: relative;
+        }
+
+        /* Section color accent line on left — uses inline style */
+        .section-header::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: var(--sp-4);
+            width: 3px;
+            background: linear-gradient(180deg, var(--section-color, var(--gold)) 0%, transparent 100%);
+            border-radius: 2px;
+        }
+
+        /* Wave decoration below section header */
+        .section-header::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 100px;
+            height: 16px;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 16' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,8 Q12.5,0 25,8 T50,8 T75,8 T100,8' stroke='%23C1440E' stroke-width='1.2' fill='none' opacity='0.4'/%3E%3Cpath d='M0,12 Q12.5,4 25,12 T50,12 T75,12 T100,12' stroke='%23C9A961' stroke-width='0.6' fill='none' opacity='0.25'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+        }
+
+        .section-icon {
+            font-size: 1.5em;
+            margin-left: var(--sp-3);
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            font-weight: 500;
+            color: var(--indigo);
+            font-family: var(--font-serif);
+            letter-spacing: 0.06em;
+        }
+
+        .section-count {
+            margin-left: auto;
+            background: var(--vermillion);
+            color: var(--cloud-white);
+            padding: var(--sp-1) var(--sp-3);
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 600;
+            font-family: var(--font-sans);
+            box-shadow: 0 1px 4px rgba(193, 68, 14, 0.3);
+        }
+
+        /* ============================================================
+         * SECTION WAVE SEPARATOR — wave-shaped divider between sections
+         * ============================================================ */
+        .section-wave-sep {
+            position: relative;
+            height: 30px;
+            margin: var(--sp-8) 0;
+            overflow: hidden;
+        }
+        .section-wave-sep::before {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 30px;
+            background-image: url("data:image/svg+xml,%3Csvg width='400' height='30' viewBox='0 0 400 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,15 C50,0 100,30 150,15 S250,0 300,15 S400,30 400,15' stroke='%23264653' stroke-width='1' fill='none' opacity='0.2'/%3E%3Cpath d='M0,18 C50,5 100,28 150,18 S250,5 300,18 S400,28 400,18' stroke='%23C9A961' stroke-width='0.7' fill='none' opacity='0.15'/%3E%3C/svg%3E");
+            background-repeat: repeat-x;
+            background-size: 400px 30px;
+        }
+
+        /* ============================================================
+         * BRIEF CARDS: Woodblock print inspired
+         * ============================================================ */
+        .brief {
+            background: var(--cloud-white);
+            border: 1px solid var(--border);
+            border-left: 4px solid transparent;
+            padding: var(--sp-6);
+            margin-bottom: var(--sp-4);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-card);
+            transition: all 0.3s ease;
+            page-break-inside: avoid;
+            position: relative;
+        }
+        .brief:hover {
+            box-shadow: var(--shadow-elevated);
+            transform: translateY(-2px);
+            border-color: var(--border-strong);
+        }
+
+        /* Must-read: vermillion */
+        .brief.must-read {
+            border-left-color: var(--priority-must);
+            background: linear-gradient(135deg, var(--priority-must-bg) 0%, var(--cloud-white) 60%);
+        }
+        .brief.must-read::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 0; height: 0;
+            border-top: 24px solid var(--vermillion);
+            border-left: 24px solid transparent;
+            opacity: 0.7;
+            border-radius: 0 var(--radius-md) 0 0;
+        }
+
+        /* Recommended: bamboo green */
+        .brief.recommended {
+            border-left-color: var(--priority-rec);
+            background: linear-gradient(135deg, var(--priority-rec-bg) 0%, var(--cloud-white) 60%);
+        }
+
+        /* FYI: indigo */
+        .brief.fyi {
+            border-left-color: var(--priority-fyi);
+            background: linear-gradient(135deg, var(--priority-fyi-bg) 0%, var(--cloud-white) 60%);
+        }
+
+        .brief-header {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--sp-3);
+            margin-bottom: var(--sp-4);
+        }
+
+        /* Kanji priority markers */
+        .priority-marker {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72em;
+            font-weight: 700;
+            color: white;
+            margin-top: 2px;
+            font-family: var(--font-serif);
+        }
+        .brief.must-read .priority-marker {
+            background: var(--priority-must);
+            box-shadow: 0 2px 6px rgba(193, 68, 14, 0.35);
+        }
+        .brief.must-read .priority-marker::before { content: '重'; }
+        .brief.recommended .priority-marker {
+            background: var(--priority-rec);
+            box-shadow: 0 2px 6px rgba(107, 142, 61, 0.3);
+        }
+        .brief.recommended .priority-marker::before { content: '薦'; }
+        .brief.fyi .priority-marker {
+            background: var(--priority-fyi);
+            box-shadow: 0 2px 6px rgba(38, 70, 83, 0.3);
+        }
+        .brief.fyi .priority-marker::before { content: '参'; }
+
+        .brief-headline {
+            flex: 1;
+            font-size: 1.15em;
+            font-weight: 600;
+            line-height: 1.45;
+            font-family: var(--font-serif);
+        }
+        .brief-headline a {
+            color: var(--text-primary);
+            transition: color 0.2s ease;
+        }
+        .brief-headline a:hover {
+            color: var(--indigo);
+        }
+        .brief.must-read .brief-headline a {
+            color: var(--vermillion-dark);
+            font-weight: 700;
+        }
+
+        .brief-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            margin-bottom: var(--sp-4);
+            flex-wrap: wrap;
+        }
+
+        .source-badge {
+            background: var(--bg-surface);
+            color: var(--indigo);
+            border: 1px solid var(--border-accent);
+            padding: var(--sp-1) var(--sp-3);
+            border-radius: 16px;
+            font-size: 0.78em;
+            font-weight: 500;
+            font-family: var(--font-sans);
+            transition: background 0.2s ease;
+        }
+        .source-badge:hover {
+            background: var(--indigo-dim);
+        }
+
+        .tag {
+            background: var(--cherry-pink);
+            color: var(--text-primary);
+            border: 1px solid rgba(193, 68, 14, 0.15);
+            padding: var(--sp-1) var(--sp-3);
+            border-radius: 12px;
+            font-size: 0.72em;
+            font-weight: 500;
+            font-family: var(--font-sans);
+            transition: background 0.2s ease;
+        }
+        .tag:hover {
+            background: rgba(232, 165, 165, 0.7);
+        }
+
+        .brief-detail {
+            color: var(--text-secondary);
+            font-size: 0.95em;
+            line-height: 1.85;
+            margin-left: calc(28px + var(--sp-3));
+            font-family: var(--font-serif);
+        }
+        .brief-detail strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        .brief-detail code {
+            font-family: var(--font-mono);
+            background: var(--bg-surface);
+            color: var(--vermillion);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.88em;
+            border: 1px solid var(--border);
+        }
+
+        /* ============================================================
+         * GOLD STRIP — Ichimatsu pattern decorative divider
+         * ============================================================ */
+        .gold-strip {
+            height: 4px;
+            margin: var(--sp-8) 0;
+            background-image: repeating-linear-gradient(
+                90deg,
+                var(--gold) 0px, var(--gold) 6px,
+                transparent 6px, transparent 12px
+            );
+            opacity: 0.3;
+        }
+
+        /* ============================================================
+         * OCEAN WAVES — Layered CSS waves at page bottom
+         * Four layers of indigo waves, lighter to darker
+         * ============================================================ */
+        .ocean-waves {
+            position: relative;
+            width: 100%;
+            height: 120px;
+            overflow: hidden;
+            margin-top: var(--sp-10);
+        }
+
+        .ocean-wave {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 100%;
+        }
+
+        /* Wave layer 1 — lightest, furthest back */
+        .ocean-wave-1 {
+            bottom: 0;
+            z-index: 1;
+        }
+        .ocean-wave-1::before {
+            content: '';
+            position: absolute;
+            bottom: 0; left: -5%; right: -5%;
+            height: 80px;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 1200 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,40 C100,10 200,70 300,40 S500,10 600,40 S800,70 900,40 S1100,10 1200,40 L1200,80 L0,80 Z' fill='%235199A8' opacity='0.3'/%3E%3C/svg%3E");
+            background-size: 1200px 80px;
+            background-repeat: repeat-x;
+        }
+
+        /* Wave layer 2 */
+        .ocean-wave-2 {
+            bottom: 0;
+            z-index: 2;
+        }
+        .ocean-wave-2::before {
+            content: '';
+            position: absolute;
+            bottom: 0; left: -5%; right: -5%;
+            height: 70px;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 1200 70' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,35 C80,15 180,55 280,35 S480,15 580,35 S780,55 880,35 S1080,15 1200,35 L1200,70 L0,70 Z' fill='%233A7B8E' opacity='0.4'/%3E%3C/svg%3E");
+            background-size: 1200px 70px;
+            background-repeat: repeat-x;
+        }
+
+        /* Wave layer 3 */
+        .ocean-wave-3 {
+            bottom: 0;
+            z-index: 3;
+        }
+        .ocean-wave-3::before {
+            content: '';
+            position: absolute;
+            bottom: 0; left: -5%; right: -5%;
+            height: 55px;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 1200 55' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,28 C70,8 170,48 270,28 S470,8 570,28 S770,48 870,28 S1070,8 1200,28 L1200,55 L0,55 Z' fill='%232A5A6A' opacity='0.5'/%3E%3C/svg%3E");
+            background-size: 1200px 55px;
+            background-repeat: repeat-x;
+        }
+
+        /* Wave layer 4 — darkest, foreground */
+        .ocean-wave-4 {
+            bottom: 0;
+            z-index: 4;
+        }
+        .ocean-wave-4::before {
+            content: '';
+            position: absolute;
+            bottom: 0; left: -5%; right: -5%;
+            height: 40px;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 1200 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,20 C60,5 160,35 260,20 S460,5 560,20 S760,35 860,20 S1060,5 1200,20 L1200,40 L0,40 Z' fill='%23264653' opacity='0.6'/%3E%3C/svg%3E");
+            background-size: 1200px 40px;
+            background-repeat: repeat-x;
+        }
+
+        /* Hokusai-style wave crests — white foam */
+        .wave-foam {
+            position: absolute;
+            bottom: 28px;
+            left: 0; right: 0;
+            height: 20px;
+            z-index: 5;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 600 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50,15 Q55,5 65,12 Q70,3 80,10 M180,14 Q185,4 195,11 Q200,2 210,9 M320,15 Q325,5 335,12 Q340,3 350,10 M470,14 Q475,4 485,11 Q490,2 500,9' stroke='white' stroke-width='1.5' fill='none' opacity='0.35' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: repeat-x;
+            background-size: 600px 20px;
+        }
+
+        /* ============================================================
+         * FOOTER: Traditional Seal Style
+         * ============================================================ */
+        .footer {
+            text-align: center;
+            padding: var(--sp-12) 0 var(--sp-8);
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Seigaiha wave pattern above footer */
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background-image: url("data:image/svg+xml,%3Csvg width='120' height='20' viewBox='0 0 120 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,10 Q15,0 30,10 T60,10 T90,10 T120,10' stroke='%23C9A961' stroke-width='1.2' fill='none' opacity='0.35'/%3E%3Cpath d='M0,14 Q15,4 30,14 T60,14 T90,14 T120,14' stroke='%23264653' stroke-width='0.8' fill='none' opacity='0.2'/%3E%3C/svg%3E");
+            background-repeat: repeat-x;
+            background-size: 120px 20px;
+        }
+
+        .footer-seal {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            background: var(--vermillion);
+            color: var(--cloud-white);
+            border-radius: 50%;
+            font-size: 1em;
+            font-weight: 700;
+            font-family: var(--font-serif);
+            box-shadow: 0 2px 10px rgba(193, 68, 14, 0.35);
+            transform: rotate(-8deg);
+            margin-bottom: var(--sp-4);
+            border: 2px solid var(--vermillion-dark);
+        }
+
+        .footer-brand {
+            font-size: 1.3em;
+            font-weight: 500;
+            color: var(--indigo);
+            margin-bottom: var(--sp-2);
+            font-family: var(--font-serif);
+            letter-spacing: 0.1em;
+        }
+
+        .footer-tagline {
+            font-size: 0.88em;
+            color: var(--text-secondary);
+            margin-bottom: var(--sp-3);
+            font-family: var(--font-serif);
+        }
+
+        .footer-meta {
+            font-size: 0.78em;
+            color: var(--text-muted);
+            font-family: var(--font-sans);
+        }
+
+        /* Ichimatsu pattern strip at very bottom */
+        .footer::after {
+            content: '';
+            display: block;
+            margin-top: var(--sp-8);
+            height: 6px;
+            background-image: repeating-linear-gradient(
+                90deg,
+                var(--indigo) 0px, var(--indigo) 6px,
+                var(--gold) 6px, var(--gold) 12px
+            );
+            opacity: 0.5;
+        }
+
+        /* ============================================================
+         * PRINT / PDF Overrides
+         * ============================================================ */
+        @media print {
+            body {
+                background: var(--bg-washi) !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            body::before, body::after { display: none; }
+            .container {
+                box-shadow: none;
+                border: none;
+                max-width: 100%;
+                padding: 0;
+            }
+            .container::before { display: none; }
+            .fuji-scene { height: 100px; }
+            .header { margin-bottom: var(--sp-8); padding: var(--sp-6) var(--sp-4); }
+            .exec-summary { margin-bottom: var(--sp-8); padding: var(--sp-5) var(--sp-6); }
+            .section { margin-bottom: var(--sp-8); }
+            .brief { margin-bottom: var(--sp-2); padding: var(--sp-4); box-shadow: none; }
+            .brief:hover { transform: none; box-shadow: none; }
+            .ocean-waves { height: 80px; }
+            a { color: var(--text-primary) !important; border-bottom: none !important; }
+        }
+
+        /* ============================================================
+         * MOBILE Responsive
+         * ============================================================ */
+        @media (max-width: 640px) {
+            .container {
+                padding: var(--sp-8) var(--sp-4);
+                border: none;
+            }
+            .fuji-scene { height: 100px; }
+            .fuji-mountain {
+                border-left-width: 70px;
+                border-right-width: 70px;
+                border-bottom-width: 70px;
+            }
+            .fuji-snow {
+                bottom: 62px;
+                border-left-width: 18px;
+                border-right-width: 18px;
+                border-bottom-width: 18px;
+            }
+            .header {
+                padding: var(--sp-8) var(--sp-4);
+            }
+            .header-title {
+                font-size: 2em;
+                letter-spacing: 0.08em;
+            }
+            .header-seal {
+                width: 40px;
+                height: 40px;
+                font-size: 1.1em;
+                top: var(--sp-3);
+                right: var(--sp-3);
+            }
+            .header-ornament { display: none; }
+            .exec-summary {
+                padding: var(--sp-5) var(--sp-5);
+            }
+            .exec-content p {
+                text-indent: 0;
+            }
+            .brief {
+                padding: var(--sp-4);
+            }
+            .brief-detail {
+                margin-left: 0;
+                margin-top: var(--sp-3);
+            }
+            .section-title {
+                font-size: 1.25em;
+            }
+            .ocean-waves { height: 80px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- ====== MT. FUJI SCENE — Distant landscape ====== -->
+        <div class="fuji-scene">
+            <div class="fuji-mountain"></div>
+            <div class="fuji-snow"></div>
+            <div class="fuji-cloud"></div>
+            <div class="fuji-cloud"></div>
+        </div>
+
+        <!-- ====== HEADER: Traditional Japanese Masthead ====== -->
+        <header class="header">
+            <div class="header-ornament"></div>
+            <div class="header-seal">印</div>
+            <div class="header-brand">NEWSLOOM · 浮世絵</div>
+            <h1 class="header-title">浮世絵 報告書</h1>
+            <div class="header-subtitle">Daily Intelligence in Ukiyo-e Style</div>
+            <div class="header-date">{{ date_str }}</div>
+            <div class="header-meta">
+                <span>{{ generated_time }}</span>
+                <span class="sep">·</span>
+                <span>{{ total_items }} 件の情報</span>
+                {% set must_read_total = [] %}
+                {% for section_key, items in briefs.items() %}
+                {% if items is iterable and items is not string %}
+                {% for item in items %}
+                {% if item.priority == '🔴' %}
+                {% if must_read_total.append(1) %}{% endif %}
+                {% endif %}
+                {% endfor %}
+                {% endif %}
+                {% endfor %}
+                {% if must_read_total|length > 0 %}
+                <span class="sep">·</span>
+                <span class="must-read-count">{{ must_read_total|length }} 件必読</span>
+                {% endif %}
+            </div>
+        </header>
+
+        <!-- ====== EXECUTIVE SUMMARY: Scroll / Makimono ====== -->
+        {% if executive_summary %}
+        <div class="exec-summary">
+            <div class="exec-label">⚡ 本日概要</div>
+            <h2 class="exec-title">要旨</h2>
+            <div class="exec-content">
+                {% for line in executive_summary.strip().split('\n') %}
+                {% if line.strip() %}
+                <p>{{ line.strip() | md_inline }}</p>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ====== WAVE DIVIDER ====== -->
+        <div class="wave-divider">
+            <span class="wave-divider-icon">🌊</span>
+        </div>
+
+        <!-- ====== SECTIONS ====== -->
+        {% for section_key in section_order %}
+        {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+        {% set meta = section_configs.get(section_key, {}) %}
+        {% set items = briefs[section_key] %}
+        {% set section_color = meta.color|default('#C9A961') %}
+        <section class="section">
+            <div class="section-header" style="--section-color: {{ section_color }}">
+                <span class="section-icon">{{ meta.emoji|default('🌊') }}</span>
+                <h2 class="section-title" style="color: {{ section_color }}">{{ meta.title|default(section_key|title) }}</h2>
+                <span class="section-count" style="background: {{ section_color }}">{{ items|length }}</span>
+            </div>
+
+            {% for item in items %}
+            {% set priority = item.priority|default('🟢') %}
+            {% set p_class = 'must-read' if priority == '🔴' else ('recommended' if priority == '🟡' else 'fyi') %}
+            <div class="brief {{ p_class }}">
+                <div class="brief-header">
+                    <div class="priority-marker"></div>
+                    <div class="brief-headline">
+                        <a href="{{ item.url|default('#') }}" target="_blank">{{ item.headline|default(item.title|default('無題')) }}</a>
+                    </div>
+                </div>
+                <div class="brief-meta">
+                    {% if item.source %}
+                    <span class="source-badge">{{ item.source }}</span>
+                    {% endif %}
+                    {% if item.tags %}
+                    {% for tag in item.tags %}
+                    <span class="tag">{{ tag }}</span>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+                {% if item.detail %}
+                <div class="brief-detail">{{ item.detail|default('') | md_inline }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </section>
+
+        {% if not loop.last %}
+        <div class="section-wave-sep"></div>
+        {% endif %}
+
+        {% endif %}
+        {% endfor %}
+
+        <!-- ====== OCEAN WAVES — Layered bottom decoration ====== -->
+        <div class="ocean-waves">
+            <div class="ocean-wave ocean-wave-1"></div>
+            <div class="ocean-wave ocean-wave-2"></div>
+            <div class="ocean-wave ocean-wave-3"></div>
+            <div class="ocean-wave ocean-wave-4"></div>
+            <div class="wave-foam"></div>
+        </div>
+
+        <!-- ====== FOOTER: Seal Style ====== -->
+        <footer class="footer">
+            <div class="footer-seal">雲</div>
+            <div class="footer-brand">浮世絵ニューズ</div>
+            <div class="footer-tagline">伝統美学で現代を読む</div>
+            <div class="footer-meta">{{ date_str }} · {{ total_items }} 件の情報を分析 · AI-curated</div>
+        </footer>
+
+    </div>
+</body>
+</html>

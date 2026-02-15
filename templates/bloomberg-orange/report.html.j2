@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLOOMBERG TERMINAL · NEWSLOOM · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * BLOOMBERG ORANGE — Financial Terminal Data Theme
+         * ============================================================
+         * Deep blue-black background with subtle grid overlay
+         * Bloomberg signature orange · Dense monospace data layout
+         * Terminal status bar · Ticker bars · <GO> key section headers
+         * Alert-level priority colors · Scrolling data bar
+         * Inspired by: Bloomberg Terminal, bloomberg.com data vis
+         * ============================================================ */
+
+        /* --- Design Tokens (CSS Custom Properties) --- */
+        :root {
+            /* Bloomberg Terminal Colors — deep blue-black, NOT pure dark */
+            --bg-primary:     #0a0e1a;
+            --bg-secondary:   #0f1424;
+            --bg-card:        #141a2e;
+            --bg-hover:       #1a2038;
+            --bg-terminal:    #080c16;
+            --bg-surface:     #181e32;
+            --bg-elevated:    #1e2540;
+            --bg-ticker:      var(--orange);
+
+            /* Subtle grid overlay colors */
+            --grid-line:      rgba(255, 255, 255, 0.03);
+            --grid-line-strong: rgba(255, 255, 255, 0.05);
+
+            /* Text Hierarchy */
+            --text-primary:   #F0F0F0;
+            --text-secondary: #D8D8D8;
+            --text-body:      #C0C0C0;
+            --text-muted:     #909090;
+            --text-subtle:    #686868;
+            --text-dim:       #505050;
+            --text-dark:      #0a0e1a;
+            --text-inverse:   #FFFFFF;
+
+            /* Bloomberg Orange System */
+            --orange:         #FF6F00;
+            --orange-bright:  #FF8F00;
+            --orange-light:   #FFB74D;
+            --orange-dim:     rgba(255, 111, 0, 0.15);
+            --orange-soft:    rgba(255, 111, 0, 0.08);
+            --orange-glow:    rgba(255, 111, 0, 0.35);
+            --orange-border:  rgba(255, 111, 0, 0.25);
+
+            /* Terminal Data Colors — market colors */
+            --green:          #00E676;
+            --green-dim:      rgba(0, 230, 118, 0.12);
+            --red:            #FF5252;
+            --red-dim:        rgba(255, 82, 82, 0.12);
+            --yellow:         #FFD740;
+            --cyan:           #18FFFF;
+            --blue:           #448AFF;
+            --magenta:        #E040FB;
+
+            /* Priority System — Terminal alert levels */
+            --priority-must:     #FF5252;
+            --priority-must-bg:  rgba(255, 82, 82, 0.08);
+            --priority-must-glow: rgba(255, 82, 82, 0.25);
+            --priority-rec:      #FFD740;
+            --priority-rec-bg:   rgba(255, 215, 64, 0.06);
+            --priority-fyi:      #00E676;
+            --priority-fyi-bg:   rgba(0, 230, 118, 0.04);
+
+            /* Market Data Colors */
+            --data-positive:  #00E676;
+            --data-negative:  #FF5252;
+            --data-neutral:   #FFB74D;
+            --data-info:      #40C4FF;
+
+            /* Borders & Lines */
+            --border:         #1e2540;
+            --border-strong:  #2a3050;
+            --border-subtle:  #161c30;
+            --border-orange:  var(--orange-border);
+
+            /* Effects */
+            --glow-orange:    0 0 12px var(--orange-glow);
+            --shadow-terminal: 0 2px 8px rgba(0, 0, 0, 0.5);
+            --shadow-card:    0 1px 4px rgba(0, 0, 0, 0.4);
+            --shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.5);
+
+            /* Spacing (Terminal-compact) */
+            --sp-1:  4px;   --sp-2:  8px;   --sp-3:  12px;
+            --sp-4:  16px;  --sp-5:  20px;  --sp-6:  24px;
+            --sp-8:  32px;  --sp-10: 40px;  --sp-12: 48px;
+            --sp-16: 64px;
+
+            /* Typography (Terminal monospace primary) */
+            --font-mono: "SF Mono", "Cascadia Code", "Fira Code", "JetBrains Mono",
+                        "Monaco", "Consolas", "Liberation Mono", "Courier New", monospace;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                        "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei",
+                        "Helvetica Neue", Arial, sans-serif;
+
+            /* Radius (Terminal = sharp) */
+            --radius-none: 0;
+            --radius-sm: 2px;
+            --radius-md: 4px;
+        }
+
+        /* --- Page Setup (PDF — Dark terminal) --- */
+        @page {
+            size: A4;
+            margin: 1cm;
+            background: var(--bg-primary);
+            @top-left {
+                content: "BLOOMBERG TERMINAL";
+                font-family: var(--font-mono);
+                font-size: 7pt;
+                color: var(--orange);
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+            }
+            @top-right {
+                content: "{{ date_str }}";
+                font-family: var(--font-mono);
+                font-size: 7pt;
+                color: var(--text-muted);
+            }
+            @bottom-right {
+                content: "BBG " counter(page);
+                font-family: var(--font-mono);
+                font-size: 7pt;
+                color: var(--text-muted);
+            }
+        }
+
+        /* --- Global Reset --- */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* --- Base Typography --- */
+        body {
+            font-family: var(--font-mono);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 12px;
+            line-height: 1.45;
+            -webkit-font-smoothing: auto;
+            -moz-osx-font-smoothing: auto;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            letter-spacing: 0.01em;
+            /* Subtle grid background — the Bloomberg signature */
+            background-image:
+                repeating-linear-gradient(
+                    0deg,
+                    var(--grid-line) 0px,
+                    var(--grid-line) 1px,
+                    transparent 1px,
+                    transparent 24px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    var(--grid-line) 0px,
+                    var(--grid-line) 1px,
+                    transparent 1px,
+                    transparent 24px
+                );
+            background-size: 24px 24px;
+        }
+
+        /* --- Terminal Cursor Animation --- */
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* Alert blink — for CRITICAL priority */
+        @keyframes alert-blink {
+            0%, 40% { opacity: 1; }
+            50% { opacity: 0.3; }
+            60%, 100% { opacity: 1; }
+        }
+
+        .cursor::after {
+            content: '█';
+            animation: blink 1s step-end infinite;
+            color: var(--orange);
+            font-weight: 400;
+            margin-left: 2px;
+        }
+
+        /* --- Links --- */
+        a {
+            color: var(--orange);
+            text-decoration: none;
+            transition: all 0.15s ease;
+        }
+
+        a:hover {
+            color: var(--orange-bright);
+            text-shadow: var(--glow-orange);
+        }
+
+        /* --- Layout Container --- */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: var(--sp-3);
+            position: relative;
+        }
+
+        /* ==========================================================
+         * HEADER: Terminal Status Bar + Title
+         * ========================================================== */
+        .header {
+            background: var(--bg-terminal);
+            border: 1px solid var(--border-strong);
+            margin-bottom: var(--sp-4);
+            overflow: hidden;
+        }
+
+        /* Top ticker bar — orange with terminal data */
+        .ticker-bar {
+            background: var(--orange);
+            color: var(--text-dark);
+            padding: var(--sp-2) var(--sp-4);
+            font-weight: 700;
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ticker-left {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+        }
+
+        .ticker-status {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--sp-1);
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--bg-terminal);
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        .ticker-right {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            font-weight: 600;
+        }
+
+        /* Header content area — with status bar feel */
+        .header-content {
+            padding: var(--sp-5) var(--sp-4);
+        }
+
+        /* Terminal status bar row — time, date, connection, refresh rate */
+        .terminal-status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--sp-2) var(--sp-3);
+            margin-bottom: var(--sp-4);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            font-size: 0.72em;
+            color: var(--text-muted);
+            gap: var(--sp-2);
+            flex-wrap: wrap;
+        }
+
+        .terminal-status-item {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-1);
+        }
+
+        .terminal-status-item .ts-label {
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .terminal-status-item .ts-value {
+            color: var(--orange);
+            font-weight: 700;
+        }
+
+        .terminal-status-item .ts-value.online {
+            color: var(--green);
+        }
+
+        .terminal-brand {
+            font-size: 2em;
+            font-weight: 700;
+            color: var(--orange);
+            letter-spacing: 0.06em;
+            margin-bottom: var(--sp-1);
+            text-shadow: var(--glow-orange);
+        }
+
+        .terminal-subtitle {
+            color: var(--text-muted);
+            font-size: 0.85em;
+            margin-bottom: var(--sp-4);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        /* Data grid stats — stock board style */
+        .terminal-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            margin-top: var(--sp-3);
+        }
+
+        .stat-block {
+            text-align: center;
+            padding: var(--sp-3) var(--sp-2);
+            background: var(--bg-terminal);
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--orange);
+            line-height: 1;
+            margin-bottom: var(--sp-1);
+        }
+
+        .stat-value.up { color: var(--data-positive); }
+        .stat-value.down { color: var(--data-negative); }
+
+        .stat-label {
+            font-size: 0.68em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        /* ==========================================================
+         * SYSTEM STATUS BAR
+         * ========================================================== */
+        .system-bar {
+            background: var(--bg-terminal);
+            border: 1px solid var(--border);
+            padding: var(--sp-2) var(--sp-4);
+            margin-bottom: var(--sp-4);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.72em;
+            color: var(--text-subtle);
+        }
+
+        .system-bar-left {
+            display: flex;
+            gap: var(--sp-4);
+        }
+
+        .sys-item {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-1);
+        }
+
+        .sys-label {
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .sys-value {
+            color: var(--orange);
+            font-weight: 600;
+        }
+
+        .sys-value.positive { color: var(--data-positive); }
+        .sys-value.negative { color: var(--data-negative); }
+
+        /* ==========================================================
+         * MARKET TICKER (Scrolling data bar)
+         * ========================================================== */
+        .market-ticker {
+            background: var(--bg-terminal);
+            border: 1px solid var(--border);
+            padding: var(--sp-2) 0;
+            margin-bottom: var(--sp-4);
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+        }
+
+        /* Fade edges */
+        .market-ticker::before,
+        .market-ticker::after {
+            content: '';
+            position: absolute;
+            top: 0; bottom: 0;
+            width: 40px;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .market-ticker::before {
+            left: 0;
+            background: linear-gradient(90deg, var(--bg-terminal), transparent);
+        }
+
+        .market-ticker::after {
+            right: 0;
+            background: linear-gradient(270deg, var(--bg-terminal), transparent);
+        }
+
+        .ticker-scroll {
+            display: inline-block;
+            animation: scroll-left 50s linear infinite;
+            color: var(--text-muted);
+            font-size: 0.78em;
+            padding: 0 var(--sp-4);
+        }
+
+        @keyframes scroll-left {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .ticker-item {
+            margin-right: var(--sp-8);
+        }
+
+        .ticker-symbol {
+            color: var(--orange);
+            font-weight: 700;
+        }
+
+        .ticker-positive { color: var(--data-positive); }
+        .ticker-negative { color: var(--data-negative); }
+
+        /* ==========================================================
+         * EXECUTIVE SUMMARY: Terminal Command Window
+         * ========================================================== */
+        .executive-summary {
+            background: var(--bg-terminal);
+            border: 1px solid var(--border);
+            margin-bottom: var(--sp-6);
+            box-shadow: var(--shadow-terminal);
+            page-break-inside: avoid;
+        }
+
+        .summary-header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: var(--sp-2) var(--sp-4);
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+        }
+
+        .summary-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--orange);
+            box-shadow: 0 0 6px var(--orange-glow);
+            animation: pulse-dot 3s ease-in-out infinite;
+        }
+
+        .summary-title {
+            font-size: 0.78em;
+            font-weight: 700;
+            color: var(--orange);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .summary-timestamp {
+            margin-left: auto;
+            font-size: 0.68em;
+            color: var(--text-dim);
+        }
+
+        /* Command prompt decoration */
+        .summary-prompt {
+            padding: var(--sp-3) var(--sp-4);
+            border-bottom: 1px solid var(--border-subtle);
+            color: var(--text-subtle);
+            font-size: 0.78em;
+        }
+
+        .summary-prompt .cmd {
+            color: var(--orange);
+            font-weight: 600;
+        }
+
+        .summary-content {
+            padding: var(--sp-4);
+            font-family: var(--font-sans);
+        }
+
+        .summary-content p {
+            color: var(--text-body);
+            margin-bottom: var(--sp-3);
+            line-height: 1.6;
+            font-size: 0.92em;
+        }
+
+        .summary-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .summary-content strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* ==========================================================
+         * SECTION: Bloomberg <GO> key tab-style headers
+         * ========================================================== */
+        .section {
+            margin-bottom: var(--sp-6);
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+        }
+
+        .section-header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 0;
+            display: flex;
+            align-items: stretch;
+            position: relative;
+        }
+
+        /* Orange left indicator — uses section color */
+        .section-header::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+            background: var(--section-color, var(--orange));
+        }
+
+        /* <GO> key badge */
+        .section-go-key {
+            background: var(--orange);
+            color: var(--text-dark);
+            font-size: 0.65em;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            padding: var(--sp-2) var(--sp-3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+            min-width: 50px;
+            border-right: 1px solid rgba(0,0,0,0.2);
+        }
+
+        .section-header-content {
+            flex: 1;
+            padding: var(--sp-3) var(--sp-4);
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+        }
+
+        .section-emoji {
+            font-size: 1em;
+            width: 18px;
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: 0.82em;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            flex: 1;
+        }
+
+        .section-count {
+            font-size: 0.72em;
+            font-weight: 700;
+            color: var(--orange);
+            background: var(--orange-soft);
+            padding: 2px var(--sp-2);
+            border: 1px solid var(--orange-dim);
+            text-transform: uppercase;
+        }
+
+        .section-critical-count {
+            font-size: 0.68em;
+            font-weight: 700;
+            color: var(--priority-must);
+            background: var(--priority-must-bg);
+            padding: 2px var(--sp-2);
+            border: 1px solid rgba(255, 82, 82, 0.15);
+            animation: alert-blink 2s ease-in-out infinite;
+        }
+
+        /* Section color bar at top */
+        .section-color-bar {
+            height: 2px;
+            background: var(--section-color, var(--orange));
+            opacity: 0.6;
+        }
+
+        /* ==========================================================
+         * BRIEF: Dense Terminal Data Rows
+         * ========================================================== */
+        .brief {
+            border-bottom: 1px solid var(--border-subtle);
+            padding: var(--sp-3) var(--sp-4);
+            transition: background 0.1s ease;
+            font-size: 0.92em;
+            page-break-inside: avoid;
+            position: relative;
+        }
+
+        .brief:hover {
+            background: var(--bg-hover);
+        }
+
+        .brief:last-child {
+            border-bottom: none;
+        }
+
+        /* Priority Terminal Indicators — Alert/Warning/Normal */
+        .brief.must-read {
+            border-left: 3px solid var(--priority-must);
+            background: linear-gradient(90deg, var(--priority-must-bg) 0%, var(--bg-secondary) 20%);
+        }
+
+        .brief.must-read::after {
+            content: '▸ ALERT';
+            position: absolute;
+            top: var(--sp-3);
+            right: var(--sp-4);
+            font-size: 0.65em;
+            font-weight: 700;
+            color: var(--priority-must);
+            background: var(--priority-must-bg);
+            padding: 1px 6px;
+            border: 1px solid rgba(255, 82, 82, 0.2);
+            letter-spacing: 0.06em;
+            animation: alert-blink 2s ease-in-out infinite;
+        }
+
+        .brief.recommended {
+            border-left: 3px solid var(--priority-rec);
+            background: linear-gradient(90deg, var(--priority-rec-bg) 0%, var(--bg-secondary) 20%);
+        }
+
+        .brief.recommended::after {
+            content: '▸ WARNING';
+            position: absolute;
+            top: var(--sp-3);
+            right: var(--sp-4);
+            font-size: 0.65em;
+            font-weight: 700;
+            color: var(--priority-rec);
+            background: var(--priority-rec-bg);
+            padding: 1px 6px;
+            border: 1px solid rgba(255, 215, 64, 0.15);
+            letter-spacing: 0.06em;
+        }
+
+        .brief.fyi {
+            border-left: 3px solid var(--priority-fyi);
+        }
+
+        .brief.fyi::after {
+            content: 'NORMAL';
+            position: absolute;
+            top: var(--sp-3);
+            right: var(--sp-4);
+            font-size: 0.6em;
+            font-weight: 600;
+            color: var(--priority-fyi);
+            opacity: 0.6;
+            letter-spacing: 0.06em;
+        }
+
+        /* Brief Layout Grid */
+        .brief-row {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: var(--sp-3);
+            align-items: start;
+        }
+
+        .brief-priority {
+            font-size: 0.95em;
+            width: 14px;
+            text-align: center;
+            margin-top: 1px;
+        }
+
+        .brief-main {
+            min-width: 0;
+        }
+
+        .brief-meta-compact {
+            text-align: right;
+            min-width: 70px;
+        }
+
+        .brief-headline {
+            font-weight: 600;
+            line-height: 1.35;
+            margin-bottom: var(--sp-2);
+            font-family: var(--font-sans);
+        }
+
+        .brief-headline a {
+            color: var(--text-primary);
+        }
+
+        .brief-headline a:hover {
+            color: var(--orange);
+        }
+
+        .brief.must-read .brief-headline a {
+            color: var(--text-inverse);
+            font-weight: 700;
+        }
+
+        .brief-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+            margin-bottom: var(--sp-2);
+            flex-wrap: wrap;
+        }
+
+        .source {
+            font-size: 0.72em;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: var(--bg-terminal);
+            padding: 1px var(--sp-2);
+            border: 1px solid var(--border);
+        }
+
+        .tags {
+            display: flex;
+            gap: var(--sp-1);
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            font-size: 0.68em;
+            padding: 1px var(--sp-2);
+            background: var(--bg-terminal);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            text-transform: uppercase;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            transition: border-color 0.15s;
+        }
+
+        .tag:hover {
+            border-color: var(--orange);
+            color: var(--orange);
+        }
+
+        .brief-timestamp {
+            font-size: 0.68em;
+            color: var(--text-subtle);
+            font-weight: 500;
+        }
+
+        .brief-detail {
+            color: var(--text-body);
+            line-height: 1.5;
+            font-size: 0.85em;
+            font-family: var(--font-sans);
+            margin-top: var(--sp-2);
+        }
+
+        .brief-detail p {
+            margin-bottom: var(--sp-2);
+        }
+
+        .brief-detail p:last-child {
+            margin-bottom: 0;
+        }
+
+        .brief-detail strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .brief-detail em {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .brief-detail code {
+            background: var(--bg-terminal);
+            color: var(--orange);
+            padding: 1px var(--sp-1);
+            border: 1px solid var(--border);
+            font-size: 0.9em;
+            font-family: var(--font-mono);
+        }
+
+        /* ==========================================================
+         * FOOTER: Terminal Status Bar + Scrolling Data Bar
+         * ========================================================== */
+        .footer {
+            background: var(--bg-terminal);
+            border: 1px solid var(--border);
+            margin-top: var(--sp-6);
+        }
+
+        .footer-bar {
+            background: var(--orange);
+            color: var(--text-dark);
+            padding: var(--sp-2) var(--sp-4);
+            font-size: 0.72em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .footer-content {
+            padding: var(--sp-4);
+        }
+
+        .footer-status {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--sp-6);
+            margin-bottom: var(--sp-3);
+            flex-wrap: wrap;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-1);
+            font-size: 0.75em;
+            color: var(--text-muted);
+        }
+
+        .status-value {
+            color: var(--orange);
+            font-weight: 700;
+        }
+
+        .footer-divider {
+            width: 80px;
+            height: 1px;
+            background: var(--border);
+            margin: var(--sp-3) auto;
+        }
+
+        .footer-copyright {
+            font-size: 0.68em;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            text-align: center;
+        }
+
+        /* Bottom scrolling data bar — like stock ticker */
+        .footer-data-bar {
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+            padding: var(--sp-2) 0;
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+        }
+
+        .footer-data-bar::before,
+        .footer-data-bar::after {
+            content: '';
+            position: absolute;
+            top: 0; bottom: 0;
+            width: 30px;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .footer-data-bar::before {
+            left: 0;
+            background: linear-gradient(90deg, var(--bg-card), transparent);
+        }
+
+        .footer-data-bar::after {
+            right: 0;
+            background: linear-gradient(270deg, var(--bg-card), transparent);
+        }
+
+        .data-bar-scroll {
+            display: inline-block;
+            animation: scroll-left 40s linear infinite;
+            font-size: 0.72em;
+            color: var(--text-subtle);
+            padding: 0 var(--sp-4);
+        }
+
+        .data-bar-item {
+            margin-right: var(--sp-6);
+        }
+
+        .data-bar-label {
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .data-bar-value {
+            color: var(--orange);
+            font-weight: 700;
+        }
+
+        .data-bar-value.up { color: var(--data-positive); }
+        .data-bar-value.down { color: var(--data-negative); }
+
+        /* ==========================================================
+         * PRINT / PDF OVERRIDES
+         * ========================================================== */
+        @media print {
+            body {
+                background: var(--bg-primary) !important;
+                background-image: none !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            .container {
+                max-width: 100%;
+                padding: var(--sp-2);
+            }
+
+            .market-ticker,
+            .footer-data-bar {
+                display: none;
+            }
+
+            .system-bar {
+                display: none;
+            }
+
+            .section {
+                margin-bottom: var(--sp-4);
+                break-inside: avoid;
+            }
+
+            .brief {
+                break-inside: avoid;
+                padding: var(--sp-2) var(--sp-3);
+            }
+
+            .brief:hover {
+                background: transparent;
+            }
+
+            .brief::after { animation: none !important; }
+            .section-critical-count { animation: none !important; }
+
+            .cursor::after { display: none; }
+
+            a {
+                color: var(--text-primary) !important;
+                text-shadow: none !important;
+            }
+        }
+
+        /* ==========================================================
+         * RESPONSIVE: Mobile Adaptation
+         * ========================================================== */
+        @media (max-width: 768px) {
+            .container {
+                padding: var(--sp-2);
+            }
+
+            .terminal-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .ticker-bar {
+                flex-wrap: wrap;
+                gap: var(--sp-2);
+            }
+
+            .brief-row {
+                grid-template-columns: auto 1fr;
+                gap: var(--sp-2);
+            }
+
+            .brief-meta-compact {
+                grid-column: 2;
+                text-align: left;
+                margin-top: var(--sp-1);
+            }
+
+            .brief::after {
+                display: none;
+            }
+
+            .system-bar {
+                flex-wrap: wrap;
+                gap: var(--sp-2);
+            }
+
+            .system-bar-left {
+                flex-wrap: wrap;
+            }
+
+            .footer-status {
+                gap: var(--sp-3);
+            }
+
+            .terminal-status-row {
+                flex-direction: column;
+                gap: var(--sp-1);
+            }
+
+            .section-go-key {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                font-size: 11px;
+            }
+
+            .terminal-brand {
+                font-size: 1.5em;
+            }
+
+            .terminal-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .brief {
+                padding: var(--sp-2) var(--sp-3);
+            }
+
+            .market-ticker {
+                display: none;
+            }
+
+            .header-content {
+                padding: var(--sp-3);
+            }
+
+            .footer-bar {
+                flex-wrap: wrap;
+                gap: var(--sp-1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- ====== HEADER: Terminal Ticker ====== -->
+        <header class="header">
+            <div class="ticker-bar">
+                <div class="ticker-left">
+                    <div class="ticker-status">
+                        <span class="status-dot"></span>
+                        <span>LIVE</span>
+                    </div>
+                    <span>BBG TERMINAL</span>
+                </div>
+                <div class="ticker-right">
+                    <span>SESSION: {{ date_str }}</span>
+                    <span>{{ generated_time }}</span>
+                </div>
+            </div>
+            <div class="header-content">
+                <!-- Terminal status row — the "real terminal" feel -->
+                <div class="terminal-status-row">
+                    <div class="terminal-status-item">
+                        <span class="ts-label">TIME:</span>
+                        <span class="ts-value">{{ generated_time }}</span>
+                    </div>
+                    <div class="terminal-status-item">
+                        <span class="ts-label">DATE:</span>
+                        <span class="ts-value">{{ date_str }}</span>
+                    </div>
+                    <div class="terminal-status-item">
+                        <span class="ts-label">CONN:</span>
+                        <span class="ts-value online">CONNECTED</span>
+                    </div>
+                    <div class="terminal-status-item">
+                        <span class="ts-label">REFRESH:</span>
+                        <span class="ts-value">REAL-TIME</span>
+                    </div>
+                    <div class="terminal-status-item">
+                        <span class="ts-label">LATENCY:</span>
+                        <span class="ts-value">&lt;1ms</span>
+                    </div>
+                </div>
+
+                <h1 class="terminal-brand cursor">NEWSLOOM</h1>
+                <div class="terminal-subtitle">Intelligence Data Stream · {{ date_str }}</div>
+                <div class="terminal-stats">
+                    <div class="stat-block">
+                        <div class="stat-value">{{ total_items }}</div>
+                        <div class="stat-label">Items</div>
+                    </div>
+                    {% set must_read_count = [] %}
+                    {% for section_key, items in briefs.items() %}
+                    {% if items is iterable and items is not string %}
+                    {% for item in items %}
+                    {% if item.priority == '🔴' %}
+                    {% if must_read_count.append(1) %}{% endif %}
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
+                    {% endfor %}
+                    {% if must_read_count|length > 0 %}
+                    <div class="stat-block">
+                        <div class="stat-value down">{{ must_read_count|length }}</div>
+                        <div class="stat-label">Alert</div>
+                    </div>
+                    {% endif %}
+                    <div class="stat-block">
+                        <div class="stat-value">{{ briefs|length }}</div>
+                        <div class="stat-label">Feeds</div>
+                    </div>
+                    <div class="stat-block">
+                        <div class="stat-value">{{ generated_time.split(':')[0][-2:] }}:{{ generated_time.split(':')[1] }}</div>
+                        <div class="stat-label">Updated</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ====== SYSTEM STATUS BAR ====== -->
+        <div class="system-bar">
+            <div class="system-bar-left">
+                <div class="sys-item">
+                    <span class="sys-label">SYS:</span>
+                    <span class="sys-value positive">ONLINE</span>
+                </div>
+                <div class="sys-item">
+                    <span class="sys-label">FEED:</span>
+                    <span class="sys-value">{{ total_items }} ACTIVE</span>
+                </div>
+                <div class="sys-item">
+                    <span class="sys-label">LAT:</span>
+                    <span class="sys-value">&lt;1ms</span>
+                </div>
+            </div>
+            <div class="sys-item">
+                <span class="sys-label">UPD:</span>
+                <span class="sys-value">{{ generated_time }}</span>
+            </div>
+        </div>
+
+        <!-- ====== MARKET TICKER (Scrolling) ====== -->
+        <div class="market-ticker">
+            <div class="ticker-scroll">
+                <span class="ticker-item"><span class="ticker-symbol">AAPL</span> 175.23 <span class="ticker-positive">+1.24%</span></span>
+                <span class="ticker-item"><span class="ticker-symbol">MSFT</span> 378.91 <span class="ticker-positive">+0.87%</span></span>
+                <span class="ticker-item"><span class="ticker-symbol">GOOGL</span> 142.56 <span class="ticker-negative">-0.45%</span></span>
+                <span class="ticker-item"><span class="ticker-symbol">AMZN</span> 151.94 <span class="ticker-positive">+2.13%</span></span>
+                <span class="ticker-item"><span class="ticker-symbol">TSLA</span> 248.42 <span class="ticker-negative">-1.67%</span></span>
+                <span class="ticker-item"><span class="ticker-symbol">META</span> 507.24 <span class="ticker-positive">+0.91%</span></span>
+                <span class="ticker-item"><span class="ticker-symbol">NVDA</span> 722.48 <span class="ticker-positive">+3.42%</span></span>
+                <span class="ticker-item"><span class="ticker-symbol">BTC</span> 52,180 <span class="ticker-positive">+2.8%</span></span>
+                <span class="ticker-item"><span class="ticker-symbol">ETH</span> 2,890 <span class="ticker-positive">+1.5%</span></span>
+                <!-- Duplicate for seamless loop -->
+                <span class="ticker-item"><span class="ticker-symbol">AAPL</span> 175.23 <span class="ticker-positive">+1.24%</span></span>
+                <span class="ticker-item"><span class="ticker-symbol">MSFT</span> 378.91 <span class="ticker-positive">+0.87%</span></span>
+                <span class="ticker-item"><span class="ticker-symbol">GOOGL</span> 142.56 <span class="ticker-negative">-0.45%</span></span>
+                <span class="ticker-item"><span class="ticker-symbol">AMZN</span> 151.94 <span class="ticker-positive">+2.13%</span></span>
+                <span class="ticker-item"><span class="ticker-symbol">TSLA</span> 248.42 <span class="ticker-negative">-1.67%</span></span>
+            </div>
+        </div>
+
+        <!-- ====== EXECUTIVE SUMMARY ====== -->
+        {% if executive_summary %}
+        <section class="executive-summary">
+            <div class="summary-header">
+                <div class="summary-indicator"></div>
+                <div class="summary-title">Executive Brief</div>
+                <div class="summary-timestamp">{{ generated_time }}</div>
+            </div>
+            <div class="summary-prompt">
+                <span class="cmd">BBG&gt;</span> EXEC SUMMARY --format=brief --date={{ date_str }}
+            </div>
+            <div class="summary-content">
+                {% for line in executive_summary.strip().split('\n') %}
+                {% if line.strip() %}
+                <p>{{ line.strip() | md_inline }}</p>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- ====== SECTIONS: Bloomberg <GO> key tabs ====== -->
+        {% for section_key in section_order %}
+        {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+        {% set meta = section_configs.get(section_key, {}) %}
+        {% set items = briefs[section_key] %}
+        {% set section_critical = items|selectattr('priority', 'equalto', '🔴')|list|length %}
+        {% set sec_color = meta.color|default('#FF6F00') %}
+        <section class="section" style="--section-color: {{ sec_color }};">
+            <div class="section-color-bar" style="background: {{ sec_color }};"></div>
+            <div class="section-header">
+                <div class="section-go-key" style="background: {{ sec_color }};">&lt;GO&gt;</div>
+                <div class="section-header-content">
+                    <span class="section-emoji">{{ meta.emoji|default('📊') }}</span>
+                    <h2 class="section-title">{{ meta.title|default(section_key) }}</h2>
+                    <span class="section-count">{{ items|length }} items</span>
+                    {% if section_critical > 0 %}
+                    <span class="section-critical-count">{{ section_critical }} ALERT</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% for item in items %}
+            {% set priority = item.priority|default('🟢') %}
+            {% set p_class = 'must-read' if priority == '🔴' else ('recommended' if priority == '🟡' else 'fyi') %}
+            <article class="brief {{ p_class }}">
+                <div class="brief-row">
+                    <span class="brief-priority">{{ priority }}</span>
+                    <div class="brief-main">
+                        <h3 class="brief-headline">
+                            <a href="{{ item.url|default('#') }}" target="_blank">
+                                {{ item.headline|default(item.title|default('Untitled')) }}
+                            </a>
+                        </h3>
+                        {% if item.source or item.tags %}
+                        <div class="brief-meta">
+                            {% if item.source %}
+                            <span class="source">{{ item.source }}</span>
+                            {% endif %}
+                            {% if item.tags %}
+                            <div class="tags">
+                                {% for tag in item.tags %}
+                                <span class="tag">{{ tag }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        {% if item.detail %}
+                        <div class="brief-detail">{{ item.detail|default('') | md_inline }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="brief-meta-compact">
+                        <div class="brief-timestamp">{{ generated_time.split(' ')[1] if ' ' in generated_time else generated_time }}</div>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </section>
+        {% endif %}
+        {% endfor %}
+
+        <!-- ====== FOOTER ====== -->
+        <footer class="footer">
+            <div class="footer-bar">
+                <span>NEWSLOOM TERMINAL</span>
+                <span>SESSION END</span>
+            </div>
+            <div class="footer-content">
+                <div class="footer-status">
+                    <div class="status-item">
+                        <span>Session:</span>
+                        <span class="status-value">{{ date_str }}</span>
+                    </div>
+                    <div class="status-item">
+                        <span>Terminal:</span>
+                        <span class="status-value">CLOSED</span>
+                    </div>
+                    <div class="status-item">
+                        <span>Sources:</span>
+                        <span class="status-value">{{ total_items }}</span>
+                    </div>
+                </div>
+                <div class="footer-divider"></div>
+                <div class="footer-copyright">
+                    Bloomberg Terminal Style · Newsloom Intelligence System · {{ date_str }}
+                </div>
+            </div>
+            <!-- Bottom scrolling data bar -->
+            <div class="footer-data-bar">
+                <div class="data-bar-scroll">
+                    <span class="data-bar-item"><span class="data-bar-label">ITEMS:</span> <span class="data-bar-value">{{ total_items }}</span></span>
+                    <span class="data-bar-item"><span class="data-bar-label">FEEDS:</span> <span class="data-bar-value">{{ section_order|length }}</span></span>
+                    <span class="data-bar-item"><span class="data-bar-label">ALERTS:</span> <span class="data-bar-value down">{{ must_read_count|length }}</span></span>
+                    <span class="data-bar-item"><span class="data-bar-label">STATUS:</span> <span class="data-bar-value up">ONLINE</span></span>
+                    <span class="data-bar-item"><span class="data-bar-label">UPDATED:</span> <span class="data-bar-value">{{ generated_time }}</span></span>
+                    <span class="data-bar-item"><span class="data-bar-label">LATENCY:</span> <span class="data-bar-value up">&lt;1ms</span></span>
+                    <span class="data-bar-item"><span class="data-bar-label">SESSION:</span> <span class="data-bar-value">{{ date_str }}</span></span>
+                    {% for section_key in section_order %}
+                    {% if section_key in briefs and briefs[section_key] %}
+                    {% set meta = section_configs.get(section_key, {}) %}
+                    <span class="data-bar-item"><span class="data-bar-label">{{ section_key|upper }}:</span> <span class="data-bar-value">{{ briefs[section_key]|length }}</span></span>
+                    {% endif %}
+                    {% endfor %}
+                    <!-- Duplicate for seamless loop -->
+                    <span class="data-bar-item"><span class="data-bar-label">ITEMS:</span> <span class="data-bar-value">{{ total_items }}</span></span>
+                    <span class="data-bar-item"><span class="data-bar-label">FEEDS:</span> <span class="data-bar-value">{{ section_order|length }}</span></span>
+                    <span class="data-bar-item"><span class="data-bar-label">ALERTS:</span> <span class="data-bar-value down">{{ must_read_count|length }}</span></span>
+                    <span class="data-bar-item"><span class="data-bar-label">STATUS:</span> <span class="data-bar-value up">ONLINE</span></span>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+</body>
+</html>

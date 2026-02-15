@@ -1,0 +1,17 @@
+name: "FT Salmon"
+description: "Financial Times inspired design with signature salmon pink background and classic newspaper layout"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "light"
+features:
+  - "Signature salmon pink #FFF1E5 background color"
+  - "Deep dark #1A1A1A text for premium readability"
+  - "Deep red #990F3D accent matching FT brand"
+  - "Serif typography for editorial authority"
+  - "Classic newspaper three-column layout"
+  - "British financial journalism aesthetics"
+category: "finance"
+color_scheme:
+  primary: "#FFF1E5"
+  accent: "#990F3D"
+  text: "#1A1A1A"

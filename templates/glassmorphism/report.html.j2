@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsloom · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * GLASSMORPHISM — iOS 16 Frosted Glass Universe
+         * 
+         * Design Philosophy:
+         *   Ultra-vivid multi-color gradient background with large
+         *   animated floating color orbs. Every panel is frosted
+         *   glass with heavy backdrop-filter blur. The background
+         *   is alive — pulsing, shifting color blobs create a
+         *   constantly dynamic canvas behind crisp glass panels.
+         *
+         * Visual Targets:
+         *   - iOS 16 Lock Screen
+         *   - macOS Ventura widgets
+         *   - Apple Music "spatial audio" UI
+         *   - Windows 11 Mica material
+         *
+         * Palette (vivid, not muted):
+         *   - Vivid Violet:   #8B5CF6 / #A78BFA
+         *   - Electric Fuchsia: #EC4899 / #F472B6
+         *   - Neon Blue:      #3B82F6 / #60A5FA
+         *   - Hot Orange:     #F97316 / #FB923C
+         *   - Lime Burst:     #84CC16 / #A3E635
+         *   - Teal Spark:     #14B8A6 / #2DD4BF
+         * ============================================================ */
+
+        /* --- Design Tokens --- */
+        :root {
+            /* Background gradient */
+            --bg-base-1:         #1a0533;
+            --bg-base-2:         #0c1445;
+            --bg-base-3:         #1a0a2e;
+
+            /* Orb colors */
+            --orb-violet:        #8B5CF6;
+            --orb-fuchsia:       #EC4899;
+            --orb-blue:          #3B82F6;
+            --orb-orange:        #F97316;
+            --orb-lime:          #84CC16;
+            --orb-teal:          #14B8A6;
+
+            /* Glass layers */
+            --glass-bg:          rgba(255, 255, 255, 0.07);
+            --glass-bg-strong:   rgba(255, 255, 255, 0.12);
+            --glass-bg-hover:    rgba(255, 255, 255, 0.16);
+            --glass-bg-dark:     rgba(0, 0, 0, 0.20);
+            --glass-blur:        20px;
+            --glass-blur-heavy:  28px;
+            --glass-border:      rgba(255, 255, 255, 0.12);
+            --glass-border-strong: rgba(255, 255, 255, 0.22);
+            --glass-border-glow: rgba(255, 255, 255, 0.30);
+
+            /* Text */
+            --text-white:        #FFFFFF;
+            --text-bright:       rgba(255, 255, 255, 0.95);
+            --text-secondary:    rgba(255, 255, 255, 0.75);
+            --text-muted:        rgba(255, 255, 255, 0.50);
+            --text-dim:          rgba(255, 255, 255, 0.30);
+
+            /* Accent gradients */
+            --gradient-violet-fuchsia: linear-gradient(135deg, #8B5CF6, #EC4899);
+            --gradient-blue-teal: linear-gradient(135deg, #3B82F6, #14B8A6);
+            --gradient-orange-lime: linear-gradient(135deg, #F97316, #84CC16);
+            --gradient-rainbow: linear-gradient(90deg, #8B5CF6, #EC4899, #3B82F6, #14B8A6, #F97316);
+
+            /* Priority */
+            --priority-must:     #FF4D6A;
+            --priority-must-bg:  rgba(255, 77, 106, 0.15);
+            --priority-must-border: rgba(255, 77, 106, 0.30);
+            --priority-must-glow: rgba(255, 77, 106, 0.5);
+            --priority-rec:      #FBBF24;
+            --priority-rec-bg:   rgba(251, 191, 36, 0.12);
+            --priority-rec-border: rgba(251, 191, 36, 0.25);
+            --priority-fyi:      #34D399;
+            --priority-fyi-bg:   rgba(52, 211, 153, 0.10);
+            --priority-fyi-border: rgba(52, 211, 153, 0.20);
+
+            /* Spacing (8pt grid) */
+            --sp-1: 4px;   --sp-2: 8px;   --sp-3: 12px;  --sp-4: 16px;
+            --sp-5: 20px;  --sp-6: 24px;  --sp-8: 32px;  --sp-10: 40px;
+            --sp-12: 48px; --sp-16: 64px;
+
+            /* Typography */
+            --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+            --font-mono: "SF Mono", "JetBrains Mono", "Fira Code", "Consolas", monospace;
+
+            /* Radius */
+            --radius-sm: 10px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+            --radius-pill: 100px;
+
+            /* Shadows */
+            --shadow-glass:    0 8px 32px rgba(0, 0, 0, 0.25);
+            --shadow-elevated: 0 16px 48px rgba(0, 0, 0, 0.35);
+            --shadow-glow-v:   0 0 40px rgba(139, 92, 246, 0.25);
+            --shadow-glow-f:   0 0 40px rgba(236, 72, 153, 0.20);
+        }
+
+        /* --- Page (PDF) --- */
+        @page {
+            size: A4;
+            margin: 1.2cm 1.4cm;
+            background: linear-gradient(160deg, #1a0533, #0c1445, #1a0a2e);
+            @bottom-center {
+                content: "Newsloom Glass · " counter(page);
+                font-size: 7pt;
+                color: rgba(255,255,255,0.35);
+                font-family: var(--font-sans);
+            }
+        }
+
+        /* --- Reset --- */
+        *, *::before, *::after {
+            margin: 0; padding: 0; box-sizing: border-box;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        /* ============================================================
+         * BODY: The vivid gradient canvas + floating orbs
+         * ============================================================ */
+        body {
+            font-family: var(--font-sans);
+            color: var(--text-bright);
+            font-size: 15px;
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+
+            /* ★★★ VIVID MESH GRADIENT BACKGROUND ★★★ */
+            background:
+                /* Violet orb — top left */
+                radial-gradient(ellipse 650px 550px at 5% 10%, rgba(139, 92, 246, 0.50) 0%, transparent 60%),
+                /* Fuchsia orb — top right */
+                radial-gradient(ellipse 550px 650px at 90% 5%, rgba(236, 72, 153, 0.45) 0%, transparent 55%),
+                /* Blue orb — center */
+                radial-gradient(ellipse 700px 600px at 50% 35%, rgba(59, 130, 246, 0.35) 0%, transparent 55%),
+                /* Orange orb — mid-right */
+                radial-gradient(ellipse 500px 500px at 85% 55%, rgba(249, 115, 22, 0.30) 0%, transparent 50%),
+                /* Teal orb — bottom left */
+                radial-gradient(ellipse 600px 500px at 10% 70%, rgba(20, 184, 166, 0.28) 0%, transparent 55%),
+                /* Lime orb — bottom center */
+                radial-gradient(ellipse 500px 400px at 55% 85%, rgba(132, 204, 22, 0.20) 0%, transparent 50%),
+                /* Deep base */
+                linear-gradient(160deg,
+                    #1a0533 0%,
+                    #0c1445 25%,
+                    #1a0a2e 50%,
+                    #0f1a3d 75%,
+                    #1a0533 100%);
+            background-attachment: fixed;
+        }
+
+        /* ★★★ FLOATING ANIMATED ORB 1 — Large violet/pink ★★★ */
+        .orb-1 {
+            position: fixed;
+            top: -15%;
+            left: -10%;
+            width: 55vw;
+            height: 55vw;
+            max-width: 600px;
+            max-height: 600px;
+            background: radial-gradient(circle,
+                rgba(139, 92, 246, 0.40) 0%,
+                rgba(236, 72, 153, 0.20) 40%,
+                transparent 70%);
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 0;
+            animation: orb-float-1 20s ease-in-out infinite;
+        }
+
+        /* ★★★ FLOATING ANIMATED ORB 2 — Large blue/teal ★★★ */
+        .orb-2 {
+            position: fixed;
+            bottom: -20%;
+            right: -15%;
+            width: 60vw;
+            height: 60vw;
+            max-width: 700px;
+            max-height: 700px;
+            background: radial-gradient(circle,
+                rgba(59, 130, 246, 0.35) 0%,
+                rgba(20, 184, 166, 0.18) 40%,
+                transparent 70%);
+            border-radius: 50%;
+            filter: blur(90px);
+            pointer-events: none;
+            z-index: 0;
+            animation: orb-float-2 25s ease-in-out infinite;
+        }
+
+        /* ★★★ FLOATING ANIMATED ORB 3 — Mid orange/lime ★★★ */
+        .orb-3 {
+            position: fixed;
+            top: 40%;
+            right: 5%;
+            width: 40vw;
+            height: 40vw;
+            max-width: 500px;
+            max-height: 500px;
+            background: radial-gradient(circle,
+                rgba(249, 115, 22, 0.30) 0%,
+                rgba(132, 204, 22, 0.15) 40%,
+                transparent 70%);
+            border-radius: 50%;
+            filter: blur(70px);
+            pointer-events: none;
+            z-index: 0;
+            animation: orb-float-3 22s ease-in-out infinite;
+        }
+
+        /* ★★★ FLOATING ANIMATED ORB 4 — Small fuchsia accent ★★★ */
+        .orb-4 {
+            position: fixed;
+            top: 60%;
+            left: -5%;
+            width: 35vw;
+            height: 35vw;
+            max-width: 400px;
+            max-height: 400px;
+            background: radial-gradient(circle,
+                rgba(236, 72, 153, 0.28) 0%,
+                rgba(139, 92, 246, 0.12) 45%,
+                transparent 70%);
+            border-radius: 50%;
+            filter: blur(65px);
+            pointer-events: none;
+            z-index: 0;
+            animation: orb-float-4 18s ease-in-out infinite;
+        }
+
+        @keyframes orb-float-1 {
+            0%   { transform: translate(0, 0) scale(1); }
+            33%  { transform: translate(50px, 30px) scale(1.05); }
+            66%  { transform: translate(-20px, 60px) scale(0.95); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+
+        @keyframes orb-float-2 {
+            0%   { transform: translate(0, 0) scale(1); }
+            33%  { transform: translate(-40px, -50px) scale(1.08); }
+            66%  { transform: translate(30px, -20px) scale(0.92); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+
+        @keyframes orb-float-3 {
+            0%   { transform: translate(0, 0) scale(1); }
+            50%  { transform: translate(-60px, 40px) scale(1.1); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+
+        @keyframes orb-float-4 {
+            0%   { transform: translate(0, 0) scale(1); }
+            50%  { transform: translate(45px, -35px) scale(1.12); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+
+        a {
+            color: #60A5FA;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        a:hover {
+            color: var(--text-white);
+            text-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+        }
+
+        /* --- Container --- */
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: var(--sp-10) var(--sp-6);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ============================================================
+         * HEADER: Hero frosted glass with internal gradient mesh
+         * ============================================================ */
+        .header {
+            position: relative;
+            border-radius: var(--radius-xl);
+            padding: var(--sp-12) var(--sp-10);
+            margin-bottom: var(--sp-10);
+            overflow: hidden;
+            isolation: isolate;
+
+            background: var(--glass-bg-strong);
+            backdrop-filter: blur(var(--glass-blur-heavy));
+            -webkit-backdrop-filter: blur(var(--glass-blur-heavy));
+            border: 1px solid var(--glass-border-strong);
+            box-shadow: var(--shadow-elevated), var(--shadow-glow-v);
+        }
+
+        /* Top rainbow shimmer */
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg,
+                var(--orb-violet),
+                var(--orb-fuchsia),
+                var(--orb-blue),
+                var(--orb-teal),
+                var(--orb-orange),
+                var(--orb-lime),
+                var(--orb-violet));
+            background-size: 200% 100%;
+            animation: shimmer-slide 4s linear infinite;
+            z-index: 2;
+        }
+
+        @keyframes shimmer-slide {
+            0%   { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        /* Internal colorful mesh glow */
+        .header::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 250px 200px at 15% 50%, rgba(139, 92, 246, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse 200px 250px at 85% 30%, rgba(236, 72, 153, 0.12) 0%, transparent 60%),
+                radial-gradient(ellipse 220px 180px at 50% 80%, rgba(59, 130, 246, 0.10) 0%, transparent 60%);
+            animation: header-glow-pulse 8s ease-in-out infinite alternate;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes header-glow-pulse {
+            0%   { opacity: 0.5; }
+            50%  { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            margin-bottom: var(--sp-5);
+        }
+
+        .header-icon {
+            width: 54px; height: 54px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6em;
+            background: var(--gradient-violet-fuchsia);
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+
+            /* Glass inset effect */
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .header-name {
+            font-size: 0.85em;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            background: var(--gradient-rainbow);
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: name-rainbow 5s linear infinite;
+        }
+
+        @keyframes name-rainbow {
+            0%   { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        .header-title {
+            font-size: 2.6em;
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: var(--sp-4);
+            letter-spacing: -0.02em;
+            color: var(--text-white);
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-subtitle {
+            font-size: 1.02em;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: var(--sp-5);
+            max-width: 560px;
+        }
+
+        .header-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            font-size: 0.88em;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+        }
+
+        .header-meta .sep { opacity: 0.4; }
+
+        .critical-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--sp-2);
+            background: var(--priority-must-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: var(--priority-must);
+            font-size: 0.82em;
+            font-weight: 700;
+            padding: var(--sp-1) var(--sp-3);
+            border-radius: var(--radius-pill);
+            border: 1px solid var(--priority-must-border);
+        }
+
+        .critical-dot {
+            width: 8px; height: 8px;
+            background: var(--priority-must);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--priority-must-glow);
+            animation: critical-pulse 1.5s infinite;
+        }
+
+        @keyframes critical-pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.3); }
+        }
+
+        /* ============================================================
+         * EXECUTIVE SUMMARY: Frosted glass with gradient accent
+         * ============================================================ */
+        .exec-summary {
+            position: relative;
+            border-radius: var(--radius-lg);
+            padding: var(--sp-8);
+            margin-bottom: var(--sp-10);
+            page-break-inside: avoid;
+            overflow: hidden;
+
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-glass);
+        }
+
+        /* Rainbow left accent */
+        .exec-summary::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg,
+                var(--orb-violet),
+                var(--orb-fuchsia),
+                var(--orb-blue),
+                var(--orb-teal),
+                var(--orb-orange));
+            border-radius: 4px 0 0 4px;
+        }
+
+        /* Internal subtle glow */
+        .exec-summary::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 40%; height: 100%;
+            background: radial-gradient(ellipse at 90% 50%, rgba(139, 92, 246, 0.06), transparent 60%);
+            pointer-events: none;
+        }
+
+        .exec-label {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--sp-2);
+            margin-bottom: var(--sp-5);
+            position: relative;
+        }
+
+        .exec-label-icon {
+            width: 28px; height: 28px;
+            background: var(--gradient-violet-fuchsia);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.78em;
+            box-shadow: 0 2px 12px rgba(139, 92, 246, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .exec-label-text {
+            font-size: 0.72em;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            background: var(--gradient-violet-fuchsia);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .exec-summary p {
+            position: relative;
+            color: var(--text-secondary);
+            font-size: 0.96em;
+            line-height: 1.78;
+            margin-bottom: var(--sp-4);
+        }
+
+        .exec-summary p:last-of-type { margin-bottom: 0; }
+
+        .exec-summary p strong {
+            color: var(--text-white);
+            font-weight: 600;
+        }
+
+        /* ============================================================
+         * SECTION HEADERS: Frosted panels with color identity
+         * ============================================================ */
+        .section {
+            margin-bottom: var(--sp-10);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            padding: var(--sp-4) var(--sp-5);
+            margin-bottom: var(--sp-5);
+            border-radius: var(--radius-md);
+            position: relative;
+            overflow: hidden;
+
+            background: var(--glass-bg-strong);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Color-coded gradient accent per section */
+        .section:nth-child(6n+1) .section-header::before { background: linear-gradient(180deg, var(--orb-violet), var(--orb-fuchsia)); }
+        .section:nth-child(6n+1) .section-header { background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, var(--glass-bg) 50%); }
+        .section:nth-child(6n+2) .section-header::before { background: linear-gradient(180deg, var(--orb-blue), var(--orb-teal)); }
+        .section:nth-child(6n+2) .section-header { background: linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, var(--glass-bg) 50%); }
+        .section:nth-child(6n+3) .section-header::before { background: linear-gradient(180deg, var(--orb-fuchsia), var(--orb-orange)); }
+        .section:nth-child(6n+3) .section-header { background: linear-gradient(135deg, rgba(236, 72, 153, 0.12) 0%, var(--glass-bg) 50%); }
+        .section:nth-child(6n+4) .section-header::before { background: linear-gradient(180deg, var(--orb-teal), var(--orb-lime)); }
+        .section:nth-child(6n+4) .section-header { background: linear-gradient(135deg, rgba(20, 184, 166, 0.12) 0%, var(--glass-bg) 50%); }
+        .section:nth-child(6n+5) .section-header::before { background: linear-gradient(180deg, var(--orb-orange), var(--orb-lime)); }
+        .section:nth-child(6n+5) .section-header { background: linear-gradient(135deg, rgba(249, 115, 22, 0.12) 0%, var(--glass-bg) 50%); }
+        .section:nth-child(6n+6) .section-header::before { background: linear-gradient(180deg, var(--orb-violet), var(--orb-blue)); }
+        .section:nth-child(6n+6) .section-header { background: linear-gradient(135deg, rgba(139, 92, 246, 0.10) 0%, var(--glass-bg) 50%); }
+
+        .section-header::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 50%;
+            transform: translateY(-50%);
+            width: 4px; height: 60%;
+            border-radius: 0 4px 4px 0;
+            background: var(--orb-violet); /* fallback */
+        }
+
+        .section-emoji {
+            font-size: 1.3em;
+            margin-left: var(--sp-3);
+            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+        }
+
+        .section-title {
+            font-size: 1.18em;
+            font-weight: 700;
+            color: var(--text-white);
+        }
+
+        .section-count {
+            margin-left: auto;
+            font-size: 0.72em;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            padding: 3px 14px;
+            border-radius: var(--radius-pill);
+        }
+
+        /* ============================================================
+         * BRIEF CARDS: Frosted glass panels
+         * ============================================================ */
+        .brief {
+            position: relative;
+            border-radius: var(--radius-md);
+            padding: var(--sp-5) var(--sp-6);
+            margin-bottom: var(--sp-3);
+            page-break-inside: avoid;
+            transition: all 0.3s ease;
+
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        .brief:hover {
+            background: var(--glass-bg-hover);
+            border-color: var(--glass-border-strong);
+            box-shadow: var(--shadow-glass);
+            transform: translateY(-2px);
+        }
+
+        /* Priority variants */
+        .brief.must-read {
+            background: linear-gradient(135deg, var(--priority-must-bg) 0%, var(--glass-bg) 30%);
+            border-color: var(--priority-must-border);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12), 0 0 20px rgba(255, 77, 106, 0.08);
+        }
+
+        .brief.must-read:hover {
+            box-shadow: var(--shadow-glass), 0 0 30px rgba(255, 77, 106, 0.12);
+        }
+
+        .brief.recommended {
+            background: linear-gradient(135deg, var(--priority-rec-bg) 0%, var(--glass-bg) 30%);
+            border-left: 3px solid var(--priority-rec);
+        }
+
+        .brief.fyi {
+            border-left: 3px solid var(--priority-fyi);
+        }
+
+        .brief-header {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--sp-3);
+            margin-bottom: var(--sp-3);
+        }
+
+        /* Glowing priority dot */
+        .priority-orb {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 5px;
+        }
+
+        .brief.must-read .priority-orb {
+            background: var(--priority-must);
+            box-shadow:
+                0 0 6px var(--priority-must-glow),
+                0 0 15px rgba(255, 77, 106, 0.25),
+                0 0 30px rgba(255, 77, 106, 0.1);
+            animation: orb-pulse 2s infinite;
+        }
+
+        @keyframes orb-pulse {
+            0%, 100% { box-shadow: 0 0 6px var(--priority-must-glow), 0 0 15px rgba(255, 77, 106, 0.25); }
+            50% { box-shadow: 0 0 10px var(--priority-must-glow), 0 0 25px rgba(255, 77, 106, 0.35), 0 0 45px rgba(255, 77, 106, 0.15); }
+        }
+
+        .brief.recommended .priority-orb {
+            background: var(--priority-rec);
+            box-shadow: 0 0 8px rgba(251, 191, 36, 0.4), 0 0 16px rgba(251, 191, 36, 0.15);
+        }
+
+        .brief.fyi .priority-orb {
+            background: var(--priority-fyi);
+            box-shadow: 0 0 6px rgba(52, 211, 153, 0.3);
+            opacity: 0.75;
+        }
+
+        .brief-headline {
+            flex: 1;
+            font-size: 1.04em;
+            font-weight: 600;
+            line-height: 1.45;
+        }
+
+        .brief-headline a {
+            color: var(--text-white);
+            transition: all 0.2s;
+        }
+
+        .brief-headline a:hover {
+            color: #A78BFA;
+            text-shadow: 0 0 12px rgba(139, 92, 246, 0.4);
+        }
+
+        .brief.must-read .brief-headline a {
+            font-weight: 700;
+        }
+
+        .brief-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+            margin-bottom: var(--sp-3);
+            flex-wrap: wrap;
+        }
+
+        .source-badge {
+            font-size: 0.72em;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: var(--glass-bg);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid var(--glass-border);
+            padding: 3px 12px;
+            border-radius: var(--radius-pill);
+        }
+
+        .tag {
+            font-size: 0.68em;
+            font-weight: 500;
+            color: #A78BFA;
+            background: rgba(139, 92, 246, 0.12);
+            border: 1px solid rgba(139, 92, 246, 0.20);
+            padding: 3px 10px;
+            border-radius: var(--radius-pill);
+            transition: all 0.2s;
+        }
+
+        .tag:hover {
+            background: rgba(139, 92, 246, 0.22);
+            color: var(--text-white);
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.15);
+        }
+
+        .brief-detail {
+            color: var(--text-secondary);
+            font-size: 0.93em;
+            line-height: 1.72;
+        }
+
+        .brief-detail strong {
+            color: var(--text-white);
+            font-weight: 600;
+        }
+
+        .brief-detail code {
+            font-family: var(--font-mono);
+            font-size: 0.88em;
+            background: var(--glass-bg-strong);
+            color: #60A5FA;
+            padding: 2px 6px;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+        }
+
+        /* ============================================================
+         * GLASS DIVIDER
+         * ============================================================ */
+        .glass-divider {
+            height: 2px;
+            margin: var(--sp-5) var(--sp-12);
+            border-radius: 1px;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(139, 92, 246, 0.25) 15%,
+                rgba(236, 72, 153, 0.20) 35%,
+                rgba(59, 130, 246, 0.20) 55%,
+                rgba(20, 184, 166, 0.18) 75%,
+                transparent 100%);
+        }
+
+        /* ============================================================
+         * FOOTER: Frosted glass footer
+         * ============================================================ */
+        .footer {
+            margin-top: var(--sp-12);
+            padding: var(--sp-8) var(--sp-6);
+            text-align: center;
+            position: relative;
+            border-radius: var(--radius-lg);
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Rainbow top accent */
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: var(--gradient-rainbow);
+            background-size: 200% 100%;
+            animation: shimmer-slide 5s linear infinite;
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        }
+
+        .footer-brand {
+            font-size: 0.88em;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: var(--sp-2);
+            background: var(--gradient-rainbow);
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: name-rainbow 5s linear infinite;
+        }
+
+        .footer-meta {
+            font-size: 0.78em;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--sp-2);
+            flex-wrap: wrap;
+        }
+
+        .footer-dot {
+            width: 3px; height: 3px;
+            background: var(--text-dim);
+            border-radius: 50%;
+        }
+
+        .footer-tagline {
+            font-size: 0.72em;
+            color: var(--text-dim);
+            margin-top: var(--sp-3);
+            font-style: italic;
+        }
+
+        /* ============================================================
+         * PRINT / PDF
+         * ============================================================ */
+        @media print {
+            body {
+                background:
+                    radial-gradient(ellipse at 5% 10%, rgba(139, 92, 246, 0.40) 0%, transparent 55%),
+                    radial-gradient(ellipse at 90% 5%, rgba(236, 72, 153, 0.35) 0%, transparent 50%),
+                    radial-gradient(ellipse at 50% 35%, rgba(59, 130, 246, 0.28) 0%, transparent 50%),
+                    radial-gradient(ellipse at 85% 55%, rgba(249, 115, 22, 0.22) 0%, transparent 45%),
+                    radial-gradient(ellipse at 10% 70%, rgba(20, 184, 166, 0.22) 0%, transparent 50%),
+                    linear-gradient(160deg, #1a0533 0%, #0c1445 50%, #1a0a2e 100%) !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            .orb-1, .orb-2, .orb-3, .orb-4 { display: none !important; }
+            .container { max-width: 100%; padding: 0; }
+
+            .header,
+            .exec-summary,
+            .section-header,
+            .brief,
+            .footer {
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+            }
+
+            .header {
+                margin-bottom: var(--sp-6);
+                padding: var(--sp-6) var(--sp-8);
+                background: rgba(255, 255, 255, 0.08) !important;
+            }
+            .header::before, .header::after { display: none; }
+            .exec-summary { margin-bottom: var(--sp-6); padding: var(--sp-5); }
+            .brief { margin-bottom: var(--sp-2); padding: var(--sp-4) var(--sp-5); }
+            .brief:hover { transform: none !important; }
+            .section { margin-bottom: var(--sp-6); }
+
+            a { color: var(--text-white) !important; text-shadow: none !important; }
+            * { animation: none !important; transition: none !important; }
+        }
+
+        /* ============================================================
+         * MOBILE Responsive
+         * ============================================================ */
+        @media (max-width: 768px) {
+            .container { padding: var(--sp-8) var(--sp-4); }
+            .header {
+                padding: var(--sp-8) var(--sp-5);
+                border-radius: var(--radius-lg);
+            }
+            .header-title { font-size: 1.9em; }
+            .exec-summary { padding: var(--sp-5); }
+            .brief { padding: var(--sp-4) var(--sp-5); }
+            .section-header { padding: var(--sp-3) var(--sp-4); }
+        }
+
+        @media (max-width: 480px) {
+            .header-title { font-size: 1.5em; }
+            .header-brand { flex-direction: column; align-items: flex-start; }
+            .brief-meta { flex-direction: column; align-items: flex-start; gap: var(--sp-1); }
+            .glass-divider { margin: var(--sp-4) var(--sp-6); }
+            .orb-1, .orb-2, .orb-3, .orb-4 { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- ★★★ ANIMATED FLOATING COLOR ORBS ★★★ -->
+    <div class="orb-1"></div>
+    <div class="orb-2"></div>
+    <div class="orb-3"></div>
+    <div class="orb-4"></div>
+
+    <div class="container">
+
+        <!-- ====== HEADER: Frosted Glass Hero ====== -->
+        <header class="header">
+            <div class="header-content">
+                <div class="header-brand">
+                    <div class="header-icon">📡</div>
+                    <span class="header-name">Newsloom</span>
+                </div>
+                <h1 class="header-title">Daily Intelligence Brief</h1>
+                <div class="header-subtitle">AI-curated insights through frosted glass — clarity from the noise.</div>
+                <div class="header-meta">
+                    <span>{{ date_str }}</span>
+                    <span class="sep">·</span>
+                    <span>{{ generated_time }}</span>
+                    <span class="sep">·</span>
+                    <span>{{ total_items }} items curated</span>
+                    {% set must_read_total = [] %}
+                    {% for section_key, items in briefs.items() %}
+                    {% if items is iterable and items is not string %}
+                    {% for item in items %}
+                    {% if item.priority == '🔴' %}
+                    {% if must_read_total.append(1) %}{% endif %}
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
+                    {% endfor %}
+                    {% if must_read_total|length > 0 %}
+                    <span class="critical-badge">
+                        <span class="critical-dot"></span>
+                        {{ must_read_total|length }} critical
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+        </header>
+
+        <!-- ====== EXECUTIVE SUMMARY ====== -->
+        {% if executive_summary %}
+        <div class="exec-summary">
+            <div class="exec-label">
+                <span class="exec-label-icon">⚡</span>
+                <span class="exec-label-text">Executive Summary</span>
+            </div>
+            {% for line in executive_summary.strip().split('\n') %}
+            {% if line.strip() %}
+            <p>{{ line.strip() | md_inline }}</p>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- ====== SECTIONS ====== -->
+        {% for section_key in section_order %}
+        {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+        {% set meta = section_configs.get(section_key, {}) %}
+        {% set items = briefs[section_key] %}
+        <section class="section">
+            <div class="section-header">
+                <span class="section-emoji">{{ meta.emoji|default('📌') }}</span>
+                <h2 class="section-title">{{ meta.title|default(section_key) }}</h2>
+                <span class="section-count">{{ items|length }}</span>
+            </div>
+
+            {% for item in items %}
+            {% set priority = item.priority|default('🟢') %}
+            {% set p_class = 'must-read' if priority == '🔴' else ('recommended' if priority == '🟡' else 'fyi') %}
+            <div class="brief {{ p_class }}">
+                <div class="brief-header">
+                    <div class="priority-orb"></div>
+                    <div class="brief-headline">
+                        <a href="{{ item.url|default('#') }}" target="_blank">{{ item.headline|default(item.title|default('Untitled')) }}</a>
+                    </div>
+                </div>
+                <div class="brief-meta">
+                    {% if item.source %}
+                    <span class="source-badge">{{ item.source }}</span>
+                    {% endif %}
+                    {% if item.tags %}
+                    {% for tag in item.tags %}
+                    <span class="tag">{{ tag }}</span>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+                {% if item.detail %}
+                <div class="brief-detail">{{ item.detail|default('') | md_inline }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </section>
+
+        {% if not loop.last %}
+        <div class="glass-divider"></div>
+        {% endif %}
+
+        {% endif %}
+        {% endfor %}
+
+        <!-- ====== FOOTER ====== -->
+        <footer class="footer">
+            <div class="footer-brand">Newsloom Intelligence</div>
+            <div class="footer-meta">
+                <span>{{ date_str }}</span>
+                <span class="footer-dot"></span>
+                <span>{{ total_items }} sources analyzed</span>
+                <span class="footer-dot"></span>
+                <span>AI-curated</span>
+            </div>
+            <div class="footer-tagline">Through the glass, clearly · Frosted with purpose</div>
+        </footer>
+
+    </div>
+</body>
+</html>

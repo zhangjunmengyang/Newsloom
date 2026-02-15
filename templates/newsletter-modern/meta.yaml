@@ -1,0 +1,12 @@
+name: "Newsletter Modern"
+description: "现代邮件通讯风格的日报模板，采用居中窄栏设计和紫色accent"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "light"
+features:
+  - "现代邮件通讯设计风格"
+  - "居中窄栏布局（max-width 600px）"
+  - "紫色accent配色方案"
+  - "CTA按钮样式的链接"
+  - "订阅/退订footer区域"
+  - "简洁的白底设计"

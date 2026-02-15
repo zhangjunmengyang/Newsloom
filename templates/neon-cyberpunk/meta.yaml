@@ -1,0 +1,13 @@
+name: "neon-cyberpunk"
+description: "赛博朋克霓虹风格 — 深黑背景配多色霓虹发光，粉青橙霓虹配色，text-shadow发光效果，glitch故障动画，网格背景，未来科幻美学"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "dark"
+features:
+  - "赛博朋克暗黑美学"
+  - "多色霓虹发光效果"
+  - "故障风格CSS动画"
+  - "网格科幻背景"
+  - "A4 PDF 优化"
+  - "CJK 字体支持"
+  - "三级优先级视觉"

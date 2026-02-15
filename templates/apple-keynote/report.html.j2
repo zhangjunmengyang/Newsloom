@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsloom · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         *  APPLE KEYNOTE — WWDC Stage Presentation Theme
+         * ============================================================
+         *  Visual Language:
+         *    — Pure black stage with floating multi-color gradient orbs
+         *    — Apple classic spectrum: purple→blue→cyan→green→orange
+         *    — Gradient text (background-clip: text) for hero titles
+         *    — Full-width gradient color bands as section transitions
+         *    — Deep gray frosted glass cards + subtle glowing borders
+         *    — Executive Summary as centered keynote "one-liner" quote
+         *    — Each section gets distinct Apple-grade gradient identity
+         *    — "One more thing..." signature footer closing
+         *    — SF Pro / PingFang CJK font stack
+         *    — Animations: orb float, shimmer, fade-in, border pulse
+         * ============================================================ */
+
+        /* ── Design Tokens ── */
+        :root {
+            /* Stage Surfaces */
+            --bg-stage:       #000000;
+            --bg-deep:        #050505;
+            --bg-elevated:    #0D0D0D;
+            --bg-card:        rgba(28, 28, 30, 0.72);
+            --bg-card-hover:  rgba(38, 38, 40, 0.78);
+            --bg-surface:     rgba(44, 44, 46, 0.50);
+            --bg-pill:        rgba(255, 255, 255, 0.06);
+
+            /* Text Hierarchy */
+            --text-hero:      #FFFFFF;
+            --text-primary:   #F5F5F7;
+            --text-secondary: #D1D1D6;
+            --text-tertiary:  #AEAEB2;
+            --text-muted:     #8E8E93;
+            --text-subtle:    #636366;
+            --text-dim:       #48484A;
+
+            /* Apple Gradient Presets */
+            --g-hero:    linear-gradient(135deg, #af52de 0%, #5e5ce6 20%, #0a84ff 40%, #30d158 60%, #ffd60a 80%, #ff9f0a 100%);
+            --g-purple:  linear-gradient(135deg, #BF5AF2, #5E5CE6);
+            --g-blue:    linear-gradient(135deg, #5E5CE6, #0A84FF);
+            --g-ocean:   linear-gradient(135deg, #0A84FF, #5AC8FA, #64D2FF);
+            --g-aurora:  linear-gradient(135deg, #30D158, #5AC8FA, #BF5AF2);
+            --g-sunset:  linear-gradient(135deg, #FF9F0A, #FF6B6B, #FF2D55);
+            --g-rose:    linear-gradient(135deg, #FF2D55, #BF5AF2);
+            --g-mint:    linear-gradient(135deg, #66D4CF, #30D158);
+            --g-cosmic:  linear-gradient(135deg, #5E5CE6, #BF5AF2, #FF2D55, #FF9F0A);
+            --g-silver:  linear-gradient(135deg, #86868B, #D1D1D6, #F5F5F7, #D1D1D6, #86868B);
+
+            /* Apple System Colors */
+            --blue:    #0A84FF;  --indigo:  #5E5CE6;
+            --purple:  #BF5AF2;  --pink:    #FF2D55;
+            --red:     #FF453A;  --orange:  #FF9F0A;
+            --yellow:  #FFD60A;  --green:   #30D158;
+            --mint:    #66D4CF;  --teal:    #40C8E0;
+            --cyan:    #64D2FF;
+
+            /* Priority */
+            --p-must:      #FF453A;
+            --p-must-bg:   rgba(255, 69, 58, 0.10);
+            --p-must-glow: rgba(255, 69, 58, 0.35);
+            --p-rec:       #FF9F0A;
+            --p-rec-bg:    rgba(255, 159, 10, 0.08);
+            --p-rec-glow:  rgba(255, 159, 10, 0.25);
+            --p-fyi:       #30D158;
+            --p-fyi-bg:    rgba(48, 209, 88, 0.06);
+
+            /* Borders */
+            --border:        rgba(255, 255, 255, 0.06);
+            --border-medium: rgba(255, 255, 255, 0.10);
+            --border-strong: rgba(255, 255, 255, 0.15);
+            --border-glow:   rgba(255, 255, 255, 0.20);
+
+            /* Effects */
+            --glass-blur:    blur(40px) saturate(180%);
+            --shadow-soft:   0 4px 30px rgba(0, 0, 0, 0.4);
+            --shadow-deep:   0 12px 60px rgba(0, 0, 0, 0.6);
+            --shadow-card:   0 2px 20px rgba(0, 0, 0, 0.35);
+            --shadow-glow:   0 0 40px rgba(10, 132, 255, 0.15);
+
+            /* Spacing — Apple 8pt with keynote scale */
+            --sp-1: 4px;   --sp-2: 8px;   --sp-3: 12px;
+            --sp-4: 16px;  --sp-5: 20px;  --sp-6: 24px;
+            --sp-8: 32px;  --sp-10: 40px; --sp-12: 48px;
+            --sp-16: 64px; --sp-20: 80px; --sp-24: 96px;
+            --sp-32: 128px;
+
+            /* Typography — SF Pro + CJK */
+            --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+                           "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei",
+                           "Helvetica Neue", Arial, sans-serif;
+            --font-text:    -apple-system, BlinkMacSystemFont, "SF Pro Text",
+                           "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei",
+                           "Helvetica Neue", Arial, sans-serif;
+            --font-mono:    "SF Mono", "Monaco", "Cascadia Code",
+                           "Fira Code", "Noto Sans Mono", monospace;
+
+            /* Radius — Apple rounded */
+            --r-sm:   10px;  --r-md:   16px;
+            --r-lg:   22px;  --r-xl:   30px;
+            --r-pill: 100px;
+        }
+
+        /* ── Animations ── */
+        @keyframes orbDrift1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25%  { transform: translate(80px, -50px) scale(1.12); }
+            50%  { transform: translate(-20px, 40px) scale(0.95); }
+            75%  { transform: translate(40px, 20px) scale(1.05); }
+        }
+        @keyframes orbDrift2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33%  { transform: translate(-60px, 60px) scale(1.08); }
+            66%  { transform: translate(50px, -35px) scale(0.92); }
+        }
+        @keyframes orbDrift3 {
+            0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+            50%  { transform: translate(35px, 25px) scale(1.1) rotate(5deg); }
+        }
+        @keyframes shimmer {
+            0%   { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes glowPulse {
+            0%, 100% { opacity: 0.4; }
+            50%      { opacity: 0.9; }
+        }
+        @keyframes breathe {
+            0%, 100% { box-shadow: 0 0 20px rgba(191, 90, 242, 0.08); }
+            50%      { box-shadow: 0 0 40px rgba(191, 90, 242, 0.18); }
+        }
+
+        /* ── PDF Page Setup ── */
+        @page {
+            size: A4;
+            margin: 1.5cm;
+            background: #000000;
+            @bottom-center {
+                content: "Newsloom · " counter(page);
+                font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+                font-size: 8pt;
+                color: #636366;
+            }
+        }
+
+        /* ── Reset & Base ── */
+        *, *::before, *::after {
+            margin: 0; padding: 0; box-sizing: border-box;
+        }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font-text);
+            background: var(--bg-stage);
+            color: var(--text-primary);
+            font-size: 17px;
+            line-height: 1.47;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ═══ Stage Background: Floating Multi-Color Gradient Orbs ═══ */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                /* Purple orb — top left */
+                radial-gradient(ellipse 650px 650px at 12% 18%, rgba(191, 90, 242, 0.14) 0%, transparent 70%),
+                /* Blue orb — top right */
+                radial-gradient(ellipse 550px 550px at 82% 25%, rgba(10, 132, 255, 0.12) 0%, transparent 70%),
+                /* Green orb — center bottom */
+                radial-gradient(ellipse 450px 450px at 45% 72%, rgba(48, 209, 88, 0.09) 0%, transparent 70%),
+                /* Orange orb — bottom left */
+                radial-gradient(ellipse 500px 500px at 20% 88%, rgba(255, 159, 10, 0.08) 0%, transparent 70%),
+                /* Pink orb — right edge */
+                radial-gradient(ellipse 400px 400px at 90% 70%, rgba(255, 45, 85, 0.07) 0%, transparent 70%),
+                /* Cyan accent — top center */
+                radial-gradient(ellipse 300px 300px at 55% 8%, rgba(100, 210, 255, 0.06) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+            animation: orbDrift1 22s ease-in-out infinite;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 380px 380px at 68% 12%, rgba(94, 92, 230, 0.10) 0%, transparent 70%),
+                radial-gradient(ellipse 320px 320px at 28% 48%, rgba(64, 200, 224, 0.07) 0%, transparent 70%),
+                radial-gradient(ellipse 500px 500px at 55% 92%, rgba(255, 214, 10, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+            animation: orbDrift2 28s ease-in-out infinite;
+        }
+
+        /* Third orb layer for extra depth */
+        .stage-orb-layer {
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 280px 280px at 40% 35%, rgba(191, 90, 242, 0.05) 0%, transparent 70%),
+                radial-gradient(ellipse 350px 350px at 75% 55%, rgba(48, 209, 88, 0.04) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+            animation: orbDrift3 18s ease-in-out infinite;
+        }
+
+        /* Subtle film grain texture */
+        .stage-grain {
+            position: fixed;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.018'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.5;
+        }
+
+        /* Link style */
+        a {
+            color: var(--blue);
+            text-decoration: none;
+            transition: opacity 0.2s ease, color 0.2s ease;
+        }
+        a:hover { opacity: 0.85; }
+
+        /* ── Layout Container ── */
+        .container {
+            max-width: 980px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ============================================================
+         * HEADER — WWDC Opening Slide: Gradient Title on Black Stage
+         * ============================================================ */
+        .header {
+            text-align: center;
+            padding: var(--sp-32) var(--sp-8) var(--sp-24);
+            position: relative;
+            overflow: hidden;
+            min-height: 520px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Giant hero orb behind title */
+        .header::before {
+            content: '';
+            position: absolute;
+            width: 900px; height: 900px;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle,
+                rgba(191, 90, 242, 0.20) 0%,
+                rgba(94, 92, 230, 0.14) 20%,
+                rgba(10, 132, 255, 0.10) 40%,
+                rgba(48, 209, 88, 0.06) 60%,
+                transparent 80%);
+            border-radius: 50%;
+            animation: orbDrift3 16s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        /* Secondary warm orb */
+        .header::after {
+            content: '';
+            position: absolute;
+            width: 550px; height: 550px;
+            top: 45%; left: 62%;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle,
+                rgba(255, 159, 10, 0.12) 0%,
+                rgba(255, 45, 85, 0.08) 40%,
+                transparent 80%);
+            border-radius: 50%;
+            animation: orbDrift2 20s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .header-inner {
+            position: relative;
+            z-index: 2;
+            animation: fadeUp 1.2s ease-out;
+        }
+
+        /* Apple event logo circle */
+        .header-icon {
+            width: 64px; height: 64px;
+            margin: 0 auto var(--sp-10);
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            box-shadow: 0 0 50px rgba(191, 90, 242, 0.12), 0 0 100px rgba(10, 132, 255, 0.06);
+            animation: breathe 4s ease-in-out infinite;
+        }
+
+        /* Gradient hero text — the keynote signature */
+        .brand-title {
+            font-family: var(--font-display);
+            font-size: 6rem;
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            line-height: 1.0;
+            margin-bottom: var(--sp-5);
+            background: var(--g-hero);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 7s linear infinite;
+            filter: drop-shadow(0 4px 24px rgba(191, 90, 242, 0.18));
+        }
+
+        .brand-subtitle {
+            font-family: var(--font-display);
+            font-size: 1.55rem;
+            font-weight: 400;
+            color: var(--text-tertiary);
+            letter-spacing: 0;
+            margin-bottom: var(--sp-16);
+        }
+
+        /* Stats row — Apple keynote number callouts */
+        .header-stats {
+            display: flex;
+            justify-content: center;
+            gap: var(--sp-16);
+            flex-wrap: wrap;
+        }
+
+        .stat-block {
+            text-align: center;
+            min-width: 100px;
+            position: relative;
+        }
+        .stat-block + .stat-block::before {
+            content: '';
+            position: absolute;
+            left: calc(var(--sp-16) / -2);
+            top: 15%; height: 70%;
+            width: 1px;
+            background: linear-gradient(180deg, transparent, rgba(255,255,255,0.12), transparent);
+        }
+
+        .stat-num {
+            font-family: var(--font-display);
+            font-size: 3.4rem;
+            font-weight: 700;
+            color: var(--text-hero);
+            letter-spacing: -0.03em;
+            line-height: 1.05;
+            margin-bottom: var(--sp-1);
+        }
+
+        .stat-label {
+            font-family: var(--font-text);
+            font-size: 0.76rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+        }
+
+        /* ============================================================
+         * GRADIENT BAND — Full-Width Section Transition
+         * ============================================================ */
+        .gradient-band {
+            height: 4px;
+            border: none;
+            margin: 0;
+        }
+        .gradient-band.hero { background: var(--g-hero); }
+
+        /* ============================================================
+         * EXECUTIVE SUMMARY — Centered Keynote "One-Liner" Quote
+         * ============================================================ */
+        .exec-summary {
+            text-align: center;
+            padding: var(--sp-24) var(--sp-12);
+            margin: 0 auto;
+            max-width: 820px;
+            position: relative;
+            page-break-inside: avoid;
+        }
+
+        /* Top decorative gradient line */
+        .exec-summary::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 15%; right: 15%;
+            height: 1px;
+            background: linear-gradient(90deg,
+                transparent,
+                rgba(191, 90, 242, 0.5),
+                rgba(94, 92, 230, 0.4),
+                rgba(10, 132, 255, 0.5),
+                transparent);
+        }
+
+        /* Bottom gradient line */
+        .exec-summary::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 15%; right: 15%;
+            height: 1px;
+            background: linear-gradient(90deg,
+                transparent,
+                rgba(48, 209, 88, 0.4),
+                rgba(255, 159, 10, 0.4),
+                rgba(255, 45, 85, 0.3),
+                transparent);
+        }
+
+        .exec-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--sp-2);
+            padding: var(--sp-2) var(--sp-6);
+            background: rgba(191, 90, 242, 0.10);
+            border: 1px solid rgba(191, 90, 242, 0.22);
+            border-radius: var(--r-pill);
+            font-family: var(--font-text);
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--purple);
+            margin-bottom: var(--sp-10);
+        }
+
+        .exec-title {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            margin-bottom: var(--sp-10);
+            background: var(--g-silver);
+            background-size: 300% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .exec-body p {
+            color: var(--text-tertiary);
+            margin-bottom: var(--sp-5);
+            line-height: 1.78;
+            font-size: 1.15rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .exec-body p:last-child { margin-bottom: 0; }
+        .exec-body strong {
+            color: var(--text-hero);
+            font-weight: 600;
+        }
+        .exec-body em {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+        .exec-body code {
+            font-family: var(--font-mono);
+            background: rgba(255, 255, 255, 0.08);
+            padding: 2px var(--sp-2);
+            border-radius: 6px;
+            font-size: 0.88em;
+            color: var(--cyan);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* ============================================================
+         * SECTION — Each Section = A Keynote Slide
+         * ============================================================ */
+        .section {
+            margin-bottom: var(--sp-20);
+            position: relative;
+        }
+
+        /* Full-width gradient transition band */
+        .section-band {
+            height: 3px;
+            margin-bottom: var(--sp-12);
+        }
+
+        .section-header {
+            padding: var(--sp-12) var(--sp-8) var(--sp-10);
+            text-align: center;
+            position: relative;
+        }
+
+        /* Ambient section glow */
+        .section-glow {
+            position: absolute;
+            top: -80px; left: 50%;
+            transform: translateX(-50%);
+            width: 700px; height: 350px;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0.45;
+        }
+
+        .section-emoji {
+            display: block;
+            font-size: 3.2rem;
+            margin-bottom: var(--sp-5);
+            filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.4));
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 2.6rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            line-height: 1.12;
+            margin-bottom: var(--sp-4);
+            /* gradient text per section — set inline */
+        }
+
+        .section-count-pill {
+            display: inline-block;
+            font-family: var(--font-text);
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            padding: var(--sp-2) var(--sp-5);
+            border-radius: var(--r-pill);
+            background: var(--bg-pill);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            letter-spacing: 0.05em;
+        }
+
+        /* ============================================================
+         * BRIEF CARDS — Deep Gray Frosted Glass + Glowing Borders
+         * ============================================================ */
+        .cards-wrap {
+            padding: 0 var(--sp-8);
+        }
+
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--border-medium);
+            border-radius: var(--r-lg);
+            padding: var(--sp-8);
+            margin-bottom: var(--sp-5);
+            transition: all 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
+            page-break-inside: avoid;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Top-edge shimmer highlight */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: var(--sp-10); right: var(--sp-10);
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), transparent);
+            transition: opacity 0.3s;
+        }
+
+        .card:hover {
+            background: var(--bg-card-hover);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-deep), 0 0 0 1px var(--border-strong);
+            border-color: var(--border-glow);
+        }
+
+        .card:last-child { margin-bottom: 0; }
+
+        /* Priority visual overrides */
+        .card.must-read {
+            border-color: rgba(255, 69, 58, 0.28);
+            background: linear-gradient(135deg, var(--p-must-bg) 0%, var(--bg-card) 35%);
+        }
+        .card.must-read::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--p-must), transparent);
+            animation: glowPulse 3s ease-in-out infinite;
+        }
+        .card.must-read:hover {
+            box-shadow: var(--shadow-deep), 0 0 35px var(--p-must-glow);
+        }
+
+        .card.recommended {
+            border-color: rgba(255, 159, 10, 0.20);
+            background: linear-gradient(135deg, var(--p-rec-bg) 0%, var(--bg-card) 35%);
+        }
+        .card.recommended::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--p-rec), transparent);
+            opacity: 0.5;
+        }
+        .card.recommended:hover {
+            box-shadow: var(--shadow-deep), 0 0 25px var(--p-rec-glow);
+        }
+
+        .card.fyi {
+            border-color: rgba(48, 209, 88, 0.12);
+        }
+
+        /* Card header */
+        .card-head {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--sp-4);
+            margin-bottom: var(--sp-4);
+        }
+
+        .card-priority {
+            font-size: 1.3rem;
+            line-height: 1;
+            margin-top: 3px;
+            flex-shrink: 0;
+        }
+
+        .card-title-area { flex: 1; min-width: 0; }
+
+        .card-headline {
+            font-family: var(--font-display);
+            font-size: 1.28rem;
+            font-weight: 600;
+            line-height: 1.35;
+            margin-bottom: var(--sp-2);
+            letter-spacing: -0.015em;
+        }
+        .card-headline a {
+            color: var(--text-primary);
+            transition: color 0.2s;
+        }
+        .card-headline a:hover {
+            color: var(--blue);
+            opacity: 1;
+        }
+        .card.must-read .card-headline { font-weight: 700; }
+        .card.must-read .card-headline a { color: #FFFFFF; }
+
+        /* Card metadata */
+        .card-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            margin-bottom: var(--sp-4);
+            flex-wrap: wrap;
+        }
+
+        .card-source {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+        }
+        .card-source::before {
+            content: '—';
+            margin-right: var(--sp-2);
+            opacity: 0.35;
+        }
+
+        .card-tags {
+            display: flex;
+            gap: var(--sp-2);
+            flex-wrap: wrap;
+        }
+        .tag {
+            font-size: 0.72rem;
+            padding: var(--sp-1) var(--sp-3);
+            background: var(--bg-pill);
+            color: var(--text-tertiary);
+            border-radius: var(--r-pill);
+            font-weight: 500;
+            border: 1px solid var(--border);
+            transition: background 0.2s;
+        }
+        .tag:hover { background: rgba(255, 255, 255, 0.12); }
+
+        /* Card detail */
+        .card-detail {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+        .card-detail strong { color: var(--text-hero); font-weight: 600; }
+        .card-detail em { color: var(--text-secondary); font-style: italic; }
+        .card-detail code {
+            font-family: var(--font-mono);
+            background: rgba(255, 255, 255, 0.08);
+            padding: 2px var(--sp-2);
+            border-radius: 6px;
+            font-size: 0.88em;
+            color: var(--cyan);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* ============================================================
+         * STATS OVERVIEW — Keynote Number Grid
+         * ============================================================ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: var(--sp-4);
+            padding: 0 var(--sp-8);
+            margin: var(--sp-16) 0;
+        }
+
+        .stats-card {
+            background: var(--bg-card);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+            padding: var(--sp-6) var(--sp-5);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 20%; right: 20%;
+            height: 2px;
+            border-radius: 2px;
+        }
+
+        .stats-card-emoji {
+            font-size: 1.5rem;
+            margin-bottom: var(--sp-2);
+        }
+
+        .stats-card-count {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-hero);
+            line-height: 1.1;
+            margin-bottom: var(--sp-1);
+        }
+
+        .stats-card-label {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            letter-spacing: 0.06em;
+        }
+
+        /* ============================================================
+         * FOOTER — "One more thing..." Keynote Closing Slide
+         * ============================================================ */
+        .footer {
+            text-align: center;
+            padding: var(--sp-32) var(--sp-8) var(--sp-24);
+            margin-top: var(--sp-20);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Subtle top border */
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 10%; right: 10%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+        }
+
+        /* Ambient footer orb */
+        .footer::after {
+            content: '';
+            position: absolute;
+            bottom: -150px; left: 50%;
+            transform: translateX(-50%);
+            width: 600px; height: 400px;
+            background: radial-gradient(circle,
+                rgba(191, 90, 242, 0.08) 0%,
+                rgba(10, 132, 255, 0.05) 40%,
+                transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: orbDrift3 12s ease-in-out infinite;
+        }
+
+        .footer-inner {
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-omt {
+            font-family: var(--font-display);
+            font-size: 2.8rem;
+            font-weight: 300;
+            font-style: italic;
+            letter-spacing: -0.02em;
+            margin-bottom: var(--sp-8);
+            background: linear-gradient(135deg, var(--text-subtle), var(--text-muted), var(--text-subtle));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .footer-logo { font-size: 2.8rem; margin-bottom: var(--sp-5); }
+
+        .footer-brand {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: var(--sp-4);
+            background: var(--g-purple);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .footer-info {
+            font-family: var(--font-text);
+            font-size: 0.9rem;
+            color: var(--text-subtle);
+            line-height: 1.6;
+            margin-bottom: var(--sp-6);
+        }
+
+        .footer-rule {
+            width: 60px; height: 2px;
+            margin: 0 auto var(--sp-6);
+            background: var(--g-hero);
+            border-radius: 2px;
+        }
+
+        .footer-copyright {
+            font-family: var(--font-text);
+            font-size: 0.68rem;
+            color: var(--text-dim);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        /* ============================================================
+         * PRINT / PDF Overrides
+         * ============================================================ */
+        @media print {
+            body {
+                background: #000000 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            body::before, body::after,
+            .stage-orb-layer, .stage-grain { display: none; }
+            .container { max-width: 100%; }
+            .header {
+                padding: var(--sp-16) var(--sp-6);
+                min-height: auto;
+            }
+            .header::before, .header::after { display: none; }
+            .exec-summary { padding: var(--sp-12) var(--sp-8); }
+            .section { margin-bottom: var(--sp-12); }
+            .section-header { page-break-after: avoid; }
+            .section-glow { display: none; }
+            .card {
+                break-inside: avoid;
+                margin-bottom: var(--sp-4);
+                padding: var(--sp-5);
+                backdrop-filter: none;
+                -webkit-backdrop-filter: none;
+            }
+            .card:hover {
+                transform: none;
+                box-shadow: none;
+            }
+            .card::after { display: none; }
+            a { color: var(--text-primary) !important; }
+            .footer {
+                margin-top: var(--sp-12);
+                padding: var(--sp-10) var(--sp-6);
+            }
+            .footer::after { display: none; }
+            .stats-card {
+                backdrop-filter: none;
+                -webkit-backdrop-filter: none;
+            }
+            * { animation-duration: 0s !important; }
+        }
+
+        /* ============================================================
+         * RESPONSIVE — Mobile Adaptation
+         * ============================================================ */
+        @media (max-width: 768px) {
+            .brand-title { font-size: 3.4rem; }
+            .brand-subtitle { font-size: 1.15rem; }
+            .header {
+                padding: var(--sp-20) var(--sp-6) var(--sp-16);
+                min-height: auto;
+            }
+            .header-stats { gap: var(--sp-8); }
+            .stat-num { font-size: 2.4rem; }
+            .stat-block + .stat-block::before { display: none; }
+            .exec-summary { padding: var(--sp-16) var(--sp-6); }
+            .exec-title { font-size: 2.1rem; }
+            .exec-body p { font-size: 1.05rem; }
+            .section-header { padding: var(--sp-8) var(--sp-6); }
+            .section-title { font-size: 1.9rem; }
+            .section-emoji { font-size: 2.5rem; }
+            .cards-wrap { padding: 0 var(--sp-5); }
+            .card { padding: var(--sp-6); }
+            .card-headline { font-size: 1.1rem; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); padding: 0 var(--sp-5); }
+            .footer { padding: var(--sp-20) var(--sp-6) var(--sp-16); }
+            .footer-omt { font-size: 1.8rem; }
+        }
+
+        @media (max-width: 480px) {
+            body { font-size: 16px; }
+            .brand-title { font-size: 2.4rem; }
+            .header {
+                padding: var(--sp-16) var(--sp-4) var(--sp-12);
+            }
+            .header-stats { flex-direction: column; gap: var(--sp-5); }
+            .exec-summary { padding: var(--sp-10) var(--sp-4); }
+            .exec-title { font-size: 1.6rem; }
+            .section-header { padding: var(--sp-6) var(--sp-4); }
+            .section-title { font-size: 1.5rem; }
+            .section-emoji { font-size: 2rem; }
+            .cards-wrap { padding: 0 var(--sp-3); }
+            .card { border-radius: var(--r-md); }
+            .card-headline { font-size: 1rem; }
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: var(--sp-3); padding: 0 var(--sp-3); }
+            .footer { padding: var(--sp-12) var(--sp-4); }
+            .footer-omt { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Stage background layers -->
+    <div class="stage-orb-layer" aria-hidden="true"></div>
+    <div class="stage-grain" aria-hidden="true"></div>
+
+    <div class="container">
+
+        <!-- ══════ HEADER: WWDC Opening Slide ══════ -->
+        <header class="header">
+            <div class="header-inner">
+                <div class="header-icon">📡</div>
+                <h1 class="brand-title">Newsloom</h1>
+                <div class="brand-subtitle">Daily Intelligence · {{ date_str }}</div>
+
+                <div class="header-stats">
+                    <div class="stat-block">
+                        <div class="stat-num">{{ total_items }}</div>
+                        <div class="stat-label">Articles</div>
+                    </div>
+                    {% set ns = namespace(must_count=0) %}
+                    {% for sk in section_order %}
+                        {% if sk in briefs and briefs[sk] %}
+                            {% for it in briefs[sk] %}
+                                {% if it.priority == '🔴' %}
+                                    {% set ns.must_count = ns.must_count + 1 %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                    {% if ns.must_count > 0 %}
+                    <div class="stat-block">
+                        <div class="stat-num">{{ ns.must_count }}</div>
+                        <div class="stat-label">Critical</div>
+                    </div>
+                    {% endif %}
+                    <div class="stat-block">
+                        <div class="stat-num">{{ briefs | length }}</div>
+                        <div class="stat-label">Sections</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero gradient band -->
+        <hr class="gradient-band hero">
+
+        <!-- ══════ EXECUTIVE SUMMARY: Keynote Core Quote ══════ -->
+        {% if executive_summary %}
+        <section class="exec-summary">
+            <div class="exec-badge">⚡ Executive Overview</div>
+            <h2 class="exec-title">Today's Key Insight</h2>
+            <div class="exec-body">
+                {% for line in executive_summary.strip().split('\n') %}
+                    {% if line.strip() %}
+                <p>{{ line.strip() | md_inline }}</p>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- ══════ SECTIONS: Keynote Content Slides ══════ -->
+        {% for section_key in section_order %}
+            {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key] | length > 0 %}
+                {% set meta = section_configs.get(section_key, {}) %}
+                {% set items = briefs[section_key] %}
+                {% set sec_color = meta.color | default('#0A84FF') %}
+
+                <!-- Section transition gradient band -->
+                <div class="section-band" style="background: linear-gradient(90deg, transparent, {{ sec_color }}, transparent);"></div>
+
+                <section class="section">
+                    <div class="section-header">
+                        <!-- Ambient glow from section color -->
+                        <div class="section-glow" style="background: radial-gradient(ellipse, {{ sec_color }}20 0%, transparent 70%);"></div>
+
+                        <span class="section-emoji">{{ meta.emoji | default('📌') }}</span>
+                        <h2 class="section-title" style="background: linear-gradient(135deg, {{ sec_color }}, #FFFFFF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">{{ meta.title | default(section_key) }}</h2>
+                        <span class="section-count-pill">{{ items | length }} items</span>
+                    </div>
+
+                    <div class="cards-wrap">
+                        {% for item in items %}
+                            {% set priority = item.priority | default('🟢') %}
+                            {% set pc = 'must-read' if priority == '🔴' else ('recommended' if priority == '🟡' else 'fyi') %}
+
+                            <article class="card {{ pc }}">
+                                <div class="card-head">
+                                    <span class="card-priority">{{ priority }}</span>
+                                    <div class="card-title-area">
+                                        <h3 class="card-headline">
+                                            <a href="{{ item.url | default('#') }}" target="_blank">
+                                                {{ item.headline | default('Untitled') }}
+                                            </a>
+                                        </h3>
+                                    </div>
+                                </div>
+
+                                {% if item.source or item.tags %}
+                                <div class="card-meta">
+                                    {% if item.source %}
+                                    <span class="card-source">{{ item.source }}</span>
+                                    {% endif %}
+                                    {% if item.tags %}
+                                    <div class="card-tags">
+                                        {% for tag in item.tags %}
+                                        <span class="tag">{{ tag }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+
+                                {% if item.detail %}
+                                <div class="card-detail">{{ item.detail | md_inline }}</div>
+                                {% endif %}
+                            </article>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endif %}
+        {% endfor %}
+
+        <!-- ══════ STATS GRID: Keynote Number Callouts ══════ -->
+        <div class="section-band" style="background: var(--g-cosmic);"></div>
+        <div class="stats-grid">
+            {% for sk in section_order %}
+                {% if sk in briefs and briefs[sk] %}
+                    {% set m = section_configs.get(sk, {}) %}
+                    {% set sc = m.color | default('#0A84FF') %}
+                    <div class="stats-card">
+                        <div style="position:absolute;top:0;left:20%;right:20%;height:2px;background:linear-gradient(90deg,transparent,{{ sc }},transparent);border-radius:2px;"></div>
+                        <div class="stats-card-emoji">{{ m.emoji | default('📌') }}</div>
+                        <div class="stats-card-count" style="color: {{ sc }};">{{ briefs[sk] | length }}</div>
+                        <div class="stats-card-label">{{ m.title | default(sk) }}</div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- ══════ FOOTER: "One more thing..." Closing Slide ══════ -->
+        <footer class="footer">
+            <div class="footer-inner">
+                <div class="footer-omt">One more thing...</div>
+                <div class="footer-logo">📡</div>
+                <div class="footer-brand">Newsloom Intelligence</div>
+                <div class="footer-info">
+                    AI-curated daily intelligence · {{ date_str }}<br>
+                    {{ total_items }} sources analyzed · Generated {{ generated_time }}
+                </div>
+                <div class="footer-rule"></div>
+                <div class="footer-copyright">Powered by Newsloom · Made with ♡</div>
+            </div>
+        </footer>
+
+    </div>
+</body>
+</html>

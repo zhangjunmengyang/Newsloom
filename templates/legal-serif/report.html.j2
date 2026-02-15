@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsloom · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * LEGAL SERIF — Law Firm Memorandum Style
+         * ============================================================
+         * Parchment texture · Deep Navy (#1A237E) · Gold (#B8860B) trim
+         * TO/FROM/RE/DATE memo header · §-numbered sections
+         * URGENT red seal · Footnote citation · Signature block
+         * CONFIDENTIAL watermark · Georgia serif body
+         * ============================================================ */
+
+        /* --- Design Tokens --- */
+        :root {
+            /* Backgrounds — parchment hierarchy */
+            --bg-parchment:    #FDFBF5;
+            --bg-secondary:    #FBF8F0;
+            --bg-card:         #F8F5EB;
+            --bg-surface:      #F3EFDF;
+            --bg-hover:        #EDE8D6;
+
+            /* Text — ink hierarchy */
+            --text-primary:    #1A1813;
+            --text-secondary:  #3D3A30;
+            --text-muted:      #6B6756;
+            --text-light:      #9A9584;
+
+            /* Primary — Deep Navy */
+            --navy:            #1A237E;
+            --navy-light:      #283593;
+            --navy-dark:       #0D1652;
+            --navy-dim:        rgba(26, 35, 126, 0.08);
+            --navy-glow:       rgba(26, 35, 126, 0.04);
+
+            /* Gold accent */
+            --gold:            #B8860B;
+            --gold-light:      #D4A843;
+            --gold-dark:       #8B6508;
+            --gold-dim:        rgba(184, 134, 11, 0.12);
+            --gold-glow:       rgba(184, 134, 11, 0.06);
+
+            /* Priority — legal urgency */
+            --priority-must:   #8B1A1A;
+            --priority-must-bg: rgba(139, 26, 26, 0.06);
+            --priority-rec:    #8B6914;
+            --priority-rec-bg: rgba(139, 105, 20, 0.05);
+            --priority-fyi:    #2D5A3D;
+            --priority-fyi-bg: rgba(45, 90, 61, 0.04);
+
+            /* Borders */
+            --border:          #DDD8C8;
+            --border-strong:   #C5C0AE;
+            --border-accent:   var(--gold);
+
+            /* Spacing — 8pt grid (generous legal spacing) */
+            --sp-1: 4px;   --sp-2: 8px;   --sp-3: 12px;
+            --sp-4: 16px;  --sp-5: 20px;  --sp-6: 24px;
+            --sp-8: 32px;  --sp-10: 40px; --sp-12: 48px;
+            --sp-16: 64px; --sp-20: 80px;
+
+            /* Typography */
+            --font-serif: "Georgia", "Times New Roman", "Noto Serif SC", "Songti SC", "SimSun", serif;
+            --font-sans: "Helvetica Neue", "Arial", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+            --font-mono: "Courier New", "Monaco", "Consolas", monospace;
+
+            /* Radius — sharp legal */
+            --radius-sm: 0px;
+            --radius-md: 2px;
+            --radius-lg: 3px;
+
+            /* Shadows */
+            --shadow-card: 0 1px 4px rgba(0, 0, 0, 0.06), 0 0 1px rgba(0, 0, 0, 0.08);
+            --shadow-elevated: 0 3px 12px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
+            --shadow-seal: 0 2px 8px rgba(139, 26, 26, 0.2);
+        }
+
+        /* --- Page Setup (PDF) --- */
+        @page {
+            size: A4;
+            margin: 2.5cm 3cm;
+            @top-center {
+                content: "NEWSLOOM INTELLIGENCE — CONFIDENTIAL";
+                font-family: var(--font-sans);
+                font-size: 7pt;
+                font-weight: 600;
+                color: var(--text-light);
+                letter-spacing: 0.15em;
+                text-transform: uppercase;
+            }
+            @bottom-left {
+                content: "Document NL-{{ date_str | replace('-', '') }}-001";
+                font-family: var(--font-serif);
+                font-size: 7pt;
+                color: var(--text-light);
+                font-style: italic;
+            }
+            @bottom-right {
+                content: "Page " counter(page);
+                font-family: var(--font-serif);
+                font-size: 7pt;
+                color: var(--text-light);
+            }
+        }
+
+        /* --- Reset & Base --- */
+        *, *::before, *::after {
+            margin: 0; padding: 0; box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-serif);
+            /* Parchment texture background using CSS gradients */
+            background:
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(184, 134, 11, 0.008) 2px,
+                    rgba(184, 134, 11, 0.008) 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 3px,
+                    rgba(139, 105, 20, 0.005) 3px,
+                    rgba(139, 105, 20, 0.005) 6px
+                ),
+                radial-gradient(ellipse at 50% 0%, rgba(184, 134, 11, 0.04) 0%, transparent 60%),
+                linear-gradient(180deg, #FDFBF5 0%, #FAF6EA 30%, #FDFBF5 70%, #F8F4E5 100%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            font-size: 16px;
+            line-height: 1.8;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            font-weight: 400;
+            position: relative;
+        }
+
+        /* --- CONFIDENTIAL watermark --- */
+        body::before {
+            content: 'CONFIDENTIAL';
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-35deg);
+            font-family: var(--font-sans);
+            font-size: 7rem;
+            font-weight: 800;
+            color: rgba(26, 35, 126, 0.018);
+            letter-spacing: 0.15em;
+            pointer-events: none;
+            z-index: 0;
+            white-space: nowrap;
+        }
+
+        /* --- Links --- */
+        a {
+            color: var(--navy);
+            text-decoration: none;
+            border-bottom: 1px solid var(--border);
+            transition: all 0.2s ease;
+        }
+        a:hover {
+            color: var(--gold-dark);
+            border-bottom-color: var(--gold);
+        }
+
+        /* --- Container --- */
+        .container {
+            max-width: 780px;
+            margin: 0 auto;
+            padding: var(--sp-16) var(--sp-8);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ============================================================
+         * HEADER — Law Firm Letterhead
+         * Gold decorative lines + MEMORANDUM title
+         * ============================================================ */
+        .header {
+            text-align: center;
+            padding: var(--sp-10) 0 var(--sp-8);
+            margin-bottom: var(--sp-10);
+            position: relative;
+        }
+
+        /* Triple gold rule at top */
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 8px;
+            background:
+                linear-gradient(180deg,
+                    var(--gold) 0%, var(--gold) 2px,
+                    transparent 2px, transparent 3px,
+                    var(--gold-light) 3px, var(--gold-light) 4px,
+                    transparent 4px, transparent 6px,
+                    var(--gold) 6px, var(--gold) 8px
+                );
+        }
+
+        /* Bottom double navy rule */
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 6px;
+            background:
+                linear-gradient(180deg,
+                    var(--navy) 0%, var(--navy) 2px,
+                    transparent 2px, transparent 4px,
+                    var(--navy) 4px, var(--navy) 6px
+                );
+        }
+
+        /* Firm seal / emblem */
+        .header-seal {
+            width: 80px; height: 80px;
+            margin: var(--sp-6) auto var(--sp-4);
+            border: 3px solid var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: radial-gradient(circle, var(--bg-parchment) 60%, var(--gold-glow) 100%);
+        }
+
+        .header-seal::before {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            border: 1px solid var(--gold-light);
+            border-radius: 50%;
+        }
+
+        .header-seal::after {
+            content: '';
+            position: absolute;
+            inset: 8px;
+            border: 1px dotted var(--gold-dim);
+            border-radius: 50%;
+        }
+
+        .header-seal-text {
+            font-family: var(--font-sans);
+            font-size: 0.55em;
+            font-weight: 700;
+            color: var(--gold-dark);
+            text-align: center;
+            line-height: 1.15;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        /* Firm name */
+        .firm-name {
+            font-family: var(--font-sans);
+            font-size: 0.72em;
+            font-weight: 700;
+            color: var(--navy);
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            margin-bottom: var(--sp-2);
+        }
+
+        .firm-address {
+            font-family: var(--font-sans);
+            font-size: 0.65em;
+            color: var(--text-light);
+            letter-spacing: 0.08em;
+            margin-bottom: var(--sp-6);
+        }
+
+        /* Gold flourish divider */
+        .header-flourish {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--sp-4);
+            margin-bottom: var(--sp-6);
+            color: var(--gold);
+            font-size: 0.9em;
+        }
+
+        .header-flourish::before,
+        .header-flourish::after {
+            content: '';
+            flex: 1;
+            max-width: 140px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        /* MEMORANDUM title */
+        .memo-title {
+            font-family: var(--font-sans);
+            font-size: 2.2em;
+            font-weight: 700;
+            color: var(--navy);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: var(--sp-2);
+        }
+
+        .memo-subtitle {
+            font-family: var(--font-serif);
+            font-size: 0.95em;
+            font-style: italic;
+            color: var(--text-muted);
+            margin-bottom: var(--sp-8);
+        }
+
+        .doc-number {
+            font-family: var(--font-mono);
+            font-size: 0.72em;
+            color: var(--text-light);
+            letter-spacing: 0.08em;
+        }
+
+        /* ============================================================
+         * MEMO HEADER — TO / FROM / RE / DATE fields
+         * ============================================================ */
+        .memo-fields {
+            border-top: 2px solid var(--navy);
+            border-bottom: 2px solid var(--navy);
+            padding: var(--sp-5) var(--sp-6);
+            margin-bottom: var(--sp-10);
+            background: var(--bg-secondary);
+        }
+
+        .memo-field {
+            display: flex;
+            gap: var(--sp-4);
+            padding: var(--sp-2) 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.92em;
+        }
+
+        .memo-field:last-child {
+            border-bottom: none;
+        }
+
+        .memo-field-label {
+            font-family: var(--font-sans);
+            font-weight: 700;
+            color: var(--navy);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            min-width: 80px;
+            flex-shrink: 0;
+            font-size: 0.85em;
+        }
+
+        .memo-field-value {
+            color: var(--text-primary);
+            font-weight: 400;
+        }
+
+        /* ============================================================
+         * URGENT NOTICE BANNER — Red seal stamp effect
+         * ============================================================ */
+        .urgent-notice {
+            position: relative;
+            background:
+                linear-gradient(135deg, var(--priority-must-bg) 0%, rgba(139, 26, 26, 0.03) 100%);
+            border: 2px solid var(--priority-must);
+            padding: var(--sp-5) var(--sp-8);
+            margin-bottom: var(--sp-10);
+            text-align: center;
+            overflow: hidden;
+        }
+
+        /* Rotated URGENT stamp overlay */
+        .urgent-stamp {
+            position: absolute;
+            top: 50%;
+            right: var(--sp-6);
+            transform: translateY(-50%) rotate(-12deg);
+            font-family: var(--font-sans);
+            font-size: 1.4em;
+            font-weight: 900;
+            color: var(--priority-must);
+            border: 3px solid var(--priority-must);
+            padding: var(--sp-1) var(--sp-4);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            opacity: 0.35;
+            border-radius: 4px;
+            box-shadow: var(--shadow-seal);
+        }
+
+        .urgent-text {
+            font-family: var(--font-sans);
+            font-size: 0.85em;
+            font-weight: 700;
+            color: var(--priority-must);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            position: relative;
+            z-index: 1;
+        }
+
+        .urgent-text::before,
+        .urgent-text::after {
+            content: '§';
+            margin: 0 var(--sp-2);
+            opacity: 0.5;
+        }
+
+        /* ============================================================
+         * EXECUTIVE SUMMARY — Legal Brief / Statement of Facts
+         * ============================================================ */
+        .exec-summary {
+            background:
+                linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            border-left: 5px solid var(--gold);
+            border-top: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: var(--sp-8) var(--sp-10);
+            margin-bottom: var(--sp-16);
+            page-break-inside: avoid;
+            box-shadow: var(--shadow-card);
+            position: relative;
+        }
+
+        .exec-summary::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 5px; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold-dim), transparent);
+        }
+
+        .exec-header {
+            margin-bottom: var(--sp-6);
+            text-align: center;
+            padding-bottom: var(--sp-4);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .exec-title {
+            font-family: var(--font-sans);
+            font-size: 0.82em;
+            font-weight: 700;
+            color: var(--navy);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: var(--sp-2);
+        }
+
+        .exec-citation {
+            font-family: var(--font-mono);
+            font-size: 0.72em;
+            color: var(--text-light);
+            font-style: italic;
+        }
+
+        .exec-summary p {
+            text-align: justify;
+            margin-bottom: var(--sp-5);
+            text-indent: 2em;
+            color: var(--text-primary);
+            line-height: 1.9;
+        }
+
+        .exec-summary p:first-of-type {
+            text-indent: 0;
+        }
+
+        .exec-summary p:first-of-type::first-letter {
+            font-size: 2.8em;
+            float: left;
+            margin-right: var(--sp-2);
+            margin-top: 3px;
+            color: var(--navy);
+            font-weight: 700;
+            line-height: 0.85;
+        }
+
+        .exec-summary p:last-of-type { margin-bottom: 0; }
+
+        .exec-summary p strong {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Footnote reference style */
+        .footnote-ref {
+            font-size: 0.7em;
+            vertical-align: super;
+            color: var(--navy);
+            font-weight: 600;
+        }
+
+        /* ============================================================
+         * SECTION — §-numbered Articles
+         * ============================================================ */
+        .section {
+            margin-bottom: var(--sp-16);
+            page-break-inside: avoid;
+            counter-reset: brief-counter;
+        }
+
+        .section-header {
+            margin-bottom: var(--sp-8);
+            padding-bottom: var(--sp-4);
+            position: relative;
+        }
+
+        /* Double-rule under section header */
+        .section-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 4px;
+            background:
+                linear-gradient(180deg,
+                    var(--navy) 0%, var(--navy) 1px,
+                    transparent 1px, transparent 3px,
+                    var(--border-strong) 3px, var(--border-strong) 4px
+                );
+        }
+
+        /* Section color indicator bar */
+        .section-color-bar {
+            width: 40px;
+            height: 3px;
+            margin-bottom: var(--sp-3);
+            border-radius: 1px;
+        }
+
+        .section-number {
+            font-family: var(--font-sans);
+            font-size: 0.72em;
+            color: var(--text-light);
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: var(--sp-2);
+        }
+
+        .section-title {
+            font-size: 1.45em;
+            font-weight: 700;
+            color: var(--navy);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: var(--sp-2);
+        }
+
+        .section-count {
+            font-family: var(--font-sans);
+            font-size: 0.75em;
+            color: var(--text-light);
+            font-style: italic;
+        }
+
+        /* ============================================================
+         * BRIEF CARDS — Legal paragraphs with ¶ numbering
+         * ============================================================ */
+        .brief {
+            margin-bottom: var(--sp-6);
+            padding: var(--sp-6);
+            border-bottom: 1px solid var(--border);
+            page-break-inside: avoid;
+            counter-increment: brief-counter;
+            position: relative;
+            transition: background 0.2s ease;
+        }
+
+        .brief:hover {
+            background: var(--bg-hover);
+        }
+
+        .brief:last-child { border-bottom: none; }
+
+        .brief-number {
+            font-family: var(--font-sans);
+            font-weight: 700;
+            color: var(--text-muted);
+            font-size: 0.82em;
+            margin-bottom: var(--sp-3);
+            letter-spacing: 0.04em;
+        }
+
+        /* --- Priority: must-read gets URGENT stamp --- */
+        .brief.must-read {
+            background:
+                linear-gradient(135deg, var(--priority-must-bg) 0%, rgba(139, 26, 26, 0.02) 100%);
+            border-left: 4px solid var(--priority-must);
+            padding-left: var(--sp-6);
+            box-shadow: var(--shadow-card);
+        }
+
+        /* Rotated URGENT micro-stamp */
+        .brief.must-read::after {
+            content: 'URGENT';
+            position: absolute;
+            top: var(--sp-3); right: var(--sp-4);
+            font-family: var(--font-sans);
+            font-size: 0.58em;
+            font-weight: 800;
+            color: var(--priority-must);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            border: 2px solid var(--priority-must);
+            padding: 2px 8px;
+            transform: rotate(-3deg);
+            opacity: 0.7;
+        }
+
+        .brief.recommended {
+            background: var(--priority-rec-bg);
+            border-left: 4px solid var(--priority-rec);
+            padding-left: var(--sp-6);
+        }
+
+        .brief.fyi {
+            background: var(--priority-fyi-bg);
+            border-left: 4px solid var(--priority-fyi);
+            padding-left: var(--sp-6);
+        }
+
+        .brief-headline {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--sp-4);
+            line-height: 1.5;
+        }
+
+        .brief-headline a {
+            color: var(--text-primary);
+            border-bottom: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .brief-headline a:hover {
+            color: var(--navy);
+            border-bottom-color: var(--navy);
+        }
+
+        .brief.must-read .brief-headline a {
+            color: var(--priority-must);
+            font-weight: 700;
+        }
+
+        .brief-meta {
+            margin-bottom: var(--sp-4);
+            font-family: var(--font-sans);
+            font-size: 0.78em;
+            color: var(--text-muted);
+            display: flex;
+            gap: var(--sp-3);
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .source-citation {
+            font-style: italic;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            padding: var(--sp-1) var(--sp-3);
+            background: var(--bg-surface);
+        }
+
+        .topic-tag {
+            font-weight: 600;
+            color: var(--navy);
+            background: var(--navy-dim);
+            border: 1px solid rgba(26, 35, 126, 0.15);
+            padding: var(--sp-1) var(--sp-3);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-size: 0.72em;
+        }
+
+        .brief-detail {
+            text-align: justify;
+            line-height: 1.9;
+            color: var(--text-primary);
+            text-indent: 2em;
+        }
+
+        .brief-detail strong { font-weight: 700; }
+
+        .brief-detail code {
+            font-family: var(--font-mono);
+            font-size: 0.88em;
+            background: var(--bg-surface);
+            color: var(--navy);
+            padding: 2px 6px;
+            border: 1px solid var(--border);
+        }
+
+        /* ============================================================
+         * SECTION IMPLICATIONS BOX — End-of-section summary
+         * ============================================================ */
+        .implications-box {
+            background: var(--navy-dim);
+            border: 1px solid rgba(26, 35, 126, 0.12);
+            border-left: 4px solid var(--navy);
+            padding: var(--sp-5) var(--sp-6);
+            margin-top: var(--sp-6);
+            font-family: var(--font-sans);
+            font-size: 0.82em;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .implications-label {
+            font-weight: 700;
+            color: var(--navy);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.85em;
+            margin-bottom: var(--sp-2);
+        }
+
+        /* ============================================================
+         * FOOTNOTES SECTION
+         * ============================================================ */
+        .footnotes {
+            margin-top: var(--sp-12);
+            padding-top: var(--sp-6);
+            border-top: 1px solid var(--border);
+            font-size: 0.78em;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .footnote-title {
+            font-family: var(--font-sans);
+            font-size: 0.82em;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: var(--sp-4);
+        }
+
+        .footnote-item {
+            margin-bottom: var(--sp-2);
+            padding-left: var(--sp-5);
+            text-indent: calc(-1 * var(--sp-5));
+        }
+
+        .footnote-num {
+            font-weight: 700;
+            color: var(--navy);
+            margin-right: var(--sp-2);
+        }
+
+        /* ============================================================
+         * FOOTER — Legal Certification + Signature Block
+         * ============================================================ */
+        .footer {
+            margin-top: var(--sp-20);
+            padding-top: var(--sp-10);
+            text-align: center;
+            position: relative;
+        }
+
+        /* Double-rule top */
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 6px;
+            background:
+                linear-gradient(180deg,
+                    var(--navy) 0%, var(--navy) 2px,
+                    transparent 2px, transparent 4px,
+                    var(--navy) 4px, var(--navy) 6px
+                );
+        }
+
+        .footer-attestation {
+            font-family: var(--font-serif);
+            font-size: 0.88em;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-bottom: var(--sp-8);
+            line-height: 1.7;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Signature area */
+        .signature-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: var(--sp-10);
+            padding-top: var(--sp-8);
+            border-top: 1px solid var(--border);
+        }
+
+        .signature-block {
+            display: flex;
+            flex-direction: column;
+            gap: var(--sp-2);
+            align-items: center;
+        }
+
+        .signature-line {
+            width: 180px;
+            border-bottom: 2px solid var(--text-primary);
+            height: 2em;
+        }
+
+        .signature-label {
+            font-family: var(--font-sans);
+            font-size: 0.72em;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 600;
+        }
+
+        /* Document seal */
+        .document-seal {
+            width: 72px; height: 72px;
+            border: 3px solid var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-sans);
+            font-weight: 700;
+            color: var(--gold);
+            font-size: 0.55em;
+            text-align: center;
+            line-height: 1.15;
+            position: relative;
+            background: radial-gradient(circle, var(--bg-parchment) 50%, var(--gold-glow) 100%);
+        }
+
+        .document-seal::before {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            border: 1px solid var(--gold-light);
+            border-radius: 50%;
+        }
+
+        /* Gold bottom decoration */
+        .footer-gold-rule {
+            margin-top: var(--sp-8);
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        /* Disclaimer */
+        .footer-disclaimer {
+            margin-top: var(--sp-6);
+            padding-top: var(--sp-4);
+            font-family: var(--font-sans);
+            font-size: 0.65em;
+            color: var(--text-light);
+            line-height: 1.5;
+            max-width: 520px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Date line */
+        .date-line {
+            margin-top: var(--sp-6);
+            font-family: var(--font-sans);
+            font-size: 0.72em;
+            color: var(--text-muted);
+            font-weight: 500;
+            letter-spacing: 0.06em;
+        }
+
+        /* ============================================================
+         * Print / PDF
+         * ============================================================ */
+        @media print {
+            body {
+                background: var(--bg-parchment) !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            body::before { display: none; }
+            .container { max-width: 100%; padding: var(--sp-8) 0; }
+            .header { margin-bottom: var(--sp-8); padding-bottom: var(--sp-6); }
+            .exec-summary { margin-bottom: var(--sp-10); padding: var(--sp-6) var(--sp-8); }
+            .brief { margin-bottom: var(--sp-4); padding: var(--sp-4) var(--sp-5); }
+            .brief:hover { background: transparent; }
+            .section { margin-bottom: var(--sp-12); }
+            a { color: var(--text-primary) !important; border-bottom: none !important; }
+        }
+
+        /* ============================================================
+         * Mobile
+         * ============================================================ */
+        @media (max-width: 768px) {
+            .container { padding: var(--sp-8) var(--sp-4); }
+            .memo-title { font-size: 1.6em; letter-spacing: 0.1em; }
+            .header-meta, .memo-fields { padding: var(--sp-4); }
+            .memo-field { flex-direction: column; gap: var(--sp-1); }
+            .exec-summary { padding: var(--sp-6) var(--sp-5); }
+            .brief { padding: var(--sp-4); }
+            .brief.must-read::after { display: none; }
+            .urgent-stamp { display: none; }
+            .signature-area { flex-direction: column; gap: var(--sp-6); align-items: center; }
+        }
+
+        @media (max-width: 480px) {
+            body { font-size: 15px; }
+            .memo-title { font-size: 1.4em; }
+            .header-seal { width: 60px; height: 60px; }
+            .section-title { font-size: 1.2em; }
+            .brief-meta { flex-direction: column; gap: var(--sp-2); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- ====== HEADER: Law Firm Letterhead ====== -->
+        <header class="header">
+            <div class="header-seal">
+                <span class="header-seal-text">NL<br>INTEL</span>
+            </div>
+            <div class="firm-name">Newsloom Intelligence Partners, LLP</div>
+            <div class="firm-address">Established for Strategic Analysis &amp; Intelligence Distribution</div>
+            <div class="header-flourish">⚖</div>
+            <h1 class="memo-title">Memorandum</h1>
+            <div class="memo-subtitle">Daily Intelligence Brief — Confidential Attorney Work Product</div>
+            <div class="doc-number">Ref: NL-{{ date_str|replace('-', '') }}-001</div>
+        </header>
+
+        <!-- ====== MEMO FIELDS: TO / FROM / RE / DATE ====== -->
+        <div class="memo-fields">
+            <div class="memo-field">
+                <span class="memo-field-label">To:</span>
+                <span class="memo-field-value">Senior Leadership &amp; Authorized Personnel</span>
+            </div>
+            <div class="memo-field">
+                <span class="memo-field-label">From:</span>
+                <span class="memo-field-value">Newsloom Intelligence Analysis Division</span>
+            </div>
+            <div class="memo-field">
+                <span class="memo-field-label">Re:</span>
+                <span class="memo-field-value">Daily Strategic Intelligence Brief — {{ total_items }} Matters Under Review</span>
+            </div>
+            <div class="memo-field">
+                <span class="memo-field-label">Date:</span>
+                <span class="memo-field-value">{{ date_str }} · {{ generated_time }}</span>
+            </div>
+        </div>
+
+        <!-- ====== URGENT NOTICE ====== -->
+        {% set must_read_total = [] %}
+        {% for section_key, items in briefs.items() %}
+        {% if items is iterable and items is not string %}
+        {% for item in items %}
+        {% if item.priority == '🔴' %}
+        {% if must_read_total.append(1) %}{% endif %}
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+        {% endfor %}
+        {% if must_read_total|length > 0 %}
+        <div class="urgent-notice">
+            <span class="urgent-text">Attention Required: {{ must_read_total|length }} Urgent Matter(s) Demand Immediate Review</span>
+            <span class="urgent-stamp">URGENT</span>
+        </div>
+        {% endif %}
+
+        <!-- ====== EXECUTIVE SUMMARY: Statement of Facts ====== -->
+        {% if executive_summary %}
+        <div class="exec-summary">
+            <div class="exec-header">
+                <div class="exec-title">Article I — Executive Summary</div>
+                <div class="exec-citation">Statement of Key Findings and Preliminary Analysis</div>
+            </div>
+            {% for line in executive_summary.strip().split('\n') %}
+            {% if line.strip() %}
+            <p>{{ line.strip() | md_inline }}</p>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- ====== SECTIONS: § Numbered Legal Sections ====== -->
+        {% set section_counter = [1] %}
+        {% set roman = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'] %}
+        {% set footnote_counter = [1] %}
+        {% for section_key in section_order %}
+        {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+        {% set meta = section_configs.get(section_key, {}) %}
+        {% set items = briefs[section_key] %}
+        {% set idx = section_counter[0] - 1 %}
+        <section class="section">
+            <div class="section-header">
+                <div class="section-color-bar" style="background: {{ meta.color|default('#6B6756') }};"></div>
+                <div class="section-number">§ {{ section_counter[0] }} — Article {{ roman[idx] if idx < roman|length else section_counter[0] }} · {{ meta.emoji|default('§') }}</div>
+                <h2 class="section-title">{{ meta.title|default(section_key) }}</h2>
+                <div class="section-count">({{ items|length }} matter{% if items|length != 1 %}s{% endif %} for review)</div>
+            </div>
+
+            {% for item in items %}
+            {% set priority = item.priority|default('🟢') %}
+            {% set p_class = 'must-read' if priority == '🔴' else ('recommended' if priority == '🟡' else 'fyi') %}
+            <div class="brief {{ p_class }}">
+                <div class="brief-number">¶ {{ loop.index }}.</div>
+                <div class="brief-headline">
+                    <a href="{{ item.url|default('#') }}" target="_blank">{{ item.headline|default(item.title|default('Untitled Matter')) }}</a>
+                </div>
+                <div class="brief-meta">
+                    {% if item.source %}
+                    <span class="source-citation">Source: {{ item.source }}</span>
+                    {% endif %}
+                    {% if item.tags %}
+                    {% for tag in item.tags %}
+                    <span class="topic-tag">{{ tag }}</span>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+                {% if item.detail %}
+                <div class="brief-detail">{{ item.detail|default('') | md_inline }}<sup class="footnote-ref">[{{ footnote_counter[0] }}]</sup></div>
+                {% if footnote_counter.append(footnote_counter.pop() + 1) %}{% endif %}
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <!-- Section implications -->
+            <div class="implications-box">
+                <div class="implications-label">Implications &amp; Advisory Note</div>
+                The {{ items|length }} matter{% if items|length != 1 %}s{% endif %} reviewed in this section warrant continued monitoring. {% if items|selectattr('priority', 'equalto', '🔴')|list|length > 0 %}Urgent items have been flagged for immediate action.{% endif %} Further analysis may be requested per standard protocol.
+            </div>
+        </section>
+        {% if section_counter.append(section_counter.pop() + 1) %}{% endif %}
+        {% endif %}
+        {% endfor %}
+
+        <!-- ====== FOOTNOTES ====== -->
+        <div class="footnotes">
+            <div class="footnote-title">References &amp; Source Citations</div>
+            {% set fn_counter = [1] %}
+            {% for section_key in section_order %}
+            {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+            {% set items = briefs[section_key] %}
+            {% for item in items %}
+            {% if item.detail %}
+            <div class="footnote-item">
+                <span class="footnote-num">[{{ fn_counter[0] }}]</span>
+                {{ item.source|default('Source undisclosed') }} — "{{ item.headline|default(item.title|default('Untitled'))|truncate(80) }}" ({{ date_str }})
+            </div>
+            {% if fn_counter.append(fn_counter.pop() + 1) %}{% endif %}
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- ====== FOOTER: Certification + Signatures ====== -->
+        <footer class="footer">
+            <div class="footer-attestation">
+                This memorandum constitutes a comprehensive intelligence analysis prepared under the Newsloom Intelligence Framework. The {{ total_items }} matters reviewed herein have been compiled, analyzed, and classified as of {{ date_str }}. This document is privileged and confidential.
+            </div>
+            <div class="signature-area">
+                <div class="signature-block">
+                    <div class="signature-line"></div>
+                    <div class="signature-label">Intelligence Analyst</div>
+                </div>
+                <div class="document-seal">
+                    NEWSLOOM<br>SEAL
+                </div>
+                <div class="signature-block">
+                    <div class="signature-line"></div>
+                    <div class="signature-label">Date: {{ date_str }}</div>
+                </div>
+            </div>
+            <div class="footer-gold-rule"></div>
+            <div class="footer-disclaimer">
+                PRIVILEGED AND CONFIDENTIAL — This memorandum is intended solely for the identified recipient(s). Unauthorized disclosure, reproduction, or distribution is strictly prohibited. © {{ date_str[:4] }} Newsloom Intelligence Partners, LLP.
+            </div>
+            <div class="date-line">Filed: {{ date_str }} · {{ generated_time }}</div>
+        </footer>
+
+    </div>
+</body>
+</html>

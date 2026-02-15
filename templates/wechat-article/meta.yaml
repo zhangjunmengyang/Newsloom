@@ -1,0 +1,12 @@
+name: "WeChat Article"
+description: "微信公众号文章风格的日报模板，优化中文排版和微信绿色调"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "light"
+features:
+  - "微信公众号文章原生风格"
+  - "微信绿色accent配色"
+  - "中文排版最优化"
+  - "较窄栏宽适合手机阅读"
+  - "灰色背景section分隔"
+  - "二维码footer区域"

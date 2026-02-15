@@ -1,0 +1,13 @@
+name: "realestate-luxury"
+description: "房地产奢华风格 — 象牙白底色配金棕色点缀，优雅衬线字体，高端楼盘宣传美学，金色渐变边框装饰，奢华地产行业专用"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "light"
+features:
+  - "奢华衬线字体"
+  - "金棕色高端配色"
+  - "渐变金色边框"
+  - "房地产行业定制"
+  - "A4 PDF 优化"
+  - "CJK 字体支持"
+  - "三级优先级视觉"

@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsloom Strategy Brief · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * BAIN RED v2 — Consulting PPT Deck
+         * Clean white + Bain Deep Red (#CC0000)
+         *
+         * Visual Narrative:
+         *   - White base + red only as accent (extremely restrained)
+         *   - Full-width red band header with white type
+         *   - Each section styled like a PPT slide
+         *   - Key finding box: red left border + pale red background
+         *   - Oversized numbers for statistics
+         *   - Bottom disclaimer bar
+         *   - Professional, authoritative, boardroom-ready
+         *
+         * Inspired by: Bain & Company presentations, McKinsey decks,
+         *              HBR layouts, investor pitch books
+         * ============================================================ */
+
+        :root {
+            /* === Bain Red Palette === */
+            --bain-red:         #CC0000;
+            --bain-red-dark:    #A30000;
+            --bain-red-deeper:  #8B0000;
+            --bain-red-light:   #E60000;
+            --bain-red-pale:    #FFF0F0;
+            --bain-red-wash:    #FFF5F5;
+            --bain-red-bg:      rgba(204, 0, 0, 0.04);
+            --bain-red-bg-med:  rgba(204, 0, 0, 0.08);
+            --bain-red-border:  rgba(204, 0, 0, 0.20);
+            --bain-red-border-strong: rgba(204, 0, 0, 0.40);
+
+            /* === Neutral Palette === */
+            --white:          #FFFFFF;
+            --gray-50:        #FAFAFA;
+            --gray-100:       #F5F5F5;
+            --gray-200:       #EEEEEE;
+            --gray-300:       #E0E0E0;
+            --gray-400:       #BDBDBD;
+            --gray-500:       #9E9E9E;
+            --gray-600:       #757575;
+            --gray-700:       #616161;
+            --gray-800:       #424242;
+            --gray-900:       #212121;
+            --black:          #1A1A1A;
+
+            /* === Text === */
+            --text-primary:    var(--gray-900);
+            --text-secondary:  var(--gray-700);
+            --text-muted:      var(--gray-500);
+            --text-dim:        var(--gray-400);
+            --text-light:      var(--gray-600);
+
+            /* === Priority === */
+            --priority-must:       var(--bain-red);
+            --priority-must-bg:    var(--bain-red-pale);
+            --priority-must-border: var(--bain-red-border-strong);
+            --priority-rec:        #B45309;
+            --priority-rec-bg:     #FFFBEB;
+            --priority-rec-border: rgba(180, 83, 9, 0.20);
+            --priority-fyi:        #059669;
+            --priority-fyi-bg:     #F0FDF4;
+            --priority-fyi-border: rgba(5, 150, 105, 0.15);
+
+            /* === Typography === */
+            --font-sans: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Arial", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Source Han Sans SC", sans-serif;
+            --font-serif: "Georgia", "Times New Roman", "Noto Serif SC", "Source Han Serif SC", "STSong", serif;
+            --font-mono: "SF Mono", "Menlo", "Consolas", monospace;
+            --font-display: "Helvetica Neue", "Arial", -apple-system, "PingFang SC", sans-serif;
+
+            /* === Spacing (8pt grid) === */
+            --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px;
+            --sp-4: 16px; --sp-5: 20px; --sp-6: 24px;
+            --sp-8: 32px; --sp-10: 40px; --sp-12: 48px;
+            --sp-16: 64px; --sp-20: 80px;
+
+            /* === Radius === */
+            --radius-sm: 2px;
+            --radius-md: 4px;
+            --radius-lg: 6px;
+
+            /* === Shadows === */
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-lg: 0 4px 16px rgba(0,0,0,0.10);
+            --shadow-slide: 0 1px 4px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+        }
+
+        /* --- Page (PDF) --- */
+        @page {
+            size: A4;
+            margin: 1.8cm 2.2cm;
+            @bottom-left {
+                content: "CONFIDENTIAL";
+                font-size: 7pt;
+                color: var(--gray-400);
+                font-family: var(--font-sans);
+                letter-spacing: 0.15em;
+                text-transform: uppercase;
+            }
+            @bottom-center {
+                content: "Newsloom Strategy Brief · {{ date_str }}";
+                font-size: 7pt;
+                color: var(--gray-500);
+                font-family: var(--font-sans);
+            }
+            @bottom-right {
+                content: "Page " counter(page);
+                font-size: 7pt;
+                color: var(--gray-400);
+                font-family: var(--font-sans);
+            }
+        }
+
+        /* --- Reset --- */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-sans);
+            color: var(--text-primary);
+            font-size: 15px;
+            line-height: 1.72;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            min-height: 100vh;
+
+            /* === SUBTLE PROFESSIONAL BACKGROUND ===
+             * Near-white with very faint diagonal pinstripe texture
+             * to add subtle depth without distraction
+             */
+            background:
+                /* Very faint diagonal pinstripes */
+                repeating-linear-gradient(
+                    135deg,
+                    transparent,
+                    transparent 14px,
+                    rgba(0, 0, 0, 0.008) 14px,
+                    rgba(0, 0, 0, 0.008) 15px
+                ),
+                /* Subtle warm center glow */
+                radial-gradient(ellipse at 50% 0%, rgba(204, 0, 0, 0.015) 0%, transparent 60%),
+                /* Clean white base */
+                linear-gradient(180deg, #FFFFFF 0%, #FAFAFA 50%, #F8F8F8 100%);
+            background-attachment: fixed;
+        }
+
+        a {
+            color: var(--bain-red);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        a:hover {
+            color: var(--bain-red-dark);
+            text-decoration: underline;
+        }
+
+        code {
+            font-family: var(--font-mono);
+            background: var(--gray-100);
+            color: var(--gray-800);
+            padding: 2px 6px;
+            border-radius: var(--radius-sm);
+            font-size: 0.88em;
+            border: 1px solid var(--gray-200);
+        }
+
+        strong {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        /* --- Container --- */
+        .container {
+            max-width: 780px;
+            margin: 0 auto;
+            padding: 0 var(--sp-6);
+        }
+
+        /* ==========================================================
+         * HEADER — Full-Width Red Band + White Typography
+         * ========================================================== */
+        .header {
+            position: relative;
+            padding: var(--sp-16) var(--sp-8);
+            margin-bottom: var(--sp-10);
+            text-align: left;
+            color: var(--white);
+            overflow: hidden;
+
+            /* Full-width red band with subtle gradient */
+            background:
+                /* Subtle diagonal texture for depth */
+                repeating-linear-gradient(
+                    -45deg,
+                    transparent,
+                    transparent 4px,
+                    rgba(255, 255, 255, 0.02) 4px,
+                    rgba(255, 255, 255, 0.02) 5px
+                ),
+                /* Rich red gradient */
+                linear-gradient(135deg, #CC0000 0%, #B30000 40%, #A30000 70%, #990000 100%);
+        }
+
+        /* Bottom edge shadow for depth */
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.15), transparent);
+        }
+
+        .header-inner {
+            max-width: 780px;
+            margin: 0 auto;
+        }
+
+        .header-top-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--sp-8);
+            padding-bottom: var(--sp-4);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.20);
+        }
+
+        .header-brand {
+            font-family: var(--font-display);
+            font-size: 0.72em;
+            font-weight: 800;
+            letter-spacing: 0.30em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.90);
+        }
+
+        .header-date {
+            font-family: var(--font-sans);
+            font-size: 0.78em;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.70);
+        }
+
+        .header h1 {
+            font-family: var(--font-display);
+            font-size: 3.0em;
+            font-weight: 800;
+            line-height: 1.08;
+            color: var(--white);
+            margin-bottom: var(--sp-3);
+            letter-spacing: -0.01em;
+        }
+
+        .header .subtitle {
+            font-family: var(--font-sans);
+            font-size: 1.1em;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.75);
+            margin-bottom: var(--sp-8);
+        }
+
+        /* Big stat numbers row */
+        .header-stats {
+            display: flex;
+            gap: var(--sp-10);
+            align-items: flex-end;
+        }
+
+        .header-stat {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-stat .stat-number {
+            font-family: var(--font-display);
+            font-size: 3.2em;
+            font-weight: 800;
+            line-height: 1.0;
+            color: var(--white);
+        }
+
+        .header-stat .stat-label {
+            font-family: var(--font-sans);
+            font-size: 0.70em;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: rgba(255, 255, 255, 0.55);
+            margin-top: var(--sp-1);
+        }
+
+        .header-stat .stat-divider {
+            width: 32px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.30);
+            margin-top: var(--sp-2);
+        }
+
+        /* ==========================================================
+         * EXECUTIVE SUMMARY — Key Finding Box
+         * Red left border + pale red background
+         * ========================================================== */
+        .executive-summary {
+            position: relative;
+            margin-bottom: var(--sp-10);
+            page-break-inside: avoid;
+        }
+
+        .exec-label {
+            font-family: var(--font-sans);
+            font-size: 0.68em;
+            font-weight: 800;
+            letter-spacing: 0.20em;
+            text-transform: uppercase;
+            color: var(--bain-red);
+            margin-bottom: var(--sp-4);
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+        }
+
+        .exec-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--gray-200);
+        }
+
+        .exec-card {
+            padding: var(--sp-8) var(--sp-8);
+            background: var(--bain-red-wash);
+            border-left: 4px solid var(--bain-red);
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .exec-card p {
+            font-family: var(--font-sans);
+            color: var(--text-secondary);
+            font-size: 0.95em;
+            line-height: 1.85;
+            margin-bottom: var(--sp-4);
+        }
+
+        .exec-card p:first-of-type {
+            color: var(--text-primary);
+            font-size: 1.0em;
+            font-weight: 500;
+        }
+
+        .exec-card p:last-of-type { margin-bottom: 0; }
+
+        .exec-card p strong {
+            color: var(--bain-red);
+            font-weight: 700;
+        }
+
+        .exec-card p code {
+            font-family: var(--font-mono);
+            background: var(--white);
+            color: var(--gray-800);
+            padding: 2px 6px;
+            border-radius: var(--radius-sm);
+            font-size: 0.88em;
+            border: 1px solid var(--gray-200);
+        }
+
+        /* ==========================================================
+         * SLIDE DIVIDER — Clean horizontal rule with page number
+         * ========================================================== */
+        .slide-divider {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-4);
+            margin: var(--sp-10) 0;
+            page-break-before: auto;
+        }
+
+        .slide-divider::before,
+        .slide-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--gray-200);
+        }
+
+        .slide-divider .slide-number {
+            font-family: var(--font-sans);
+            font-size: 0.62em;
+            font-weight: 700;
+            color: var(--gray-400);
+            letter-spacing: 0.10em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        /* ==========================================================
+         * SECTION — PPT Slide Style
+         * ========================================================== */
+        .section {
+            margin-bottom: var(--sp-10);
+            page-break-inside: avoid;
+        }
+
+        /* Slide frame effect */
+        .slide-frame {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-slide);
+            overflow: hidden;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-4);
+            padding: var(--sp-5) var(--sp-6);
+            position: relative;
+            background: var(--gray-50);
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        /* Left color accent — section identity */
+        .section-header .section-accent {
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+        }
+
+        .section-emoji {
+            font-size: 1.2em;
+            width: 38px; height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-md);
+        }
+
+        .section-header h2 {
+            font-family: var(--font-display);
+            font-size: 1.25em;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: 0.01em;
+        }
+
+        .section-count {
+            margin-left: auto;
+            font-family: var(--font-sans);
+            font-size: 0.68em;
+            font-weight: 700;
+            color: var(--text-muted);
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            padding: 3px 14px;
+            border-radius: 100px;
+            letter-spacing: 0.04em;
+        }
+
+        .slide-body {
+            padding: var(--sp-5) var(--sp-6);
+        }
+
+        /* ==========================================================
+         * BRIEF CARDS — Clean professional items
+         * ========================================================== */
+        .briefs-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .brief {
+            display: flex;
+            gap: var(--sp-4);
+            padding: var(--sp-5) 0;
+            position: relative;
+            page-break-inside: avoid;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .brief:last-child {
+            border-bottom: none;
+        }
+
+        /* Priority left bar */
+        .brief-priority-bar {
+            width: 3px;
+            flex-shrink: 0;
+            border-radius: 3px;
+            align-self: stretch;
+        }
+
+        .brief-priority-bar.must { background: var(--bain-red); }
+        .brief-priority-bar.rec { background: var(--priority-rec); }
+        .brief-priority-bar.fyi { background: var(--gray-300); }
+
+        /* === MUST-READ: Key Finding emphasis === */
+        .brief.must-read-item {
+            background: var(--bain-red-pale);
+            margin: 0 calc(-1 * var(--sp-6));
+            padding: var(--sp-5) var(--sp-6);
+            border-bottom: 1px solid var(--bain-red-border);
+            border-left: 4px solid var(--bain-red);
+        }
+
+        .brief.must-read-item .brief-priority-bar {
+            display: none;
+        }
+
+        .brief-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .brief-headline {
+            font-family: var(--font-sans);
+            font-size: 1.0em;
+            font-weight: 600;
+            line-height: 1.4;
+            margin-bottom: var(--sp-1);
+        }
+
+        .brief-headline a {
+            color: var(--text-primary);
+            transition: color 0.2s;
+        }
+
+        .brief-headline a:hover {
+            color: var(--bain-red);
+        }
+
+        .brief.must-read-item .brief-headline a {
+            color: var(--bain-red-dark);
+            font-weight: 700;
+        }
+
+        .key-finding-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-family: var(--font-sans);
+            font-size: 0.58em;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--bain-red);
+            background: var(--white);
+            border: 1px solid var(--bain-red-border-strong);
+            padding: 2px 10px;
+            border-radius: var(--radius-sm);
+            margin-left: var(--sp-2);
+            vertical-align: middle;
+        }
+
+        .key-finding-label .red-dot {
+            width: 5px; height: 5px;
+            background: var(--bain-red);
+            border-radius: 50%;
+        }
+
+        .brief-detail {
+            color: var(--text-secondary);
+            font-size: 0.90em;
+            line-height: 1.78;
+            margin-bottom: var(--sp-2);
+        }
+
+        .brief-detail strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .brief-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            font-size: 0.72em;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+        }
+
+        .brief-source {
+            font-family: var(--font-sans);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-light);
+        }
+
+        .meta-dot {
+            width: 3px; height: 3px;
+            background: var(--gray-300);
+            border-radius: 50%;
+        }
+
+        .brief-tags {
+            display: flex;
+            gap: var(--sp-1);
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            font-family: var(--font-sans);
+            font-size: 0.90em;
+            background: var(--gray-100);
+            color: var(--text-muted);
+            padding: 1px 8px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--gray-200);
+        }
+
+        /* ==========================================================
+         * STATS PANEL — Oversized numbers (like Bain deck data pages)
+         * ========================================================== */
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--sp-4);
+            margin-bottom: var(--sp-10);
+            padding: var(--sp-6);
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-slide);
+        }
+
+        .stats-panel .stat-item {
+            text-align: center;
+            padding: var(--sp-4) var(--sp-2);
+        }
+
+        .stats-panel .stat-item:not(:last-child) {
+            border-right: 1px solid var(--gray-200);
+        }
+
+        .stats-panel .stat-big-number {
+            font-family: var(--font-display);
+            font-size: 3.0em;
+            font-weight: 800;
+            line-height: 1.0;
+            color: var(--bain-red);
+        }
+
+        .stats-panel .stat-big-number.neutral {
+            color: var(--text-primary);
+        }
+
+        .stats-panel .stat-label {
+            font-family: var(--font-sans);
+            font-size: 0.68em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--text-muted);
+            margin-top: var(--sp-2);
+        }
+
+        .stats-panel .stat-sub {
+            font-family: var(--font-sans);
+            font-size: 0.62em;
+            color: var(--text-dim);
+            margin-top: var(--sp-1);
+        }
+
+        /* ==========================================================
+         * FOOTER — Disclaimer Bar
+         * ========================================================== */
+        .footer {
+            margin-top: var(--sp-12);
+            padding: 0;
+        }
+
+        /* Red thin top line */
+        .footer-red-line {
+            height: 3px;
+            background: var(--bain-red);
+            margin-bottom: var(--sp-6);
+        }
+
+        .footer-content {
+            max-width: 780px;
+            margin: 0 auto;
+            padding: 0 var(--sp-6) var(--sp-10);
+        }
+
+        .footer-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--sp-6);
+            padding-bottom: var(--sp-4);
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .footer-brand {
+            font-family: var(--font-display);
+            font-size: 0.72em;
+            font-weight: 800;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--bain-red);
+        }
+
+        .footer-date {
+            font-family: var(--font-sans);
+            font-size: 0.72em;
+            color: var(--text-muted);
+        }
+
+        .footer-disclaimer {
+            font-family: var(--font-sans);
+            font-size: 0.70em;
+            line-height: 1.7;
+            color: var(--text-muted);
+            margin-bottom: var(--sp-4);
+        }
+
+        .footer-disclaimer strong {
+            color: var(--text-secondary);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .footer-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-family: var(--font-sans);
+            font-size: 0.65em;
+            color: var(--text-dim);
+            padding-top: var(--sp-3);
+            border-top: 1px solid var(--gray-100);
+        }
+
+        .footer-meta a {
+            color: var(--text-dim);
+        }
+        .footer-meta a:hover {
+            color: var(--bain-red);
+        }
+
+        /* ==========================================================
+         * PRINT / PDF
+         * ========================================================== */
+        @media print {
+            body {
+                background: var(--white) !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .container { max-width: 100%; padding: 0; }
+            .header {
+                padding: var(--sp-10) var(--sp-6);
+                margin-bottom: var(--sp-6);
+                page-break-after: avoid;
+            }
+            .executive-summary { margin-bottom: var(--sp-6); }
+            .section { margin-bottom: var(--sp-6); }
+            .slide-frame { box-shadow: none; border: 1px solid var(--gray-200); }
+            .brief:hover { transform: none; }
+            .brief.must-read-item { background: var(--bain-red-pale) !important; }
+            .stats-panel { box-shadow: none; }
+            a { color: var(--text-primary) !important; text-decoration: none !important; }
+            .footer { page-break-inside: avoid; }
+            .footer-red-line { height: 2px; }
+        }
+
+        /* ==========================================================
+         * MOBILE
+         * ========================================================== */
+        @media (max-width: 640px) {
+            .container { padding: 0 var(--sp-3); }
+            .header {
+                padding: var(--sp-10) var(--sp-5);
+            }
+            .header h1 { font-size: 2.0em; }
+            .header-stats { gap: var(--sp-6); }
+            .header-stat .stat-number { font-size: 2.2em; }
+            .exec-card { padding: var(--sp-5); }
+            .section-header {
+                padding: var(--sp-3) var(--sp-4);
+            }
+            .section-header h2 { font-size: 1.05em; }
+            .section-emoji { width: 32px; height: 32px; font-size: 1.0em; }
+            .slide-body { padding: var(--sp-4); }
+            .brief {
+                padding: var(--sp-4) 0;
+                gap: var(--sp-3);
+            }
+            .brief.must-read-item {
+                margin: 0 calc(-1 * var(--sp-4));
+                padding: var(--sp-4);
+            }
+            .brief-headline { font-size: 0.92em; }
+            .stats-panel {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+            .stats-panel .stat-item {
+                padding: var(--sp-3);
+                border-right: none !important;
+                border-bottom: 1px solid var(--gray-200);
+            }
+            .stats-panel .stat-item:last-child { border-bottom: none; }
+            .stats-panel .stat-big-number { font-size: 2.4em; }
+            .footer-content { padding: 0 var(--sp-3) var(--sp-6); }
+            .footer-top { flex-direction: column; gap: var(--sp-2); align-items: flex-start; }
+        }
+
+        @media (max-width: 380px) {
+            body { font-size: 14px; }
+            .header h1 { font-size: 1.7em; }
+            .header-stats { flex-direction: column; gap: var(--sp-4); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ====== HEADER: Full-Width Red Band ====== -->
+    <header class="header">
+        <div class="header-inner">
+            <div class="header-top-row">
+                <span class="header-brand">NEWSLOOM</span>
+                <span class="header-date">{{ date_str }}</span>
+            </div>
+
+            <h1>Daily Strategy<br>Brief</h1>
+            <div class="subtitle">Technology, Markets & Strategic Intelligence</div>
+
+            {% set ns = namespace(must_count=0, sections_active=0) %}
+            {% for section_key in section_order %}
+                {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+                    {% set ns.sections_active = ns.sections_active + 1 %}
+                    {% for item in briefs[section_key] %}
+                        {% if item.priority == '🔴' %}
+                            {% set ns.must_count = ns.must_count + 1 %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+
+            <div class="header-stats">
+                <div class="header-stat">
+                    <div class="stat-number">{{ total_items }}</div>
+                    <div class="stat-label">Items Curated</div>
+                    <div class="stat-divider"></div>
+                </div>
+                <div class="header-stat">
+                    <div class="stat-number">{{ ns.must_count }}</div>
+                    <div class="stat-label">Key Findings</div>
+                    <div class="stat-divider"></div>
+                </div>
+                <div class="header-stat">
+                    <div class="stat-number">{{ ns.sections_active }}</div>
+                    <div class="stat-label">Categories</div>
+                    <div class="stat-divider"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- ====== EXECUTIVE SUMMARY: Key Finding Box ====== -->
+        {% if executive_summary %}
+        <section class="executive-summary">
+            <div class="exec-label">
+                <span>Executive Summary</span>
+            </div>
+            <div class="exec-card">
+                {% for line in executive_summary.strip().split('\n') %}
+                    {% if line.strip() %}
+                <p>{{ line.strip() | md_inline }}</p>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- ====== STATS PANEL: Oversized Numbers ====== -->
+        {% if stats %}
+        <div class="stats-panel">
+            <div class="stat-item">
+                <div class="stat-big-number">
+                    {% if stats.total_input is defined %}{{ stats.total_input }}{% else %}—{% endif %}
+                </div>
+                <div class="stat-label">Sources Scanned</div>
+                <div class="stat-sub">raw signal inputs</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-big-number neutral">{{ total_items }}</div>
+                <div class="stat-label">Items Selected</div>
+                <div class="stat-sub">after analysis & ranking</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-big-number">{{ ns.must_count }}</div>
+                <div class="stat-label">Critical Alerts</div>
+                <div class="stat-sub">require immediate attention</div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ====== SECTIONS: PPT Slides ====== -->
+        {% set slide_ns = namespace(slide_num=0) %}
+        {% for section_key in section_order %}
+            {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+                {% set meta = section_configs.get(section_key, {}) %}
+                {% set section_briefs = briefs[section_key] %}
+                {% set section_color = meta.get('color', '#CC0000') %}
+                {% set slide_ns.slide_num = slide_ns.slide_num + 1 %}
+
+                {% if slide_ns.slide_num > 1 %}
+                <div class="slide-divider">
+                    <span class="slide-number">Slide {{ slide_ns.slide_num }}</span>
+                </div>
+                {% endif %}
+
+                <section class="section">
+                    <div class="slide-frame">
+                        <header class="section-header">
+                            <div class="section-accent" style="background: {{ section_color }};"></div>
+                            <span class="section-emoji">{{ meta.get('emoji', '📌') }}</span>
+                            <h2>{{ meta.get('title', section_key|title) }}</h2>
+                            <span class="section-count">{{ section_briefs|length }} items</span>
+                        </header>
+
+                        <div class="slide-body">
+                            <div class="briefs-list">
+                                {% for brief in section_briefs %}
+                                    {% set is_must = brief.priority == '🔴' %}
+                                    {% set priority_class = 'must-read-item' if is_must else '' %}
+
+                                    <article class="brief {{ priority_class }}">
+                                        {% if not is_must %}
+                                        <div class="brief-priority-bar {{ 'rec' if brief.priority == '🟡' else 'fyi' }}"></div>
+                                        {% endif %}
+                                        <div class="brief-content">
+                                            <div class="brief-headline">
+                                                <a href="{{ brief.url }}" target="_blank">{{ brief.headline }}</a>
+                                                {% if is_must %}
+                                                <span class="key-finding-label"><span class="red-dot"></span> Key Finding</span>
+                                                {% endif %}
+                                            </div>
+                                            {% if brief.detail %}
+                                            <div class="brief-detail">
+                                                {{ brief.detail | md_inline }}
+                                            </div>
+                                            {% endif %}
+                                            <footer class="brief-meta">
+                                                <span class="brief-source">{{ brief.source }}</span>
+                                                {% if brief.tags %}
+                                                <span class="meta-dot"></span>
+                                                <div class="brief-tags">
+                                                    {% for tag in brief.tags %}
+                                                    <span class="tag">{{ tag }}</span>
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                            </footer>
+                                        </div>
+                                    </article>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            {% endif %}
+        {% endfor %}
+
+    </div>
+
+    <!-- ====== FOOTER: Disclaimer Bar ====== -->
+    <footer class="footer">
+        <div class="footer-red-line"></div>
+        <div class="footer-content">
+            <div class="footer-top">
+                <span class="footer-brand">NEWSLOOM</span>
+                <span class="footer-date">{{ date_str }} · Generated {{ generated_time }}</span>
+            </div>
+
+            <div class="footer-disclaimer">
+                <strong>Disclaimer</strong> — This briefing is generated by an AI-powered intelligence system for informational purposes only. It does not constitute investment advice, professional consulting, or official recommendations. All information is sourced from publicly available data and may contain errors or omissions. Verify critical information through primary sources before making decisions.
+            </div>
+
+            <div class="footer-meta">
+                <span>CONFIDENTIAL · For authorized recipients only</span>
+                <span>Powered by <a href="#">Newsloom</a> · Bain Red v2.0</span>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

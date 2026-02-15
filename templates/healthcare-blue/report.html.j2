@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinical Intelligence Report · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * HEALTHCARE BLUE — Clinical Report / Medical White Paper
+         * ============================================================
+         * White base + Medical Blue #0072CE + Green #00A550
+         * ECG waveform sine-wave CSS texture (radial-gradient approx)
+         * Header: blue gradient + cross / heart CSS icons
+         * Clinical Alert red frame for must-read items
+         * Progress bar visual elements · Rx-001 prescription numbering
+         * Compliance disclaimer footer
+         *
+         * Inspired by: Mayo Clinic, NEJM, WHO reports
+         * ============================================================ */
+
+        /* ---------- Design Tokens ---------- */
+        :root {
+            --blue:       #0072CE;
+            --blue-dk:    #005AA0;
+            --blue-deep:  #003D6B;
+            --blue-lt:    #3DA1E8;
+            --blue-pale:  #E6F2FB;
+            --blue-dim:   rgba(0,114,206,0.08);
+            --blue-glow:  rgba(0,114,206,0.04);
+
+            --green:      #00A550;
+            --green-dk:   #008540;
+            --green-pale: #E3F8ED;
+            --green-dim:  rgba(0,165,80,0.08);
+
+            --red:        #D32F2F;
+            --red-dk:     #B71C1C;
+            --red-dim:    rgba(211,47,47,0.06);
+            --red-glow:   rgba(211,47,47,0.12);
+
+            --orange:     #F57C00;
+            --orange-dim: rgba(245,124,0,0.06);
+
+            --bg:         #FFFFFF;
+            --bg2:        #F6F9FC;
+            --bg3:        #EDF3F8;
+            --bg4:        #E0EAF2;
+            --bg-frost:   #FAFCFE;
+
+            --txt:        #1A2332;
+            --txt2:       #3D5068;
+            --txt3:       #6B839A;
+            --txt4:       #94AAC0;
+            --txt-inv:    #FFFFFF;
+
+            --bdr:        #D0DDE8;
+            --bdr-lt:     #E3ECF3;
+            --bdr-str:    #B0C4D8;
+
+            --sh-sm:  0 1px 3px rgba(0,55,100,0.06);
+            --sh-md:  0 2px 10px rgba(0,55,100,0.08), 0 1px 3px rgba(0,55,100,0.05);
+            --sh-lg:  0 8px 28px rgba(0,55,100,0.10), 0 2px 8px rgba(0,55,100,0.06);
+
+            --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px;
+            --sp-5:20px; --sp-6:24px; --sp-8:32px; --sp-10:40px;
+            --sp-12:48px; --sp-16:64px;
+
+            --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+                    "PingFang SC", "Noto Sans SC", "Microsoft YaHei",
+                    "Hiragino Sans GB", sans-serif;
+            --mono: "SF Mono", "Consolas", "Monaco",
+                    "Noto Sans Mono CJK SC", monospace;
+
+            --r-sm:6px; --r:10px; --r-lg:14px; --r-xl:20px; --r-pill:100px;
+        }
+
+        /* ---------- PDF / Print ---------- */
+        @page {
+            size: A4;
+            margin: 1.8cm 2cm;
+            @top-center {
+                content: "Clinical Intelligence Report · {{ date_str }}";
+                font-size: 8pt;
+                color: #94AAC0;
+                font-family: "Inter", "PingFang SC", sans-serif;
+            }
+            @bottom-center {
+                content: "Page " counter(page) " · CONFIDENTIAL — For Authorized Use Only";
+                font-size: 7pt;
+                color: #94AAC0;
+                font-family: "Inter", "PingFang SC", sans-serif;
+            }
+        }
+
+        @media print {
+            html { font-size: 12px; }
+            body { background: #fff !important; }
+            body::before, body::after { display: none !important; }
+            .ecg-bar { display: none !important; }
+            .container { max-width: 100%; padding: 0; }
+            .header, .exec-summary, .brief, .vital-stats .v-card,
+            .section-header, .footer-box, .compliance {
+                box-shadow: none !important;
+            }
+            .brief:hover { transform: none !important; border-color: var(--bdr) !important; }
+            .v-card:hover { transform: none !important; }
+            a { color: var(--txt) !important; }
+            .brief { break-inside: avoid; }
+            .section { break-before: auto; }
+        }
+
+        /* ---------- Reset ---------- */
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+        html {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--txt);
+            font-size: 15px;
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ===== ECG WAVEFORM BACKGROUND TEXTURE =====
+         * Approximate a sine-wave heartbeat pattern using
+         * repeating radial-gradient arcs + linear stripes.
+         */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background:
+                /* Horizontal faint ECG grid lines */
+                repeating-linear-gradient(
+                    0deg,
+                    transparent, transparent 39px,
+                    rgba(0,114,206,0.025) 39px, rgba(0,114,206,0.025) 40px
+                ),
+                /* Vertical faint grid lines */
+                repeating-linear-gradient(
+                    90deg,
+                    transparent, transparent 39px,
+                    rgba(0,114,206,0.02) 39px, rgba(0,114,206,0.02) 40px
+                ),
+                /* ECG "wave" peaks — arcs via radial gradients */
+                radial-gradient(ellipse 12px 20px at 60px 50%, rgba(0,114,206,0.04) 0%, transparent 100%),
+                radial-gradient(ellipse 8px 30px at 72px 40%, rgba(0,165,80,0.03) 0%, transparent 100%),
+                radial-gradient(ellipse 10px 18px at 84px 55%, rgba(0,114,206,0.03) 0%, transparent 100%);
+            background-size:
+                100% 40px,
+                40px 100%,
+                160px 80px,
+                160px 80px,
+                160px 80px;
+            opacity: 0.7;
+        }
+
+        /* Subtle corner glow */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse at 15% 10%, rgba(0,114,206,0.035) 0%, transparent 45%),
+                radial-gradient(ellipse at 85% 90%, rgba(0,165,80,0.025) 0%, transparent 40%);
+        }
+
+        a { color: var(--blue); text-decoration: none; transition: all .2s; }
+        a:hover { color: var(--blue-dk); }
+
+        .container {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: var(--sp-10) var(--sp-6);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ============================================================
+         *  ECG ANIMATED BAR — top accent
+         * ============================================================ */
+        .ecg-bar {
+            height: 4px;
+            background: linear-gradient(90deg,
+                var(--blue) 0%, var(--blue-lt) 25%,
+                var(--green) 50%, var(--blue-lt) 75%,
+                var(--blue) 100%);
+            background-size: 200% auto;
+            animation: ecg-slide 4s linear infinite;
+        }
+        @keyframes ecg-slide {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+
+        /* ============================================================
+         *  HEADER — Medical Record Masthead
+         * ============================================================ */
+        .header {
+            background: var(--bg);
+            border: 1px solid var(--bdr);
+            border-radius: var(--r-xl);
+            padding: var(--sp-10) var(--sp-8);
+            margin-bottom: var(--sp-10);
+            box-shadow: var(--sh-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Blue → green top gradient bar */
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 5px;
+            background: linear-gradient(90deg,
+                var(--blue), var(--blue-lt), var(--green), var(--blue-lt), var(--blue));
+        }
+
+        /* ECG waveform shimmer at bottom */
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 40px;
+            background: linear-gradient(180deg, transparent, var(--blue-glow));
+            pointer-events: none;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-5);
+            margin-bottom: var(--sp-6);
+        }
+
+        /* Medical cross + heart logo */
+        .header-logo {
+            width: 66px; height: 66px;
+            background: linear-gradient(135deg, var(--blue), var(--blue-dk));
+            border-radius: var(--r-lg);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            position: relative;
+            box-shadow: 0 4px 16px rgba(0,114,206,0.25);
+        }
+        /* White cross via pseudo-elements */
+        .header-logo::before {
+            content: '';
+            position: absolute;
+            width: 22px; height: 6px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 2px;
+        }
+        .header-logo::after {
+            content: '';
+            position: absolute;
+            width: 6px; height: 22px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 2px;
+        }
+        /* Green heartbeat dot */
+        .header-logo-pulse {
+            position: absolute;
+            bottom: -4px; right: -4px;
+            width: 18px; height: 18px;
+            background: var(--green);
+            border-radius: 50%;
+            border: 3px solid var(--bg);
+        }
+        .header-logo-pulse::after {
+            content: '♥';
+            position: absolute;
+            inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 8px; color: #fff;
+        }
+
+        .header-info { flex: 1; }
+        .header-dept {
+            font-size: 0.65em;
+            font-weight: 700;
+            color: var(--txt3);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 2px;
+        }
+        .header-title {
+            font-size: 1.85em;
+            font-weight: 800;
+            color: var(--blue-deep);
+            line-height: 1.22;
+            letter-spacing: -0.02em;
+            margin-bottom: var(--sp-1);
+        }
+        .header-sub {
+            font-size: 0.85em;
+            color: var(--txt2);
+            font-weight: 500;
+        }
+
+        /* Header metadata grid */
+        .header-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: var(--sp-4);
+            padding-top: var(--sp-6);
+            border-top: 1px solid var(--bdr-lt);
+        }
+        .mf {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            padding: var(--sp-3);
+            background: var(--bg-frost);
+            border-radius: var(--r);
+            border: 1px solid var(--bdr-lt);
+        }
+        .mf-label {
+            font-size: 0.62em;
+            font-weight: 700;
+            color: var(--txt3);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        .mf-value {
+            font-size: 0.9em;
+            font-weight: 700;
+            color: var(--txt);
+        }
+
+        /* Clinical alert badge */
+        .clin-alert {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--sp-1);
+            background: var(--red-dim);
+            color: var(--red);
+            font-size: 0.82em;
+            font-weight: 800;
+            padding: 3px var(--sp-3);
+            border-radius: var(--r-pill);
+            border: 1px solid rgba(211,47,47,0.2);
+        }
+        .clin-alert::before {
+            content: '●';
+            font-size: 0.65em;
+            animation: ca-pulse 2s ease-in-out infinite;
+        }
+        @keyframes ca-pulse {
+            0%,100% { opacity:0.3; }
+            50% { opacity:1; }
+        }
+
+        /* ============================================================
+         *  VITAL STATS — Progress bar cards
+         * ============================================================ */
+        .vital-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: var(--sp-4);
+            margin-bottom: var(--sp-10);
+        }
+        .v-card {
+            background: var(--bg);
+            border: 1px solid var(--bdr);
+            border-radius: var(--r-lg);
+            padding: var(--sp-5) var(--sp-4);
+            box-shadow: var(--sh-sm);
+            transition: transform .2s, box-shadow .2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .v-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--sh-md);
+        }
+        /* Progress bar at bottom */
+        .v-bar {
+            position: absolute;
+            bottom: 0; left: 0;
+            height: 3px;
+            border-radius: 0 0 var(--r-lg) var(--r-lg);
+            transition: width .6s ease;
+        }
+        .v-num {
+            font-size: 1.5em;
+            font-weight: 800;
+            line-height: 1;
+            text-align: center;
+            margin-bottom: var(--sp-2);
+        }
+        .v-lbl {
+            font-size: 0.65em;
+            font-weight: 700;
+            color: var(--txt3);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            text-align: center;
+        }
+
+        /* ============================================================
+         *  EXECUTIVE SUMMARY — Clinical Assessment
+         * ============================================================ */
+        .exec-summary {
+            background: var(--bg);
+            border: 1px solid var(--bdr);
+            border-radius: var(--r-lg);
+            padding: var(--sp-8);
+            margin-bottom: var(--sp-12);
+            box-shadow: var(--sh-md);
+            position: relative;
+            overflow: hidden;
+            page-break-inside: avoid;
+        }
+        /* Left blue→green gradient accent */
+        .exec-summary::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 4px; height: 100%;
+            background: linear-gradient(180deg, var(--blue), var(--green));
+        }
+        /* ECG pulse decoration at bottom */
+        .exec-summary::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                var(--blue-dim) 8%,
+                var(--blue) 12%, var(--green) 18%,
+                transparent 24%,
+                transparent 44%,
+                var(--blue-dim) 48%,
+                var(--blue) 52%,
+                transparent 56%,
+                transparent 76%,
+                var(--blue-dim) 80%,
+                var(--blue) 84%, var(--green) 88%,
+                transparent 94%
+            );
+            opacity: 0.35;
+        }
+
+        .exec-top {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            margin-bottom: var(--sp-5);
+            padding-left: var(--sp-4);
+        }
+        .exec-icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--blue-pale), var(--bg3));
+            border-radius: var(--r);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1em;
+            border: 1px solid var(--bdr-lt);
+        }
+        .exec-title {
+            font-size: 0.75em;
+            font-weight: 800;
+            color: var(--blue-deep);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        .exec-badge {
+            margin-left: auto;
+            font-size: 0.6em;
+            font-weight: 700;
+            color: var(--blue);
+            background: var(--blue-dim);
+            padding: 3px var(--sp-3);
+            border-radius: var(--r-pill);
+            border: 1px solid rgba(0,114,206,0.15);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .exec-body { padding-left: var(--sp-4); }
+        .exec-summary p {
+            color: var(--txt2);
+            font-size: 0.95em;
+            line-height: 1.8;
+            margin-bottom: var(--sp-4);
+        }
+        .exec-summary p:last-of-type { margin-bottom: 0; }
+        .exec-summary p strong { color: var(--txt); font-weight: 700; }
+
+        /* ============================================================
+         *  SECTION — Clinical Department
+         * ============================================================ */
+        .section { margin-bottom: var(--sp-12); }
+
+        .section-header {
+            background: var(--bg);
+            border: 1px solid var(--bdr);
+            border-radius: var(--r-lg);
+            padding: var(--sp-5) var(--sp-6);
+            margin-bottom: var(--sp-5);
+            display: flex;
+            align-items: center;
+            gap: var(--sp-4);
+            box-shadow: var(--sh-sm);
+            position: relative;
+            overflow: hidden;
+        }
+        /* Section color left bar */
+        .section-header .s-bar {
+            position: absolute;
+            top: 0; left: 0;
+            width: 4px; height: 100%;
+        }
+        .section-icon {
+            width: 42px; height: 42px;
+            background: linear-gradient(135deg, var(--bg3), var(--bg4));
+            border-radius: var(--r);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3em;
+            border: 1px solid var(--bdr-lt);
+        }
+        .section-title {
+            font-size: 1.15em;
+            font-weight: 800;
+            color: var(--blue-deep);
+            flex: 1;
+        }
+        .section-count {
+            background: linear-gradient(135deg, var(--blue), var(--blue-dk));
+            color: var(--txt-inv);
+            font-size: 0.68em;
+            font-weight: 700;
+            padding: 3px var(--sp-3);
+            border-radius: var(--r-pill);
+            min-width: 30px;
+            text-align: center;
+        }
+
+        /* ============================================================
+         *  BRIEF CARDS — Prescription / Clinical Record
+         * ============================================================ */
+        .brief {
+            background: var(--bg);
+            border: 1px solid var(--bdr);
+            border-radius: var(--r-lg);
+            padding: var(--sp-6);
+            margin-bottom: var(--sp-4);
+            box-shadow: var(--sh-md);
+            transition: all .2s;
+            position: relative;
+            overflow: hidden;
+            page-break-inside: avoid;
+        }
+        .brief:hover {
+            border-color: rgba(0,114,206,0.3);
+            box-shadow: var(--sh-lg);
+            transform: translateY(-1px);
+        }
+
+        /* --- Priority: must-read = Clinical Alert --- */
+        .brief.p-must {
+            border-left: 5px solid var(--red);
+            background: linear-gradient(135deg, var(--red-dim), var(--bg) 30%);
+        }
+        .brief.p-must::before {
+            content: '⚠ CLINICAL ALERT';
+            position: absolute;
+            top: 0; right: 0;
+            background: var(--red);
+            color: var(--txt-inv);
+            font-size: 0.58em;
+            font-weight: 800;
+            padding: 3px 10px;
+            border-radius: 0 0 0 var(--r);
+            letter-spacing: 0.08em;
+        }
+        .brief.p-must::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--red), transparent 60%);
+        }
+
+        .brief.p-rec {
+            border-left: 5px solid var(--orange);
+            background: linear-gradient(135deg, var(--orange-dim), var(--bg) 25%);
+        }
+        .brief.p-fyi {
+            border-left: 5px solid var(--green);
+            background: linear-gradient(135deg, var(--green-dim), var(--bg) 20%);
+        }
+
+        .brief-top {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--sp-3);
+            margin-bottom: var(--sp-4);
+        }
+
+        /* Priority dot */
+        .p-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 6px;
+        }
+        .p-must .p-dot { background: var(--red); box-shadow: 0 0 6px var(--red-glow); }
+        .p-rec .p-dot  { background: var(--orange); }
+        .p-fyi .p-dot  { background: var(--green); }
+
+        /* Rx prescription number */
+        .rx-num {
+            font-family: var(--mono);
+            font-size: 0.6em;
+            font-weight: 700;
+            color: var(--blue);
+            background: var(--blue-dim);
+            padding: 3px 8px;
+            border-radius: var(--r-sm);
+            border: 1px solid rgba(0,114,206,0.12);
+            white-space: nowrap;
+            flex-shrink: 0;
+            margin-top: 4px;
+        }
+
+        .brief-headline {
+            flex: 1;
+            font-size: 1.02em;
+            font-weight: 700;
+            line-height: 1.42;
+        }
+        .brief-headline a { color: var(--txt); }
+        .brief-headline a:hover { color: var(--blue); }
+        .p-must .brief-headline a { color: var(--blue-deep); font-weight: 800; }
+
+        .brief-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+            margin-bottom: var(--sp-4);
+            flex-wrap: wrap;
+        }
+        .src-badge {
+            font-size: 0.7em;
+            font-weight: 600;
+            color: var(--txt3);
+            background: var(--bg3);
+            border: 1px solid var(--bdr-lt);
+            padding: 2px var(--sp-3);
+            border-radius: var(--r-pill);
+        }
+        .spec-tag {
+            font-size: 0.62em;
+            font-weight: 700;
+            color: var(--blue);
+            background: var(--blue-dim);
+            border: 1px solid rgba(0,114,206,0.12);
+            padding: 2px var(--sp-3);
+            border-radius: var(--r);
+            letter-spacing: 0.02em;
+        }
+
+        .brief-detail {
+            color: var(--txt2);
+            font-size: 0.93em;
+            line-height: 1.72;
+        }
+        .brief-detail strong { color: var(--txt); font-weight: 700; }
+        .brief-detail code {
+            font-family: var(--mono);
+            font-size: 0.88em;
+            background: var(--bg3);
+            color: var(--blue-dk);
+            padding: 2px 6px;
+            border-radius: var(--r-sm);
+            border: 1px solid var(--bdr-lt);
+        }
+
+        /* ============================================================
+         *  SECTION SEPARATOR — ECG line
+         * ============================================================ */
+        .ecg-sep {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-4);
+            margin: var(--sp-6) 0;
+        }
+        .ecg-sep::before,
+        .ecg-sep::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--bdr), transparent);
+        }
+        .ecg-sep span {
+            font-size: 0.75em;
+            color: var(--txt4);
+            background: var(--bg);
+            padding: 2px var(--sp-3);
+            border-radius: var(--r-pill);
+            border: 1px solid var(--bdr-lt);
+        }
+
+        /* ============================================================
+         *  COMPLIANCE DISCLAIMER
+         * ============================================================ */
+        .compliance {
+            background: var(--bg-frost);
+            border: 1px solid var(--bdr);
+            border-radius: var(--r);
+            padding: var(--sp-5) var(--sp-6);
+            margin-top: var(--sp-12);
+            font-size: 0.72em;
+            color: var(--txt3);
+            line-height: 1.65;
+        }
+        .compliance-hd {
+            font-weight: 700;
+            color: var(--txt2);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: var(--sp-2);
+            font-size: 0.92em;
+        }
+        .compliance-body { font-style: italic; }
+
+        /* ============================================================
+         *  FOOTER — Medical certification bar
+         * ============================================================ */
+        .footer-box {
+            margin-top: var(--sp-10);
+            background: var(--bg);
+            border: 1px solid var(--bdr);
+            border-radius: var(--r-lg);
+            padding: var(--sp-8) var(--sp-6);
+            box-shadow: var(--sh-sm);
+            position: relative;
+            overflow: hidden;
+        }
+        .footer-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg,
+                var(--blue), var(--blue-lt), var(--green), var(--blue-lt), var(--blue));
+        }
+        .footer-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: var(--sp-4);
+        }
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+        }
+        .footer-icon {
+            width: 28px; height: 28px;
+            background: linear-gradient(135deg, var(--blue), var(--blue-lt));
+            border-radius: var(--r-sm);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 0.75em; font-weight: 800;
+        }
+        .footer-name {
+            font-size: 0.82em;
+            font-weight: 800;
+            color: var(--blue);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .footer-info {
+            font-size: 0.72em;
+            color: var(--txt3);
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+        }
+        .footer-sep { color: var(--bdr-str); }
+
+        .footer-verified {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+            font-size: 0.72em;
+            color: var(--green);
+            font-weight: 700;
+        }
+        .v-check {
+            width: 18px; height: 18px;
+            background: linear-gradient(135deg, var(--green), var(--green-dk));
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 10px; font-weight: 700;
+        }
+
+        /* ============================================================
+         *  MOBILE
+         * ============================================================ */
+        @media (max-width: 768px) {
+            .container { padding: var(--sp-6) var(--sp-4); }
+            .header { padding: var(--sp-6) var(--sp-5); }
+            .header-title { font-size: 1.5em; }
+            .header-meta { grid-template-columns: 1fr 1fr; }
+            .vital-stats { grid-template-columns: 1fr 1fr; }
+            .brief { padding: var(--sp-5); }
+            .section-header { padding: var(--sp-4) var(--sp-5); }
+        }
+
+        @media (max-width: 480px) {
+            .header-top { flex-direction: column; text-align: center; }
+            .header-meta { grid-template-columns: 1fr; }
+            .vital-stats { grid-template-columns: 1fr; }
+            .brief-meta { flex-direction: column; align-items: flex-start; }
+            .brief-top { flex-direction: column; }
+            .footer-row { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ECG animated bar at very top -->
+    <div class="ecg-bar"></div>
+
+    <div class="container">
+
+        <!-- ====== HEADER ====== -->
+        <header class="header">
+            <div class="header-top">
+                <div class="header-logo">
+                    <span class="header-logo-pulse"></span>
+                </div>
+                <div class="header-info">
+                    <div class="header-dept">Clinical Intelligence Division · 临床情报部</div>
+                    <h1 class="header-title">Clinical Intelligence Report</h1>
+                    <div class="header-sub">Daily Health &amp; Technology Assessment · AI-Powered Analysis</div>
+                </div>
+            </div>
+
+            <div class="header-meta">
+                <div class="mf">
+                    <span class="mf-label">Report Date</span>
+                    <span class="mf-value">{{ date_str }}</span>
+                </div>
+                <div class="mf">
+                    <span class="mf-label">Generated</span>
+                    <span class="mf-value">{{ generated_time }}</span>
+                </div>
+                <div class="mf">
+                    <span class="mf-label">Total Cases</span>
+                    <span class="mf-value">{{ total_items }} items</span>
+                </div>
+                {# Count must-reads #}
+                {% set ns = namespace(rx=0, must=0) %}
+                {% for sk, sitems in briefs.items() %}
+                {% if sitems is iterable and sitems is not string %}
+                {% for it in sitems %}
+                {% if it.priority == '🔴' %}{% set ns.must = ns.must + 1 %}{% endif %}
+                {% endfor %}
+                {% endif %}
+                {% endfor %}
+                {% if ns.must > 0 %}
+                <div class="mf">
+                    <span class="mf-label">Clinical Priority</span>
+                    <span class="mf-value"><span class="clin-alert">{{ ns.must }} URGENT</span></span>
+                </div>
+                {% endif %}
+            </div>
+        </header>
+
+        <!-- ====== VITAL STATS ====== -->
+        <div class="vital-stats">
+            <div class="v-card">
+                <div class="v-num" style="color:var(--blue);">{{ total_items }}</div>
+                <div class="v-lbl">Total Cases</div>
+                <div class="v-bar" style="width:85%; background:var(--blue);"></div>
+            </div>
+            <div class="v-card">
+                <div class="v-num" style="color:var(--green);">{{ section_order|length }}</div>
+                <div class="v-lbl">Departments</div>
+                <div class="v-bar" style="width:60%; background:var(--green);"></div>
+            </div>
+            <div class="v-card">
+                <div class="v-num" style="color:var(--red);">{{ ns.must }}</div>
+                <div class="v-lbl">Critical</div>
+                <div class="v-bar" style="width:{% if total_items > 0 %}{{ (ns.must * 100 / total_items)|int }}{% else %}0{% endif %}%; background:var(--red);"></div>
+            </div>
+            <div class="v-card">
+                <div class="v-num" style="color:var(--green);">✓</div>
+                <div class="v-lbl">AI-Verified</div>
+                <div class="v-bar" style="width:100%; background:linear-gradient(90deg, var(--blue), var(--green));"></div>
+            </div>
+        </div>
+
+        <!-- ====== EXECUTIVE SUMMARY ====== -->
+        {% if executive_summary %}
+        <div class="exec-summary">
+            <div class="exec-top">
+                <div class="exec-icon">📋</div>
+                <span class="exec-title">Clinical Summary · 临床摘要</span>
+                <span class="exec-badge">Key Findings</span>
+            </div>
+            <div class="exec-body">
+                {% for line in executive_summary.strip().split('\n') %}
+                {% if line.strip() %}
+                <p>{{ line.strip() | md_inline }}</p>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ====== SECTIONS ====== -->
+        {% set ns.rx = 0 %}
+        {% set ns_sec = namespace(idx=0) %}
+        {% for section_key in section_order %}
+        {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+        {% set meta = section_configs.get(section_key, {}) %}
+        {% set items = briefs[section_key] %}
+        {% set sc = meta.color|default('#0072CE') %}
+
+        {% if ns_sec.idx > 0 %}
+        <div class="ecg-sep"><span>♥</span></div>
+        {% endif %}
+
+        <section class="section">
+            <div class="section-header">
+                <div class="s-bar" style="background: {{ sc }};"></div>
+                <div class="section-icon">{{ meta.emoji|default('🏥') }}</div>
+                <h2 class="section-title">{{ meta.title|default(section_key) }}</h2>
+                <span class="section-count" style="background: linear-gradient(135deg, {{ sc }}, {{ sc }}cc);">{{ items|length }}</span>
+            </div>
+
+            {% for item in items %}
+            {% set ns.rx = ns.rx + 1 %}
+            {% set priority = item.priority|default('🟢') %}
+            {% set pcls = 'p-must' if priority == '🔴' else ('p-rec' if priority == '🟡' else 'p-fyi') %}
+            <div class="brief {{ pcls }}">
+                <div class="brief-top">
+                    <div class="p-dot"></div>
+                    <span class="rx-num">Rx-{{ '%03d' % ns.rx }}</span>
+                    <div class="brief-headline">
+                        <a href="{{ item.url|default('#') }}" target="_blank">{{ item.headline|default('Untitled') }}</a>
+                    </div>
+                </div>
+                <div class="brief-meta">
+                    {% if item.source %}
+                    <span class="src-badge">{{ item.source }}</span>
+                    {% endif %}
+                    {% if item.tags %}
+                    {% for tg in item.tags %}
+                    <span class="spec-tag">{{ tg }}</span>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+                {% if item.detail %}
+                <div class="brief-detail">{{ item.detail | md_inline }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </section>
+
+        {% set ns_sec.idx = ns_sec.idx + 1 %}
+        {% endif %}
+        {% endfor %}
+
+        <!-- ====== COMPLIANCE DISCLAIMER ====== -->
+        <div class="compliance">
+            <div class="compliance-hd">⚖ Compliance &amp; Disclaimer</div>
+            <div class="compliance-body">
+                This clinical intelligence report is generated by AI-assisted analysis and is intended for
+                informational purposes only. It does not constitute medical advice, diagnosis, or treatment
+                recommendations. All data should be independently verified before making clinical or business
+                decisions. This report complies with applicable data protection regulations and is distributed
+                on a need-to-know basis. 本报告由人工智能辅助生成，仅供参考，不构成医疗建议。
+            </div>
+        </div>
+
+        <!-- ====== FOOTER ====== -->
+        <footer class="footer-box">
+            <div class="footer-row">
+                <div class="footer-brand">
+                    <div class="footer-icon">✚</div>
+                    <span class="footer-name">Newsloom Clinical</span>
+                </div>
+                <div class="footer-info">
+                    <span>{{ date_str }}</span>
+                    <span class="footer-sep">·</span>
+                    <span>{{ total_items }} sources analyzed</span>
+                    <span class="footer-sep">·</span>
+                    <span>Rx-001 – Rx-{{ '%03d' % ns.rx }}</span>
+                </div>
+                <div class="footer-verified">
+                    <div class="v-check">✓</div>
+                    <span>AI-Verified Intelligence</span>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+</body>
+</html>

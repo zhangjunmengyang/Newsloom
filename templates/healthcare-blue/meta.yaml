@@ -1,0 +1,12 @@
+name: "healthcare-blue"
+description: "Medical healthcare design with calming blue tones and clinical aesthetic"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "light"
+features:
+  - "Calming light blue background (#F0F8FF)"
+  - "Medical blue accents (#0077B6)"
+  - "Peaceful and trustworthy color palette"
+  - "Rounded corners for comfort"
+  - "Medical cross and heartbeat SVG decorations"
+  - "High readability for healthcare professionals"

@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harvard Intelligence Brief · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * HARVARD CRIMSON — Scholarly Publication Design
+         * ============================================================
+         * Harvard Crimson (#A51C30) · Gold (#C7963E) · Parchment tones
+         * VERITAS shield decoration · Roman numeral section numbering
+         * Footnote citation system · Research Highlight cards
+         * Running header with abbreviated title · Serif body + Sans abstract
+         * Inspired by: Harvard University Press, The Crimson, HBR
+         * ============================================================ */
+
+        /* --- Design Tokens --- */
+        :root {
+            /* Harvard Core */
+            --crimson:          #A51C30;
+            --crimson-dark:     #8A1728;
+            --crimson-deeper:   #6F1220;
+            --crimson-light:    #C43D52;
+            --crimson-pale:     #FDF1F3;
+            --crimson-dim:      rgba(165, 28, 48, 0.08);
+            --crimson-glow:     rgba(165, 28, 48, 0.04);
+
+            /* Gold accents */
+            --gold:             #C7963E;
+            --gold-light:       #D4AA5C;
+            --gold-dark:        #A67C30;
+            --gold-dim:         rgba(199, 150, 62, 0.1);
+            --gold-bright:      #DFC06B;
+
+            /* Backgrounds — parchment hierarchy */
+            --bg-primary:       #FFFFFF;
+            --bg-parchment:     #FBF8F3;
+            --bg-cream:         #F6F2EB;
+            --bg-quote:         #FDF5F6;
+            --bg-code:          #F5F3EE;
+            --bg-hover:         #F3F0E8;
+
+            /* Text — ink hierarchy */
+            --text-primary:     #2B2520;
+            --text-secondary:   #4A453E;
+            --text-muted:       #7A756D;
+            --text-light:       #A8A29A;
+            --text-inverse:     #FFFFFF;
+
+            /* Academic accents */
+            --ink-blue:         #1B365D;
+            --veritas-green:    #5A7A5A;
+
+            /* Priority — scholarly urgency */
+            --priority-must:    #A51C30;
+            --priority-must-bg: rgba(165, 28, 48, 0.06);
+            --priority-must-glow: rgba(165, 28, 48, 0.12);
+            --priority-rec:     #C7963E;
+            --priority-rec-bg:  rgba(199, 150, 62, 0.06);
+            --priority-fyi:     #5A7A5A;
+            --priority-fyi-bg:  rgba(90, 122, 90, 0.05);
+
+            /* Borders */
+            --border:           #E0DCD5;
+            --border-light:     #EBE8E2;
+            --border-strong:    #C8C4BB;
+
+            /* Shadows */
+            --shadow-subtle:    0 1px 2px rgba(0,0,0,0.04);
+            --shadow-card:      0 2px 8px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+            --shadow-elevated:  0 4px 16px rgba(0,0,0,0.08);
+            --shadow-crimson:   0 4px 16px rgba(165, 28, 48, 0.08);
+
+            /* Spacing — 8pt grid */
+            --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px;
+            --sp-4: 16px; --sp-5: 20px; --sp-6: 24px;
+            --sp-8: 32px; --sp-10: 40px; --sp-12: 48px;
+            --sp-16: 64px; --sp-20: 80px;
+
+            /* Typography — academic serifs */
+            --font-serif: "Georgia", "Times New Roman", "Noto Serif SC", "Source Han Serif SC", "SimSun", serif;
+            --font-sans: "Helvetica Neue", "Arial", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+            --font-display: "Georgia", "Times New Roman", "Noto Serif SC", serif;
+            --font-mono: "Menlo", "Monaco", "Consolas", "Courier New", monospace;
+
+            /* Radius — minimal, scholarly */
+            --radius-xs: 2px;
+            --radius-sm: 4px;
+            --radius: 6px;
+            --radius-lg: 8px;
+        }
+
+        /* --- PDF Page Setup --- */
+        @page {
+            size: A4;
+            margin: 2.5cm 2cm 2cm 2cm;
+            @top-center {
+                content: "Harvard Intelligence Brief · {{ date_str }} · Veritas";
+                font-family: "Georgia", serif;
+                font-size: 8pt;
+                color: #A8A29A;
+                font-style: italic;
+                border-bottom: 0.5pt solid #E0DCD5;
+                padding-bottom: 6pt;
+            }
+            @bottom-center {
+                content: "— " counter(page) " —";
+                font-family: "Georgia", serif;
+                font-size: 9pt;
+                color: #A8A29A;
+            }
+        }
+
+        /* --- Reset & Base --- */
+        *, *::before, *::after {
+            margin: 0; padding: 0; box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-serif);
+            background: var(--bg-primary);
+            /* Subtle parchment texture — overlapping radial gradients */
+            background-image:
+                radial-gradient(ellipse at 20% 50%, rgba(199, 150, 62, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(165, 28, 48, 0.02) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(199, 150, 62, 0.02) 0%, transparent 50%);
+            color: var(--text-primary);
+            font-size: 16px;
+            line-height: 1.75;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        a {
+            color: var(--crimson);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: all 0.25s ease;
+        }
+        a:hover {
+            border-bottom-color: var(--crimson);
+            color: var(--crimson-dark);
+        }
+
+        /* --- Container --- */
+        .document {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: var(--sp-16) var(--sp-6);
+        }
+
+        /* ============================================================
+         * HEADER — Harvard Crimson Letterhead
+         * ============================================================ */
+        .header {
+            text-align: center;
+            margin-bottom: var(--sp-16);
+            position: relative;
+        }
+
+        /* Full-width crimson banner */
+        .header-banner {
+            background: linear-gradient(135deg, var(--crimson-dark) 0%, var(--crimson) 50%, var(--crimson-dark) 100%);
+            padding: var(--sp-12) var(--sp-8) var(--sp-10);
+            margin: 0 calc(-1 * var(--sp-6));
+            position: relative;
+            box-shadow: var(--shadow-crimson);
+        }
+
+        /* Gold top rule */
+        .header-banner::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent);
+        }
+
+        /* Gold bottom rule */
+        .header-banner::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent);
+        }
+
+        /* VERITAS shield decoration */
+        .veritas-shield {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: var(--sp-5);
+        }
+
+        .veritas-books {
+            display: flex;
+            gap: var(--sp-2);
+            margin-bottom: var(--sp-2);
+        }
+
+        .veritas-book {
+            width: 36px;
+            height: 28px;
+            border: 2px solid var(--gold);
+            border-radius: var(--radius-xs);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-size: 0.52em;
+            font-weight: 700;
+            color: var(--gold);
+            letter-spacing: 0.05em;
+            background: rgba(199, 150, 62, 0.1);
+        }
+
+        .veritas-text {
+            font-family: var(--font-display);
+            font-size: 0.72em;
+            font-weight: 700;
+            color: var(--gold);
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+        }
+
+        .header-institution {
+            font-family: var(--font-sans);
+            font-size: 0.72em;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: var(--sp-5);
+        }
+
+        .header-title {
+            font-family: var(--font-display);
+            font-size: 2.6em;
+            font-weight: 700;
+            color: var(--text-inverse);
+            line-height: 1.15;
+            margin-bottom: var(--sp-3);
+            letter-spacing: -0.02em;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header-subtitle {
+            font-family: var(--font-serif);
+            font-size: 1.05em;
+            font-style: italic;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: var(--sp-6);
+        }
+
+        /* Gold decorative rule in banner */
+        .header-ornament {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--sp-4);
+            margin-bottom: var(--sp-5);
+            color: var(--gold);
+        }
+        .header-ornament::before,
+        .header-ornament::after {
+            content: '';
+            width: 80px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold));
+        }
+        .header-ornament::after {
+            background: linear-gradient(90deg, var(--gold), transparent);
+        }
+
+        .header-meta {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--sp-6);
+            font-family: var(--font-sans);
+            font-size: 0.82em;
+            color: rgba(255,255,255,0.65);
+            flex-wrap: wrap;
+        }
+        .meta-item { display: flex; align-items: center; gap: var(--sp-2); }
+        .meta-label { font-weight: 700; color: var(--gold-light); font-size: 0.9em; }
+        .meta-sep { color: rgba(255,255,255,0.3); }
+
+        /* ============================================================
+         * TABLE OF CONTENTS — Academic Index
+         * ============================================================ */
+        .toc {
+            background: var(--bg-parchment);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: var(--sp-8);
+            margin: var(--sp-12) 0;
+            position: relative;
+        }
+        .toc::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--crimson), var(--gold), var(--crimson));
+            border-radius: var(--radius) var(--radius) 0 0;
+        }
+
+        .toc-title {
+            font-family: var(--font-sans);
+            font-size: 0.78em;
+            font-weight: 700;
+            color: var(--crimson);
+            text-align: center;
+            margin-bottom: var(--sp-6);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .toc-entry {
+            display: flex;
+            align-items: center;
+            padding: var(--sp-3) 0;
+            border-bottom: 1px dotted var(--border);
+            transition: background 0.2s ease;
+        }
+        .toc-entry:last-child { border-bottom: none; }
+        .toc-entry:hover { background: var(--bg-hover); }
+
+        .toc-numeral {
+            font-family: var(--font-serif);
+            font-size: 0.82em;
+            color: var(--crimson);
+            font-weight: 700;
+            min-width: 40px;
+            font-style: italic;
+        }
+        .toc-section-name {
+            font-family: var(--font-serif);
+            color: var(--text-primary);
+            flex: 1;
+            font-size: 0.95em;
+        }
+        .toc-dots {
+            flex-grow: 1;
+            border-bottom: 1px dotted var(--text-light);
+            margin: 0 var(--sp-4);
+            min-width: 40px;
+        }
+        .toc-page {
+            font-family: var(--font-mono);
+            font-size: 0.8em;
+            color: var(--crimson);
+            font-weight: 600;
+            min-width: 25px;
+            text-align: right;
+        }
+
+        /* ============================================================
+         * EXECUTIVE SUMMARY — Academic Abstract Block
+         * ============================================================ */
+        .exec-summary {
+            background: var(--bg-quote);
+            border-left: 5px solid var(--crimson);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            padding: var(--sp-8);
+            margin: var(--sp-12) 0;
+            box-shadow: var(--shadow-card);
+            page-break-inside: avoid;
+            position: relative;
+        }
+
+        /* Subtle crimson glow on right */
+        .exec-summary::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 120px; height: 100%;
+            background: linear-gradient(90deg, transparent, var(--crimson-glow));
+            pointer-events: none;
+        }
+
+        /* Opening quotation mark */
+        .exec-summary::after {
+            content: '\201C';
+            position: absolute;
+            top: var(--sp-4); left: var(--sp-4);
+            font-family: var(--font-display);
+            font-size: 4em;
+            color: var(--crimson);
+            opacity: 0.1;
+            line-height: 1;
+        }
+
+        .summary-header {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            margin-bottom: var(--sp-6);
+        }
+        .summary-label {
+            font-family: var(--font-sans);
+            font-size: 0.75em;
+            font-weight: 700;
+            color: var(--crimson);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+        .summary-rule {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, var(--crimson-dim), transparent);
+        }
+
+        .summary-content p {
+            font-family: var(--font-sans);
+            font-size: 0.95em;
+            line-height: 1.85;
+            color: var(--text-secondary);
+            margin-bottom: var(--sp-4);
+        }
+        .summary-content p:last-child { margin-bottom: 0; }
+        .summary-content strong { color: var(--crimson); font-weight: 700; }
+
+        /* ============================================================
+         * SECTION — Academic Chapter with Roman Numerals
+         * ============================================================ */
+        .section {
+            margin: var(--sp-16) 0 var(--sp-12);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: var(--sp-10);
+            padding: var(--sp-6) 0;
+            position: relative;
+        }
+
+        /* Decorative rules above and below */
+        .section-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 10%; right: 10%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+        }
+        .section-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 10%; right: 10%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+        }
+
+        .section-numeral {
+            font-family: var(--font-display);
+            font-size: 1.2em;
+            color: var(--crimson);
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            margin-bottom: var(--sp-2);
+        }
+
+        .section-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--sp-4);
+            margin-bottom: var(--sp-3);
+        }
+
+        .section-icon { font-size: 1.6em; }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 2em;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+        }
+
+        /* Section color accent bar */
+        .section-color-bar {
+            width: 40px;
+            height: 3px;
+            margin: var(--sp-3) auto var(--sp-2);
+            border-radius: 2px;
+        }
+
+        .section-meta {
+            font-family: var(--font-sans);
+            font-size: 0.82em;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* ============================================================
+         * BRIEF — Academic Citation Card
+         * ============================================================ */
+        .brief {
+            margin-bottom: var(--sp-6);
+            padding: var(--sp-6);
+            border-bottom: 1px solid var(--border-light);
+            page-break-inside: avoid;
+            position: relative;
+            transition: background 0.2s ease;
+            border-radius: var(--radius);
+        }
+        .brief:hover { background: var(--bg-hover); }
+        .brief:last-child { border-bottom: none; }
+
+        /* Priority left indicator */
+        .brief::before {
+            content: '';
+            position: absolute;
+            left: 0; top: var(--sp-6);
+            width: 4px;
+            height: calc(100% - var(--sp-12));
+            border-radius: 2px;
+        }
+        .brief.must-read::before {
+            background: var(--priority-must);
+            box-shadow: 0 0 8px var(--priority-must-glow);
+        }
+        .brief.recommended::before { background: var(--priority-rec); }
+        .brief.fyi::before { background: var(--priority-fyi); opacity: 0.5; }
+
+        /* Must-read highlight */
+        .brief.must-read {
+            background: var(--priority-must-bg);
+            border-left: 4px solid var(--priority-must);
+            padding-left: var(--sp-8);
+        }
+        .brief.must-read:hover { background: rgba(165, 28, 48, 0.08); }
+
+        /* Research Highlight card for must-read */
+        .brief.must-read .research-highlight {
+            display: block;
+        }
+        .research-highlight {
+            display: none;
+            font-family: var(--font-sans);
+            font-size: 0.65em;
+            font-weight: 700;
+            color: var(--text-inverse);
+            background: linear-gradient(135deg, var(--crimson), var(--crimson-dark));
+            padding: 3px 10px;
+            border-radius: var(--radius-sm);
+            position: absolute;
+            top: var(--sp-2); right: var(--sp-3);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            box-shadow: 0 2px 4px rgba(165, 28, 48, 0.2);
+        }
+
+        .brief-header { margin-bottom: var(--sp-3); }
+
+        .brief-footnote-num {
+            font-family: var(--font-serif);
+            font-size: 0.75em;
+            color: var(--crimson);
+            font-weight: 700;
+            vertical-align: super;
+            margin-right: var(--sp-1);
+        }
+
+        .brief-headline {
+            display: inline;
+            font-family: var(--font-display);
+            font-size: 1.2em;
+            font-weight: 700;
+            line-height: 1.4;
+            color: var(--text-primary);
+        }
+        .brief-headline a {
+            color: inherit;
+            border-bottom: 2px solid transparent;
+            transition: all 0.25s ease;
+        }
+        .brief-headline a:hover {
+            color: var(--crimson);
+            border-bottom-color: var(--crimson);
+        }
+        .brief.must-read .brief-headline a {
+            color: var(--crimson);
+            font-weight: 800;
+        }
+
+        .brief-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-4);
+            margin: var(--sp-3) 0 var(--sp-4);
+            flex-wrap: wrap;
+        }
+
+        .brief-source {
+            font-family: var(--font-serif);
+            font-size: 0.85em;
+            font-style: italic;
+            color: var(--crimson);
+            font-weight: 500;
+        }
+        .brief-source::before { content: '— '; color: var(--text-light); }
+
+        .brief-tags { display: flex; gap: var(--sp-2); flex-wrap: wrap; }
+        .brief-tag {
+            font-family: var(--font-mono);
+            font-size: 0.68em;
+            padding: 3px 8px;
+            background: var(--bg-code);
+            color: var(--text-secondary);
+            border-radius: var(--radius-xs);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            border: 1px solid var(--border-light);
+            transition: all 0.2s ease;
+        }
+        .brief-tag:hover {
+            background: var(--bg-hover);
+            border-color: var(--crimson-dim);
+            color: var(--crimson);
+        }
+
+        /* Body text — serif for readability */
+        .brief-detail {
+            font-family: var(--font-serif);
+            font-size: 0.98em;
+            line-height: 1.85;
+            color: var(--text-secondary);
+            text-align: justify;
+            text-indent: 1.5em;
+        }
+        .brief-detail strong { color: var(--text-primary); font-weight: 700; }
+        .brief-detail code {
+            font-family: var(--font-mono);
+            font-size: 0.88em;
+            padding: 2px 6px;
+            background: var(--bg-code);
+            color: var(--crimson);
+            border-radius: var(--radius-xs);
+        }
+
+        /* ============================================================
+         * ORNAMENT DIVIDER — Scholarly
+         * ============================================================ */
+        .ornament {
+            text-align: center;
+            margin: var(--sp-10) 0;
+            color: var(--text-light);
+            font-size: 0.85em;
+            letter-spacing: 0.5em;
+        }
+        .ornament::before,
+        .ornament::after {
+            content: '';
+            display: inline-block;
+            width: 60px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border));
+            vertical-align: middle;
+            margin: 0 var(--sp-4);
+        }
+        .ornament::after {
+            background: linear-gradient(90deg, var(--border), transparent);
+        }
+
+        /* ============================================================
+         * FOOTNOTES / COLOPHON — Academic citation info
+         * ============================================================ */
+        .footnotes {
+            margin-top: var(--sp-12);
+            padding-top: var(--sp-6);
+            border-top: 1px solid var(--border);
+        }
+
+        .footnotes-title {
+            font-family: var(--font-sans);
+            font-size: 0.72em;
+            font-weight: 700;
+            color: var(--crimson);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: var(--sp-4);
+        }
+
+        .footnote-entry {
+            font-family: var(--font-serif);
+            font-size: 0.82em;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: var(--sp-2);
+            padding-left: var(--sp-6);
+            position: relative;
+        }
+        .footnote-entry::before {
+            content: attr(data-num);
+            position: absolute;
+            left: 0;
+            font-size: 0.8em;
+            color: var(--crimson);
+            font-weight: 700;
+            vertical-align: super;
+        }
+
+        .colophon {
+            background: var(--bg-parchment);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: var(--sp-5) var(--sp-6);
+            margin-top: var(--sp-8);
+            font-family: var(--font-serif);
+            font-size: 0.82em;
+            color: var(--text-muted);
+            line-height: 1.7;
+            font-style: italic;
+        }
+        .colophon-title {
+            font-style: normal;
+            font-weight: 700;
+            color: var(--text-secondary);
+            font-size: 0.88em;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: var(--sp-2);
+            font-family: var(--font-sans);
+        }
+
+        /* ============================================================
+         * FOOTER — Academic Attribution
+         * ============================================================ */
+        .footer {
+            margin-top: var(--sp-16);
+            padding: var(--sp-12) 0;
+            text-align: center;
+            position: relative;
+        }
+
+        /* Full-width crimson banner footer */
+        .footer-banner {
+            background: linear-gradient(135deg, var(--crimson-dark) 0%, var(--crimson) 50%, var(--crimson-dark) 100%);
+            margin: 0 calc(-1 * var(--sp-6));
+            padding: var(--sp-10) var(--sp-8);
+            position: relative;
+        }
+
+        .footer-banner::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        .footer-veritas {
+            font-family: var(--font-display);
+            font-size: 1.3em;
+            font-weight: 700;
+            color: var(--gold);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: var(--sp-4);
+        }
+
+        .footer-content {
+            font-family: var(--font-serif);
+            font-size: 0.88em;
+            color: rgba(255,255,255,0.75);
+            line-height: 1.7;
+            font-style: italic;
+        }
+
+        .footer-signature {
+            margin-top: var(--sp-5);
+            font-family: var(--font-sans);
+            font-size: 0.75em;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 0.06em;
+        }
+
+        .footer-latin {
+            margin-top: var(--sp-3);
+            font-family: var(--font-serif);
+            font-size: 0.7em;
+            color: rgba(255,255,255,0.35);
+            font-style: italic;
+        }
+
+        /* ============================================================
+         * Print / PDF Overrides
+         * ============================================================ */
+        @media print {
+            body {
+                background: white !important;
+                background-image: none !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .document { max-width: 100%; padding: 0; }
+            .header-banner { margin: 0; box-shadow: none; }
+            .footer-banner { margin: 0; }
+            .section { margin: var(--sp-10) 0 var(--sp-8); }
+            .section-header::before, .section-header::after { display: none; }
+            .brief { margin-bottom: var(--sp-5); padding: var(--sp-4); }
+            .brief:hover { background: transparent; }
+            .exec-summary::before { display: none; }
+            .ornament { display: none; }
+            a { color: var(--text-primary) !important; border-bottom: none !important; }
+            .brief.must-read .brief-headline a { color: var(--priority-must) !important; }
+        }
+
+        /* ============================================================
+         * Mobile Responsive
+         * ============================================================ */
+        @media (max-width: 768px) {
+            .document { padding: var(--sp-8) var(--sp-4); }
+            .header-banner { padding: var(--sp-8) var(--sp-4); margin: 0 calc(-1 * var(--sp-4)); }
+            .header-title { font-size: 2em; }
+            .header-meta { flex-direction: column; gap: var(--sp-3); }
+            .section-title { font-size: 1.6em; }
+            .brief-headline { font-size: 1.1em; }
+            .brief-detail { text-indent: 0; text-align: left; }
+            .toc { padding: var(--sp-5); }
+            .footer-banner { margin: 0 calc(-1 * var(--sp-4)); }
+        }
+
+        @media (max-width: 480px) {
+            .header-title { font-size: 1.7em; }
+            .veritas-books { gap: var(--sp-1); }
+            .veritas-book { width: 28px; height: 22px; font-size: 0.45em; }
+            .brief-meta { flex-direction: column; align-items: flex-start; gap: var(--sp-2); }
+        }
+    </style>
+</head>
+<body>
+    <div class="document">
+
+        <!-- ====== HEADER: Harvard Crimson Letterhead ====== -->
+        <header class="header">
+            <div class="header-banner">
+                <!-- VERITAS Shield -->
+                <div class="veritas-shield">
+                    <div class="veritas-books">
+                        <div class="veritas-book">VE</div>
+                        <div class="veritas-book">RI</div>
+                        <div class="veritas-book">TAS</div>
+                    </div>
+                    <div class="veritas-text">Veritas</div>
+                </div>
+
+                <div class="header-institution">Harvard Intelligence Division</div>
+                <div class="header-ornament">❧</div>
+                <h1 class="header-title">Daily Intelligence Brief</h1>
+                <div class="header-subtitle">Scholarly Analysis of Global Technology &amp; Market Developments</div>
+
+                <div class="header-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Date:</span>
+                        <span>{{ date_str }}</span>
+                    </div>
+                    <span class="meta-sep">·</span>
+                    <div class="meta-item">
+                        <span class="meta-label">Generated:</span>
+                        <span>{{ generated_time }}</span>
+                    </div>
+                    <span class="meta-sep">·</span>
+                    <div class="meta-item">
+                        <span class="meta-label">Articles:</span>
+                        <span>{{ total_items }}</span>
+                    </div>
+                    {% set must_read_count = [] %}
+                    {% for section_key, items in briefs.items() %}
+                    {% if items is iterable and items is not string %}
+                    {% for item in items %}
+                    {% if item.priority == '🔴' %}
+                    {% if must_read_count.append(1) %}{% endif %}
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
+                    {% endfor %}
+                    {% if must_read_count|length > 0 %}
+                    <span class="meta-sep">·</span>
+                    <div class="meta-item">
+                        <span class="meta-label">Priority:</span>
+                        <span>{{ must_read_count|length }} Critical</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </header>
+
+        <!-- ====== TABLE OF CONTENTS ====== -->
+        <div class="toc">
+            <h2 class="toc-title">Table of Contents</h2>
+            {% set roman = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'] %}
+            {% set ns = namespace(counter=0) %}
+            {% for section_key in section_order %}
+            {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+            {% set ns.counter = ns.counter + 1 %}
+            {% set meta = section_configs.get(section_key, {}) %}
+            {% set items = briefs[section_key] %}
+            <div class="toc-entry">
+                <span class="toc-numeral">{{ roman[ns.counter - 1] if ns.counter <= 10 else ns.counter }}.</span>
+                <span class="toc-section-name">{{ meta.emoji|default('📚') }} {{ meta.title|default(section_key) }}</span>
+                <span class="toc-dots"></span>
+                <span class="toc-page">{{ items|length }}</span>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- ====== EXECUTIVE SUMMARY ====== -->
+        {% if executive_summary %}
+        <div class="exec-summary">
+            <div class="summary-header">
+                <span class="summary-label">Executive Summary</span>
+                <span class="summary-rule"></span>
+            </div>
+            <div class="summary-content">
+                {% for line in executive_summary.strip().split('\n') %}
+                {% if line.strip() %}
+                <p>{{ line.strip() | md_inline }}</p>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ====== SECTIONS: Academic Chapters ====== -->
+        {% set ns = namespace(counter=0, footnote=0) %}
+        {% for section_key in section_order %}
+        {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+        {% set ns.counter = ns.counter + 1 %}
+        {% set meta = section_configs.get(section_key, {}) %}
+        {% set items = briefs[section_key] %}
+        {% set section_color = meta.color|default('#6366f1') %}
+
+        {% if ns.counter > 1 %}
+        <div class="ornament">❧</div>
+        {% endif %}
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-numeral">{{ roman[ns.counter - 1] if ns.counter <= 10 else ns.counter }}</div>
+                <div class="section-title-row">
+                    <span class="section-icon">{{ meta.emoji|default('📚') }}</span>
+                    <h2 class="section-title">{{ meta.title|default(section_key) }}</h2>
+                </div>
+                <div class="section-color-bar" style="background: {{ section_color }};"></div>
+                <div class="section-meta">Chapter {{ roman[ns.counter - 1] if ns.counter <= 10 else ns.counter }} · {{ items|length }} articles</div>
+            </div>
+
+            {% for item in items %}
+            {% set ns.footnote = ns.footnote + 1 %}
+            {% set priority = item.priority|default('🟢') %}
+            {% set p_class = 'must-read' if priority == '🔴' else ('recommended' if priority == '🟡' else 'fyi') %}
+            <article class="brief {{ p_class }}">
+                <span class="research-highlight">★ Research Highlight</span>
+                <div class="brief-header">
+                    <span class="brief-footnote-num">[{{ ns.footnote }}]</span>
+                    <h3 class="brief-headline">
+                        <a href="{{ item.url|default('#') }}" target="_blank">{{ item.headline|default(item.title|default('Untitled')) }}</a>
+                    </h3>
+                </div>
+                <div class="brief-meta">
+                    {% if item.source %}
+                    <span class="brief-source">{{ item.source }}</span>
+                    {% endif %}
+                    {% if item.tags %}
+                    <div class="brief-tags">
+                        {% for tag in item.tags %}
+                        <span class="brief-tag">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% if item.detail %}
+                <div class="brief-detail">{{ item.detail|default('') | md_inline }}</div>
+                {% endif %}
+            </article>
+            {% endfor %}
+        </section>
+        {% endif %}
+        {% endfor %}
+
+        <!-- ====== FOOTNOTES ====== -->
+        <div class="footnotes">
+            <div class="footnotes-title">References &amp; Sources</div>
+            {% set ns2 = namespace(fn=0) %}
+            {% for section_key in section_order %}
+            {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+            {% for item in briefs[section_key] %}
+            {% set ns2.fn = ns2.fn + 1 %}
+            <div class="footnote-entry" data-num="[{{ ns2.fn }}]">
+                {{ item.headline|default('Untitled') }}. <em>{{ item.source|default('Unknown') }}</em>.
+                {% if item.url %}<a href="{{ item.url }}" target="_blank" style="font-size: 0.9em;">{{ item.url[:60] }}{% if item.url|length > 60 %}…{% endif %}</a>{% endif %}
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- ====== COLOPHON ====== -->
+        <div class="colophon">
+            <div class="colophon-title">Note on Methodology</div>
+            This intelligence brief is compiled through AI-assisted analysis of {{ total_items }} sources
+            across {{ section_order|length }} sectors. All content is curated for relevance and priority-ranked
+            for executive attention. Sources should be independently verified for critical decisions.
+        </div>
+
+        <!-- ====== FOOTER ====== -->
+        <footer class="footer">
+            <div class="footer-banner">
+                <div class="footer-veritas">Veritas</div>
+                <div class="footer-content">
+                    Prepared by the Harvard Intelligence Division<br>
+                    Advancing knowledge through rigorous analysis
+                </div>
+                <div class="footer-signature">
+                    {{ date_str }} · {{ total_items }} sources analyzed · {{ generated_time }}
+                </div>
+                <div class="footer-latin">
+                    Christo et Ecclesiae · In pursuit of truth
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

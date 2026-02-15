@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsloom · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * FIGMA PLAYFUL — Design File Canvas Visual Narrative
+         * ============================================================
+         * Canvas: #F5F5F5 + dotted grid (Figma canvas feel)
+         * Figma 5-color: Red #F24E1E · Orange #FF7262 · Purple #A259FF
+         *                Blue #1ABCFE · Green #0ACF83
+         * Toolbar header with file tab + share button
+         * Cards = Figma frames with selection highlight
+         * Section headers = layer panel entries with chevrons
+         * Hover micro-scale (1.01) + blue selection border
+         * Comment bubble annotations · Bottom bar (zoom + page)
+         * ============================================================ */
+
+        /* ---------- Design Tokens ---------- */
+        :root {
+            --fig-red:       #F24E1E;
+            --fig-orange:    #FF7262;
+            --fig-purple:    #A259FF;
+            --fig-blue:      #1ABCFE;
+            --fig-green:     #0ACF83;
+
+            --fig-red-bg:    rgba(242,78,30,0.09);
+            --fig-orange-bg: rgba(255,114,98,0.09);
+            --fig-purple-bg: rgba(162,89,255,0.09);
+            --fig-blue-bg:   rgba(26,188,254,0.09);
+            --fig-green-bg:  rgba(10,207,131,0.09);
+
+            --canvas:        #F5F5F5;
+            --canvas-alt:    #FAFAFA;
+            --white:         #FFFFFF;
+            --panel-dark:    #2C2C2C;
+            --panel-mid:     #383838;
+            --panel-hover:   #4A4A4A;
+
+            --txt:           #1E1E1E;
+            --txt2:          #555555;
+            --txt3:          #888888;
+            --txt4:          #B0B0B0;
+            --txt-inv:       #FFFFFF;
+            --txt-panel:     #CCCCCC;
+
+            --bdr:           #E0E0E0;
+            --bdr-light:     #EEEEEE;
+            --bdr-sel:       var(--fig-blue);
+
+            --sh-sm:  0 1px 3px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.03);
+            --sh-md:  0 3px 12px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04);
+            --sh-lg:  0 8px 32px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.06);
+            --sh-sel: 0 0 0 2px var(--fig-blue), 0 3px 12px rgba(26,188,254,0.15);
+
+            --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px;
+            --sp-5:20px; --sp-6:24px; --sp-8:32px; --sp-10:40px;
+            --sp-12:48px; --sp-16:64px;
+
+            --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+                    "PingFang SC", "Noto Sans SC", "Microsoft YaHei",
+                    "Hiragino Sans GB", sans-serif;
+            --mono: "SF Mono", "Fira Code", "Consolas",
+                    "Noto Sans Mono CJK SC", monospace;
+
+            --r-xs:4px; --r-sm:8px; --r:12px; --r-lg:16px; --r-xl:24px;
+        }
+
+        /* ---------- PDF / Print ---------- */
+        @page {
+            size: A4;
+            margin: 1.4cm 1.6cm;
+            @bottom-center {
+                content: "Newsloom · {{ date_str }} · Page " counter(page);
+                font-size: 8pt;
+                color: #999;
+                font-family: "Inter", "PingFang SC", sans-serif;
+            }
+        }
+
+        @media print {
+            html { font-size: 12px; }
+            body { background: #fff !important; }
+            body::before, body::after { display: none !important; }
+            .toolbar, .bottom-bar { display: none !important; }
+            .container { max-width: 100%; padding: 0; }
+            .header, .exec-summary, .brief, .section-header,
+            .layer-bar { box-shadow: none !important; }
+            .brief:hover { transform: none !important; }
+            .brief:hover::after { display: none !important; }
+            .color-rail { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+            a { color: var(--txt) !important; }
+            .section-divider { break-before: auto; }
+            .brief { break-inside: avoid; }
+        }
+
+        /* ---------- Reset ---------- */
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+        html {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--canvas);
+            color: var(--txt);
+            font-size: 14px;
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ===== CANVAS DOT GRID — Figma infinite canvas ===== */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background-image:
+                radial-gradient(circle, #C8C8C8 0.7px, transparent 0.7px),
+                radial-gradient(circle, #D5D5D5 0.5px, transparent 0.5px);
+            background-size: 24px 24px, 24px 24px;
+            background-position: 0 0, 12px 12px;
+            opacity: 0.55;
+        }
+
+        /* Subtle vignette around canvas edges */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background: radial-gradient(ellipse at 50% 40%, transparent 55%, rgba(0,0,0,0.04) 100%);
+        }
+
+        a { color: var(--fig-purple); text-decoration: none; transition: color .15s; }
+        a:hover { color: var(--fig-blue); }
+
+        /* ============================================================
+         *  TOOLBAR — Figma dark top bar with file tabs
+         * ============================================================ */
+        .toolbar {
+            background: var(--panel-dark);
+            height: 48px;
+            display: flex;
+            align-items: center;
+            padding: 0 var(--sp-4);
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.4);
+        }
+
+        /* Mini Figma 4-block logo */
+        .tb-logo {
+            display: grid;
+            grid-template-columns: 9px 9px;
+            grid-template-rows: 9px 9px;
+            gap: 2px;
+            margin-right: var(--sp-3);
+            flex-shrink: 0;
+        }
+        .tb-logo i { display: block; }
+        .tb-logo i:nth-child(1) { background: var(--fig-red); border-radius: 3px 1px 1px 1px; }
+        .tb-logo i:nth-child(2) { background: var(--fig-orange); border-radius: 1px 3px 1px 1px; }
+        .tb-logo i:nth-child(3) { background: var(--fig-purple); border-radius: 1px 1px 1px 3px; }
+        .tb-logo i:nth-child(4) { background: var(--fig-green); border-radius: 1px 1px 3px 1px; }
+
+        .tb-file {
+            font-size: 0.82em;
+            font-weight: 600;
+            color: var(--txt-inv);
+            white-space: nowrap;
+            margin-right: var(--sp-4);
+        }
+        .tb-file span { color: var(--txt4); font-weight: 400; }
+
+        /* Active page tab */
+        .tb-tab {
+            background: var(--panel-mid);
+            color: var(--txt-panel);
+            font-size: 0.72em;
+            font-weight: 600;
+            padding: 5px var(--sp-4);
+            border-radius: var(--r-xs) var(--r-xs) 0 0;
+            border-bottom: 2px solid var(--fig-blue);
+            margin-right: var(--sp-1);
+        }
+
+        .tb-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+        }
+
+        .tb-btn {
+            font-size: 0.68em;
+            font-weight: 600;
+            color: var(--txt-panel);
+            background: var(--panel-mid);
+            padding: 4px var(--sp-3);
+            border-radius: var(--r-xs);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        /* Figma avatar circles */
+        .tb-avatars {
+            display: flex;
+            margin-right: var(--sp-2);
+        }
+        .tb-avatar {
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            border: 2px solid var(--panel-dark);
+            margin-left: -6px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.55em; font-weight: 700; color: #fff;
+        }
+        .tb-avatar:nth-child(1) { background: var(--fig-purple); z-index:3; }
+        .tb-avatar:nth-child(2) { background: var(--fig-blue); z-index:2; }
+        .tb-avatar:nth-child(3) { background: var(--fig-green); z-index:1; }
+
+        .tb-share {
+            background: var(--fig-blue);
+            color: #fff;
+            font-size: 0.72em;
+            font-weight: 700;
+            padding: 5px var(--sp-5);
+            border-radius: var(--r-sm);
+            letter-spacing: 0.03em;
+            cursor: default;
+        }
+
+        /* ============================================================
+         *  CONTAINER — Canvas area
+         * ============================================================ */
+        .container {
+            max-width: 920px;
+            margin: 0 auto;
+            padding: var(--sp-10) var(--sp-6);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ============================================================
+         *  HEADER — Figma hero frame / component card
+         * ============================================================ */
+        .header {
+            background: var(--white);
+            border: 2px solid var(--bdr);
+            border-radius: var(--r-xl);
+            padding: var(--sp-10) var(--sp-8);
+            margin-bottom: var(--sp-8);
+            box-shadow: var(--sh-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Corner decoration circles */
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50px; right: -50px;
+            width: 160px; height: 160px;
+            background:
+                radial-gradient(circle at 40% 40%, var(--fig-purple-bg) 0%, transparent 60%),
+                radial-gradient(circle at 70% 60%, var(--fig-blue-bg) 0%, transparent 50%);
+            border-radius: 50%;
+            border: 2px dashed rgba(162,89,255,0.12);
+        }
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -40px; left: -30px;
+            width: 140px; height: 140px;
+            background:
+                radial-gradient(circle at 50% 50%, var(--fig-green-bg) 0%, transparent 55%);
+            border-radius: 50%;
+            border: 2px dashed rgba(10,207,131,0.10);
+        }
+
+        /* Frame name label — floats above the card */
+        .frame-label {
+            position: absolute;
+            top: -13px; left: var(--sp-6);
+            font-size: 0.65em;
+            font-weight: 700;
+            color: var(--fig-purple);
+            background: var(--canvas);
+            padding: 2px var(--sp-3);
+            border-radius: var(--r-xs);
+            letter-spacing: 0.04em;
+            z-index: 5;
+        }
+
+        .header-row {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-5);
+            margin-bottom: var(--sp-6);
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo-box {
+            width: 58px; height: 58px;
+            background: linear-gradient(135deg, var(--fig-purple), var(--fig-blue));
+            border-radius: var(--r-lg);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff;
+            font-size: 1.6em; font-weight: 800;
+            box-shadow: 0 4px 16px rgba(162,89,255,0.3);
+            position: relative;
+            flex-shrink: 0;
+        }
+        /* Green online dot */
+        .logo-box::after {
+            content: '';
+            position: absolute;
+            bottom: -3px; right: -3px;
+            width: 15px; height: 15px;
+            background: var(--fig-green);
+            border-radius: 50%;
+            border: 3px solid var(--white);
+        }
+
+        .header-text h1 {
+            font-size: 0.72em;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--fig-purple);
+            margin-bottom: 2px;
+        }
+        .header-text p {
+            font-size: 0.78em;
+            color: var(--txt3);
+        }
+
+        .header-title {
+            font-size: 2.4em;
+            font-weight: 800;
+            line-height: 1.12;
+            letter-spacing: -0.025em;
+            margin-bottom: var(--sp-6);
+            position: relative;
+            z-index: 2;
+        }
+        .header-title .grad {
+            background: linear-gradient(100deg, var(--fig-red), var(--fig-purple), var(--fig-blue), var(--fig-green));
+            background-size: 250% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Meta pills row */
+        .pills {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 2;
+        }
+        .pill {
+            font-size: 0.78em;
+            font-weight: 600;
+            padding: 5px var(--sp-4);
+            border-radius: 100px;
+            border: 1px solid var(--bdr);
+            background: var(--canvas-alt);
+            color: var(--txt2);
+            transition: all .2s;
+        }
+        .pill:hover {
+            background: var(--fig-blue-bg);
+            border-color: var(--fig-blue);
+        }
+        .pill.accent {
+            background: var(--fig-purple-bg);
+            color: var(--fig-purple);
+            border-color: rgba(162,89,255,0.2);
+        }
+        .pill.crit {
+            background: var(--fig-red-bg);
+            color: var(--fig-red);
+            border-color: rgba(242,78,30,0.2);
+            font-weight: 700;
+        }
+
+        /* ============================================================
+         *  COLOR RAIL — Figma rainbow divider
+         * ============================================================ */
+        .color-rail {
+            height: 4px;
+            border-radius: 100px;
+            background: linear-gradient(90deg,
+                var(--fig-red) 0%, var(--fig-orange) 20%, var(--fig-purple) 40%,
+                var(--fig-blue) 60%, var(--fig-green) 80%, var(--fig-red) 100%);
+            margin: var(--sp-8) 0;
+            opacity: 0.85;
+        }
+
+        /* ============================================================
+         *  EXEC SUMMARY — Annotation card with comment bubble
+         * ============================================================ */
+        .exec-summary {
+            background: var(--white);
+            border: 2px solid var(--bdr);
+            border-radius: var(--r-xl);
+            padding: var(--sp-8);
+            margin-bottom: var(--sp-10);
+            box-shadow: var(--sh-md);
+            position: relative;
+            page-break-inside: avoid;
+        }
+        /* Rainbow top accent */
+        .exec-summary::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, var(--fig-purple), var(--fig-blue), var(--fig-green), var(--fig-orange));
+            border-radius: var(--r-xl) var(--r-xl) 0 0;
+        }
+        /* Comment bubble icon */
+        .exec-summary::after {
+            content: '💬';
+            position: absolute;
+            top: -14px; right: 28px;
+            font-size: 1em;
+            width: 32px; height: 32px;
+            background: var(--white);
+            border: 2px solid var(--bdr);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: var(--sh-sm);
+        }
+
+        .exec-label {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--sp-2);
+            font-size: 0.72em;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--fig-purple);
+            background: var(--fig-purple-bg);
+            padding: 4px var(--sp-4);
+            border-radius: 100px;
+            border: 1px solid rgba(162,89,255,0.18);
+            margin-bottom: var(--sp-5);
+        }
+
+        .exec-summary p {
+            color: var(--txt2);
+            font-size: 0.95em;
+            line-height: 1.8;
+            margin-bottom: var(--sp-4);
+        }
+        .exec-summary p:last-of-type { margin-bottom: 0; }
+        .exec-summary p strong { color: var(--txt); font-weight: 700; }
+
+        /* ============================================================
+         *  LAYER BAR — Section counter (like Figma left panel)
+         * ============================================================ */
+        .layer-bar {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-4);
+            background: var(--white);
+            border: 1px solid var(--bdr-light);
+            border-radius: var(--r);
+            padding: var(--sp-3) var(--sp-6);
+            margin-bottom: var(--sp-8);
+            box-shadow: var(--sh-sm);
+        }
+        .layer-bar-title {
+            font-size: 0.65em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--txt3);
+        }
+        .layer-dots {
+            display: flex;
+            gap: 4px;
+        }
+        .layer-dots i {
+            display: block;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+        }
+        .layer-dots i:nth-child(5n+1) { background: var(--fig-red); }
+        .layer-dots i:nth-child(5n+2) { background: var(--fig-orange); }
+        .layer-dots i:nth-child(5n+3) { background: var(--fig-purple); }
+        .layer-dots i:nth-child(5n+4) { background: var(--fig-blue); }
+        .layer-dots i:nth-child(5n+5) { background: var(--fig-green); }
+
+        .layer-count {
+            margin-left: auto;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: var(--fig-purple);
+            background: var(--fig-purple-bg);
+            padding: 3px var(--sp-3);
+            border-radius: 100px;
+        }
+
+        /* ============================================================
+         *  SECTION — Frame / Layer group
+         * ============================================================ */
+        .section {
+            margin-bottom: var(--sp-12);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            padding: var(--sp-4) var(--sp-5);
+            margin-bottom: var(--sp-5);
+            background: var(--white);
+            border: 2px solid var(--bdr);
+            border-radius: var(--r-lg);
+            box-shadow: var(--sh-sm);
+            transition: all .2s;
+            position: relative;
+        }
+        .section-header:hover {
+            box-shadow: var(--sh-md);
+        }
+
+        /* Left color accent derived from section_configs */
+        .section-header .accent-bar {
+            position: absolute;
+            top: 0; left: 0;
+            width: 5px; height: 100%;
+            border-radius: var(--r-lg) 0 0 var(--r-lg);
+        }
+
+        .section-chevron {
+            font-size: 0.7em;
+            color: var(--txt3);
+            transition: transform .2s;
+        }
+        .section-header:hover .section-chevron {
+            transform: rotate(90deg);
+        }
+
+        .section-emoji { font-size: 1.35em; }
+
+        .section-name {
+            font-size: 1.15em;
+            font-weight: 800;
+            color: var(--txt);
+            flex: 1;
+        }
+
+        .section-badge {
+            font-size: 0.68em;
+            font-weight: 700;
+            color: #fff;
+            padding: 3px var(--sp-4);
+            border-radius: 100px;
+        }
+
+        /* ============================================================
+         *  BRIEF CARDS — Figma component frames
+         * ============================================================ */
+        .brief {
+            background: var(--white);
+            border: 2px solid var(--bdr);
+            border-radius: var(--r-lg);
+            padding: var(--sp-5) var(--sp-6);
+            margin-bottom: var(--sp-4);
+            box-shadow: var(--sh-sm);
+            transition: all .25s ease;
+            position: relative;
+            page-break-inside: avoid;
+        }
+
+        /* Hover: micro-scale + Figma blue selection glow */
+        .brief:hover {
+            transform: scale(1.01);
+            border-color: var(--fig-blue);
+            box-shadow: var(--sh-sel);
+        }
+
+        /* Selection check mark on hover */
+        .brief:hover::after {
+            content: '✓';
+            position: absolute;
+            top: -7px; right: -7px;
+            width: 20px; height: 20px;
+            background: var(--fig-blue);
+            color: #fff;
+            border-radius: 50%;
+            font-size: 0.55em;
+            font-weight: 900;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid var(--white);
+            box-shadow: var(--sh-sm);
+        }
+
+        /* --- Priority variants --- */
+        .brief.p-must {
+            border-left: 6px solid var(--fig-red);
+            background: linear-gradient(100deg, var(--fig-red-bg), var(--white) 14%);
+        }
+        .brief.p-rec {
+            border-left: 6px solid var(--fig-orange);
+            background: linear-gradient(100deg, var(--fig-orange-bg), var(--white) 10%);
+        }
+        .brief.p-fyi {
+            border-left: 6px solid var(--fig-green);
+            background: linear-gradient(100deg, var(--fig-green-bg), var(--white) 8%);
+        }
+
+        /* Pulsing dot for must-read */
+        @keyframes pulse {
+            0%,100% { opacity:1; transform:scale(1); }
+            50% { opacity:0.4; transform:scale(0.65); }
+        }
+
+        .brief-top {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--sp-3);
+            margin-bottom: var(--sp-3);
+        }
+
+        .p-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 6px;
+        }
+        .p-must .p-dot  { background: var(--fig-red); animation: pulse 2s ease-in-out infinite; }
+        .p-rec .p-dot   { background: var(--fig-orange); }
+        .p-fyi .p-dot   { background: var(--fig-green); }
+
+        .brief-headline {
+            flex: 1;
+            font-size: 1.02em;
+            font-weight: 700;
+            line-height: 1.42;
+        }
+        .brief-headline a { color: var(--txt); }
+        .brief-headline a:hover { color: var(--fig-purple); }
+        .p-must .brief-headline a { font-weight: 800; }
+
+        .brief-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+            flex-wrap: wrap;
+            margin-bottom: var(--sp-3);
+        }
+
+        .src-tag {
+            font-size: 0.72em;
+            font-weight: 600;
+            color: var(--txt3);
+            background: var(--canvas-alt);
+            border: 1px solid var(--bdr-light);
+            padding: 2px var(--sp-3);
+            border-radius: 100px;
+        }
+
+        .tag {
+            font-size: 0.68em;
+            font-weight: 600;
+            padding: 2px var(--sp-3);
+            border-radius: 100px;
+            border: 1px solid transparent;
+        }
+
+        .brief-detail {
+            color: var(--txt2);
+            font-size: 0.92em;
+            line-height: 1.78;
+        }
+        .brief-detail strong { color: var(--txt); font-weight: 700; }
+        .brief-detail code {
+            font-family: var(--mono);
+            font-size: 0.88em;
+            background: var(--canvas-alt);
+            color: var(--fig-purple);
+            padding: 2px 6px;
+            border-radius: var(--r-xs);
+            border: 1px solid var(--bdr-light);
+        }
+
+        /* ============================================================
+         *  COMMENT BUBBLE — Figma annotation style
+         * ============================================================ */
+        .comment-bubble {
+            background: var(--fig-orange);
+            color: #fff;
+            padding: var(--sp-3) var(--sp-4);
+            border-radius: var(--r) var(--r) var(--r) 0;
+            font-size: 0.82em;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--sp-2);
+            margin-top: var(--sp-4);
+            position: relative;
+            box-shadow: 0 3px 10px rgba(255,114,98,0.25);
+        }
+        .comment-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -7px; left: 0;
+            border-left: 9px solid var(--fig-orange);
+            border-bottom: 7px solid transparent;
+        }
+
+        /* ============================================================
+         *  SECTION DIVIDER
+         * ============================================================ */
+        .section-divider {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-4);
+            padding: var(--sp-2) 0;
+            margin: var(--sp-4) 0 var(--sp-6);
+        }
+        .section-divider::before,
+        .section-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--bdr), transparent);
+        }
+        .section-divider span {
+            font-size: 0.8em;
+            color: var(--txt4);
+            background: var(--canvas);
+            padding: 2px var(--sp-3);
+            border-radius: 100px;
+            border: 1px solid var(--bdr-light);
+        }
+
+        /* ============================================================
+         *  FIGMA CURSOR — Decorative cursor for comments
+         * ============================================================ */
+        .fig-cursor {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: var(--sp-2);
+        }
+        .fig-cursor .arrow {
+            display: inline-block;
+            width: 0; height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 10px solid var(--fig-purple);
+            transform: rotate(-30deg);
+        }
+        .fig-cursor .name {
+            font-size: 0.6em;
+            font-weight: 700;
+            color: #fff;
+            background: var(--fig-purple);
+            padding: 1px 6px;
+            border-radius: 0 var(--r-xs) var(--r-xs) var(--r-xs);
+        }
+
+        /* ============================================================
+         *  BOTTOM BAR — Figma zoom / page info
+         * ============================================================ */
+        .bottom-bar {
+            background: var(--panel-dark);
+            color: var(--txt-panel);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--sp-6);
+            height: 36px;
+            border-radius: var(--r) var(--r) 0 0;
+            margin-top: var(--sp-12);
+            font-size: 0.7em;
+            font-weight: 500;
+        }
+
+        .bb-left {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-4);
+        }
+
+        .zoom-badge {
+            background: var(--panel-mid);
+            padding: 3px var(--sp-3);
+            border-radius: var(--r-xs);
+            font-weight: 700;
+            color: var(--txt-inv);
+        }
+
+        .bb-right {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+        }
+
+        .bb-dots {
+            display: flex;
+            gap: 3px;
+        }
+        .bb-dots i {
+            display: block;
+            width: 6px; height: 6px;
+            border-radius: 50%;
+        }
+        .bb-dots i:nth-child(1) { background: var(--fig-red); }
+        .bb-dots i:nth-child(2) { background: var(--fig-orange); }
+        .bb-dots i:nth-child(3) { background: var(--fig-purple); }
+        .bb-dots i:nth-child(4) { background: var(--fig-blue); }
+        .bb-dots i:nth-child(5) { background: var(--fig-green); }
+
+        /* ============================================================
+         *  MOBILE
+         * ============================================================ */
+        @media (max-width: 768px) {
+            body::before { opacity: 0.25; }
+            .toolbar { height: 42px; padding: 0 var(--sp-3); }
+            .tb-tab, .tb-btn, .tb-avatars { display: none; }
+            .container { padding: var(--sp-6) var(--sp-3); }
+            .header { padding: var(--sp-6) var(--sp-5); border-radius: var(--r-lg); }
+            .header-title { font-size: 1.8em; }
+            .exec-summary { padding: var(--sp-5); }
+            .brief { padding: var(--sp-4) var(--sp-5); }
+            .section-header { padding: var(--sp-3) var(--sp-4); }
+            .bottom-bar { border-radius: 0; }
+        }
+
+        @media (max-width: 480px) {
+            .header-title { font-size: 1.5em; }
+            .header-row { flex-direction: column; text-align: center; }
+            .pills { justify-content: center; }
+            .brief-meta { flex-direction: column; align-items: flex-start; gap: 3px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ====== TOOLBAR ====== -->
+    <div class="toolbar">
+        <div class="tb-logo"><i></i><i></i><i></i><i></i></div>
+        <span class="tb-file">Newsloom <span>/ {{ date_str }}</span></span>
+        <span class="tb-tab">📄 Page 1</span>
+        <div class="tb-right">
+            <span class="tb-btn">{{ total_items }} layers</span>
+            <div class="tb-avatars">
+                <span class="tb-avatar">AI</span>
+                <span class="tb-avatar">U</span>
+                <span class="tb-avatar">+</span>
+            </div>
+            <span class="tb-share">Share ▾</span>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <!-- ====== HEADER ====== -->
+        <header class="header">
+            <div class="frame-label">▼ Header / Hero</div>
+            <div class="header-row">
+                <div class="logo-box">📊</div>
+                <div class="header-text">
+                    <h1>Newsloom</h1>
+                    <p>Intelligence Design System · 设计情报系统</p>
+                </div>
+            </div>
+            <h1 class="header-title">Daily Intelligence <span class="grad">Brief</span></h1>
+            <div class="pills">
+                <span class="pill">📅 {{ date_str }}</span>
+                <span class="pill">⏰ {{ generated_time }}</span>
+                <span class="pill accent">📦 {{ total_items }} items</span>
+                {# Count must-reads with namespace #}
+                {% set ns_mr = namespace(count=0) %}
+                {% for sk, sitems in briefs.items() %}
+                {% if sitems is iterable and sitems is not string %}
+                {% for it in sitems %}
+                {% if it.priority == '🔴' %}{% set ns_mr.count = ns_mr.count + 1 %}{% endif %}
+                {% endfor %}
+                {% endif %}
+                {% endfor %}
+                {% if ns_mr.count > 0 %}
+                <span class="pill crit">🔴 {{ ns_mr.count }} Critical</span>
+                {% endif %}
+            </div>
+        </header>
+
+        <div class="color-rail"></div>
+
+        <!-- ====== EXECUTIVE SUMMARY ====== -->
+        {% if executive_summary %}
+        <div class="exec-summary">
+            <div class="exec-label">⚡ Executive Summary</div>
+            {% for line in executive_summary.strip().split('\n') %}
+            {% if line.strip() %}
+            <p>{{ line.strip() | md_inline }}</p>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- ====== LAYER BAR ====== -->
+        <div class="layer-bar">
+            <span class="layer-bar-title">Layers</span>
+            <div class="layer-dots">
+                {% for sk in section_order %}
+                {% if sk in briefs and briefs[sk] is iterable and briefs[sk] is not string and briefs[sk]|length > 0 %}
+                <i></i>
+                {% endif %}
+                {% endfor %}
+            </div>
+            <span class="layer-count">{{ section_order|length }} sections</span>
+        </div>
+
+        <!-- ====== SECTIONS ====== -->
+        {% set ns = namespace(idx=0, total=0) %}
+        {% for section_key in section_order %}
+        {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+        {% set meta = section_configs.get(section_key, {}) %}
+        {% set items = briefs[section_key] %}
+        {% set sc = meta.color|default('#A259FF') %}
+
+        {% if ns.idx > 0 %}
+        <div class="section-divider"><span>✦</span></div>
+        {% endif %}
+
+        <section class="section">
+            <div class="section-header">
+                <div class="accent-bar" style="background: {{ sc }};"></div>
+                <span class="section-chevron">▶</span>
+                <span class="section-emoji">{{ meta.emoji|default('📌') }}</span>
+                <h2 class="section-name">{{ meta.title|default(section_key) }}</h2>
+                <span class="section-badge" style="background: {{ sc }};">{{ items|length }}</span>
+            </div>
+
+            {% for item in items %}
+            {% set priority = item.priority|default('🟢') %}
+            {% set pcls = 'p-must' if priority == '🔴' else ('p-rec' if priority == '🟡' else 'p-fyi') %}
+            {% set ns.total = ns.total + 1 %}
+            <div class="brief {{ pcls }}">
+                <div class="brief-top">
+                    <div class="p-dot"></div>
+                    <div class="brief-headline">
+                        <a href="{{ item.url|default('#') }}" target="_blank">{{ item.headline|default('Untitled') }}</a>
+                    </div>
+                </div>
+                <div class="brief-meta">
+                    {% if item.source %}
+                    <span class="src-tag">{{ item.source }}</span>
+                    {% endif %}
+                    {% if item.tags %}
+                    {% for tg in item.tags %}
+                    <span class="tag" style="color:{{ sc }}; background:{{ sc }}12;">{{ tg }}</span>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+                {% if item.detail %}
+                <div class="brief-detail">{{ item.detail | md_inline }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            {# Comment bubble on first section with must-reads #}
+            {% if ns.idx == 0 and ns_mr.count > 0 %}
+            <div class="comment-bubble">
+                💬 {{ ns_mr.count }} critical items need attention!
+                <span class="fig-cursor"><span class="arrow"></span><span class="name">AI</span></span>
+            </div>
+            {% endif %}
+        </section>
+
+        {% set ns.idx = ns.idx + 1 %}
+        {% endif %}
+        {% endfor %}
+
+    </div>
+
+    <!-- ====== BOTTOM BAR ====== -->
+    <div class="bottom-bar">
+        <div class="bb-left">
+            <span class="zoom-badge">100%</span>
+            <span>{{ ns.total }} layers · {{ ns.idx }} frames</span>
+        </div>
+        <div class="bb-right">
+            <div class="bb-dots"><i></i><i></i><i></i><i></i><i></i></div>
+            <span>{{ date_str }} · Newsloom AI</span>
+        </div>
+    </div>
+
+</body>
+</html>

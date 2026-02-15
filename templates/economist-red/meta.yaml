@@ -1,0 +1,12 @@
+name: "The Economist"
+description: "Authoritative design inspired by The Economist magazine with distinctive red accents and serious editorial layout"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "light"
+features:
+  - "Iconic Economist red (#E3120B)"
+  - "Red horizontal header bars"
+  - "Serif body typography"
+  - "Red square section markers"
+  - "Authoritative serious tone"
+  - "PDF-optimized"

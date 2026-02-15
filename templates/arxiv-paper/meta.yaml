@@ -1,0 +1,12 @@
+name: "arXiv Paper"
+description: "Academic paper style inspired by arXiv preprints with Computer Modern typography, two-column layout, and LaTeX aesthetic"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "light"
+features:
+  - "Computer Modern / Latin Modern fonts"
+  - "Two-column academic layout"
+  - "LaTeX mathematical feel"
+  - "Blue hyperlinks (#0000EE)"
+  - "Academic paper formatting"
+  - "PDF-optimized"

@@ -1,0 +1,15 @@
+name: premium
+description: "Premium Tech Intelligence — Deep Navy dark theme with brand blue accents"
+version: "3.0.0"
+author: "J.A.R.V.I.S."
+created: "2026-02-16"
+theme: dark
+features:
+  - dark-mode-default
+  - gradient-header
+  - glassmorphism-exec-summary
+  - enhanced-priority-indicators
+  - brand-color-sections
+  - responsive-mobile
+  - pdf-optimized
+  - chinese-typography-enhanced

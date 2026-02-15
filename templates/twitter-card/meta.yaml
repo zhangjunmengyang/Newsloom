@@ -1,0 +1,12 @@
+name: "Twitter Card"
+description: "Twitter/X暗色模式风格的日报模板，采用黑底白字和经典蓝色accent"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "dark"
+features:
+  - "Twitter/X暗色模式设计"
+  - "推文卡片风格布局"
+  - "圆角头像占位符"
+  - "互动栏（回复/转发/喜欢）样式"
+  - "Twitter经典蓝色accent"
+  - "简洁的黑白配色方案"

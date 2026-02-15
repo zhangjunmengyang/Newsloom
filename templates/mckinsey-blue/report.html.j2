@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>McKinsey Intelligence Brief · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * MCKINSEY BLUE — Strategic Consulting Report
+         * ============================================================
+         * White base · McKinsey Blue (#003E6B) · Light blue auxiliary
+         * Subtle grid pattern background · "Exhibit" style boxes
+         * Blue circle numbered insights · Data bars / progress
+         * Extreme whitespace · Trend arrows · Executive summary
+         * "Implications" box at section end
+         * ============================================================ */
+
+        /* --- Design Tokens --- */
+        :root {
+            /* McKinsey Blue palette */
+            --mckinsey:          #003E6B;
+            --mckinsey-light:    #1A6BAF;
+            --mckinsey-dark:     #002D4F;
+            --mckinsey-dim:      rgba(0, 62, 107, 0.08);
+            --mckinsey-glow:     rgba(0, 62, 107, 0.04);
+            --mckinsey-pale:     #E6F0FA;
+            --mckinsey-accent:   #2E8BC6;
+            --mckinsey-sky:      #4DA8DA;
+
+            /* Backgrounds */
+            --bg-primary:        #FFFFFF;
+            --bg-secondary:      #F8FAFE;
+            --bg-card:           #FAFCFF;
+            --bg-surface:        #F0F4F8;
+            --bg-hover:          #EBF1F7;
+            --bg-blue:           var(--mckinsey);
+
+            /* Text */
+            --text-primary:      #1A1A1A;
+            --text-secondary:    #4A4A4A;
+            --text-muted:        #6B7B8D;
+            --text-light:        #94A3B8;
+            --text-inverse:      #FFFFFF;
+
+            /* Priority */
+            --priority-must:     #DC2626;
+            --priority-must-bg:  rgba(220, 38, 38, 0.06);
+            --priority-rec:      #D97706;
+            --priority-rec-bg:   rgba(217, 119, 6, 0.05);
+            --priority-fyi:      #059669;
+            --priority-fyi-bg:   rgba(5, 150, 105, 0.04);
+
+            /* Borders */
+            --border:            #E2E8F0;
+            --border-strong:     #CBD5E1;
+            --border-accent:     rgba(0, 62, 107, 0.2);
+
+            /* Spacing — generous consulting whitespace */
+            --sp-1: 4px;   --sp-2: 8px;   --sp-3: 12px;
+            --sp-4: 16px;  --sp-5: 20px;  --sp-6: 24px;
+            --sp-8: 32px;  --sp-10: 40px; --sp-12: 48px;
+            --sp-16: 64px; --sp-20: 80px; --sp-24: 96px;
+
+            /* Typography */
+            --font-primary: "Helvetica Neue", "Arial", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+            --font-display: "Helvetica Neue", "Arial", sans-serif;
+            --font-mono: "SF Mono", "Consolas", "Monaco", monospace;
+            --font-serif: "Georgia", "Noto Serif SC", serif;
+
+            /* Radius */
+            --radius-xs: 2px;
+            --radius-sm: 4px;
+            --radius: 6px;
+            --radius-lg: 8px;
+
+            /* Shadows */
+            --shadow-subtle:     0 1px 2px rgba(0, 0, 0, 0.04);
+            --shadow-card:       0 2px 6px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+            --shadow-elevated:   0 4px 16px rgba(0, 0, 0, 0.08);
+            --shadow-blue:       0 4px 20px rgba(0, 62, 107, 0.12);
+        }
+
+        /* --- PDF --- */
+        @page {
+            size: A4;
+            margin: 2.5cm 2cm;
+            @top-center {
+                content: "CONFIDENTIAL — STRATEGIC INTELLIGENCE REPORT";
+                font-family: var(--font-primary);
+                font-size: 7pt;
+                font-weight: 600;
+                color: var(--text-light);
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+            }
+            @bottom-left {
+                content: "{{ date_str }}";
+                font-family: var(--font-primary);
+                font-size: 7pt;
+                color: var(--text-light);
+            }
+            @bottom-right {
+                content: "Page " counter(page);
+                font-family: var(--font-primary);
+                font-size: 7pt;
+                color: var(--text-light);
+            }
+        }
+
+        /* --- Reset & Base --- */
+        *, *::before, *::after {
+            margin: 0; padding: 0; box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            /* Subtle grid line pattern background */
+            background:
+                linear-gradient(rgba(0, 62, 107, 0.018) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 62, 107, 0.018) 1px, transparent 1px),
+                linear-gradient(180deg, #FFFFFF 0%, #F8FAFE 50%, #FFFFFF 100%);
+            background-size: 40px 40px, 40px 40px, 100% 100%;
+            background-attachment: fixed;
+            color: var(--text-primary);
+            font-size: 15px;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        a {
+            color: var(--mckinsey-accent);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        a:hover { color: var(--mckinsey); text-decoration: underline; }
+
+        .container {
+            max-width: 880px;
+            margin: 0 auto;
+            padding: var(--sp-16) var(--sp-8);
+        }
+
+        /* ============================================================
+         * HEADER — Deep blue full-width banner
+         * "STRATEGIC INTELLIGENCE REPORT" + date
+         * ============================================================ */
+        .header {
+            background: linear-gradient(160deg, var(--mckinsey-dark) 0%, var(--mckinsey) 50%, var(--mckinsey-light) 100%);
+            color: var(--text-inverse);
+            padding: var(--sp-16) var(--sp-10);
+            margin: calc(var(--sp-16) * -1) calc(var(--sp-8) * -1) var(--sp-16);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Geometric accent — structured consulting aesthetic */
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -15%;
+            width: 55%;
+            height: 180%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+            transform: rotate(15deg);
+            pointer-events: none;
+        }
+
+        /* Bottom accent gradient */
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--mckinsey-sky), rgba(255,255,255,0.3), var(--mckinsey-sky));
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--sp-12);
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-brand-block {
+            display: flex;
+            flex-direction: column;
+            gap: var(--sp-2);
+        }
+
+        .header-brand {
+            font-size: 1.4em;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        .header-date {
+            font-size: 0.88em;
+            opacity: 0.75;
+            font-weight: 400;
+        }
+
+        .header-confidential {
+            font-size: 0.72em;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            opacity: 0.5;
+            padding: var(--sp-2) var(--sp-4);
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: var(--radius-xs);
+        }
+
+        .header-title-block {
+            position: relative;
+            z-index: 1;
+            margin-bottom: var(--sp-8);
+        }
+
+        .header-report-type {
+            font-size: 0.72em;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            opacity: 0.6;
+            margin-bottom: var(--sp-3);
+        }
+
+        .header-title {
+            font-family: var(--font-display);
+            font-size: 2.8em;
+            font-weight: 300;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            margin-bottom: var(--sp-4);
+        }
+
+        .header-subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            font-weight: 400;
+            line-height: 1.4;
+            max-width: 75%;
+        }
+
+        /* KPI metrics row */
+        .header-kpis {
+            display: flex;
+            gap: var(--sp-10);
+            position: relative;
+            z-index: 1;
+            padding-top: var(--sp-6);
+            border-top: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .kpi {
+            text-align: left;
+        }
+
+        .kpi-number {
+            font-size: 2.4em;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: var(--sp-1);
+        }
+
+        .kpi-label {
+            font-size: 0.72em;
+            opacity: 0.6;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        /* Trend arrow */
+        .kpi-trend {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--sp-1);
+            font-size: 0.7em;
+            margin-top: var(--sp-1);
+            opacity: 0.7;
+        }
+
+        .trend-up { color: #4ADE80; }
+        .trend-neutral { color: rgba(255,255,255,0.5); }
+
+        /* ============================================================
+         * EXECUTIVE SUMMARY — Blue background large text
+         * ============================================================ */
+        .exec-summary {
+            background: linear-gradient(135deg, var(--mckinsey-pale) 0%, #F0F7FF 100%);
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--mckinsey);
+            padding: var(--sp-10) var(--sp-8);
+            margin-bottom: var(--sp-16);
+            page-break-inside: avoid;
+            position: relative;
+        }
+
+        .exec-summary::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 150px; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 62, 107, 0.02));
+            pointer-events: none;
+        }
+
+        .exec-header {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            margin-bottom: var(--sp-6);
+        }
+
+        /* Blue circle icon */
+        .exec-circle-icon {
+            width: 36px; height: 36px;
+            background: var(--mckinsey);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-inverse);
+            font-weight: 700;
+            font-size: 0.82em;
+            flex-shrink: 0;
+        }
+
+        .exec-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--mckinsey);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .exec-content {
+            font-size: 1.1em;
+            line-height: 1.85;
+            color: var(--text-secondary);
+        }
+
+        .exec-content p {
+            margin-bottom: var(--sp-4);
+            position: relative;
+            padding-left: var(--sp-6);
+        }
+
+        /* McKinsey bullet */
+        .exec-content p::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 10px;
+            width: 8px;
+            height: 8px;
+            background: var(--mckinsey);
+            border-radius: 50%;
+        }
+
+        .exec-content p:last-child { margin-bottom: 0; }
+        .exec-content strong { color: var(--mckinsey); font-weight: 600; }
+
+        /* ============================================================
+         * EXHIBIT BOX — McKinsey "Exhibit N" style chart frames
+         * ============================================================ */
+        .exhibit {
+            border: 1px solid var(--border);
+            margin: var(--sp-6) 0;
+            page-break-inside: avoid;
+        }
+
+        .exhibit-header {
+            background: var(--bg-surface);
+            padding: var(--sp-3) var(--sp-5);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .exhibit-number {
+            font-size: 0.78em;
+            font-weight: 700;
+            color: var(--mckinsey);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .exhibit-title {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .exhibit-body {
+            padding: var(--sp-5);
+        }
+
+        /* Data bar in exhibit */
+        .data-bar {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            margin-bottom: var(--sp-3);
+        }
+
+        .data-bar:last-child { margin-bottom: 0; }
+
+        .data-bar-label {
+            font-size: 0.78em;
+            color: var(--text-secondary);
+            min-width: 100px;
+            text-align: right;
+        }
+
+        .data-bar-track {
+            flex: 1;
+            height: 8px;
+            background: var(--bg-surface);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .data-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.6s ease;
+        }
+
+        .data-bar-value {
+            font-family: var(--font-mono);
+            font-size: 0.72em;
+            color: var(--mckinsey);
+            font-weight: 600;
+            min-width: 35px;
+        }
+
+        /* ============================================================
+         * SECTION — Corporate Structure with blue accent
+         * ============================================================ */
+        .section {
+            margin-bottom: var(--sp-20);
+        }
+
+        .section-header {
+            background: var(--bg-secondary);
+            border-bottom: 3px solid var(--mckinsey);
+            padding: var(--sp-5) var(--sp-6);
+            margin-bottom: var(--sp-8);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .section-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 4px; height: 100%;
+            background: var(--mckinsey);
+        }
+
+        .section-left {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-4);
+        }
+
+        /* Blue circle section number */
+        .section-num-circle {
+            width: 32px; height: 32px;
+            background: var(--mckinsey);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-inverse);
+            font-weight: 700;
+            font-size: 0.82em;
+            flex-shrink: 0;
+        }
+
+        .section-title-group { display: flex; flex-direction: column; gap: 2px; }
+
+        .section-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--mckinsey);
+            letter-spacing: 0.01em;
+        }
+
+        .section-subtitle {
+            font-size: 0.72em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        /* Section color indicator */
+        .section-color-line {
+            width: 40px;
+            height: 3px;
+            border-radius: 2px;
+        }
+
+        .section-count-badge {
+            background: var(--mckinsey);
+            color: var(--text-inverse);
+            padding: var(--sp-2) var(--sp-4);
+            border-radius: var(--radius-sm);
+            font-size: 0.78em;
+            font-weight: 600;
+            min-width: 55px;
+            text-align: center;
+        }
+
+        /* ============================================================
+         * BRIEF — Structured exhibit item
+         * ============================================================ */
+        .brief {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: var(--sp-6);
+            margin-bottom: var(--sp-5);
+            box-shadow: var(--shadow-subtle);
+            transition: all 0.2s;
+            page-break-inside: avoid;
+            position: relative;
+        }
+
+        .brief:hover {
+            box-shadow: var(--shadow-card);
+            border-color: var(--border-strong);
+        }
+
+        .brief-header {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--sp-4);
+            margin-bottom: var(--sp-4);
+        }
+
+        /* Key insight blue circle number */
+        .insight-number {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72em;
+            font-weight: 700;
+            color: var(--text-inverse);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .brief.must-read .insight-number { background: var(--priority-must); }
+        .brief.recommended .insight-number { background: var(--priority-rec); }
+        .brief.fyi .insight-number { background: var(--priority-fyi); }
+
+        /* Priority card styling */
+        .brief.must-read {
+            border-left: 4px solid var(--priority-must);
+            background: linear-gradient(135deg, var(--priority-must-bg) 0%, var(--bg-primary) 20%);
+        }
+
+        .brief.must-read::after {
+            content: 'HIGH PRIORITY';
+            position: absolute;
+            top: var(--sp-2); right: var(--sp-3);
+            font-size: 0.58em;
+            font-weight: 700;
+            color: var(--priority-must);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            background: var(--priority-must-bg);
+            padding: 2px 8px;
+            border-radius: var(--radius-xs);
+        }
+
+        .brief.recommended {
+            border-left: 4px solid var(--priority-rec);
+            background: linear-gradient(135deg, var(--priority-rec-bg) 0%, var(--bg-primary) 15%);
+        }
+
+        .brief.fyi {
+            border-left: 4px solid var(--priority-fyi);
+        }
+
+        .brief-headline {
+            flex: 1;
+            font-size: 1.05em;
+            font-weight: 600;
+            line-height: 1.4;
+            margin-bottom: var(--sp-2);
+        }
+
+        .brief-headline a { color: var(--text-primary); }
+        .brief-headline a:hover { color: var(--mckinsey-accent); text-decoration: none; }
+        .brief.must-read .brief-headline a { color: var(--mckinsey-dark); font-weight: 700; }
+
+        /* Trend arrow for briefs */
+        .brief-trend {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            font-size: 0.72em;
+            font-weight: 600;
+            padding: 1px 6px;
+            border-radius: var(--radius-sm);
+            margin-left: var(--sp-2);
+        }
+
+        .brief-trend.up { color: #059669; background: rgba(5, 150, 105, 0.08); }
+        .brief-trend.down { color: var(--priority-must); background: var(--priority-must-bg); }
+
+        .brief-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            margin-bottom: var(--sp-4);
+            flex-wrap: wrap;
+            margin-left: 44px;
+        }
+
+        .source-badge {
+            background: var(--mckinsey-pale);
+            color: var(--mckinsey);
+            padding: var(--sp-1) var(--sp-3);
+            border-radius: var(--radius-xs);
+            font-size: 0.75em;
+            font-weight: 600;
+        }
+
+        .tag {
+            background: var(--bg-surface);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            padding: var(--sp-1) var(--sp-3);
+            border-radius: var(--radius-sm);
+            font-size: 0.68em;
+            font-weight: 500;
+        }
+
+        .brief-detail {
+            color: var(--text-secondary);
+            font-size: 0.95em;
+            line-height: 1.75;
+            margin-left: 44px;
+        }
+
+        .brief-detail strong { color: var(--text-primary); font-weight: 600; }
+
+        .brief-detail code {
+            background: var(--bg-surface);
+            color: var(--mckinsey);
+            padding: 2px 6px;
+            border-radius: var(--radius-xs);
+            font-family: var(--font-mono);
+            font-size: 0.88em;
+            border: 1px solid var(--border);
+        }
+
+        /* ============================================================
+         * IMPLICATIONS BOX — End-of-section strategic note
+         * ============================================================ */
+        .implications {
+            background: var(--mckinsey-pale);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--mckinsey);
+            padding: var(--sp-5) var(--sp-6);
+            margin-top: var(--sp-6);
+            border-radius: 0 var(--radius) var(--radius) 0;
+        }
+
+        .implications-header {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+            margin-bottom: var(--sp-3);
+        }
+
+        /* Triangle arrow icon */
+        .implications-arrow {
+            width: 0; height: 0;
+            border-left: 6px solid var(--mckinsey);
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+        }
+
+        .implications-title {
+            font-size: 0.82em;
+            font-weight: 700;
+            color: var(--mckinsey);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .implications-text {
+            font-size: 0.88em;
+            color: var(--text-secondary);
+            line-height: 1.65;
+        }
+
+        /* ============================================================
+         * McKinsey-style horizontal divider
+         * ============================================================ */
+        .mckinsey-rule {
+            border: none;
+            height: 1px;
+            background: linear-gradient(90deg, var(--mckinsey), var(--border), transparent);
+            margin: var(--sp-8) 0;
+        }
+
+        /* ============================================================
+         * DISCLAIMER
+         * ============================================================ */
+        .disclaimer {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            padding: var(--sp-4) var(--sp-6);
+            margin-top: var(--sp-12);
+            font-size: 0.72em;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        .disclaimer-title {
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: var(--sp-2);
+        }
+
+        /* ============================================================
+         * FOOTER — Corporate blue bar
+         * ============================================================ */
+        .footer {
+            background: var(--bg-secondary);
+            border-top: 3px solid var(--mckinsey);
+            padding: var(--sp-10) var(--sp-8);
+            margin: var(--sp-16) calc(var(--sp-8) * -1) calc(var(--sp-16) * -1);
+            text-align: center;
+            position: relative;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 3px; left: 0; right: 0;
+            height: 1px;
+            background: rgba(0, 62, 107, 0.08);
+        }
+
+        .footer-brand {
+            font-size: 1.15em;
+            font-weight: 700;
+            color: var(--mckinsey);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: var(--sp-3);
+        }
+
+        .footer-tagline {
+            font-size: 0.92em;
+            color: var(--text-secondary);
+            font-style: italic;
+            margin-bottom: var(--sp-4);
+        }
+
+        .footer-meta {
+            font-size: 0.78em;
+            color: var(--text-muted);
+        }
+
+        .footer-legal {
+            margin-top: var(--sp-3);
+            font-size: 0.68em;
+            color: var(--text-light);
+            letter-spacing: 0.05em;
+        }
+
+        /* ============================================================
+         * Print
+         * ============================================================ */
+        @media print {
+            body {
+                background: var(--bg-primary) !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .container { max-width: 100%; padding: 0; }
+            .header { margin: 0 0 var(--sp-12); padding: var(--sp-8); }
+            .header::before { display: none; }
+            .exec-summary { margin-bottom: var(--sp-10); }
+            .brief { box-shadow: none; margin-bottom: var(--sp-4); }
+            .brief:hover { box-shadow: none; }
+            .brief.must-read::after { display: none; }
+            .footer { margin: var(--sp-10) 0 0; padding: var(--sp-6); }
+            a { color: var(--text-primary) !important; text-decoration: none !important; }
+        }
+
+        /* ============================================================
+         * Mobile
+         * ============================================================ */
+        @media (max-width: 768px) {
+            .container { padding: var(--sp-8) var(--sp-4); }
+            .header { margin: calc(var(--sp-8) * -1) calc(var(--sp-4) * -1) var(--sp-12); padding: var(--sp-8) var(--sp-5); }
+            .header-top { flex-direction: column; gap: var(--sp-3); }
+            .header-title { font-size: 2em; }
+            .header-subtitle { max-width: 100%; }
+            .header-kpis { gap: var(--sp-6); flex-wrap: wrap; }
+            .kpi-number { font-size: 1.8em; }
+            .section-header { padding: var(--sp-4) var(--sp-5); flex-direction: column; align-items: flex-start; gap: var(--sp-3); }
+            .brief-meta, .brief-detail { margin-left: 0; }
+            .data-bar { flex-wrap: wrap; }
+            .data-bar-label { min-width: 80px; text-align: left; }
+            .footer { margin: var(--sp-12) calc(var(--sp-4) * -1) calc(var(--sp-8) * -1); padding: var(--sp-8) var(--sp-5); }
+        }
+
+        @media (max-width: 480px) {
+            .header-title { font-size: 1.6em; }
+            .brief-header { flex-direction: column; gap: var(--sp-2); }
+            .exhibit-header { flex-direction: column; gap: var(--sp-2); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- ====== HEADER: Executive McKinsey Cover ====== -->
+        <header class="header">
+            <div class="header-top">
+                <div class="header-brand-block">
+                    <div class="header-brand">NEWSLOOM</div>
+                    <div class="header-date">{{ date_str }} · {{ generated_time }}</div>
+                </div>
+                <div class="header-confidential">Confidential</div>
+            </div>
+            <div class="header-title-block">
+                <div class="header-report-type">Strategic Intelligence Report</div>
+                <h1 class="header-title">Intelligence Brief</h1>
+                <div class="header-subtitle">Strategic insights and market intelligence for executive decision-making</div>
+            </div>
+            <div class="header-kpis">
+                <div class="kpi">
+                    <div class="kpi-number">{{ total_items }}</div>
+                    <div class="kpi-label">Articles Analyzed</div>
+                    <div class="kpi-trend trend-up">▲ Complete</div>
+                </div>
+                {% set must_read_total = [] %}
+                {% for section_key, items in briefs.items() %}
+                {% if items is iterable and items is not string %}
+                {% for item in items %}
+                {% if item.priority == '🔴' %}
+                {% if must_read_total.append(1) %}{% endif %}
+                {% endif %}
+                {% endfor %}
+                {% endif %}
+                {% endfor %}
+                <div class="kpi">
+                    <div class="kpi-number">{{ must_read_total|length }}</div>
+                    <div class="kpi-label">High Priority</div>
+                    <div class="kpi-trend trend-neutral">— Action Required</div>
+                </div>
+                <div class="kpi">
+                    <div class="kpi-number">{{ section_order|length }}</div>
+                    <div class="kpi-label">Sectors Covered</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ====== EXHIBIT: Coverage Overview Data Bars ====== -->
+        <div class="exhibit">
+            <div class="exhibit-header">
+                <span class="exhibit-number">Exhibit 1</span>
+                <span class="exhibit-title">Coverage Distribution by Sector</span>
+            </div>
+            <div class="exhibit-body">
+                {% for section_key in section_order %}
+                {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+                {% set meta = section_configs.get(section_key, {}) %}
+                {% set count = briefs[section_key]|length %}
+                {% set pct = (count * 100 / total_items)|int if total_items > 0 else 0 %}
+                <div class="data-bar">
+                    <span class="data-bar-label">{{ meta.emoji|default('📊') }} {{ meta.title|default(section_key) }}</span>
+                    <div class="data-bar-track">
+                        <div class="data-bar-fill" style="width: {{ pct }}%; background: {{ meta.color|default('#003E6B') }};"></div>
+                    </div>
+                    <span class="data-bar-value">{{ count }}</span>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- ====== EXECUTIVE SUMMARY ====== -->
+        {% if executive_summary %}
+        <div class="exec-summary">
+            <div class="exec-header">
+                <div class="exec-circle-icon">ES</div>
+                <h2 class="exec-title">Executive Summary</h2>
+            </div>
+            <div class="exec-content">
+                {% for line in executive_summary.strip().split('\n') %}
+                {% if line.strip() %}
+                <p>{{ line.strip() | md_inline }}</p>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ====== SECTIONS ====== -->
+        {% set section_counter = [1] %}
+        {% for section_key in section_order %}
+        {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+        {% set meta = section_configs.get(section_key, {}) %}
+        {% set items = briefs[section_key] %}
+        {% set section_color = meta.color|default('#003E6B') %}
+
+        {% if not loop.first %}
+        <hr class="mckinsey-rule">
+        {% endif %}
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-left">
+                    <div class="section-num-circle">{{ section_counter[0] }}</div>
+                    <div class="section-title-group">
+                        <h2 class="section-title">{{ meta.title|default(section_key|title) }}</h2>
+                        <div class="section-subtitle">{{ meta.emoji|default('📊') }} Sector Analysis</div>
+                    </div>
+                    <div class="section-color-line" style="background: {{ section_color }};"></div>
+                </div>
+                <div class="section-count-badge">{{ items|length }} items</div>
+            </div>
+
+            {% set brief_counter = [1] %}
+            {% for item in items %}
+            {% set priority = item.priority|default('🟢') %}
+            {% set p_class = 'must-read' if priority == '🔴' else ('recommended' if priority == '🟡' else 'fyi') %}
+            <div class="brief {{ p_class }}">
+                <div class="brief-header">
+                    <div class="insight-number">{{ brief_counter[0] }}</div>
+                    <div class="brief-headline">
+                        <a href="{{ item.url|default('#') }}" target="_blank">{{ item.headline|default(item.title|default('Untitled')) }}</a>
+                        {% if priority == '🔴' %}
+                        <span class="brief-trend up">▲ Critical</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="brief-meta">
+                    {% if item.source %}
+                    <span class="source-badge">{{ item.source }}</span>
+                    {% endif %}
+                    {% if item.tags %}
+                    {% for tag in item.tags %}
+                    <span class="tag">{{ tag }}</span>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+                {% if item.detail %}
+                <div class="brief-detail">{{ item.detail|default('') | md_inline }}</div>
+                {% endif %}
+                {% if brief_counter.append(brief_counter.pop() + 1) %}{% endif %}
+            </div>
+            {% endfor %}
+
+            <!-- Implications box -->
+            <div class="implications">
+                <div class="implications-header">
+                    <div class="implications-arrow"></div>
+                    <span class="implications-title">Strategic Implications</span>
+                </div>
+                <div class="implications-text">
+                    This sector presents {{ items|length }} development{% if items|length != 1 %}s{% endif %} warranting strategic attention.
+                    {% if items|selectattr('priority', 'equalto', '🔴')|list|length > 0 %}
+                    High-priority items require immediate executive review and potential resource reallocation.
+                    {% else %}
+                    Continued monitoring recommended per standard intelligence protocol.
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+        {% if section_counter.append(section_counter.pop() + 1) %}{% endif %}
+        {% endif %}
+        {% endfor %}
+
+        <!-- ====== DISCLAIMER ====== -->
+        <div class="disclaimer">
+            <div class="disclaimer-title">Disclaimer</div>
+            This strategic intelligence report is generated by AI analysis and curated for informational purposes. Content should be independently verified before executive decision-making. Past performance is not indicative of future results.
+        </div>
+
+        <!-- ====== FOOTER ====== -->
+        <footer class="footer">
+            <div class="footer-brand">Newsloom Intelligence</div>
+            <div class="footer-tagline">Strategic insights powered by AI analysis</div>
+            <div class="footer-meta">{{ date_str }} · {{ total_items }} sources analyzed · {{ generated_time }}</div>
+            <div class="footer-legal">© {{ date_str[:4] }} Newsloom Intelligence · All rights reserved · Confidential</div>
+        </footer>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Information · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * THE INFORMATION — Premium Paid Newsletter
+         * ────────────────────────────────────────────────────────────
+         * White base + deep-black text + brand deep navy (#1B2838)
+         * Subtle paper-grain texture background (SVG data-uri)
+         * Minimalist masthead: brand name + date + SUBSCRIBER EXCLUSIVE
+         * Long-form depth: large paragraphs, wide line-height, serif
+         * Key Takeaway grey boxes on must-read briefs
+         * Pull-quote: large italic navy text with left border
+         * Source links with ↗ arrow
+         * First must-read item → Featured Article hero treatment
+         * Paywall CTA hint + subscriber-exclusive footer
+         * ============================================================ */
+
+        /* ── Design Tokens ─────────────────────────────────── */
+        :root {
+            /* ── Brand navy palette ── */
+            --navy:           #1B2838;
+            --navy-mid:       #2C3E50;
+            --navy-dark:      #0F1923;
+            --navy-dim:       rgba(27,40,56,0.06);
+            --navy-glow:      rgba(27,40,56,0.03);
+            --navy-border:    rgba(27,40,56,0.15);
+
+            /* ── Backgrounds ── */
+            --bg-page:        #FAFAF8;
+            --bg-white:       #FFFFFF;
+            --bg-cream:       #F5F4F0;
+            --bg-takeaway:    #F3F2EE;
+            --bg-surface:     #EEECEA;
+            --bg-hover:       #F7F6F3;
+
+            /* ── Text — high contrast ── */
+            --ink:            #111111;
+            --ink-body:       #1E1E1E;
+            --ink-secondary:  #444444;
+            --ink-muted:      #777777;
+            --ink-light:      #AAAAAA;
+            --ink-faint:      #CCCCCC;
+            --ink-white:      #FFFFFF;
+
+            /* ── Priority ── */
+            --p-must:         #1B2838;
+            --p-must-bg:      rgba(27,40,56,0.035);
+            --p-rec:          #6B7B8D;
+            --p-rec-bg:       rgba(107,123,141,0.04);
+            --p-fyi:          #AAAAAA;
+            --p-fyi-bg:       transparent;
+
+            /* ── Borders ── */
+            --rule:           #E5E4E0;
+            --rule-strong:    #D0CFC9;
+            --rule-faint:     #F0EFEB;
+
+            /* ── 8-pt spacing ── */
+            --s1:4px; --s2:8px; --s3:12px; --s4:16px;
+            --s5:20px; --s6:24px; --s8:32px; --s10:40px;
+            --s12:48px; --s16:64px; --s20:80px;
+
+            /* ── Typography — serif first for depth ── */
+            --serif: "Georgia","Palatino","Times New Roman",
+                     "Noto Serif SC","Songti SC","STSong",serif;
+            --sans:  -apple-system,"Helvetica Neue",
+                     "PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;
+            --mono:  "SF Mono","Consolas","Monaco",monospace;
+
+            /* ── Radius ── */
+            --r-sm: 3px;
+            --r-md: 6px;
+            --r-lg: 10px;
+
+            /* ── Shadows ── */
+            --shadow-card:     0 1px 3px rgba(0,0,0,0.04);
+            --shadow-elevated: 0 0 1px rgba(0,0,0,0.06), 0 4px 24px rgba(0,0,0,0.045);
+        }
+
+        /* ── PDF / WeasyPrint ──────────────────────────────── */
+        @page {
+            size: A4;
+            margin: 2.5cm 2cm;
+
+            @bottom-center {
+                content: "The Information · Subscriber Exclusive · p." counter(page);
+                font-family: -apple-system,"Helvetica Neue",sans-serif;
+                font-size: 7.5pt;
+                color: #999;
+            }
+        }
+
+        @page :first {
+            @bottom-center {
+                content: "The Information · Premium Daily Briefing";
+                font-family: -apple-system,"Helvetica Neue",sans-serif;
+                font-size: 7.5pt;
+                color: #999;
+            }
+        }
+
+        /* ── Reset ─────────────────────────────────────────── */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* ── Body: Paper Grain Texture ─────────────────────── */
+        body {
+            font-family: var(--serif);
+            color: var(--ink-body);
+            font-size: 17px;
+            line-height: 1.88;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            background-color: var(--bg-page);
+            /* Paper grain texture: subtle vignette + micro dots */
+            background-image:
+                radial-gradient(ellipse at 50% 0%, rgba(27,40,56,0.012) 0%, transparent 50%),
+                radial-gradient(ellipse at 0% 40%, rgba(0,0,0,0.006) 0%, transparent 30%),
+                radial-gradient(ellipse at 100% 60%, rgba(0,0,0,0.006) 0%, transparent 30%),
+                url("data:image/svg+xml,%3Csvg width='6' height='6' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='6' height='6' fill='%23FAFAF8'/%3E%3Ccircle cx='1' cy='1' r='0.25' fill='%23E0DED8' opacity='0.22'/%3E%3Ccircle cx='4' cy='3' r='0.2' fill='%23D8D6D0' opacity='0.15'/%3E%3C/svg%3E");
+        }
+
+        a {
+            color: var(--navy);
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+
+        a:hover {
+            color: var(--navy-mid);
+        }
+
+        /* ── Container — white card on texture ─────────────── */
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: var(--s12) var(--s8);
+            background: var(--bg-white);
+            box-shadow: var(--shadow-elevated);
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* ============================================================
+         * MASTHEAD — Minimalist
+         *
+         * Brand name (serif, navy) on left.
+         * SUBSCRIBER EXCLUSIVE badge (navy pill) on right.
+         * Date + stats line below.
+         * 3px navy bottom border.
+         * ============================================================ */
+        .masthead {
+            padding-bottom: var(--s6);
+            margin-bottom: var(--s8);
+            border-bottom: 3px solid var(--navy);
+        }
+
+        .masthead-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--s3);
+        }
+
+        .brand {
+            font-family: var(--serif);
+            font-size: 2em;
+            font-weight: 700;
+            color: var(--navy);
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+        }
+
+        .sub-badge {
+            font-family: var(--sans);
+            font-size: 0.52em;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--ink-white);
+            background: var(--navy);
+            padding: 4px 10px;
+            border-radius: var(--r-sm);
+        }
+
+        .masthead-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--s3);
+            font-family: var(--sans);
+            font-size: 0.78em;
+            color: var(--ink-muted);
+        }
+
+        .masthead-date {
+            font-weight: 600;
+            color: var(--ink-secondary);
+        }
+
+        .masthead-dot {
+            color: var(--rule-strong);
+        }
+
+        /* ============================================================
+         * STATS BAR
+         *
+         * Three stat cells in surface-coloured rounded row.
+         * ============================================================ */
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--s4) var(--s5);
+            margin-bottom: var(--s8);
+            background: var(--bg-surface);
+            border-radius: var(--r-md);
+            border: 1px solid var(--rule);
+        }
+
+        .stat-cell {
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-cell + .stat-cell {
+            border-left: 1px solid var(--rule);
+        }
+
+        .stat-val {
+            display: block;
+            font-family: var(--sans);
+            font-weight: 800;
+            font-size: 1.35em;
+            color: var(--navy);
+            line-height: 1.2;
+        }
+
+        .stat-lbl {
+            font-family: var(--sans);
+            font-size: 0.6em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--ink-muted);
+        }
+
+        /* ============================================================
+         * EXECUTIVE SUMMARY
+         *
+         * Bordered card with navy left accent bar.
+         * "Today's Brief" label.
+         * ============================================================ */
+        .exec {
+            margin-bottom: var(--s10);
+            padding: var(--s6) var(--s8);
+            border: 1px solid var(--rule);
+            border-radius: var(--r-md);
+            background: var(--bg-white);
+            position: relative;
+        }
+
+        /* Navy left accent bar */
+        .exec::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 14px;
+            bottom: 14px;
+            width: 4px;
+            background: var(--navy);
+            border-radius: 4px;
+        }
+
+        .exec-label {
+            font-family: var(--sans);
+            font-size: 0.65em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--navy);
+            margin-bottom: var(--s4);
+            padding-left: var(--s4);
+        }
+
+        .exec-body {
+            padding-left: var(--s4);
+        }
+
+        .exec-body p {
+            font-size: 1.05em;
+            line-height: 1.9;
+            color: var(--ink-secondary);
+            margin-bottom: var(--s4);
+        }
+
+        .exec-body p:last-child {
+            margin-bottom: 0;
+        }
+
+        .exec-body p strong {
+            color: var(--ink);
+            font-weight: 700;
+        }
+
+        /* ============================================================
+         * FEATURED ARTICLE — First 🔴 gets hero treatment
+         *
+         * Large headline (1.85em), featured flag pill,
+         * full detail body, key takeaway box, source ↗ link.
+         * Navy bottom border.
+         * ============================================================ */
+        .featured {
+            margin-bottom: var(--s10);
+            padding-bottom: var(--s8);
+            border-bottom: 2px solid var(--navy);
+            page-break-inside: avoid;
+        }
+
+        .featured-flag {
+            font-family: var(--sans);
+            font-size: 0.6em;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--navy);
+            background: var(--navy-dim);
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: var(--r-sm);
+            margin-bottom: var(--s4);
+        }
+
+        .featured-hl {
+            font-family: var(--serif);
+            font-size: 1.85em;
+            font-weight: 700;
+            line-height: 1.22;
+            color: var(--ink);
+            letter-spacing: -0.02em;
+            margin-bottom: var(--s4);
+        }
+
+        .featured-hl a {
+            color: var(--ink);
+        }
+
+        .featured-hl a:hover {
+            color: var(--navy);
+        }
+
+        .featured-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--s3);
+            font-family: var(--sans);
+            font-size: 0.8em;
+            color: var(--ink-muted);
+            margin-bottom: var(--s5);
+            flex-wrap: wrap;
+        }
+
+        .featured-src {
+            font-weight: 700;
+            color: var(--navy);
+        }
+
+        .featured-tag {
+            background: var(--bg-surface);
+            padding: 2px 8px;
+            border-radius: var(--r-sm);
+            font-size: 0.9em;
+            border: 1px solid var(--rule);
+        }
+
+        .featured-body {
+            font-size: 1.12em;
+            line-height: 1.95;
+            color: var(--ink-body);
+        }
+
+        .featured-body strong {
+            color: var(--ink);
+        }
+
+        /* ============================================================
+         * KEY TAKEAWAY BOX
+         *
+         * Grey/cream background, border, rounded.
+         * Label + text.
+         * ============================================================ */
+        .takeaway {
+            background: var(--bg-takeaway);
+            border: 1px solid var(--rule);
+            border-radius: var(--r-md);
+            padding: var(--s5) var(--s6);
+            margin-top: var(--s5);
+        }
+
+        .takeaway-label {
+            font-family: var(--sans);
+            font-size: 0.6em;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--navy);
+            margin-bottom: var(--s2);
+        }
+
+        .takeaway-text {
+            font-size: 0.95em;
+            line-height: 1.75;
+            color: var(--ink-secondary);
+        }
+
+        /* ============================================================
+         * SOURCE LINK WITH ↗ ARROW
+         * ============================================================ */
+        .src-arrow {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--s1);
+            font-family: var(--sans);
+            font-size: 0.82em;
+            font-weight: 600;
+            color: var(--navy);
+            margin-top: var(--s4);
+            transition: gap 0.2s ease;
+        }
+
+        .src-arrow:hover {
+            gap: var(--s2);
+        }
+
+        .src-arrow .arrow {
+            font-size: 1.1em;
+        }
+
+        /* ============================================================
+         * PULL QUOTE — Large italic navy text
+         *
+         * 3px navy left border.
+         * Large curly quote watermark (pseudo-element).
+         * ============================================================ */
+        .pull-quote {
+            border-left: 3px solid var(--navy);
+            padding: var(--s4) var(--s6);
+            margin: var(--s8) 0;
+            font-size: 1.35em;
+            font-style: italic;
+            line-height: 1.45;
+            color: var(--navy);
+            position: relative;
+        }
+
+        .pull-quote::before {
+            content: '\201C';
+            position: absolute;
+            top: -10px;
+            left: 6px;
+            font-size: 2.5em;
+            color: var(--navy);
+            opacity: 0.12;
+            font-style: normal;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        /* ============================================================
+         * SECTION
+         *
+         * Header: navy 2px bottom border with title, colour dot,
+         * emoji icon, and count badge.
+         * ============================================================ */
+        .section {
+            margin-bottom: var(--s12);
+        }
+
+        .sec-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: var(--s3);
+            margin-bottom: var(--s5);
+            border-bottom: 2px solid var(--ink);
+        }
+
+        .sec-title-row {
+            display: flex;
+            align-items: center;
+            gap: var(--s3);
+        }
+
+        /* Section colour indicator dot */
+        .sec-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .sec-icon {
+            font-size: 1em;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-surface);
+            border-radius: var(--r-sm);
+            border: 1px solid var(--rule);
+        }
+
+        .sec-title {
+            font-family: var(--sans);
+            font-size: 1.1em;
+            font-weight: 700;
+            color: var(--ink);
+            letter-spacing: -0.01em;
+        }
+
+        .sec-count {
+            font-family: var(--sans);
+            font-size: 0.65em;
+            color: var(--ink-light);
+            font-weight: 600;
+            background: var(--bg-surface);
+            padding: 3px 10px;
+            border-radius: 100px;
+            border: 1px solid var(--rule);
+        }
+
+        /* Section-level stats */
+        .sec-stats {
+            display: flex;
+            gap: var(--s4);
+            font-family: var(--sans);
+            font-size: 0.68em;
+            color: var(--ink-light);
+            margin-bottom: var(--s4);
+        }
+
+        .sec-stats span strong {
+            color: var(--navy);
+            font-weight: 700;
+        }
+
+        /* ============================================================
+         * BRIEF CARD
+         *
+         * Three priority tiers.
+         * Must-read: navy left border + tinted background +
+         *   MUST READ badge + key takeaway box.
+         * Recommended: grey left border.
+         * FYI: plain.
+         * Source link ↗ on every brief.
+         * ============================================================ */
+        .brief {
+            padding: var(--s5) 0;
+            border-bottom: 1px solid var(--rule);
+            page-break-inside: avoid;
+            transition: background 0.12s ease;
+        }
+
+        .brief:last-child {
+            border-bottom: none;
+        }
+
+        .brief:hover {
+            background: var(--bg-hover);
+            margin: 0 calc(-1 * var(--s4));
+            padding-left: var(--s4);
+            padding-right: var(--s4);
+        }
+
+        /* Must-read */
+        .brief.p-must {
+            background: var(--p-must-bg);
+            padding: var(--s5) var(--s4);
+            margin: 0 calc(-1 * var(--s4));
+            border-left: 3px solid var(--navy);
+        }
+
+        .brief.p-must:hover {
+            background: rgba(27,40,56,0.055);
+        }
+
+        /* Recommended */
+        .brief.p-rec {
+            border-left: 3px solid var(--p-rec);
+            padding-left: var(--s4);
+            margin-left: calc(-1 * var(--s4));
+        }
+
+        /* Headline */
+        .brief-hl {
+            font-family: var(--serif);
+            font-size: 1.12em;
+            font-weight: 700;
+            line-height: 1.35;
+            margin-bottom: var(--s2);
+        }
+
+        .brief-hl a {
+            color: var(--ink);
+        }
+
+        .brief-hl a:hover {
+            color: var(--navy);
+        }
+
+        .p-must .brief-hl a {
+            color: var(--navy);
+        }
+
+        /* Must-read badge */
+        .must-badge {
+            display: inline-block;
+            font-family: var(--sans);
+            font-size: 0.48em;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--ink-white);
+            background: var(--navy);
+            padding: 2px 7px;
+            border-radius: var(--r-sm);
+            margin-left: var(--s2);
+            vertical-align: middle;
+        }
+
+        /* Meta line */
+        .brief-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--s2);
+            font-family: var(--sans);
+            font-size: 0.73em;
+            color: var(--ink-muted);
+            margin-bottom: var(--s3);
+            flex-wrap: wrap;
+        }
+
+        .brief-src {
+            font-weight: 700;
+            color: var(--navy);
+        }
+
+        .brief-tag {
+            background: var(--bg-surface);
+            padding: 1px 7px;
+            border-radius: var(--r-sm);
+            border: 1px solid var(--rule);
+            color: var(--ink-muted);
+            font-size: 0.92em;
+        }
+
+        /* Detail body */
+        .brief-body {
+            font-size: 1em;
+            line-height: 1.85;
+            color: var(--ink-body);
+        }
+
+        .brief-body strong {
+            color: var(--ink);
+            font-weight: 700;
+        }
+
+        .brief-body em {
+            font-style: italic;
+            color: var(--ink-secondary);
+        }
+
+        .brief-body code {
+            font-family: var(--mono);
+            font-size: 0.86em;
+            background: var(--bg-surface);
+            color: var(--navy);
+            padding: 1px 5px;
+            border-radius: 3px;
+            border: 1px solid var(--rule);
+        }
+
+        /* Source link ↗ */
+        .brief-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-family: var(--sans);
+            font-size: 0.76em;
+            font-weight: 600;
+            color: var(--navy);
+            margin-top: var(--s2);
+            transition: gap 0.15s ease;
+        }
+
+        .brief-link:hover {
+            text-decoration: underline;
+            gap: 5px;
+        }
+
+        /* Key Takeaway box inside must-read brief */
+        .brief-takeaway {
+            background: var(--bg-takeaway);
+            border: 1px solid var(--rule);
+            border-radius: var(--r-sm);
+            padding: var(--s3) var(--s4);
+            margin-top: var(--s3);
+            font-size: 0.9em;
+        }
+
+        .brief-takeaway-label {
+            font-family: var(--sans);
+            font-size: 0.62em;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--navy);
+            margin-bottom: var(--s1);
+        }
+
+        .brief-takeaway-text {
+            line-height: 1.65;
+            color: var(--ink-secondary);
+        }
+
+        /* ============================================================
+         * SECTION SEPARATOR — Three centered dots
+         * ============================================================ */
+        .sec-sep {
+            text-align: center;
+            padding: var(--s3) 0;
+            color: var(--ink-light);
+            font-size: 0.82em;
+            letter-spacing: 0.35em;
+        }
+
+        /* ============================================================
+         * PAYWALL CTA — Subscription Hint
+         *
+         * Centred card with navy-dim background.
+         * Title, description, CTA button.
+         * ============================================================ */
+        .paywall-cta {
+            text-align: center;
+            padding: var(--s8) var(--s6);
+            margin: var(--s10) 0;
+            background: var(--navy-dim);
+            border: 1px solid var(--rule);
+            border-radius: var(--r-md);
+            position: relative;
+        }
+
+        /* Decorative top gradient line */
+        .paywall-cta::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 20%; right: 20%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--navy), transparent);
+            border-radius: 2px;
+        }
+
+        .paywall-title {
+            font-family: var(--serif);
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: var(--s2);
+        }
+
+        .paywall-desc {
+            font-family: var(--sans);
+            font-size: 0.85em;
+            color: var(--ink-muted);
+            margin-bottom: var(--s4);
+            max-width: 420px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+
+        .paywall-btn {
+            display: inline-block;
+            background: var(--navy);
+            color: var(--ink-white);
+            font-family: var(--sans);
+            font-weight: 700;
+            font-size: 0.82em;
+            padding: 10px 28px;
+            border-radius: var(--r-md);
+            letter-spacing: 0.03em;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .paywall-btn:hover {
+            background: var(--navy-mid);
+            color: var(--ink-white);
+            transform: translateY(-1px);
+        }
+
+        /* ============================================================
+         * FOOTER — Subscriber-Exclusive Hint
+         *
+         * Navy 3px top border. Brand, tagline, exclusive badge,
+         * info line, legal text.
+         * ============================================================ */
+        .footer {
+            text-align: center;
+            margin-top: var(--s16);
+            padding: var(--s10) 0 var(--s8);
+            border-top: 3px solid var(--navy);
+        }
+
+        .footer-brand {
+            font-family: var(--serif);
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: var(--s2);
+        }
+
+        .footer-tagline {
+            font-family: var(--sans);
+            font-size: 0.85em;
+            color: var(--ink-muted);
+            margin-bottom: var(--s3);
+        }
+
+        .footer-excl {
+            font-family: var(--sans);
+            font-size: 0.68em;
+            font-weight: 600;
+            color: var(--navy);
+            background: var(--navy-dim);
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: var(--r-sm);
+            margin-bottom: var(--s4);
+            letter-spacing: 0.06em;
+        }
+
+        .footer-info {
+            font-family: var(--sans);
+            font-size: 0.7em;
+            color: var(--ink-light);
+            max-width: 400px;
+            margin: 0 auto var(--s3);
+            line-height: 1.5;
+        }
+
+        .footer-legal {
+            font-family: var(--sans);
+            font-size: 0.58em;
+            color: var(--ink-light);
+            opacity: 0.65;
+        }
+
+        /* ============================================================
+         * PRINT / PDF — CJK safe
+         * ============================================================ */
+        @media print {
+            body {
+                background: white !important;
+                background-image: none !important;
+                font-size: 10.5pt;
+                line-height: 1.65;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            .container {
+                max-width: 100%;
+                padding: var(--s6);
+                box-shadow: none;
+            }
+
+            .brief {
+                transition: none;
+            }
+
+            .brief:hover {
+                background: transparent;
+                margin: 0;
+                padding-left: 0;
+                padding-right: 0;
+            }
+
+            .brief.p-must {
+                margin: 0;
+            }
+
+            a {
+                color: var(--ink) !important;
+            }
+
+            a[href]::after {
+                content: none !important;
+            }
+
+            .paywall-cta {
+                display: none;
+            }
+        }
+
+        /* ============================================================
+         * MOBILE — Compact, no card shadow
+         * ============================================================ */
+        @media (max-width: 640px) {
+            body {
+                background: var(--bg-white);
+            }
+
+            .container {
+                padding: var(--s6) var(--s4);
+                box-shadow: none;
+            }
+
+            .brand {
+                font-size: 1.55em;
+            }
+
+            .masthead-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--s2);
+            }
+
+            .featured-hl {
+                font-size: 1.35em;
+            }
+
+            .stats-row {
+                flex-direction: column;
+                gap: var(--s3);
+            }
+
+            .stat-cell + .stat-cell {
+                border-left: none;
+                border-top: 1px solid var(--rule);
+                padding-top: var(--s3);
+            }
+
+            .pull-quote {
+                font-size: 1.1em;
+                padding: var(--s3) var(--s4);
+            }
+
+            .sec-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--s2);
+            }
+
+            .brief:hover {
+                margin: 0;
+                padding-left: 0;
+                padding-right: 0;
+            }
+
+            .brief.p-must {
+                margin: 0;
+                padding-left: var(--s4);
+            }
+
+            .sec-stats {
+                flex-direction: column;
+                gap: var(--s1);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .brand {
+                font-size: 1.35em;
+            }
+
+            .featured-hl {
+                font-size: 1.2em;
+            }
+
+            .brief-hl {
+                font-size: 1.02em;
+            }
+
+            .sub-badge {
+                font-size: 0.48em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        {# ─────────────────────────────────────────────────────
+           MASTHEAD — Minimalist: brand + date + SUBSCRIBER EXCLUSIVE
+           ───────────────────────────────────────────────────── #}
+        <header class="masthead">
+            <div class="masthead-row">
+                <h1 class="brand">The Information</h1>
+                <span class="sub-badge">Subscriber Exclusive</span>
+            </div>
+            <div class="masthead-meta">
+                <span class="masthead-date">{{ date_str }}</span>
+                <span class="masthead-dot">·</span>
+                <span>{{ total_items }} curated stories</span>
+                <span class="masthead-dot">·</span>
+                <span>Premium Daily Briefing</span>
+            </div>
+        </header>
+
+        {# ─────────────────────────────────────────────────────
+           STATS BAR
+           ───────────────────────────────────────────────────── #}
+        {% set ns = namespace(must=0) %}
+        {% for sk, sitems in briefs.items() %}
+        {% if sitems is iterable and sitems is not string %}
+        {% for it in sitems %}
+        {% if it.priority == '🔴' %}{% set ns.must = ns.must + 1 %}{% endif %}
+        {% endfor %}
+        {% endif %}
+        {% endfor %}
+
+        <div class="stats-row">
+            <div class="stat-cell">
+                <span class="stat-val">{{ total_items }}</span>
+                <span class="stat-lbl">Stories</span>
+            </div>
+            <div class="stat-cell">
+                <span class="stat-val">{{ ns.must }}</span>
+                <span class="stat-lbl">Must Read</span>
+            </div>
+            <div class="stat-cell">
+                <span class="stat-val">{{ briefs|length }}</span>
+                <span class="stat-lbl">Sectors</span>
+            </div>
+        </div>
+
+        {# ─────────────────────────────────────────────────────
+           EXECUTIVE SUMMARY
+           ───────────────────────────────────────────────────── #}
+        {% if executive_summary %}
+        <div class="exec">
+            <div class="exec-label">Today's Brief</div>
+            <div class="exec-body">
+                {% for line in executive_summary.strip().split('\n') %}
+                {% if line.strip() %}
+                <p>{{ line.strip() | md_inline }}</p>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {# ─────────────────────────────────────────────────────
+           FEATURED ARTICLE — First 🔴 item gets hero treatment
+           ───────────────────────────────────────────────────── #}
+        {% set ns_feat = namespace(done=false) %}
+        {% for section_key in section_order %}
+        {% if not ns_feat.done and section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string %}
+        {% for item in briefs[section_key] %}
+        {% if item.priority == '🔴' and not ns_feat.done %}
+        {% set ns_feat.done = true %}
+
+        <div class="featured">
+            <div class="featured-flag">Featured Article</div>
+            <h2 class="featured-hl">
+                <a href="{{ item.url|default('#') }}" target="_blank" rel="noopener">{{ item.headline|default('Untitled') }}</a>
+            </h2>
+            <div class="featured-meta">
+                {% if item.source %}
+                <span class="featured-src">{{ item.source }}</span>
+                {% endif %}
+                {% if item.tags %}
+                {% for tag in item.tags %}
+                <span class="featured-tag">{{ tag }}</span>
+                {% endfor %}
+                {% endif %}
+            </div>
+            {% if item.detail %}
+            <div class="featured-body">{{ item.detail | md_inline }}</div>
+            {% endif %}
+            <div class="takeaway">
+                <div class="takeaway-label">Key Takeaway</div>
+                <div class="takeaway-text">{{ item.headline|default('') }} — a development worth close subscriber monitoring for downstream implications.</div>
+            </div>
+            <a href="{{ item.url|default('#') }}" target="_blank" rel="noopener" class="src-arrow">
+                Read full story <span class="arrow">↗</span>
+            </a>
+        </div>
+
+        {# Pull quote from featured article #}
+        {% if item.detail and item.detail|length > 40 %}
+        <div class="pull-quote">
+            {{ item.headline|default('') }}
+        </div>
+        {% endif %}
+
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+        {% endfor %}
+
+        {# ─────────────────────────────────────────────────────
+           SECTIONS — Briefs grouped by section
+           ───────────────────────────────────────────────────── #}
+        {% for section_key in section_order %}
+        {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+        {% set meta = section_configs.get(section_key, {}) %}
+        {% set sec_color = meta.color|default('#1B2838') %}
+        {% set items = briefs[section_key] %}
+
+        {# Count priorities #}
+        {% set ns_sec = namespace(must=0, rec=0, fyi=0) %}
+        {% for it in items %}
+        {% if it.priority == '🔴' %}{% set ns_sec.must = ns_sec.must + 1 %}
+        {% elif it.priority == '🟡' %}{% set ns_sec.rec = ns_sec.rec + 1 %}
+        {% else %}{% set ns_sec.fyi = ns_sec.fyi + 1 %}
+        {% endif %}
+        {% endfor %}
+
+        <section class="section">
+            <div class="sec-header">
+                <div class="sec-title-row">
+                    <div class="sec-dot" style="background:{{ sec_color }};"></div>
+                    <span class="sec-icon">{{ meta.emoji|default('📌') }}</span>
+                    <h2 class="sec-title">{{ meta.title|default(section_key) }}</h2>
+                </div>
+                <span class="sec-count">{{ items|length }}</span>
+            </div>
+
+            {# Section stats #}
+            <div class="sec-stats">
+                {% if ns_sec.must > 0 %}
+                <span>🔴 <strong>{{ ns_sec.must }}</strong> essential</span>
+                {% endif %}
+                {% if ns_sec.rec > 0 %}
+                <span>🟡 <strong>{{ ns_sec.rec }}</strong> recommended</span>
+                {% endif %}
+                {% if ns_sec.fyi > 0 %}
+                <span>🟢 <strong>{{ ns_sec.fyi }}</strong> noted</span>
+                {% endif %}
+            </div>
+
+            {% for item in items %}
+            {% set priority = item.priority|default('🟢') %}
+            {% set pcls = 'p-must' if priority == '🔴' else ('p-rec' if priority == '🟡' else 'p-fyi') %}
+
+            <div class="brief {{ pcls }}">
+                <div class="brief-hl">
+                    <a href="{{ item.url|default('#') }}" target="_blank" rel="noopener">{{ item.headline|default('Untitled') }}</a>
+                    {% if priority == '🔴' %}
+                    <span class="must-badge">Must Read</span>
+                    {% endif %}
+                </div>
+
+                <div class="brief-meta">
+                    {% if item.source %}
+                    <span class="brief-src">{{ item.source }}</span>
+                    {% endif %}
+                    {% if item.tags %}
+                    {% for tag in item.tags %}
+                    <span class="brief-tag">{{ tag }}</span>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+
+                {% if item.detail %}
+                <div class="brief-body">{{ item.detail | md_inline }}</div>
+                {% endif %}
+
+                {# Key Takeaway for must-read #}
+                {% if priority == '🔴' and item.detail %}
+                <div class="brief-takeaway">
+                    <div class="brief-takeaway-label">Key Takeaway</div>
+                    <div class="brief-takeaway-text">{{ item.headline|default('') }}</div>
+                </div>
+                {% endif %}
+
+                {# Source ↗ link #}
+                <a href="{{ item.url|default('#') }}" target="_blank" rel="noopener" class="brief-link">{{ item.source|default('Source') }}&thinsp;↗</a>
+            </div>
+            {% endfor %}
+        </section>
+
+        {% if not loop.last %}
+        <div class="sec-sep">· · ·</div>
+        {% endif %}
+
+        {% endif %}
+        {% endfor %}
+
+        {# ─────────────────────────────────────────────────────
+           PAYWALL CTA
+           ───────────────────────────────────────────────────── #}
+        <div class="paywall-cta">
+            <div class="paywall-title">Join the conversation</div>
+            <div class="paywall-desc">Get exclusive access to in-depth analysis, proprietary data, and subscriber-only discussions.</div>
+            <a href="#" class="paywall-btn">Subscribe for Full Access</a>
+        </div>
+
+        {# ─────────────────────────────────────────────────────
+           FOOTER
+           ───────────────────────────────────────────────────── #}
+        <footer class="footer">
+            <div class="footer-brand">The Information</div>
+            <div class="footer-tagline">Premium intelligence for technology leaders</div>
+            <div class="footer-excl">This is exclusive content for subscribers</div>
+            <div class="footer-info">{{ date_str }} · {{ total_items }} stories analyzed · Generated {{ generated_time }}</div>
+            <div class="footer-legal">AI-curated by Newsloom Intelligence. Content is for informational purposes only.</div>
+        </footer>
+
+    </div>
+</body>
+</html>

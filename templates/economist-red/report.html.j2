@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsloom Intelligence · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * ECONOMIST RED — The Economist Magazine Visual Narrative
+         * ────────────────────────────────────────────────────────────
+         * Iconic Economist Red (#E3120B) on white
+         * Red masthead bar with white brand + thin white hairlines
+         * Georgia / Times New Roman serif typography
+         * Dual-column CSS-column layout (>800px)
+         * Quote boxes: red left rule + italic + curly open-quote
+         * Drop-cap on executive summary first paragraph
+         * Drop-cap on every must-read brief detail
+         * Magazine page numbers (red box, centered bottom)
+         * Section dividers: red hairline rules + centered section name
+         * Red square section markers
+         * Double-rule meta bar below masthead
+         * Decorative diamond (■) horizontal rule separators
+         * Corner-fold visual on executive summary
+         * Analysis boxes with positioned label
+         * Subtle baseline-grid background texture
+         * ============================================================ */
+
+        /* ── Design Tokens (CSS Custom Properties) ─────────────── */
+        :root {
+            /* ── Brand palette ── */
+            --brand:          #E3120B;
+            --brand-light:    #F04E48;
+            --brand-dark:     #B50F09;
+            --brand-dim:      rgba(227,18,11,0.08);
+            --brand-glow:     rgba(227,18,11,0.04);
+            --brand-border:   rgba(227,18,11,0.22);
+
+            /* ── Backgrounds ── */
+            --bg-page:        #FFFFFF;
+            --bg-cream:       #F9F8F6;
+            --bg-card:        #F5F4F2;
+            --bg-surface:     #F0EFED;
+            --bg-hover:       #FAF9F7;
+
+            /* ── Text ── */
+            --ink:            #1A1A1A;
+            --ink-body:       #2A2A2A;
+            --ink-secondary:  #4A4A4A;
+            --ink-muted:      #666666;
+            --ink-light:      #999999;
+            --ink-faint:      #BBBBBB;
+            --ink-inverse:    #FFFFFF;
+
+            /* ── Priority colours ── */
+            --p-must:         #E3120B;
+            --p-must-bg:      rgba(227,18,11,0.05);
+            --p-rec:          #C4721A;
+            --p-rec-bg:       rgba(196,114,26,0.05);
+            --p-fyi:          #2D6A4F;
+            --p-fyi-bg:       rgba(45,106,79,0.04);
+
+            /* ── Borders ── */
+            --rule:           #DEDEDE;
+            --rule-strong:    #BBBBBB;
+            --rule-faint:     #EEEEEE;
+
+            /* ── 8-pt spacing grid ── */
+            --s1:4px; --s2:8px; --s3:12px; --s4:16px;
+            --s5:20px; --s6:24px; --s8:32px; --s10:40px;
+            --s12:48px; --s16:64px; --s20:80px;
+
+            /* ── Typography — serif first ── */
+            --serif: "Georgia","Times New Roman","Noto Serif SC",
+                     "Source Han Serif SC","Songti SC","STSong",serif;
+            --sans:  "Helvetica Neue","Arial","PingFang SC",
+                     "Noto Sans SC","Microsoft YaHei",sans-serif;
+            --mono:  "Courier New","Consolas","Monaco",monospace;
+
+            /* ── Radius ── */
+            --radius: 2px;
+
+            /* ── Shadows ── */
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        /* ── PDF / WeasyPrint page setup ───────────────────────── */
+        @page {
+            size: A4;
+            margin: 2cm 1.8cm;
+
+            @top-left {
+                content: "Newsloom Intelligence";
+                font-family: "Helvetica Neue",Arial,sans-serif;
+                font-size: 7pt;
+                color: #999;
+            }
+
+            @top-right {
+                content: "{{ date_str }}";
+                font-family: "Helvetica Neue",Arial,sans-serif;
+                font-size: 7pt;
+                color: #999;
+            }
+
+            @top-center {
+                content: '';
+                border-bottom: 0.5pt solid #E3120B;
+            }
+
+            @bottom-center {
+                content: "— " counter(page) " —";
+                font-family: "Georgia",serif;
+                font-size: 9pt;
+                color: #E3120B;
+            }
+        }
+
+        /* First page: no header */
+        @page :first {
+            @top-left { content: none; }
+            @top-right { content: none; }
+            @top-center { content: none; border: none; }
+        }
+
+        /* ── Reset ─────────────────────────────────────────── */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* ── Body — baseline-grid texture ──────────────────── */
+        body {
+            font-family: var(--serif);
+            color: var(--ink-body);
+            font-size: 15px;
+            line-height: 1.75;
+            background-color: var(--bg-page);
+            /* subtle baseline-grid ruled-paper effect */
+            background-image:
+                linear-gradient(180deg, #FFFFFF 0%, #FAFAFA 50%, #F7F6F4 100%),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 25px,
+                    rgba(0,0,0,0.014) 25px,
+                    rgba(0,0,0,0.014) 26px
+                );
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        a {
+            color: var(--brand);
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+        a:hover {
+            color: var(--brand-dark);
+            text-decoration: underline;
+        }
+
+        /* ── Layout wrapper ────────────────────────────────── */
+        .wrap {
+            max-width: 820px;
+            margin: 0 auto;
+            padding: 0 var(--s6);
+        }
+
+        /* ============================================================
+         * HEADER — Iconic Red Masthead Bar
+         *
+         * Red gradient bar with white brand name on the left,
+         * edition tag on the right. Two thin white hairlines at
+         * top and bottom edges. Diagonal hatching texture overlay.
+         * ============================================================ */
+        .masthead {
+            background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 60%, #A00D08 100%);
+            padding: var(--s6) var(--s8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Top white hairline */
+        .masthead::before {
+            content: '';
+            position: absolute;
+            top: 7px;
+            left: var(--s8);
+            right: var(--s8);
+            height: 1px;
+            background: rgba(255,255,255,0.30);
+        }
+
+        /* Bottom white hairline */
+        .masthead::after {
+            content: '';
+            position: absolute;
+            bottom: 7px;
+            left: var(--s8);
+            right: var(--s8);
+            height: 1px;
+            background: rgba(255,255,255,0.30);
+        }
+
+        /* Diagonal hatching overlay */
+        .masthead-texture {
+            position: absolute;
+            inset: 0;
+            background-image: repeating-linear-gradient(
+                -45deg,
+                transparent,
+                transparent 10px,
+                rgba(255,255,255,0.018) 10px,
+                rgba(255,255,255,0.018) 11px
+            );
+            pointer-events: none;
+        }
+
+        .masthead-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-name {
+            font-family: var(--serif);
+            font-size: 2.1em;
+            font-weight: 700;
+            color: var(--ink-inverse);
+            letter-spacing: 0.03em;
+            line-height: 1.1;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+
+        .edition-tag {
+            font-family: var(--sans);
+            font-size: 0.68em;
+            font-weight: 600;
+            color: rgba(255,255,255,0.60);
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+        }
+
+        /* ============================================================
+         * META BAR — Double-rule below masthead
+         *
+         * 3px solid top rule, 1px bottom rule, thin hairline 3px
+         * above the top rule. Date on left, stats on right.
+         * ============================================================ */
+        .meta-bar {
+            border-top: 3px solid var(--ink);
+            border-bottom: 1px solid var(--rule-strong);
+            padding: var(--s3) 0;
+            margin-top: var(--s6);
+            margin-bottom: var(--s10);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: var(--sans);
+            font-size: 0.8em;
+            color: var(--ink-muted);
+            position: relative;
+        }
+
+        /* Hairline above thick rule */
+        .meta-bar::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--rule);
+        }
+
+        .meta-date {
+            font-weight: 700;
+            color: var(--ink);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .meta-stats {
+            display: flex;
+            gap: var(--s8);
+        }
+
+        .stat-pair {
+            display: flex;
+            align-items: baseline;
+            gap: var(--s2);
+        }
+
+        .stat-n {
+            font-weight: 800;
+            font-size: 1.15em;
+            color: var(--brand);
+        }
+
+        .stat-l {
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-size: 0.88em;
+        }
+
+        /* ============================================================
+         * EXECUTIVE SUMMARY
+         *
+         * Red 5px top border. Cream gradient background.
+         * Corner-fold visual (pseudo-element triangle).
+         * "EXECUTIVE SUMMARY" red label with underline.
+         * Drop-cap on first paragraph: 3.6em red serif letter.
+         * ============================================================ */
+        .exec-box {
+            border-top: 5px solid var(--brand);
+            border-left: 1px solid var(--rule);
+            border-right: 1px solid var(--rule);
+            border-bottom: 1px solid var(--rule);
+            background: linear-gradient(170deg, var(--bg-cream) 0%, var(--bg-page) 100%);
+            padding: var(--s8);
+            margin-bottom: var(--s12);
+            page-break-inside: avoid;
+            position: relative;
+        }
+
+        /* Corner fold visual */
+        .exec-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, transparent 50%, var(--brand-dim) 50%);
+            pointer-events: none;
+        }
+
+        .exec-label {
+            font-family: var(--sans);
+            font-size: 0.68em;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: var(--brand);
+            border-bottom: 2px solid var(--brand);
+            display: inline-block;
+            padding-bottom: var(--s1);
+            margin-bottom: var(--s5);
+        }
+
+        .exec-body p {
+            font-size: 1.05em;
+            line-height: 1.85;
+            color: var(--ink-body);
+            margin-bottom: var(--s4);
+        }
+
+        .exec-body p:last-child {
+            margin-bottom: 0;
+        }
+
+        .exec-body p strong {
+            color: var(--ink);
+            font-weight: 700;
+        }
+
+        /* Drop-cap on first paragraph */
+        .exec-body p:first-child::first-letter {
+            font-size: 3.6em;
+            float: left;
+            line-height: 0.78;
+            margin: 5px 8px 0 0;
+            font-weight: 700;
+            color: var(--brand);
+            font-family: var(--serif);
+        }
+
+        /* ============================================================
+         * QUOTE BOX — Red Left Line + Italic + Curly Quote
+         *
+         * 4px red left border, brand-glow gradient wash.
+         * Large opening curly quote as pseudo-element.
+         * ============================================================ */
+        .quote-box {
+            border-left: 4px solid var(--brand);
+            background: linear-gradient(90deg, var(--brand-glow) 0%, transparent 50%);
+            padding: var(--s5) var(--s6);
+            margin: var(--s6) 0;
+            font-style: italic;
+            font-size: 1.08em;
+            line-height: 1.7;
+            color: var(--ink-body);
+            position: relative;
+        }
+
+        .quote-box::before {
+            content: '\201C';
+            position: absolute;
+            top: -6px;
+            left: var(--s3);
+            font-size: 3em;
+            color: var(--brand);
+            font-weight: 700;
+            line-height: 1;
+            font-style: normal;
+            opacity: 0.7;
+        }
+
+        .quote-box p {
+            padding-left: var(--s6);
+        }
+
+        /* ============================================================
+         * ANALYSIS BOX — Special Feature Element
+         *
+         * Brand-glow gradient, accent border.
+         * Positioned "ANALYSIS" label in red pill.
+         * ============================================================ */
+        .analysis-box {
+            background: linear-gradient(135deg, var(--brand-glow) 0%, var(--brand-dim) 100%);
+            border: 1px solid var(--brand-border);
+            padding: var(--s6);
+            margin: var(--s6) 0;
+            position: relative;
+        }
+
+        .analysis-box::before {
+            content: 'ANALYSIS';
+            position: absolute;
+            top: -10px;
+            left: var(--s4);
+            background: var(--brand);
+            color: white;
+            padding: 3px 12px;
+            font-size: 0.6em;
+            font-weight: 800;
+            font-family: var(--sans);
+            letter-spacing: 0.12em;
+        }
+
+        .analysis-box p {
+            font-style: italic;
+            color: var(--ink-secondary);
+            line-height: 1.75;
+            padding-top: var(--s2);
+        }
+
+        /* ============================================================
+         * SECTION DIVIDER — Red Hairline + Centered Name
+         *
+         * Flex row: red line — [marker + name + count] — red line.
+         * Red square marker sized to section colour.
+         * ============================================================ */
+        .section {
+            margin-bottom: var(--s12);
+        }
+
+        .sec-divider {
+            display: flex;
+            align-items: center;
+            gap: var(--s4);
+            margin-bottom: var(--s6);
+        }
+
+        .sec-divider::before,
+        .sec-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--brand);
+        }
+
+        .sec-divider-inner {
+            display: flex;
+            align-items: center;
+            gap: var(--s3);
+            white-space: nowrap;
+        }
+
+        /* Red (or section-coloured) square marker */
+        .sec-marker {
+            width: 12px;
+            height: 12px;
+            flex-shrink: 0;
+        }
+
+        .sec-name {
+            font-family: var(--sans);
+            font-size: 1.15em;
+            font-weight: 700;
+            color: var(--ink);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .sec-count {
+            font-family: var(--sans);
+            font-size: 0.68em;
+            font-weight: 700;
+            color: var(--brand);
+            background: var(--brand-dim);
+            padding: 2px 10px;
+            letter-spacing: 0.06em;
+        }
+
+        /* Section description (optional) */
+        .sec-desc {
+            font-family: var(--sans);
+            font-size: 0.78em;
+            color: var(--ink-muted);
+            font-style: italic;
+            margin-bottom: var(--s4);
+            text-align: center;
+        }
+
+        /* ============================================================
+         * DUAL-COLUMN LAYOUT (>800px)
+         *
+         * CSS multi-column with column-rule.
+         * Falls to single column on mobile and in print.
+         * ============================================================ */
+        .col-grid {
+            columns: 1;
+            column-gap: var(--s8);
+            column-rule: 1px solid var(--rule-faint);
+        }
+
+        @media (min-width: 800px) {
+            .col-grid {
+                columns: 2;
+            }
+        }
+
+        /* ============================================================
+         * BRIEF — Editorial Card
+         *
+         * break-inside: avoid for column / page breaks.
+         * Three priority tiers: must-read, recommended, fyi.
+         * Must-read: red left border, tinted background, MUST READ
+         *   label pill, drop-cap on detail text.
+         * Recommended: orange left border, subtle tint.
+         * FYI: slightly reduced opacity.
+         * ============================================================ */
+        .brief {
+            break-inside: avoid;
+            page-break-inside: avoid;
+            padding: var(--s5) 0;
+            border-bottom: 1px solid var(--rule);
+            position: relative;
+            transition: background 0.12s ease;
+        }
+
+        .brief:last-child {
+            border-bottom: none;
+        }
+
+        .brief:hover {
+            background: var(--bg-hover);
+        }
+
+        /* ── Must-read ── */
+        .brief.p-must {
+            background: linear-gradient(90deg, var(--p-must-bg) 0%, transparent 70%);
+            border-left: 4px solid var(--brand);
+            padding-left: var(--s4);
+            margin-left: -4px;
+            border-bottom-color: var(--brand-border);
+        }
+
+        .brief.p-must .must-label {
+            display: inline-block;
+            font-family: var(--sans);
+            font-size: 0.55em;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--ink-inverse);
+            background: var(--brand);
+            padding: 2px 8px;
+            margin-bottom: var(--s2);
+        }
+
+        /* ── Recommended ── */
+        .brief.p-rec {
+            border-left: 3px solid var(--p-rec);
+            padding-left: var(--s4);
+            background: var(--p-rec-bg);
+        }
+
+        /* ── FYI ── */
+        .brief.p-fyi {
+            opacity: 0.90;
+        }
+
+        /* Priority indicator square */
+        .brief-dot {
+            display: inline-block;
+            width: 9px;
+            height: 9px;
+            margin-right: var(--s2);
+            vertical-align: middle;
+            flex-shrink: 0;
+        }
+
+        .p-must .brief-dot {
+            background: var(--p-must);
+            box-shadow: 0 0 4px rgba(227,18,11,0.30);
+        }
+
+        .p-rec .brief-dot {
+            background: var(--p-rec);
+        }
+
+        .p-fyi .brief-dot {
+            background: var(--p-fyi);
+            opacity: 0.5;
+        }
+
+        /* Headline */
+        .brief-headline {
+            font-size: 1.08em;
+            font-weight: 700;
+            line-height: 1.38;
+            margin-bottom: var(--s2);
+        }
+
+        .brief-headline a {
+            color: var(--ink);
+            text-decoration: none;
+        }
+
+        .brief-headline a:hover {
+            color: var(--brand);
+            text-decoration: none;
+        }
+
+        .p-must .brief-headline a {
+            color: var(--brand-dark);
+            font-weight: 800;
+        }
+
+        /* Drop-cap on must-read detail */
+        .p-must .brief-detail::first-letter {
+            font-size: 2em;
+            float: left;
+            line-height: 0.82;
+            margin: 3px 5px 0 0;
+            font-weight: 700;
+            color: var(--brand);
+            font-family: var(--serif);
+        }
+
+        /* Meta line: source badge + tags */
+        .brief-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--s2);
+            font-family: var(--sans);
+            font-size: 0.74em;
+            color: var(--ink-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: var(--s2);
+            flex-wrap: wrap;
+        }
+
+        .src-badge {
+            background: var(--ink);
+            color: var(--ink-inverse);
+            padding: 1px 7px;
+            font-weight: 700;
+            font-size: 0.92em;
+        }
+
+        .tag-chip {
+            color: var(--ink-muted);
+            background: var(--bg-card);
+            padding: 1px 7px;
+            border: 1px solid var(--rule);
+            font-size: 0.9em;
+        }
+
+        .pipe {
+            color: var(--brand);
+            font-weight: 800;
+        }
+
+        /* Detail text */
+        .brief-detail {
+            font-size: 0.94em;
+            line-height: 1.80;
+            color: var(--ink-body);
+        }
+
+        .brief-detail strong {
+            color: var(--ink);
+            font-weight: 700;
+        }
+
+        .brief-detail em {
+            font-style: italic;
+            color: var(--ink-secondary);
+        }
+
+        .brief-detail code {
+            font-family: var(--mono);
+            font-size: 0.86em;
+            background: var(--bg-card);
+            color: var(--brand);
+            padding: 1px 5px;
+            border: 1px solid var(--rule);
+            border-radius: var(--radius);
+        }
+
+        /* ============================================================
+         * SECTION STATS — small bar under section divider
+         * ============================================================ */
+        .sec-stats {
+            display: flex;
+            gap: var(--s6);
+            font-family: var(--sans);
+            font-size: 0.7em;
+            color: var(--ink-light);
+            margin-bottom: var(--s5);
+            padding-left: var(--s2);
+        }
+
+        .sec-stats span strong {
+            color: var(--brand);
+            font-weight: 800;
+        }
+
+        /* ============================================================
+         * HORIZONTAL RULE — Decorative diamond separator
+         * ============================================================ */
+        .hr-deco {
+            height: 1px;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                var(--rule-strong) 25%,
+                var(--rule-strong) 75%,
+                transparent 100%
+            );
+            margin: var(--s8) 0;
+            position: relative;
+        }
+
+        .hr-deco::after {
+            content: '■';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-page);
+            color: var(--brand);
+            padding: 0 var(--s3);
+            font-size: 0.45em;
+        }
+
+        /* ============================================================
+         * PAGE MARKER — Magazine Page Number (centered)
+         *
+         * Red square with white page number.
+         * ============================================================ */
+        .page-num {
+            text-align: center;
+            padding: var(--s4) 0;
+            font-family: var(--sans);
+            font-size: 0.72em;
+            color: var(--ink-light);
+            letter-spacing: 0.08em;
+        }
+
+        .page-num-box {
+            display: inline-block;
+            background: var(--brand);
+            color: var(--ink-inverse);
+            width: 26px;
+            height: 26px;
+            line-height: 26px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.9em;
+        }
+
+        /* ============================================================
+         * CHART PLACEHOLDER — Dashed box for future charts
+         * ============================================================ */
+        .chart-placeholder {
+            border: 2px dashed var(--rule-strong);
+            padding: var(--s8) var(--s6);
+            text-align: center;
+            margin: var(--s6) 0;
+            background: linear-gradient(135deg, var(--bg-cream) 0%, var(--bg-card) 100%);
+        }
+
+        .chart-label {
+            font-family: var(--sans);
+            font-size: 0.7em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--ink-light);
+        }
+
+        .chart-label::before {
+            content: '📊 ';
+            font-size: 1.3em;
+        }
+
+        /* ============================================================
+         * FOOTER — Economist-Style Double Rule
+         *
+         * 4px red top border with hairline above.
+         * Centered brand, tagline, info line.
+         * Red accent bar + page number pill.
+         * ============================================================ */
+        .footer {
+            text-align: center;
+            margin-top: var(--s16);
+            padding: var(--s10) 0 var(--s8);
+            border-top: 4px solid var(--brand);
+            position: relative;
+        }
+
+        /* Hairline above the thick border */
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--rule);
+        }
+
+        .footer-brand {
+            font-family: var(--serif);
+            font-size: 1.35em;
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: var(--s2);
+        }
+
+        .footer-tagline {
+            font-size: 0.9em;
+            font-style: italic;
+            color: var(--ink-body);
+            margin-bottom: var(--s4);
+        }
+
+        .footer-info {
+            font-family: var(--sans);
+            font-size: 0.7em;
+            color: var(--ink-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: var(--s5);
+        }
+
+        .footer-bar {
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--brand), var(--brand-light), var(--brand));
+            margin: 0 auto var(--s4);
+        }
+
+        .footer-page {
+            font-family: var(--sans);
+            font-size: 0.75em;
+            color: var(--ink-light);
+        }
+
+        .footer-page em {
+            display: inline-block;
+            background: var(--brand);
+            color: var(--ink-inverse);
+            font-style: normal;
+            padding: 1px 10px;
+            font-weight: 700;
+        }
+
+        /* ============================================================
+         * PRINT / PDF — CJK safe, columns preserved
+         * ============================================================ */
+        @media print {
+            body {
+                background: white !important;
+                background-image: none !important;
+                font-size: 10.5pt;
+                line-height: 1.6;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            .wrap {
+                max-width: 100%;
+                padding: 0;
+            }
+
+            .masthead {
+                break-after: avoid;
+            }
+
+            .col-grid {
+                columns: 2;
+                column-gap: 20pt;
+            }
+
+            .brief {
+                transition: none;
+            }
+
+            .brief:hover {
+                background: transparent;
+            }
+
+            a {
+                color: var(--ink) !important;
+                text-decoration: none !important;
+            }
+
+            a[href]::after {
+                content: none !important;
+            }
+
+            .chart-placeholder {
+                display: none;
+            }
+
+            .exec-box::before {
+                display: none;
+            }
+        }
+
+        /* ============================================================
+         * MOBILE — Single column, compact spacing
+         * ============================================================ */
+        @media (max-width: 640px) {
+            .wrap {
+                padding: 0 var(--s4);
+            }
+
+            .masthead {
+                padding: var(--s4);
+            }
+
+            .masthead::before,
+            .masthead::after {
+                left: var(--s4);
+                right: var(--s4);
+            }
+
+            .brand-name {
+                font-size: 1.5em;
+            }
+
+            .meta-bar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--s2);
+            }
+
+            .meta-stats {
+                flex-direction: column;
+                gap: var(--s2);
+            }
+
+            .exec-box {
+                padding: var(--s5);
+            }
+
+            .exec-body p:first-child::first-letter {
+                font-size: 2.6em;
+            }
+
+            .sec-divider {
+                gap: var(--s2);
+            }
+
+            .col-grid {
+                columns: 1;
+            }
+
+            .brief.p-must {
+                margin-left: 0;
+            }
+
+            .sec-stats {
+                flex-direction: column;
+                gap: var(--s1);
+            }
+
+            .chart-placeholder {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .brand-name {
+                font-size: 1.3em;
+            }
+
+            .edition-tag {
+                font-size: 0.58em;
+            }
+
+            .brief-headline {
+                font-size: 1em;
+            }
+
+            .exec-body p:first-child::first-letter {
+                font-size: 2.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+
+        {# ─────────────────────────────────────────────────────
+           HEADER — Red Masthead Bar
+           ───────────────────────────────────────────────────── #}
+        <header class="masthead">
+            <div class="masthead-texture"></div>
+            <div class="masthead-inner">
+                <div class="brand-name">Newsloom Intelligence</div>
+                <div class="edition-tag">{{ date_str }} Edition</div>
+            </div>
+        </header>
+
+        {# ─────────────────────────────────────────────────────
+           META BAR — Double Rule + Statistics
+           ───────────────────────────────────────────────────── #}
+        {% set ns = namespace(must=0) %}
+        {% for sk, sitems in briefs.items() %}
+        {% if sitems is iterable and sitems is not string %}
+        {% for it in sitems %}
+        {% if it.priority == '🔴' %}{% set ns.must = ns.must + 1 %}{% endif %}
+        {% endfor %}
+        {% endif %}
+        {% endfor %}
+
+        <div class="meta-bar">
+            <span class="meta-date">{{ date_str }}</span>
+            <div class="meta-stats">
+                <div class="stat-pair">
+                    <span class="stat-n">{{ total_items }}</span>
+                    <span class="stat-l">Articles</span>
+                </div>
+                <div class="stat-pair">
+                    <span class="stat-n">{{ ns.must }}</span>
+                    <span class="stat-l">Essential</span>
+                </div>
+                <div class="stat-pair">
+                    <span class="stat-n">{{ briefs|length }}</span>
+                    <span class="stat-l">Sections</span>
+                </div>
+            </div>
+        </div>
+
+        {# ─────────────────────────────────────────────────────
+           EXECUTIVE SUMMARY — Drop Cap + Red Border
+           ───────────────────────────────────────────────────── #}
+        {% if executive_summary %}
+        <div class="exec-box">
+            <div class="exec-label">Executive Summary</div>
+            <div class="exec-body">
+                {% for line in executive_summary.strip().split('\n') %}
+                {% if line.strip() %}
+                <p>{{ line.strip() | md_inline }}</p>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {# ─────────────────────────────────────────────────────
+           SECTIONS — Red Divider + Dual Column Briefs
+           ───────────────────────────────────────────────────── #}
+        {% set ns_page = namespace(num=1) %}
+        {% for section_key in section_order %}
+        {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+        {% set meta = section_configs.get(section_key, {}) %}
+        {% set sec_color = meta.color|default('#E3120B') %}
+        {% set items = briefs[section_key] %}
+
+        {# Count priorities in this section #}
+        {% set ns_sec = namespace(must=0, rec=0, fyi=0) %}
+        {% for it in items %}
+        {% if it.priority == '🔴' %}{% set ns_sec.must = ns_sec.must + 1 %}
+        {% elif it.priority == '🟡' %}{% set ns_sec.rec = ns_sec.rec + 1 %}
+        {% else %}{% set ns_sec.fyi = ns_sec.fyi + 1 %}
+        {% endif %}
+        {% endfor %}
+
+        <section class="section">
+            {# Section divider: red hairline + centered name #}
+            <div class="sec-divider">
+                <div class="sec-divider-inner">
+                    <div class="sec-marker" style="background:{{ sec_color }};"></div>
+                    <h2 class="sec-name">{{ meta.title|default(section_key) }}</h2>
+                    <span class="sec-count">{{ items|length }}&thinsp;items</span>
+                </div>
+            </div>
+
+            {# Section-level stats #}
+            <div class="sec-stats">
+                {% if ns_sec.must > 0 %}
+                <span>🔴 <strong>{{ ns_sec.must }}</strong> essential</span>
+                {% endif %}
+                {% if ns_sec.rec > 0 %}
+                <span>🟡 <strong>{{ ns_sec.rec }}</strong> recommended</span>
+                {% endif %}
+                {% if ns_sec.fyi > 0 %}
+                <span>🟢 <strong>{{ ns_sec.fyi }}</strong> noted</span>
+                {% endif %}
+            </div>
+
+            {# Dual-column brief grid #}
+            <div class="col-grid">
+                {% for item in items %}
+                {% set priority = item.priority|default('🟢') %}
+                {% set pcls = 'p-must' if priority == '🔴' else ('p-rec' if priority == '🟡' else 'p-fyi') %}
+
+                <div class="brief {{ pcls }}">
+                    {% if priority == '🔴' %}
+                    <span class="must-label">Must Read</span>
+                    {% endif %}
+
+                    <div class="brief-headline">
+                        <span class="brief-dot"></span>
+                        <a href="{{ item.url|default('#') }}" target="_blank" rel="noopener">{{ item.headline|default('Untitled') }}</a>
+                    </div>
+
+                    <div class="brief-meta">
+                        {% if item.source %}
+                        <span class="src-badge">{{ item.source }}</span>
+                        {% endif %}
+                        {% if item.tags %}
+                        {% for tag in item.tags %}
+                        <span class="pipe">|</span>
+                        <span class="tag-chip">{{ tag }}</span>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    {% if item.detail %}
+                    <div class="brief-detail">{{ item.detail | md_inline }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            {# Quote box for sections with multiple must-reads #}
+            {% if ns_sec.must >= 2 %}
+            {% set first_item = items[0] %}
+            {% if first_item and first_item.detail %}
+            <div class="quote-box">
+                <p>{{ first_item.headline|default('') }}</p>
+            </div>
+            {% endif %}
+            {% endif %}
+
+            {# Chart placeholder #}
+            <div class="chart-placeholder">
+                <div class="chart-label">{{ meta.title|default(section_key) }} Trend Overview</div>
+            </div>
+        </section>
+
+        {# Section separator + page marker (between sections) #}
+        {% if not loop.last %}
+        <div class="hr-deco"></div>
+        <div class="page-num">
+            <span class="page-num-box">{{ ns_page.num }}</span>
+        </div>
+        {% set ns_page.num = ns_page.num + 1 %}
+        {% endif %}
+
+        {% endif %}
+        {% endfor %}
+
+        {# ─────────────────────────────────────────────────────
+           FOOTER — Economist Double Rule
+           ───────────────────────────────────────────────────── #}
+        <footer class="footer">
+            <div class="footer-brand">Newsloom Intelligence</div>
+            <div class="footer-tagline">Independent analysis powered by artificial intelligence</div>
+            <div class="footer-info">{{ date_str }} · {{ total_items }} sources analyzed · Generated {{ generated_time }}</div>
+            <div class="footer-bar"></div>
+            <div class="footer-page">Page <em>{{ ns_page.num }}</em></div>
+        </footer>
+
+    </div>
+</body>
+</html>

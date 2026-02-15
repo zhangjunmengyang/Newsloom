@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Art Deco Intelligence · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * ART DECO v2 — 1920s Jazz Age Grand Luxury
+         * Deep navy-black + Radiant gold · Geometric patterns
+         * Fan motifs · Sunburst decorations · Gold filigree
+         *
+         * Design Language:
+         *   - Deep blue-black base with gold geometric crosshatch
+         *   - Gold fan/sunburst in header (CSS conic-gradient)
+         *   - Gold geometric borders with corner ornaments
+         *   - Serif typography throughout (Great Gatsby feel)
+         *   - Gold decorative frames on sections
+         *   - Diamond & chevron motifs everywhere
+         *   - Like walking into the Chrysler Building lobby
+         *
+         * Inspired by: The Great Gatsby, Chrysler Building,
+         *              Claridge's Hotel London, Empire State,
+         *              Tamara de Lempicka, Erté illustrations
+         * ============================================================ */
+
+        :root {
+            /* === Art Deco Gold Palette (8 tones) === */
+            --gold-deepest:    #7A5D10;
+            --gold-deep:       #8B6914;
+            --gold-dark:       #B08930;
+            --gold:            #D4AF37;
+            --gold-bright:     #E8C868;
+            --gold-light:      #F4D98C;
+            --gold-pale:       #FCF0C8;
+            --gold-white:      #FFF8E1;
+
+            /* === Gold Opacity Variants === */
+            --gold-glow-intense: rgba(212, 175, 55, 0.35);
+            --gold-glow-strong:  rgba(212, 175, 55, 0.20);
+            --gold-glow:         rgba(212, 175, 55, 0.12);
+            --gold-glow-soft:    rgba(212, 175, 55, 0.06);
+            --gold-dim:          rgba(212, 175, 55, 0.08);
+            --gold-border:       rgba(212, 175, 55, 0.35);
+            --gold-border-strong: rgba(212, 175, 55, 0.55);
+
+            /* === Copper & Silver accents === */
+            --copper:          #B87333;
+            --copper-dim:      rgba(184, 115, 51, 0.12);
+            --silver:          #C0C0C0;
+            --silver-dim:      rgba(192, 192, 192, 0.10);
+
+            /* === Navy Backgrounds (6 levels) === */
+            --bg-void:       #06080e;
+            --bg-primary:    #0a0d1a;
+            --bg-secondary:  #0e1220;
+            --bg-card:       #14192d;
+            --bg-surface:    #1a2038;
+            --bg-hover:      #202840;
+            --bg-elevated:   #283050;
+
+            /* === Text === */
+            --text-primary:   #F8F4E8;
+            --text-secondary: #D0C8B8;
+            --text-body:      #C0B8A8;
+            --text-muted:     #908878;
+            --text-dim:       #605848;
+
+            /* === Priority (gold-based) === */
+            --priority-must:        #DC4444;
+            --priority-must-light:  #F06060;
+            --priority-must-bg:     rgba(220, 68, 68, 0.10);
+            --priority-must-border: rgba(220, 68, 68, 0.30);
+            --priority-must-glow:   rgba(220, 68, 68, 0.25);
+            --priority-rec:         var(--gold);
+            --priority-rec-bg:      rgba(212, 175, 55, 0.08);
+            --priority-rec-border:  rgba(212, 175, 55, 0.25);
+            --priority-fyi:         var(--silver);
+            --priority-fyi-bg:      rgba(192, 192, 192, 0.05);
+            --priority-fyi-border:  rgba(192, 192, 192, 0.15);
+
+            /* === Borders === */
+            --border:         rgba(212, 175, 55, 0.08);
+            --border-medium:  rgba(212, 175, 55, 0.15);
+            --border-strong:  rgba(212, 175, 55, 0.25);
+            --border-bright:  rgba(212, 175, 55, 0.45);
+
+            /* === Shadows === */
+            --shadow-card:     0 2px 8px rgba(0,0,0,0.35);
+            --shadow-elevated: 0 8px 24px rgba(0,0,0,0.45), 0 0 40px var(--gold-glow-soft);
+            --shadow-gold:     0 0 30px var(--gold-glow), 0 0 60px var(--gold-glow-soft);
+            --shadow-gold-strong: 0 0 40px var(--gold-glow-strong), 0 0 80px var(--gold-glow);
+            --shadow-inset:    inset 0 1px 0 rgba(212, 175, 55, 0.10);
+
+            /* === Spacing (8pt) === */
+            --sp-1: 4px;   --sp-2: 8px;   --sp-3: 12px;
+            --sp-4: 16px;  --sp-5: 20px;  --sp-6: 24px;
+            --sp-8: 32px;  --sp-10: 40px; --sp-12: 48px;
+            --sp-16: 64px; --sp-20: 80px; --sp-24: 96px;
+
+            /* === Typography — Serif-heavy Art Deco === */
+            --font-display: "Copperplate", "Copperplate Gothic Bold", "Georgia", "Noto Serif SC", serif;
+            --font-title:   "Didot", "Playfair Display", "Georgia", "Noto Serif SC", "STSong", serif;
+            --font-body:    "Georgia", "Noto Serif SC", "STSong", "PingFang SC", serif;
+            --font-accent:  "Copperplate", "Impact", "Arial Black", "PingFang SC", sans-serif;
+            --font-sans:    -apple-system, BlinkMacSystemFont, "Inter", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+            --font-mono:    "SF Mono", "Fira Code", "Consolas", monospace;
+
+            /* === Radius (Art Deco = minimal radius) === */
+            --radius-sm: 2px;
+            --radius-md: 4px;
+            --radius-lg: 6px;
+        }
+
+        /* --- Page (PDF) --- */
+        @page {
+            size: A4;
+            margin: 2cm;
+            @top-center {
+                content: "◆ ART DECO INTELLIGENCE ◆";
+                font-family: var(--font-accent);
+                font-size: 8pt;
+                color: var(--gold);
+                letter-spacing: 0.25em;
+            }
+            @bottom-center {
+                content: "— " counter(page) " of " counter(pages) " —";
+                font-family: var(--font-body);
+                font-size: 8pt;
+                color: var(--text-muted);
+            }
+        }
+
+        /* --- Reset --- */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-body);
+            color: var(--text-primary);
+            font-size: 16px;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            min-height: 100vh;
+            position: relative;
+
+            /* === ART DECO GEOMETRIC BACKGROUND === */
+            background:
+                /* Gold diagonal crosshatch pattern */
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 20px,
+                    rgba(212, 175, 55, 0.03) 20px,
+                    rgba(212, 175, 55, 0.03) 21px
+                ),
+                repeating-linear-gradient(
+                    -45deg,
+                    transparent,
+                    transparent 20px,
+                    rgba(212, 175, 55, 0.03) 20px,
+                    rgba(212, 175, 55, 0.03) 21px
+                ),
+                /* Gold radiance from top */
+                radial-gradient(ellipse at 50% 0%, rgba(212, 175, 55, 0.10) 0%, transparent 55%),
+                /* Gold radiance from bottom */
+                radial-gradient(ellipse at 50% 100%, rgba(212, 175, 55, 0.05) 0%, transparent 40%),
+                /* Side glows */
+                radial-gradient(ellipse at 0% 50%, rgba(212, 175, 55, 0.03) 0%, transparent 30%),
+                radial-gradient(ellipse at 100% 50%, rgba(212, 175, 55, 0.03) 0%, transparent 30%),
+                /* Base gradient */
+                linear-gradient(180deg, #0a0d1a 0%, #111827 50%, #0a0d1a 100%);
+            background-attachment: fixed;
+        }
+
+        /* Vertical gold lines on edges — elegant framing */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background:
+                linear-gradient(90deg,
+                    rgba(212, 175, 55, 0.12) 0%,
+                    transparent 1.5%,
+                    transparent 98.5%,
+                    rgba(212, 175, 55, 0.12) 100%
+                );
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        a:hover {
+            color: var(--gold-bright);
+            text-shadow: 0 0 12px var(--gold-glow);
+        }
+
+        /* --- Container --- */
+        .container {
+            max-width: 880px;
+            margin: 0 auto;
+            padding: var(--sp-16) var(--sp-10);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* === GEOMETRIC DIVIDERS (reusable) === */
+        .geo-divider {
+            text-align: center;
+            padding: var(--sp-6) 0;
+            position: relative;
+        }
+
+        .geo-divider-content {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--sp-3);
+            color: var(--gold);
+            font-size: 0.85em;
+            letter-spacing: 0.3em;
+        }
+
+        .geo-divider-line {
+            width: 80px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold-border), transparent);
+        }
+
+        .geo-divider-diamond {
+            width: 8px; height: 8px;
+            background: var(--gold);
+            transform: rotate(45deg);
+            box-shadow: 0 0 8px var(--gold-glow-strong);
+        }
+
+        .geo-divider-dot {
+            width: 4px; height: 4px;
+            background: var(--gold-dark);
+            transform: rotate(45deg);
+        }
+
+        /* ==========================================================
+         * HEADER — Art Deco Grand Frame with Sunburst
+         * ========================================================== */
+        .header {
+            text-align: center;
+            padding: var(--sp-24) var(--sp-10);
+            margin-bottom: var(--sp-16);
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(170deg, #06080e 0%, #0e1220 35%, #14192d 65%, #080c16 100%);
+            border: 2px solid var(--gold-border);
+            box-shadow: var(--shadow-gold-strong);
+        }
+
+        /* === SUNBURST DECORATION — Radial gold rays === */
+        .header-sunburst {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px; height: 600px;
+            background: conic-gradient(
+                from 0deg,
+                transparent 0deg, rgba(212, 175, 55, 0.06) 5deg,
+                transparent 10deg, rgba(212, 175, 55, 0.05) 15deg,
+                transparent 20deg, rgba(212, 175, 55, 0.04) 25deg,
+                transparent 30deg, rgba(212, 175, 55, 0.05) 35deg,
+                transparent 40deg, rgba(212, 175, 55, 0.06) 45deg,
+                transparent 50deg, rgba(212, 175, 55, 0.04) 55deg,
+                transparent 60deg, rgba(212, 175, 55, 0.05) 65deg,
+                transparent 70deg, rgba(212, 175, 55, 0.06) 75deg,
+                transparent 80deg, rgba(212, 175, 55, 0.04) 85deg,
+                transparent 90deg, rgba(212, 175, 55, 0.05) 95deg,
+                transparent 100deg, rgba(212, 175, 55, 0.06) 105deg,
+                transparent 110deg, rgba(212, 175, 55, 0.04) 115deg,
+                transparent 120deg, rgba(212, 175, 55, 0.05) 125deg,
+                transparent 130deg, rgba(212, 175, 55, 0.06) 135deg,
+                transparent 140deg, rgba(212, 175, 55, 0.04) 145deg,
+                transparent 150deg, rgba(212, 175, 55, 0.05) 155deg,
+                transparent 160deg, rgba(212, 175, 55, 0.06) 165deg,
+                transparent 170deg, rgba(212, 175, 55, 0.04) 175deg,
+                transparent 180deg, rgba(212, 175, 55, 0.05) 185deg,
+                transparent 190deg, rgba(212, 175, 55, 0.06) 195deg,
+                transparent 200deg, rgba(212, 175, 55, 0.04) 205deg,
+                transparent 210deg, rgba(212, 175, 55, 0.05) 215deg,
+                transparent 220deg, rgba(212, 175, 55, 0.06) 225deg,
+                transparent 230deg, rgba(212, 175, 55, 0.04) 235deg,
+                transparent 240deg, rgba(212, 175, 55, 0.05) 245deg,
+                transparent 250deg, rgba(212, 175, 55, 0.06) 255deg,
+                transparent 260deg, rgba(212, 175, 55, 0.04) 265deg,
+                transparent 270deg, rgba(212, 175, 55, 0.05) 275deg,
+                transparent 280deg, rgba(212, 175, 55, 0.06) 285deg,
+                transparent 290deg, rgba(212, 175, 55, 0.04) 295deg,
+                transparent 300deg, rgba(212, 175, 55, 0.05) 305deg,
+                transparent 310deg, rgba(212, 175, 55, 0.06) 315deg,
+                transparent 320deg, rgba(212, 175, 55, 0.04) 325deg,
+                transparent 330deg, rgba(212, 175, 55, 0.05) 335deg,
+                transparent 340deg, rgba(212, 175, 55, 0.06) 345deg,
+                transparent 350deg, rgba(212, 175, 55, 0.04) 355deg,
+                transparent 360deg
+            );
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        /* Fan decoration — top center */
+        .header-fan {
+            position: absolute;
+            top: -30px; left: 50%;
+            transform: translateX(-50%);
+            width: 200px; height: 100px;
+            background: conic-gradient(
+                from 180deg at 50% 100%,
+                transparent 0deg,
+                rgba(212, 175, 55, 0.08) 15deg,
+                transparent 30deg,
+                rgba(212, 175, 55, 0.06) 45deg,
+                transparent 60deg,
+                rgba(212, 175, 55, 0.08) 75deg,
+                transparent 90deg,
+                rgba(212, 175, 55, 0.06) 105deg,
+                transparent 120deg,
+                rgba(212, 175, 55, 0.08) 135deg,
+                transparent 150deg,
+                rgba(212, 175, 55, 0.06) 165deg,
+                transparent 180deg
+            );
+            pointer-events: none;
+        }
+
+        /* Double-border inner frame */
+        .header-frame-outer {
+            position: absolute;
+            inset: 10px;
+            border: 1px solid var(--gold-border);
+            pointer-events: none;
+        }
+
+        .header-frame-inner {
+            position: absolute;
+            inset: 18px;
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            pointer-events: none;
+        }
+
+        /* Gold corner ornaments (4 corners) */
+        .header-corner {
+            position: absolute;
+            width: 40px; height: 40px;
+        }
+
+        .header-corner::before,
+        .header-corner::after {
+            content: '';
+            position: absolute;
+        }
+
+        .header-corner.tl { top: 14px; left: 14px; }
+        .header-corner.tl::before {
+            top: 0; left: 0;
+            width: 100%; height: 2px;
+            background: linear-gradient(90deg, var(--gold), transparent);
+        }
+        .header-corner.tl::after {
+            top: 0; left: 0;
+            width: 2px; height: 100%;
+            background: linear-gradient(180deg, var(--gold), transparent);
+        }
+
+        .header-corner.tr { top: 14px; right: 14px; }
+        .header-corner.tr::before {
+            top: 0; right: 0;
+            width: 100%; height: 2px;
+            background: linear-gradient(270deg, var(--gold), transparent);
+        }
+        .header-corner.tr::after {
+            top: 0; right: 0;
+            width: 2px; height: 100%;
+            background: linear-gradient(180deg, var(--gold), transparent);
+        }
+
+        .header-corner.bl { bottom: 14px; left: 14px; }
+        .header-corner.bl::before {
+            bottom: 0; left: 0;
+            width: 100%; height: 2px;
+            background: linear-gradient(90deg, var(--gold), transparent);
+        }
+        .header-corner.bl::after {
+            bottom: 0; left: 0;
+            width: 2px; height: 100%;
+            background: linear-gradient(0deg, var(--gold), transparent);
+        }
+
+        .header-corner.br { bottom: 14px; right: 14px; }
+        .header-corner.br::before {
+            bottom: 0; right: 0;
+            width: 100%; height: 2px;
+            background: linear-gradient(270deg, var(--gold), transparent);
+        }
+        .header-corner.br::after {
+            bottom: 0; right: 0;
+            width: 2px; height: 100%;
+            background: linear-gradient(0deg, var(--gold), transparent);
+        }
+
+        /* Top gold bar */
+        .header-top-bar {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg,
+                transparent 5%,
+                var(--gold-dark) 15%,
+                var(--gold) 30%,
+                var(--gold-bright) 50%,
+                var(--gold) 70%,
+                var(--gold-dark) 85%,
+                transparent 95%);
+        }
+
+        /* Bottom gold bar */
+        .header-bottom-bar {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg,
+                transparent 5%,
+                var(--gold-dark) 15%,
+                var(--gold) 30%,
+                var(--gold-bright) 50%,
+                var(--gold) 70%,
+                var(--gold-dark) 85%,
+                transparent 95%);
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .header-top-ornament {
+            color: var(--gold);
+            font-size: 1.8em;
+            letter-spacing: 0.4em;
+            margin-bottom: var(--sp-6);
+            opacity: 0.75;
+            text-shadow: 0 0 20px var(--gold-glow);
+        }
+
+        .header-deco-line {
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            margin: 0 auto var(--sp-6);
+            box-shadow: 0 0 10px var(--gold-glow);
+        }
+
+        .header-title {
+            font-family: var(--font-display);
+            font-size: 3.2em;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            line-height: 1.15;
+            margin-bottom: var(--sp-4);
+            /* Gold gradient text */
+            background: linear-gradient(180deg,
+                var(--gold-white) 0%,
+                var(--gold-bright) 25%,
+                var(--gold) 50%,
+                var(--gold-dark) 80%,
+                var(--gold-deep) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 2px 10px var(--gold-glow-strong));
+        }
+
+        .header-subtitle-line {
+            width: 60px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            margin: 0 auto var(--sp-4);
+        }
+
+        .header-subtitle {
+            font-family: var(--font-body);
+            font-size: 1.15em;
+            color: var(--text-secondary);
+            font-style: italic;
+            letter-spacing: 0.06em;
+            margin-bottom: var(--sp-3);
+        }
+
+        .header-date {
+            font-family: var(--font-accent);
+            font-size: 0.85em;
+            color: var(--gold);
+            font-weight: 600;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            margin-bottom: var(--sp-8);
+            text-shadow: 0 0 12px var(--gold-glow);
+        }
+
+        /* Stats with Art Deco geometric shape */
+        .header-stats {
+            display: flex;
+            justify-content: center;
+            gap: var(--sp-10);
+            margin-top: var(--sp-8);
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: var(--sp-5) var(--sp-8);
+            border: 1px solid var(--gold-border);
+            background: linear-gradient(135deg, var(--gold-dim) 0%, transparent 100%);
+            position: relative;
+        }
+
+        /* Chevron notch at bottom */
+        .stat-item::after {
+            content: '';
+            position: absolute;
+            bottom: -10px; left: 50%;
+            transform: translateX(-50%);
+            width: 18px; height: 10px;
+            background: var(--gold);
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+            box-shadow: 0 4px 8px var(--gold-glow);
+        }
+
+        /* Top line accent on stat */
+        .stat-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        .stat-number {
+            font-family: var(--font-display);
+            font-size: 2.4em;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: var(--sp-2);
+            background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-family: var(--font-accent);
+            font-size: 0.7em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            font-weight: 600;
+        }
+
+        /* ==========================================================
+         * EXECUTIVE SUMMARY — Grand Framed Card
+         * ========================================================== */
+        .exec-summary {
+            position: relative;
+            padding: var(--sp-16) var(--sp-12);
+            margin-bottom: var(--sp-16);
+            page-break-inside: avoid;
+            background: linear-gradient(135deg, #0e1220 0%, var(--bg-card) 50%, #0e1220 100%);
+            border: 2px solid var(--gold-border);
+            box-shadow: var(--shadow-gold);
+        }
+
+        /* Diamond ornament at top center */
+        .exec-summary::before {
+            content: '◆';
+            position: absolute;
+            top: -14px; left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.6em;
+            color: var(--gold);
+            background: var(--bg-primary);
+            padding: 0 var(--sp-4);
+            text-shadow: 0 0 15px var(--gold-glow-strong);
+        }
+
+        /* Inner border */
+        .exec-summary::after {
+            content: '';
+            position: absolute;
+            inset: 8px;
+            border: 1px solid var(--gold-border);
+            pointer-events: none;
+        }
+
+        /* Second inner border */
+        .exec-inner-frame {
+            position: absolute;
+            inset: 14px;
+            border: 1px solid rgba(212, 175, 55, 0.12);
+            pointer-events: none;
+        }
+
+        /* Corner gold ornaments */
+        .exec-corner-ornament {
+            position: absolute;
+            width: 30px; height: 30px;
+        }
+        .exec-corner-ornament.tl { top: 12px; left: 12px; border-top: 2px solid var(--gold); border-left: 2px solid var(--gold); }
+        .exec-corner-ornament.tr { top: 12px; right: 12px; border-top: 2px solid var(--gold); border-right: 2px solid var(--gold); }
+        .exec-corner-ornament.bl { bottom: 12px; left: 12px; border-bottom: 2px solid var(--gold); border-left: 2px solid var(--gold); }
+        .exec-corner-ornament.br { bottom: 12px; right: 12px; border-bottom: 2px solid var(--gold); border-right: 2px solid var(--gold); }
+
+        .exec-title {
+            position: relative;
+            font-family: var(--font-display);
+            font-size: 1.4em;
+            font-weight: 700;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: var(--sp-3);
+            z-index: 1;
+            background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .exec-ornament {
+            text-align: center;
+            margin-bottom: var(--sp-8);
+            z-index: 1;
+            position: relative;
+        }
+
+        .exec-ornament-inner {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--sp-3);
+            color: var(--gold);
+            opacity: 0.7;
+        }
+
+        .exec-ornament-line {
+            width: 40px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold-border));
+        }
+        .exec-ornament-line.right {
+            background: linear-gradient(90deg, var(--gold-border), transparent);
+        }
+
+        .exec-content {
+            position: relative;
+            font-size: 1.08em;
+            line-height: 1.9;
+            color: var(--text-secondary);
+            text-align: justify;
+            z-index: 1;
+        }
+
+        .exec-content p {
+            margin-bottom: var(--sp-5);
+            padding-left: var(--sp-5);
+            border-left: 2px solid transparent;
+        }
+
+        .exec-content p:first-child {
+            color: var(--text-primary);
+            border-left-color: var(--gold);
+            font-size: 1.05em;
+        }
+
+        .exec-content p:nth-child(2) {
+            border-left-color: var(--gold-dark);
+        }
+
+        .exec-content p:last-child { margin-bottom: 0; }
+
+        .exec-content strong {
+            color: var(--gold-bright);
+            font-weight: 700;
+        }
+
+        /* ==========================================================
+         * SECTION — Gold Decorative Frame Headers
+         * ========================================================== */
+        .section {
+            margin-bottom: var(--sp-16);
+        }
+
+        .section-header {
+            position: relative;
+            padding: var(--sp-6) var(--sp-8);
+            margin-bottom: var(--sp-8);
+            background: linear-gradient(135deg, var(--bg-surface) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--gold-border);
+            border-left: 4px solid var(--gold);
+            box-shadow: var(--shadow-inset), var(--shadow-card);
+        }
+
+        /* Top gold accent line */
+        .section-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--gold), var(--gold-dark), transparent 80%);
+        }
+
+        /* Inner border */
+        .section-header::after {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            inset-left: 0;
+            border: 1px solid rgba(212, 175, 55, 0.10);
+            pointer-events: none;
+        }
+
+        .section-title-row {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-4);
+        }
+
+        .section-icon {
+            font-size: 1.6em;
+            filter: drop-shadow(0 0 8px var(--gold-glow));
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 1.6em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-count {
+            margin-left: auto;
+            background: var(--gold);
+            color: var(--bg-void);
+            padding: var(--sp-1) var(--sp-6);
+            font-family: var(--font-accent);
+            font-size: 0.82em;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+        }
+
+        /* Gold decorative line under section header */
+        .section-header-line {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, var(--gold-border), transparent);
+            margin-top: var(--sp-3);
+        }
+
+        /* ==========================================================
+         * BRIEF CARDS — Art Deco Geometric
+         * ========================================================== */
+        .brief {
+            position: relative;
+            padding: var(--sp-6) var(--sp-8);
+            margin-bottom: var(--sp-5);
+            transition: all 0.3s ease;
+            page-break-inside: avoid;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-medium);
+            border-left: 4px solid transparent;
+        }
+
+        .brief:hover {
+            background: var(--bg-hover);
+            transform: translateX(4px);
+            box-shadow: -4px 0 20px var(--gold-glow), 0 4px 12px rgba(0,0,0,0.3);
+            border-color: var(--border-strong);
+        }
+
+        /* Gold corner triangle accent */
+        .brief::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 0; height: 0;
+            border-top: 20px solid var(--gold);
+            border-left: 20px solid transparent;
+            opacity: 0.15;
+            transition: opacity 0.3s;
+        }
+        .brief:hover::after { opacity: 0.35; }
+
+        /* Priority styles */
+        .brief.must-read {
+            border-left-color: var(--priority-must);
+            background: linear-gradient(90deg, var(--priority-must-bg) 0%, var(--bg-secondary) 5%);
+            box-shadow: 0 0 20px var(--priority-must-glow);
+            animation: must-card-glow 3s ease-in-out infinite;
+        }
+
+        @keyframes must-card-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(220, 68, 68, 0.15); }
+            50% { box-shadow: 0 0 35px rgba(220, 68, 68, 0.30), 0 0 60px rgba(212, 175, 55, 0.08); }
+        }
+
+        .brief.must-read:hover {
+            box-shadow: -4px 0 25px rgba(220, 68, 68, 0.25), 0 0 0 1px var(--priority-must-border);
+        }
+
+        .brief.must-read::after {
+            border-top-color: var(--priority-must);
+            opacity: 0.3;
+        }
+
+        .brief.recommended {
+            border-left-color: var(--gold);
+            background: linear-gradient(90deg, var(--priority-rec-bg) 0%, var(--bg-secondary) 5%);
+        }
+
+        .brief.fyi {
+            border-left-color: var(--silver);
+            opacity: 0.92;
+        }
+
+        .brief-header {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--sp-4);
+            margin-bottom: var(--sp-4);
+        }
+
+        /* Diamond-shaped priority indicator */
+        .priority-diamond {
+            flex-shrink: 0;
+            width: 20px; height: 20px;
+            transform: rotate(45deg);
+            margin-top: 4px;
+        }
+
+        .brief.must-read .priority-diamond {
+            background: linear-gradient(135deg, var(--priority-must-light), var(--priority-must));
+            box-shadow: 0 0 12px var(--priority-must-glow);
+        }
+        .brief.recommended .priority-diamond {
+            background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+            box-shadow: 0 0 10px var(--gold-glow-strong);
+        }
+        .brief.fyi .priority-diamond {
+            background: linear-gradient(135deg, var(--silver), #A0A0A0);
+            opacity: 0.5;
+        }
+
+        .brief-headline {
+            flex: 1;
+            font-family: var(--font-body);
+            font-size: 1.15em;
+            font-weight: 600;
+            line-height: 1.45;
+        }
+
+        .brief-headline a {
+            color: var(--text-primary);
+        }
+        .brief-headline a:hover { color: var(--gold-bright); }
+
+        .brief.must-read .brief-headline a {
+            color: var(--gold-bright);
+            font-weight: 700;
+        }
+
+        .must-read-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-family: var(--font-sans);
+            font-size: 0.55em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--priority-must-light);
+            background: rgba(220, 68, 68, 0.15);
+            border: 1px solid var(--priority-must-border);
+            padding: 2px 10px;
+            border-radius: 0;
+            margin-left: var(--sp-2);
+            vertical-align: middle;
+        }
+
+        .must-read-badge .badge-pulse {
+            width: 5px; height: 5px;
+            background: var(--priority-must);
+            transform: rotate(45deg);
+            animation: badge-diamond-pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes badge-diamond-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
+        }
+
+        .brief-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            margin-bottom: var(--sp-4);
+            flex-wrap: wrap;
+        }
+
+        .source-badge {
+            background: var(--gold);
+            color: var(--bg-void);
+            padding: var(--sp-1) var(--sp-4);
+            font-family: var(--font-accent);
+            font-size: 0.7em;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .tag {
+            background: var(--bg-surface);
+            color: var(--text-muted);
+            border: 1px solid var(--border-medium);
+            padding: var(--sp-1) var(--sp-3);
+            font-family: var(--font-sans);
+            font-size: 0.72em;
+            font-weight: 500;
+        }
+
+        .brief-detail {
+            color: var(--text-body);
+            font-size: 0.96em;
+            line-height: 1.78;
+            margin-left: 36px;
+        }
+
+        .brief-detail strong {
+            color: var(--gold-bright);
+            font-weight: 600;
+        }
+
+        .brief-detail code {
+            background: var(--bg-surface);
+            color: var(--gold);
+            padding: 2px 6px;
+            font-family: var(--font-mono);
+            font-size: 0.88em;
+            border: 1px solid var(--border-medium);
+        }
+
+        /* ==========================================================
+         * FOOTER — Art Deco Grand Colophon
+         * ========================================================== */
+        .footer {
+            text-align: center;
+            padding: var(--sp-16) var(--sp-10);
+            margin-top: var(--sp-16);
+            position: relative;
+            background: linear-gradient(170deg, #06080e 0%, #0e1220 50%, #06080e 100%);
+            border: 2px solid var(--gold-border);
+            overflow: hidden;
+        }
+
+        /* Sunburst in footer background */
+        .footer-sunburst {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px; height: 400px;
+            background: conic-gradient(
+                from 0deg,
+                transparent 0deg, rgba(212, 175, 55, 0.04) 10deg,
+                transparent 20deg, rgba(212, 175, 55, 0.03) 30deg,
+                transparent 40deg, rgba(212, 175, 55, 0.04) 50deg,
+                transparent 60deg, rgba(212, 175, 55, 0.03) 70deg,
+                transparent 80deg, rgba(212, 175, 55, 0.04) 90deg,
+                transparent 100deg, rgba(212, 175, 55, 0.03) 110deg,
+                transparent 120deg, rgba(212, 175, 55, 0.04) 130deg,
+                transparent 140deg, rgba(212, 175, 55, 0.03) 150deg,
+                transparent 160deg, rgba(212, 175, 55, 0.04) 170deg,
+                transparent 180deg, rgba(212, 175, 55, 0.03) 190deg,
+                transparent 200deg, rgba(212, 175, 55, 0.04) 210deg,
+                transparent 220deg, rgba(212, 175, 55, 0.03) 230deg,
+                transparent 240deg, rgba(212, 175, 55, 0.04) 250deg,
+                transparent 260deg, rgba(212, 175, 55, 0.03) 270deg,
+                transparent 280deg, rgba(212, 175, 55, 0.04) 290deg,
+                transparent 300deg, rgba(212, 175, 55, 0.03) 310deg,
+                transparent 320deg, rgba(212, 175, 55, 0.04) 330deg,
+                transparent 340deg, rgba(212, 175, 55, 0.03) 350deg,
+                transparent 360deg
+            );
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        /* Inner borders */
+        .footer-frame-outer {
+            position: absolute;
+            inset: 8px;
+            border: 1px solid var(--gold-border);
+            pointer-events: none;
+        }
+
+        .footer-frame-inner {
+            position: absolute;
+            inset: 14px;
+            border: 1px solid rgba(212, 175, 55, 0.10);
+            pointer-events: none;
+        }
+
+        /* Corner ornaments */
+        .footer-corner {
+            position: absolute;
+            width: 30px; height: 30px;
+        }
+        .footer-corner.tl { top: 12px; left: 12px; border-top: 2px solid var(--gold); border-left: 2px solid var(--gold); }
+        .footer-corner.tr { top: 12px; right: 12px; border-top: 2px solid var(--gold); border-right: 2px solid var(--gold); }
+        .footer-corner.bl { bottom: 12px; left: 12px; border-bottom: 2px solid var(--gold); border-left: 2px solid var(--gold); }
+        .footer-corner.br { bottom: 12px; right: 12px; border-bottom: 2px solid var(--gold); border-right: 2px solid var(--gold); }
+
+        /* Top gold bar */
+        .footer-top-bar {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg,
+                transparent 5%,
+                var(--gold-dark) 15%,
+                var(--gold) 30%,
+                var(--gold-bright) 50%,
+                var(--gold) 70%,
+                var(--gold-dark) 85%,
+                transparent 95%);
+        }
+
+        .footer-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .footer-ornament-top {
+            color: var(--gold);
+            font-size: 1.5em;
+            letter-spacing: 0.4em;
+            margin-bottom: var(--sp-6);
+            opacity: 0.7;
+            text-shadow: 0 0 15px var(--gold-glow);
+        }
+
+        .footer-brand {
+            font-family: var(--font-display);
+            font-size: 1.6em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            margin-bottom: var(--sp-4);
+            background: linear-gradient(180deg, var(--gold-pale), var(--gold), var(--gold-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .footer-tagline {
+            font-family: var(--font-body);
+            font-size: 0.98em;
+            color: var(--text-secondary);
+            font-style: italic;
+            margin-bottom: var(--sp-5);
+            letter-spacing: 0.04em;
+        }
+
+        .footer-line {
+            width: 80px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            margin: 0 auto var(--sp-5);
+            box-shadow: 0 0 8px var(--gold-glow);
+        }
+
+        .footer-meta {
+            font-family: var(--font-sans);
+            font-size: 0.8em;
+            color: var(--text-muted);
+            letter-spacing: 0.06em;
+            margin-bottom: var(--sp-3);
+        }
+
+        .footer-powered {
+            font-family: var(--font-sans);
+            font-size: 0.65em;
+            color: var(--text-dim);
+        }
+        .footer-powered a { color: var(--gold-dark); }
+
+        .footer-ornament-bottom {
+            color: var(--gold);
+            font-size: 1em;
+            letter-spacing: 0.3em;
+            margin-top: var(--sp-5);
+            opacity: 0.5;
+        }
+
+        /* ==========================================================
+         * PRINT / PDF
+         * ========================================================== */
+        @media print {
+            body {
+                background: #0a0d1a !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            body::after { display: none; }
+            .container { padding: var(--sp-8); max-width: 100%; }
+            .header {
+                padding: var(--sp-10);
+                margin-bottom: var(--sp-8);
+            }
+            .header-sunburst, .header-fan { display: none; }
+            .exec-summary {
+                padding: var(--sp-8);
+                margin-bottom: var(--sp-8);
+            }
+            .section { margin-bottom: var(--sp-8); }
+            .brief {
+                padding: var(--sp-4) var(--sp-5);
+                margin-bottom: var(--sp-3);
+            }
+            .brief:hover { transform: none; }
+            .brief.must-read { animation: none; }
+            .section-header::after { display: none; }
+            .footer {
+                padding: var(--sp-8);
+                margin-top: var(--sp-8);
+            }
+            .footer-sunburst { display: none; }
+            a { color: var(--text-primary) !important; }
+
+            *, *::before, *::after {
+                animation-duration: 0s !important;
+                transition-duration: 0s !important;
+            }
+        }
+
+        /* ==========================================================
+         * MOBILE
+         * ========================================================== */
+        @media (max-width: 768px) {
+            .container { padding: var(--sp-8) var(--sp-5); }
+            .header { padding: var(--sp-10) var(--sp-5); }
+            .header-title { font-size: 2.2em; letter-spacing: 0.06em; }
+            .header-sunburst { width: 300px; height: 300px; }
+            .header-fan { display: none; }
+            .header-stats { flex-direction: column; gap: var(--sp-5); align-items: center; }
+            .stat-item { min-width: 160px; }
+            .header-corner { display: none; }
+            .exec-summary { padding: var(--sp-8) var(--sp-5); }
+            .exec-corner-ornament { display: none; }
+            .exec-inner-frame { display: none; }
+            .section-header { padding: var(--sp-4) var(--sp-5); }
+            .section-header::after { display: none; }
+            .section-title { font-size: 1.3em; }
+            .brief { padding: var(--sp-4) var(--sp-5); }
+            .brief-detail { margin-left: 0; margin-top: var(--sp-3); }
+            .brief::after { display: none; }
+            .footer { padding: var(--sp-10) var(--sp-5); }
+            .footer-corner { display: none; }
+            .footer-frame-inner { display: none; }
+        }
+
+        @media (max-width: 480px) {
+            .header-title { font-size: 1.7em; }
+            .header-top-ornament { font-size: 1.2em; }
+            .section-title { font-size: 1.1em; }
+            .stat-number { font-size: 1.8em; }
+            .brief-headline { font-size: 1em; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- ====== HEADER: Art Deco Grand Frame with Sunburst ====== -->
+        <header class="header">
+            <div class="header-sunburst"></div>
+            <div class="header-fan"></div>
+            <div class="header-frame-outer"></div>
+            <div class="header-frame-inner"></div>
+            <div class="header-corner tl"></div>
+            <div class="header-corner tr"></div>
+            <div class="header-corner bl"></div>
+            <div class="header-corner br"></div>
+            <div class="header-top-bar"></div>
+            <div class="header-bottom-bar"></div>
+
+            <div class="header-content">
+                <div class="header-top-ornament">◆ ◇ ◆ ◇ ◆</div>
+                <div class="header-deco-line"></div>
+                <h1 class="header-title">Intelligence</h1>
+                <div class="header-subtitle-line"></div>
+                <div class="header-subtitle">Sophisticated Analysis in the Spirit of the Jazz Age</div>
+                <div class="header-date">{{ date_str }} · {{ generated_time }}</div>
+
+                <div class="header-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">{{ total_items }}</div>
+                        <div class="stat-label">Reports</div>
+                    </div>
+                    {% set must_read_total = [] %}
+                    {% for section_key, items in briefs.items() %}
+                    {% if items is iterable and items is not string %}
+                    {% for item in items %}
+                    {% if item.priority == '🔴' %}
+                    {% if must_read_total.append(1) %}{% endif %}
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
+                    {% endfor %}
+                    <div class="stat-item">
+                        <div class="stat-number">{{ must_read_total|length }}</div>
+                        <div class="stat-label">Priority</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">{{ section_order|length }}</div>
+                        <div class="stat-label">Sectors</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ====== EXECUTIVE SUMMARY: Grand Framed Card ====== -->
+        {% if executive_summary %}
+        <div class="exec-summary">
+            <div class="exec-inner-frame"></div>
+            <div class="exec-corner-ornament tl"></div>
+            <div class="exec-corner-ornament tr"></div>
+            <div class="exec-corner-ornament bl"></div>
+            <div class="exec-corner-ornament br"></div>
+            <h2 class="exec-title">Executive Synopsis</h2>
+            <div class="exec-ornament">
+                <span class="exec-ornament-inner">
+                    <span class="exec-ornament-line"></span>
+                    ◆
+                    <span class="exec-ornament-line right"></span>
+                </span>
+            </div>
+            <div class="exec-content">
+                {% for line in executive_summary.strip().split('\n') %}
+                {% if line.strip() %}
+                <p>{{ line.strip() | md_inline }}</p>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ====== GEOMETRIC DIVIDER ====== -->
+        <div class="geo-divider">
+            <span class="geo-divider-content">
+                <span class="geo-divider-line"></span>
+                <span class="geo-divider-dot"></span>
+                <span class="geo-divider-diamond"></span>
+                <span class="geo-divider-dot"></span>
+                <span class="geo-divider-line"></span>
+            </span>
+        </div>
+
+        <!-- ====== SECTIONS ====== -->
+        {% for section_key in section_order %}
+        {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+        {% set meta = section_configs.get(section_key, {}) %}
+        {% set items = briefs[section_key] %}
+        <section class="section">
+            <div class="section-header">
+                <div class="section-title-row">
+                    <span class="section-icon">{{ meta.emoji|default('◆') }}</span>
+                    <h2 class="section-title">{{ meta.title|default(section_key|title) }}</h2>
+                    <div class="section-count">{{ items|length }}</div>
+                </div>
+                <div class="section-header-line"></div>
+            </div>
+
+            {% for item in items %}
+            {% set priority = item.priority|default('🟢') %}
+            {% set p_class = 'must-read' if priority == '🔴' else ('recommended' if priority == '🟡' else 'fyi') %}
+            <div class="brief {{ p_class }}">
+                <div class="brief-header">
+                    <div class="priority-diamond"></div>
+                    <div class="brief-headline">
+                        <a href="{{ item.url|default('#') }}" target="_blank">{{ item.headline|default(item.title|default('Untitled')) }}</a>
+                        {% if priority == '🔴' %}
+                        <span class="must-read-badge"><span class="badge-pulse"></span> MUST READ</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="brief-meta">
+                    {% if item.source %}
+                    <span class="source-badge">{{ item.source }}</span>
+                    {% endif %}
+                    {% if item.tags %}
+                    {% for tag in item.tags %}
+                    <span class="tag">{{ tag }}</span>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+                {% if item.detail %}
+                <div class="brief-detail">{{ item.detail|default('') | md_inline }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            {% if not loop.last %}
+            <div class="geo-divider">
+                <span class="geo-divider-content">
+                    <span class="geo-divider-line"></span>
+                    <span class="geo-divider-diamond"></span>
+                    <span class="geo-divider-line"></span>
+                </span>
+            </div>
+            {% endif %}
+        </section>
+        {% endif %}
+        {% endfor %}
+
+        <!-- ====== FOOTER: Art Deco Grand Colophon ====== -->
+        <footer class="footer">
+            <div class="footer-sunburst"></div>
+            <div class="footer-frame-outer"></div>
+            <div class="footer-frame-inner"></div>
+            <div class="footer-corner tl"></div>
+            <div class="footer-corner tr"></div>
+            <div class="footer-corner bl"></div>
+            <div class="footer-corner br"></div>
+            <div class="footer-top-bar"></div>
+
+            <div class="footer-content">
+                <div class="footer-ornament-top">◆ ◇ ◆ ◇ ◆</div>
+                <div class="footer-brand">Art Deco Intelligence</div>
+                <div class="footer-tagline">Elegance in Analysis, Sophistication in Insight</div>
+                <div class="footer-line"></div>
+                <div class="footer-meta">{{ date_str }} · {{ total_items }} sources analyzed with geometric precision</div>
+                <div class="footer-powered">
+                    Powered by <a href="#">Newsloom</a> · Art Deco Template v2.0
+                </div>
+                <div class="footer-ornament-bottom">◇ ◆ ◇</div>
+            </div>
+        </footer>
+
+    </div>
+</body>
+</html>

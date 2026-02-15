@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deloitte Intelligence Report · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * DELOITTE GREEN — Annual Report Visual Narrative
+         * 
+         * Dual color system: Deloitte Green #86BC25 + Deep Navy #0D2B3E
+         * Geometric decorative lines · Progress indicators
+         * Impact highlight boxes · Numbered audit system
+         * Big-number statistics · Alternating section backgrounds
+         * Audit-style disclaimer footer
+         * 
+         * Inspired by: Deloitte Annual Impact Reports · Big Four aesthetics
+         * ============================================================ */
+
+        /* --- Design Tokens (CSS Custom Properties) --- */
+        :root {
+            /* Deloitte Dual Color System */
+            --deloitte-green:       #86BC25;
+            --deloitte-green-dark:  #6B9B1A;
+            --deloitte-green-deeper:#4F7A10;
+            --deloitte-green-light: #A5D642;
+            --deloitte-green-pale:  #F4F9E8;
+            --deloitte-green-dim:   rgba(134, 188, 37, 0.10);
+            --deloitte-green-glow:  rgba(134, 188, 37, 0.06);
+
+            --navy:                 #0D2B3E;
+            --navy-mid:             #164163;
+            --navy-light:           #1E5A8A;
+            --navy-pale:            #E8EFF5;
+            --navy-dim:             rgba(13, 43, 62, 0.08);
+            --navy-border:          rgba(13, 43, 62, 0.15);
+
+            /* Backgrounds */
+            --bg-primary:       #FFFFFF;
+            --bg-secondary:     #F7F9FB;
+            --bg-card:          #FFFFFF;
+            --bg-surface:       #F3F5F8;
+            --bg-hover:         #EEF1F4;
+            --bg-alt:           #FAFCFE;
+
+            /* Text */
+            --text-primary:     #0D2B3E;
+            --text-secondary:   #2A3E50;
+            --text-body:        #374B5C;
+            --text-muted:       #6B7D8D;
+            --text-light:       #9AABB8;
+            --text-inverse:     #FFFFFF;
+
+            /* Priority */
+            --priority-must:    #C41E3A;
+            --priority-must-bg: rgba(196, 30, 58, 0.04);
+            --priority-must-border: rgba(196, 30, 58, 0.18);
+            --priority-rec:     #D4760A;
+            --priority-rec-bg:  rgba(212, 118, 10, 0.04);
+            --priority-rec-border: rgba(212, 118, 10, 0.15);
+            --priority-fyi:     #2E7D4F;
+            --priority-fyi-bg:  rgba(46, 125, 79, 0.04);
+
+            /* Borders */
+            --border-light:     #E5E9ED;
+            --border-medium:    #CED5DC;
+            --border-strong:    #A0ADB8;
+            --border-accent:    rgba(134, 188, 37, 0.30);
+
+            /* Shadows */
+            --shadow-sm:        0 1px 2px rgba(13, 43, 62, 0.04);
+            --shadow-card:      0 2px 8px rgba(13, 43, 62, 0.06), 0 1px 2px rgba(13, 43, 62, 0.04);
+            --shadow-elevated:  0 6px 20px rgba(13, 43, 62, 0.08), 0 2px 6px rgba(13, 43, 62, 0.04);
+
+            /* Spacing (8pt grid) */
+            --sp-1: 4px;   --sp-2: 8px;   --sp-3: 12px;
+            --sp-4: 16px;  --sp-5: 20px;  --sp-6: 24px;
+            --sp-8: 32px;  --sp-10: 40px; --sp-12: 48px;
+            --sp-16: 64px; --sp-20: 80px;
+
+            /* Typography */
+            --font-primary: "Helvetica Neue", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+            --font-display: "Helvetica Neue", Arial, "PingFang SC", sans-serif;
+            --font-mono: "SF Mono", "Monaco", "Consolas", monospace;
+
+            /* Radius */
+            --radius-sm: 4px;
+            --radius-md: 6px;
+            --radius-lg: 10px;
+            --radius-xl: 14px;
+        }
+
+        /* --- Page (PDF) --- */
+        @page {
+            size: A4;
+            margin: 2cm 2cm;
+            @top-left {
+                content: "DELOITTE";
+                font-family: "Helvetica Neue", Arial, sans-serif;
+                font-size: 8pt;
+                font-weight: 700;
+                color: #86BC25;
+                letter-spacing: 0.15em;
+            }
+            @top-right {
+                content: "Intelligence Report · {{ date_str }}";
+                font-family: "Helvetica Neue", Arial, sans-serif;
+                font-size: 8pt;
+                color: #6B7D8D;
+            }
+            @bottom-left {
+                content: "CONFIDENTIAL — FOR INTERNAL USE ONLY";
+                font-family: "Helvetica Neue", Arial, sans-serif;
+                font-size: 6.5pt;
+                color: #9AABB8;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+            }
+            @bottom-right {
+                content: "Ref. NL-{{ date_str }} · Page " counter(page);
+                font-family: "Helvetica Neue", Arial, sans-serif;
+                font-size: 7pt;
+                color: #9AABB8;
+            }
+        }
+
+        /* --- Reset & Base --- */
+        *, *::before, *::after {
+            margin: 0; padding: 0; box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background: linear-gradient(180deg, #FAFCFE 0%, #F5F7FA 50%, #FAFCFE 100%);
+            color: var(--text-primary);
+            font-size: 15px;
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        a {
+            color: var(--navy-mid);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+        a:hover {
+            color: var(--deloitte-green-dark);
+        }
+
+        /* --- Container --- */
+        .container {
+            max-width: 820px;
+            margin: 0 auto;
+            padding: 0 var(--sp-6);
+        }
+
+        /* ============================================================
+         * HEADER: Deep Navy + Geometric Green Lines
+         * ============================================================ */
+        .header {
+            background: linear-gradient(155deg, var(--navy) 0%, #102E45 40%, #0A2233 100%);
+            color: var(--text-inverse);
+            padding: var(--sp-12) var(--sp-10) var(--sp-10);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Diagonal green geometric lines */
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                repeating-linear-gradient(
+                    -60deg,
+                    transparent,
+                    transparent 80px,
+                    rgba(134, 188, 37, 0.04) 80px,
+                    rgba(134, 188, 37, 0.04) 82px
+                ),
+                repeating-linear-gradient(
+                    60deg,
+                    transparent,
+                    transparent 120px,
+                    rgba(134, 188, 37, 0.03) 120px,
+                    rgba(134, 188, 37, 0.03) 122px
+                );
+            pointer-events: none;
+        }
+
+        /* Diamond pattern overlay */
+        .header::after {
+            content: '';
+            position: absolute;
+            top: -50px; right: -50px;
+            width: 300px; height: 300px;
+            background:
+                linear-gradient(45deg, transparent 45%, rgba(134, 188, 37, 0.06) 45%, rgba(134, 188, 37, 0.06) 55%, transparent 55%),
+                linear-gradient(-45deg, transparent 45%, rgba(134, 188, 37, 0.06) 45%, rgba(134, 188, 37, 0.06) 55%, transparent 55%);
+            background-size: 60px 60px;
+            pointer-events: none;
+            transform: rotate(15deg);
+        }
+
+        /* Green accent bar at bottom */
+        .header-accent {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 5px;
+            background: linear-gradient(90deg,
+                var(--deloitte-green) 0%,
+                var(--deloitte-green-light) 40%,
+                var(--deloitte-green) 70%,
+                var(--deloitte-green-dark) 100%);
+        }
+
+        .header-inner {
+            position: relative;
+            z-index: 2;
+            max-width: 820px;
+            margin: 0 auto;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--sp-8);
+        }
+
+        .header-brand-block {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-logo {
+            font-family: var(--font-display);
+            font-size: 1.8em;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--deloitte-green);
+            margin-bottom: var(--sp-1);
+        }
+
+        .header-division {
+            font-size: 0.72em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .header-ref {
+            text-align: right;
+        }
+
+        .header-ref-label {
+            font-size: 0.65em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: rgba(255, 255, 255, 0.35);
+            margin-bottom: var(--sp-1);
+        }
+
+        .header-ref-value {
+            font-family: var(--font-mono);
+            font-size: 0.78em;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .header-title {
+            font-family: var(--font-display);
+            font-size: 2.6em;
+            font-weight: 300;
+            line-height: 1.12;
+            margin-bottom: var(--sp-3);
+            letter-spacing: -0.01em;
+        }
+
+        .header-subtitle {
+            font-size: 1.05em;
+            opacity: 0.6;
+            margin-bottom: var(--sp-10);
+            font-weight: 400;
+            max-width: 480px;
+        }
+
+        /* --- Big Number Stats (Impact Data) --- */
+        .header-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--sp-4);
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(134, 188, 37, 0.15);
+            border-radius: var(--radius-md);
+            padding: var(--sp-5) var(--sp-4);
+            text-align: center;
+            backdrop-filter: blur(4px);
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.10);
+            border-color: rgba(134, 188, 37, 0.30);
+        }
+
+        /* Green dot indicator on each stat */
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: var(--sp-2);
+            left: var(--sp-2);
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--deloitte-green);
+            opacity: 0.6;
+        }
+
+        .stat-number {
+            font-family: var(--font-display);
+            font-size: 2.4em;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: var(--sp-1);
+            color: var(--deloitte-green-light);
+        }
+
+        .stat-label {
+            font-size: 0.68em;
+            opacity: 0.55;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+        }
+
+        /* ============================================================
+         * PROGRESS INDICATOR: Green dot timeline
+         * ============================================================ */
+        .progress-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--sp-3);
+            padding: var(--sp-6) 0;
+            position: relative;
+        }
+
+        .progress-bar::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 15%;
+            right: 15%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--border-light), var(--deloitte-green-dim), var(--border-light), transparent);
+            transform: translateY(-50%);
+        }
+
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--border-light);
+            border: 2px solid var(--bg-primary);
+            box-shadow: 0 0 0 2px var(--border-light);
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        .progress-dot.active {
+            background: var(--deloitte-green);
+            box-shadow: 0 0 0 2px var(--deloitte-green), 0 0 8px rgba(134, 188, 37, 0.3);
+        }
+
+        .progress-dot.completed {
+            background: var(--deloitte-green-dark);
+            box-shadow: 0 0 0 2px var(--deloitte-green-dark);
+        }
+
+        /* ============================================================
+         * EXECUTIVE SUMMARY: Impact Highlight Box
+         * ============================================================ */
+        .exec-summary {
+            background: linear-gradient(135deg, var(--deloitte-green) 0%, var(--deloitte-green-dark) 60%, var(--deloitte-green-deeper) 100%);
+            color: var(--text-inverse);
+            padding: var(--sp-10);
+            margin: var(--sp-10) auto;
+            max-width: 820px;
+            border-radius: var(--radius-xl);
+            position: relative;
+            overflow: hidden;
+            page-break-inside: avoid;
+            box-shadow: 0 8px 32px rgba(134, 188, 37, 0.2), 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Geometric pattern overlay */
+        .exec-summary::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                repeating-linear-gradient(
+                    -45deg,
+                    transparent,
+                    transparent 30px,
+                    rgba(255, 255, 255, 0.03) 30px,
+                    rgba(255, 255, 255, 0.03) 32px
+                );
+            pointer-events: none;
+        }
+
+        .exec-summary::after {
+            content: '';
+            position: absolute;
+            bottom: -40px; right: -40px;
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .exec-header {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-4);
+            margin-bottom: var(--sp-6);
+            position: relative;
+            z-index: 1;
+        }
+
+        .exec-number {
+            font-family: var(--font-display);
+            font-size: 2.2em;
+            font-weight: 800;
+            opacity: 0.25;
+            line-height: 1;
+        }
+
+        .exec-title {
+            font-family: var(--font-display);
+            font-size: 1.4em;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+
+        .exec-badge {
+            margin-left: auto;
+            font-size: 0.65em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            background: rgba(255,255,255,0.15);
+            padding: var(--sp-1) var(--sp-4);
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .exec-content {
+            font-size: 1.05em;
+            line-height: 1.8;
+            opacity: 0.92;
+            position: relative;
+            z-index: 1;
+        }
+
+        .exec-content p {
+            margin-bottom: var(--sp-4);
+        }
+        .exec-content p:last-child { margin-bottom: 0; }
+
+        .exec-content strong {
+            color: #FFFFFF;
+            font-weight: 700;
+        }
+
+        /* ============================================================
+         * SECTION: Alternating White / Light Gray Backgrounds
+         * ============================================================ */
+        .section {
+            padding: var(--sp-10) 0;
+            position: relative;
+        }
+
+        .section-even {
+            background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-surface) 50%, var(--bg-secondary) 100%);
+        }
+
+        .section-odd {
+            background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-alt) 50%, var(--bg-primary) 100%);
+        }
+
+        .section-inner {
+            max-width: 820px;
+            margin: 0 auto;
+            padding: 0 var(--sp-6);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-4);
+            margin-bottom: var(--sp-8);
+            padding-bottom: var(--sp-4);
+            border-bottom: 2px solid var(--navy);
+            position: relative;
+        }
+
+        /* Green accent line under header */
+        .section-header::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 80px;
+            height: 2px;
+            background: var(--deloitte-green);
+        }
+
+        /* Audit-style section numbering */
+        .section-number {
+            font-family: var(--font-display);
+            font-size: 2em;
+            font-weight: 800;
+            color: var(--deloitte-green);
+            opacity: 0.35;
+            line-height: 1;
+            min-width: 48px;
+        }
+
+        .section-title-group {
+            flex: 1;
+        }
+
+        .section-icon {
+            font-size: 1.15em;
+            margin-bottom: var(--sp-1);
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 1.4em;
+            font-weight: 700;
+            color: var(--navy);
+            letter-spacing: -0.01em;
+        }
+
+        .section-count {
+            background: var(--navy);
+            color: var(--text-inverse);
+            padding: var(--sp-1) var(--sp-4);
+            border-radius: var(--radius-sm);
+            font-size: 0.72em;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+        }
+
+        /* ============================================================
+         * BRIEF CARD: Clean Corporate Card
+         * ============================================================ */
+        .brief {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-left: 4px solid transparent;
+            padding: var(--sp-6);
+            margin-bottom: var(--sp-4);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+            page-break-inside: avoid;
+            position: relative;
+        }
+
+        .brief:hover {
+            box-shadow: var(--shadow-card);
+            transform: translateY(-1px);
+        }
+
+        /* Audit item numbering */
+        .brief-item-number {
+            position: absolute;
+            top: var(--sp-2);
+            right: var(--sp-3);
+            font-family: var(--font-mono);
+            font-size: 0.62em;
+            color: var(--text-light);
+            letter-spacing: 0.04em;
+        }
+
+        /* Priority visual distinction */
+        .brief.must-read {
+            border-left-color: var(--priority-must);
+            background: linear-gradient(90deg, var(--priority-must-bg) 0%, var(--bg-card) 8%);
+        }
+
+        .brief.must-read:hover {
+            box-shadow: var(--shadow-elevated), 0 0 0 1px var(--priority-must-border);
+        }
+
+        .brief.recommended {
+            border-left-color: var(--priority-rec);
+            background: linear-gradient(90deg, var(--priority-rec-bg) 0%, var(--bg-card) 6%);
+        }
+
+        .brief.fyi {
+            border-left-color: var(--deloitte-green);
+            background: linear-gradient(90deg, var(--priority-fyi-bg) 0%, var(--bg-card) 4%);
+        }
+
+        .brief-header {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--sp-3);
+            margin-bottom: var(--sp-3);
+        }
+
+        /* Green dot priority indicator */
+        .priority-dot {
+            flex-shrink: 0;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-top: 6px;
+        }
+
+        .brief.must-read .priority-dot {
+            background: var(--priority-must);
+            box-shadow: 0 0 6px rgba(196, 30, 58, 0.4);
+        }
+
+        .brief.recommended .priority-dot {
+            background: var(--priority-rec);
+            box-shadow: 0 0 4px rgba(212, 118, 10, 0.3);
+        }
+
+        .brief.fyi .priority-dot {
+            background: var(--deloitte-green);
+            opacity: 0.5;
+        }
+
+        .brief-headline {
+            flex: 1;
+            font-size: 1.08em;
+            font-weight: 600;
+            line-height: 1.45;
+        }
+
+        .brief-headline a {
+            color: var(--text-primary);
+        }
+
+        .brief-headline a:hover {
+            color: var(--deloitte-green-dark);
+        }
+
+        .brief.must-read .brief-headline a {
+            font-weight: 700;
+            color: var(--navy);
+        }
+
+        .brief-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            margin-bottom: var(--sp-3);
+            flex-wrap: wrap;
+        }
+
+        .source-badge {
+            background: var(--navy-dim);
+            color: var(--navy-mid);
+            padding: var(--sp-1) var(--sp-3);
+            border-radius: var(--radius-sm);
+            font-size: 0.72em;
+            font-weight: 600;
+            border: 1px solid var(--navy-border);
+        }
+
+        .tag {
+            background: var(--deloitte-green-pale);
+            color: var(--deloitte-green-dark);
+            border: 1px solid var(--border-accent);
+            padding: var(--sp-1) var(--sp-3);
+            border-radius: var(--radius-sm);
+            font-size: 0.68em;
+            font-weight: 500;
+        }
+
+        .brief-detail {
+            color: var(--text-body);
+            font-size: 0.94em;
+            line-height: 1.72;
+            padding-left: 22px;
+        }
+
+        .brief-detail strong {
+            color: var(--navy);
+            font-weight: 600;
+        }
+
+        .brief-detail code {
+            background: var(--deloitte-green-pale);
+            color: var(--deloitte-green-deeper);
+            padding: 2px 6px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            font-size: 0.88em;
+            border: 1px solid var(--border-accent);
+        }
+
+        /* ============================================================
+         * IMPACT BOX: Green gradient highlight for must-read
+         * ============================================================ */
+        .impact-box {
+            background: linear-gradient(135deg, var(--deloitte-green) 0%, var(--deloitte-green-dark) 100%);
+            color: var(--text-inverse);
+            padding: var(--sp-4) var(--sp-5);
+            border-radius: var(--radius-md);
+            margin-top: var(--sp-3);
+            margin-left: 22px;
+            font-size: 0.85em;
+            font-weight: 500;
+            line-height: 1.55;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .impact-box::before {
+            content: 'IMPACT';
+            position: absolute;
+            top: 50%;
+            right: var(--sp-4);
+            transform: translateY(-50%);
+            font-size: 2em;
+            font-weight: 900;
+            opacity: 0.08;
+            letter-spacing: 0.1em;
+        }
+
+        /* ============================================================
+         * BIG NUMBERS: Statistics Display Area
+         * ============================================================ */
+        .big-numbers {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--sp-5);
+            margin: var(--sp-8) auto;
+            max-width: 820px;
+            padding: 0 var(--sp-6);
+        }
+
+        .big-number-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-top: 3px solid var(--deloitte-green);
+            border-radius: var(--radius-md);
+            padding: var(--sp-6) var(--sp-5);
+            text-align: center;
+            box-shadow: var(--shadow-card);
+            transition: all 0.2s ease;
+        }
+
+        .big-number-card:hover {
+            box-shadow: var(--shadow-elevated);
+            transform: translateY(-2px);
+        }
+
+        .big-number-value {
+            font-family: var(--font-display);
+            font-size: 3em;
+            font-weight: 800;
+            color: var(--navy);
+            line-height: 1;
+            margin-bottom: var(--sp-2);
+        }
+
+        .big-number-label {
+            font-size: 0.75em;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .big-number-sub {
+            font-size: 0.68em;
+            color: var(--deloitte-green-dark);
+            margin-top: var(--sp-1);
+            font-weight: 500;
+        }
+
+        /* ============================================================
+         * FOOTER: Audit Disclaimer Style
+         * ============================================================ */
+        .footer {
+            background: linear-gradient(155deg, var(--navy) 0%, #0A2233 60%, #081C2B 100%);
+            color: var(--text-inverse);
+            padding: var(--sp-12) var(--sp-10);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Diagonal lines matching header */
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(
+                -60deg,
+                transparent,
+                transparent 80px,
+                rgba(134, 188, 37, 0.03) 80px,
+                rgba(134, 188, 37, 0.03) 82px
+            );
+            pointer-events: none;
+        }
+
+        /* Green accent bar at top */
+        .footer-accent {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--deloitte-green), var(--deloitte-green-light), var(--deloitte-green));
+        }
+
+        .footer-inner {
+            max-width: 820px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            margin-bottom: var(--sp-6);
+        }
+
+        .footer-logo {
+            font-family: var(--font-display);
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--deloitte-green);
+            letter-spacing: 0.1em;
+        }
+
+        .footer-tagline {
+            font-size: 0.88em;
+            color: rgba(255, 255, 255, 0.4);
+            font-style: italic;
+        }
+
+        .footer-divider {
+            border: none;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(134, 188, 37, 0.3), rgba(255, 255, 255, 0.1), rgba(134, 188, 37, 0.3));
+            margin: var(--sp-6) 0;
+        }
+
+        /* Audit disclaimer section */
+        .footer-disclaimer {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-md);
+            padding: var(--sp-5);
+            margin-bottom: var(--sp-6);
+        }
+
+        .footer-disclaimer-title {
+            font-size: 0.65em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: rgba(255, 255, 255, 0.45);
+            margin-bottom: var(--sp-3);
+        }
+
+        .footer-disclaimer-text {
+            font-size: 0.72em;
+            color: rgba(255, 255, 255, 0.30);
+            line-height: 1.65;
+            text-align: justify;
+        }
+
+        .footer-meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--sp-3);
+        }
+
+        .footer-meta {
+            font-size: 0.72em;
+            color: rgba(255, 255, 255, 0.35);
+            letter-spacing: 0.05em;
+        }
+
+        .footer-ref {
+            font-family: var(--font-mono);
+            font-size: 0.68em;
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        /* ============================================================
+         * PRINT / PDF Overrides
+         * ============================================================ */
+        @media print {
+            body {
+                background: white !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .header { padding: var(--sp-8) var(--sp-6); }
+            .header::before, .header::after { display: none; }
+            .brief:hover { transform: none; box-shadow: var(--shadow-sm); }
+            .big-number-card:hover { transform: none; }
+            .stat-card:hover { background: rgba(255, 255, 255, 0.06); }
+            .progress-bar { display: none; }
+            a { color: var(--text-primary) !important; }
+        }
+
+        /* ============================================================
+         * RESPONSIVE
+         * ============================================================ */
+        @media (max-width: 768px) {
+            .header { padding: var(--sp-8) var(--sp-5); }
+            .header-top { flex-direction: column; gap: var(--sp-3); }
+            .header-title { font-size: 2em; }
+            .header-stats { grid-template-columns: repeat(2, 1fr); }
+            .big-numbers { grid-template-columns: 1fr; padding: 0 var(--sp-4); }
+            .section-inner { padding: 0 var(--sp-4); }
+            .brief { padding: var(--sp-4); }
+            .brief-detail { padding-left: 0; margin-top: var(--sp-2); }
+            .impact-box { margin-left: 0; }
+            .exec-summary { padding: var(--sp-6); margin: var(--sp-6) var(--sp-4); }
+            .footer { padding: var(--sp-8) var(--sp-5); }
+            .footer-meta-row { flex-direction: column; align-items: flex-start; }
+        }
+
+        @media (max-width: 480px) {
+            .header-stats { grid-template-columns: 1fr 1fr; }
+            .header-title { font-size: 1.6em; }
+            .stat-number { font-size: 1.8em; }
+            .section-number { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- ====== HEADER: Deep Navy + Green Geometric Lines ====== -->
+    <header class="header">
+        <div class="header-accent"></div>
+        <div class="header-inner">
+            <div class="header-top">
+                <div class="header-brand-block">
+                    <div class="header-logo">DELOITTE</div>
+                    <div class="header-division">Intelligence Report Division</div>
+                </div>
+                <div class="header-ref">
+                    <div class="header-ref-label">Report Reference</div>
+                    <div class="header-ref-value">NL-{{ date_str }}-IR</div>
+                </div>
+            </div>
+            <h1 class="header-title">Intelligence Report</h1>
+            <div class="header-subtitle">Strategic market insights and technology analysis · {{ date_str }}</div>
+
+            {% set must_read_total = [] %}
+            {% for section_key, items in briefs.items() %}
+            {% if items is iterable and items is not string %}
+            {% for item in items %}
+            {% if item.priority == '🔴' %}
+            {% if must_read_total.append(1) %}{% endif %}
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+            {% endfor %}
+
+            <div class="header-stats">
+                <div class="stat-card">
+                    <div class="stat-number">{{ total_items }}</div>
+                    <div class="stat-label">Total Reports</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ must_read_total|length }}</div>
+                    <div class="stat-label">Critical</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ section_order|length }}</div>
+                    <div class="stat-label">Sectors</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ date_str[-2:] }}</div>
+                    <div class="stat-label">Report Day</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ====== PROGRESS INDICATOR: Green Dots ====== -->
+    <div class="progress-bar">
+        {% for section_key in section_order %}
+        {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+        <div class="progress-dot active"></div>
+        {% else %}
+        <div class="progress-dot"></div>
+        {% endif %}
+        {% endfor %}
+    </div>
+
+    <!-- ====== EXECUTIVE SUMMARY: Green Impact Box ====== -->
+    {% if executive_summary %}
+    <div class="exec-summary">
+        <div class="exec-header">
+            <div class="exec-number">00</div>
+            <h2 class="exec-title">Executive Summary</h2>
+            <div class="exec-badge">Key Findings</div>
+        </div>
+        <div class="exec-content">
+            {% for line in executive_summary.strip().split('\n') %}
+            {% if line.strip() %}
+            <p>{{ line.strip() | md_inline }}</p>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ====== BIG NUMBERS: Statistics Display ====== -->
+    <div class="big-numbers">
+        <div class="big-number-card">
+            <div class="big-number-value">{{ total_items }}</div>
+            <div class="big-number-label">Sources Analyzed</div>
+            <div class="big-number-sub">Cross-sector intelligence</div>
+        </div>
+        <div class="big-number-card">
+            <div class="big-number-value">{{ must_read_total|length }}</div>
+            <div class="big-number-label">Priority Actions</div>
+            <div class="big-number-sub">Requiring attention</div>
+        </div>
+        <div class="big-number-card">
+            <div class="big-number-value">{{ section_order|length }}</div>
+            <div class="big-number-label">Industry Sectors</div>
+            <div class="big-number-sub">Comprehensive coverage</div>
+        </div>
+    </div>
+
+    <!-- ====== SECTIONS: Alternating Backgrounds ====== -->
+    {% set ns_sec = namespace(idx=1) %}
+    {% for section_key in section_order %}
+    {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+    {% set meta = section_configs.get(section_key, {}) %}
+    {% set items = briefs[section_key] %}
+    <section class="section {% if ns_sec.idx is odd %}section-odd{% else %}section-even{% endif %}" id="{{ section_key }}" style="border-left: 3px solid {{ meta.color|default('#86BC25') }};">
+        <div class="section-inner">
+            <div class="section-header">
+                <div class="section-number">{{ '%02d' % ns_sec.idx }}</div>
+                <div class="section-title-group">
+                    <div class="section-icon">{{ meta.emoji|default('📊') }}</div>
+                    <h2 class="section-title">{{ meta.title|default(section_key|title) }}</h2>
+                </div>
+                <div class="section-count">{{ items|length }} items</div>
+            </div>
+
+            {% for item in items %}
+            {% set priority = item.priority|default('🟢') %}
+            {% set p_class = 'must-read' if priority == '🔴' else ('recommended' if priority == '🟡' else 'fyi') %}
+            <div class="brief {{ p_class }}">
+                <div class="brief-item-number">§{{ ns_sec.idx }}.{{ loop.index }}</div>
+                <div class="brief-header">
+                    <div class="priority-dot"></div>
+                    <div class="brief-headline">
+                        <a href="{{ item.url|default('#') }}" target="_blank">{{ item.headline|default(item.title|default('Untitled')) }}</a>
+                    </div>
+                </div>
+                <div class="brief-meta">
+                    {% if item.source %}
+                    <span class="source-badge">{{ item.source }}</span>
+                    {% endif %}
+                    {% if item.tags %}
+                    {% for tag in item.tags %}
+                    <span class="tag">{{ tag }}</span>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+                {% if item.detail %}
+                <div class="brief-detail">{{ item.detail|default('') | md_inline }}</div>
+                {% endif %}
+                {% if priority == '🔴' and item.detail %}
+                <div class="impact-box">
+                    ⚡ High-impact item requiring immediate strategic review and action consideration.
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% set ns_sec.idx = ns_sec.idx + 1 %}
+    {% endif %}
+    {% endfor %}
+
+    <!-- ====== FOOTER: Audit Disclaimer Style ====== -->
+    <footer class="footer">
+        <div class="footer-accent"></div>
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <div class="footer-logo">DELOITTE</div>
+                <div class="footer-tagline">Making an impact that matters through intelligence</div>
+            </div>
+
+            <hr class="footer-divider">
+
+            <div class="footer-disclaimer">
+                <div class="footer-disclaimer-title">Important Notice & Disclaimer</div>
+                <div class="footer-disclaimer-text">
+                    This intelligence report has been prepared by Newsloom automated analysis for informational purposes only. 
+                    The information contained herein is based on sources believed to be reliable but no representation or warranty, 
+                    express or implied, is made as to its accuracy, completeness, or reliability. This report does not constitute 
+                    professional advice and should not be relied upon as such. Recipients should seek appropriate professional 
+                    counsel before making decisions based on this information. Not affiliated with Deloitte Touche Tohmatsu Limited.
+                </div>
+            </div>
+
+            <div class="footer-meta-row">
+                <div class="footer-meta">{{ date_str }} · {{ total_items }} sources · Generated {{ generated_time }}</div>
+                <div class="footer-ref">REF: NL-{{ date_str }}-IR-001</div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

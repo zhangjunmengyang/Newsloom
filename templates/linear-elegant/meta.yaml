@@ -1,0 +1,17 @@
+name: "Linear Elegant"
+description: "Linear.app inspired minimal dark theme with near-black background and purple accent"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "dark"
+features:
+  - "Ultra-minimal design with abundant white space"
+  - "Linear.app signature purple (#5E6AD2) accent color"
+  - "#111 near-black background for eye comfort"
+  - "Sans-serif typography with clean lines"
+  - "Borderless cards with subtle shadows only"
+  - "Scandinavian-inspired minimalism"
+category: "tech"
+color_scheme:
+  primary: "#111111"
+  accent: "#5E6AD2"
+  text: "#FFFFFF"

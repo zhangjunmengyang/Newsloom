@@ -1,0 +1,12 @@
+name: "Deloitte Green"
+description: "Deloitte inspired template with signature green color scheme and modern corporate navigation design"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "light"
+features:
+  - "Deloitte signature green #86BC25"
+  - "Pure black text #000000"
+  - "Modern corporate aesthetics"
+  - "Left sidebar green navigation"
+  - "Structured information hierarchy"
+  - "Professional enterprise feel"

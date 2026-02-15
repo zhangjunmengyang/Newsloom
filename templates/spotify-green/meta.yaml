@@ -1,0 +1,12 @@
+name: "spotify-green"
+description: "Spotify-inspired design with dark background, signature green accents, and music card aesthetics"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "dark"
+features:
+  - "Dark gray background (#121212)"
+  - "Spotify green accent (#1DB954)"
+  - "Rounded cards like song items"
+  - "Section layouts like playlists"
+  - "Dynamic gradient background effects"
+  - "Music streaming interface style"

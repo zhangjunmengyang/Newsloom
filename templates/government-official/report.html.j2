@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INTELLIGENCE BRIEFING · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * GOVERNMENT OFFICIAL — Intelligence Briefing / White Paper
+         * ============================================================
+         * Deep navy (#1B3A5C) authority palette · Gold (#C5A55A) accents
+         * Shield/emblem CSS decorations · CLASSIFIED watermark overlay
+         * ITEM-001 numbering · PRIORITY: HIGH labels · Signature block
+         * Document version & security markings · Running headers/footers
+         * Inspired by: PDB, CIA World Factbook, UK White Papers
+         * ============================================================ */
+
+        /* --- Design Tokens --- */
+        :root {
+            /* Core palette — deep navy authority */
+            --navy:             #1B3A5C;
+            --navy-dark:        #0F2440;
+            --navy-deeper:      #091A30;
+            --navy-light:       #2B5A8C;
+            --navy-pale:        #3A6FA0;
+            --navy-dim:         rgba(27, 58, 92, 0.08);
+            --navy-glow:        rgba(27, 58, 92, 0.04);
+
+            /* Gold — official decoration */
+            --gold:             #C5A55A;
+            --gold-light:       #D4BA78;
+            --gold-dark:        #A08540;
+            --gold-dim:         rgba(197, 165, 90, 0.12);
+            --gold-bright:      #DCC06B;
+
+            /* Red — classification / urgency */
+            --red:              #B22234;
+            --red-dark:         #8B1A28;
+            --red-light:        #D4384A;
+            --red-dim:          rgba(178, 34, 52, 0.08);
+            --red-glow:         rgba(178, 34, 52, 0.15);
+
+            /* Backgrounds — parchment hierarchy */
+            --bg-primary:       #FFFFFF;
+            --bg-secondary:     #F7F8FA;
+            --bg-card:          #F0F2F5;
+            --bg-surface:       #E8EBF0;
+            --bg-hover:         #E0E4EA;
+            --bg-watermark:     rgba(178, 34, 52, 0.03);
+
+            /* Text — ink hierarchy */
+            --text-primary:     #1A2332;
+            --text-secondary:   #3D4B5C;
+            --text-muted:       #6B7A8D;
+            --text-light:       #94A3B8;
+            --text-inverse:     #FFFFFF;
+
+            /* Priority — government classification levels */
+            --priority-must:    #B22234;
+            --priority-must-bg: rgba(178, 34, 52, 0.06);
+            --priority-rec:     #C5A55A;
+            --priority-rec-bg:  rgba(197, 165, 90, 0.06);
+            --priority-fyi:     #2D6A4F;
+            --priority-fyi-bg:  rgba(45, 106, 79, 0.04);
+
+            /* Borders */
+            --border:           #D8DDE5;
+            --border-strong:    #BCC3CF;
+            --border-accent:    var(--navy);
+
+            /* Spacing — 8pt grid */
+            --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px;
+            --sp-4: 16px; --sp-5: 20px; --sp-6: 24px;
+            --sp-8: 32px; --sp-10: 40px; --sp-12: 48px;
+            --sp-16: 64px; --sp-20: 80px;
+
+            /* Typography */
+            --font-serif: "Times New Roman", "Georgia", "Songti SC", "Noto Serif SC", "SimSun", serif;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+            --font-mono: "Courier New", "Monaco", "Consolas", monospace;
+            --font-stencil: "Impact", "Arial Black", "PingFang SC", sans-serif;
+
+            /* Radius — formal, minimal */
+            --radius-sm: 2px;
+            --radius-md: 4px;
+            --radius-lg: 6px;
+
+            /* Shadows */
+            --shadow-card: 0 1px 4px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+            --shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.06);
+            --shadow-inset: inset 0 2px 4px rgba(0, 0, 0, 0.04);
+        }
+
+        /* --- Page (PDF) --- */
+        @page {
+            size: A4;
+            margin: 2.2cm 2cm;
+            @top-left {
+                content: "DOC-NL-{{ date_str | replace('-', '') }}-001";
+                font-family: var(--font-mono);
+                font-size: 7pt;
+                color: var(--text-light);
+                letter-spacing: 0.05em;
+            }
+            @top-right {
+                content: "CLASSIFIED — INTERNAL USE ONLY";
+                font-family: var(--font-sans);
+                font-size: 7pt;
+                color: var(--red);
+                font-weight: 700;
+                letter-spacing: 0.1em;
+            }
+            @bottom-left {
+                content: "Version 1.0 · {{ date_str }}";
+                font-family: var(--font-sans);
+                font-size: 7pt;
+                color: var(--text-light);
+            }
+            @bottom-right {
+                content: "Page " counter(page);
+                font-family: var(--font-sans);
+                font-size: 7pt;
+                color: var(--text-muted);
+            }
+        }
+
+        /* --- Reset & Base --- */
+        *, *::before, *::after {
+            margin: 0; padding: 0; box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-serif);
+            background: var(--bg-primary);
+            /* Subtle diagonal linen texture via repeating gradient */
+            background-image:
+                repeating-linear-gradient(
+                    120deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(27, 58, 92, 0.008) 2px,
+                    rgba(27, 58, 92, 0.008) 4px
+                );
+            color: var(--text-primary);
+            font-size: 15px;
+            line-height: 1.75;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            position: relative;
+        }
+
+        /* --- CLASSIFIED Watermark Overlay --- */
+        body::before {
+            content: 'CLASSIFIED';
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-35deg);
+            font-family: var(--font-stencil);
+            font-size: 120px;
+            font-weight: 900;
+            color: var(--red);
+            opacity: 0.025;
+            letter-spacing: 0.15em;
+            pointer-events: none;
+            z-index: 0;
+            white-space: nowrap;
+            user-select: none;
+        }
+
+        /* Secondary watermark line */
+        body::after {
+            content: 'CONFIDENTIAL · INTERNAL USE ONLY · CONFIDENTIAL · INTERNAL USE ONLY';
+            position: fixed;
+            top: 62%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-35deg);
+            font-family: var(--font-sans);
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--red);
+            opacity: 0.02;
+            letter-spacing: 0.3em;
+            pointer-events: none;
+            z-index: 0;
+            white-space: nowrap;
+            user-select: none;
+        }
+
+        a {
+            color: var(--navy);
+            text-decoration: underline;
+            text-decoration-thickness: 1px;
+            text-underline-offset: 2px;
+            transition: color 0.2s ease;
+        }
+        a:hover { color: var(--red); }
+
+        /* --- Container --- */
+        .container {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: var(--sp-10) var(--sp-6);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* --- Security Classification Banner --- */
+        .classification-banner {
+            background: var(--red);
+            color: var(--text-inverse);
+            text-align: center;
+            padding: var(--sp-1) var(--sp-4);
+            font-family: var(--font-sans);
+            font-size: 0.68em;
+            font-weight: 700;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            margin-bottom: var(--sp-8);
+        }
+
+        /* ============================================================
+         * HEADER — Official Government Document Masthead
+         * ============================================================ */
+        .header {
+            border: 3px double var(--navy);
+            background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 60%, var(--bg-secondary) 100%);
+            padding: var(--sp-10) var(--sp-8);
+            margin-bottom: var(--sp-10);
+            text-align: center;
+            page-break-inside: avoid;
+            position: relative;
+            box-shadow: var(--shadow-elevated);
+        }
+
+        /* Gold corner ornaments */
+        .header::before,
+        .header::after {
+            content: '';
+            position: absolute;
+            width: 28px; height: 28px;
+            border-color: var(--gold);
+            border-style: solid;
+        }
+        .header::before {
+            top: 8px; left: 8px;
+            border-width: 3px 0 0 3px;
+        }
+        .header::after {
+            bottom: 8px; right: 8px;
+            border-width: 0 3px 3px 0;
+        }
+
+        /* Additional gold corners via inner wrapper */
+        .header-inner::before,
+        .header-inner::after {
+            content: '';
+            position: absolute;
+            width: 28px; height: 28px;
+            border-color: var(--gold);
+            border-style: solid;
+        }
+        .header-inner::before {
+            top: 8px; right: 8px;
+            border-width: 3px 3px 0 0;
+        }
+        .header-inner::after {
+            bottom: 8px; left: 8px;
+            border-width: 0 0 3px 3px;
+        }
+        .header-inner {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        /* Red classification stamp at top */
+        .header-classification {
+            font-family: var(--font-sans);
+            font-size: 0.68em;
+            font-weight: 700;
+            color: var(--red);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: var(--sp-4);
+            padding: var(--sp-1) var(--sp-5);
+            border: 2px solid var(--red);
+            display: inline-block;
+        }
+
+        /* CSS Shield/Emblem */
+        .header-emblem {
+            width: 90px; height: 90px;
+            margin: var(--sp-5) auto var(--sp-4);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Shield shape via borders */
+        .header-emblem-shield {
+            width: 70px; height: 80px;
+            background: linear-gradient(180deg, var(--navy) 0%, var(--navy-dark) 100%);
+            clip-path: polygon(50% 0%, 100% 15%, 100% 65%, 50% 100%, 0% 65%, 0% 15%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .header-emblem-shield::before {
+            content: '';
+            position: absolute;
+            inset: 3px;
+            background: linear-gradient(180deg, var(--navy-light) 0%, var(--navy) 100%);
+            clip-path: polygon(50% 0%, 100% 15%, 100% 65%, 50% 100%, 0% 65%, 0% 15%);
+        }
+
+        .header-emblem-shield::after {
+            content: '';
+            position: absolute;
+            inset: 6px;
+            border: 1px solid var(--gold);
+            clip-path: polygon(50% 0%, 100% 15%, 100% 65%, 50% 100%, 0% 65%, 0% 15%);
+        }
+
+        .header-emblem-text {
+            font-family: var(--font-sans);
+            font-size: 0.55em;
+            font-weight: 800;
+            color: var(--gold);
+            text-align: center;
+            line-height: 1.15;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        /* Gold decorative stars flanking emblem */
+        .header-stars {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--sp-2);
+            color: var(--gold);
+            font-size: 0.7em;
+            letter-spacing: 0.2em;
+            margin-bottom: var(--sp-3);
+        }
+        .header-stars::before,
+        .header-stars::after {
+            content: '';
+            width: 60px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        .header-docnum {
+            font-family: var(--font-mono);
+            font-size: 0.72em;
+            color: var(--text-muted);
+            margin-bottom: var(--sp-4);
+            letter-spacing: 0.08em;
+        }
+
+        .header-brand {
+            font-family: var(--font-sans);
+            font-size: 2.2em;
+            font-weight: 800;
+            color: var(--navy);
+            margin-bottom: var(--sp-2);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        .header-title {
+            font-family: var(--font-sans);
+            font-size: 0.88em;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: var(--sp-5);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Gold decorative rule */
+        .header-rule {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--sp-3);
+            margin: var(--sp-4) 0;
+            color: var(--gold);
+            font-size: 0.8em;
+        }
+        .header-rule::before,
+        .header-rule::after {
+            content: '';
+            flex: 1;
+            max-width: 120px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        .header-date {
+            font-family: var(--font-sans);
+            font-size: 0.88em;
+            color: var(--text-muted);
+            font-weight: 500;
+            padding-top: var(--sp-3);
+            border-top: 1px solid var(--border-strong);
+        }
+
+        .header-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: var(--sp-5);
+            padding-top: var(--sp-4);
+            border-top: 1px solid var(--border);
+            font-family: var(--font-sans);
+            font-size: 0.75em;
+            color: var(--text-muted);
+        }
+
+        .stat-group {
+            display: flex;
+            gap: var(--sp-5);
+        }
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-1);
+        }
+        .stat-label { font-weight: 500; }
+        .stat-value { font-weight: 700; color: var(--navy); }
+        .stat.critical .stat-value { color: var(--red); }
+
+        /* Security classification footer in header */
+        .header-security {
+            margin-top: var(--sp-5);
+            padding-top: var(--sp-3);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--font-mono);
+            font-size: 0.65em;
+            color: var(--text-light);
+            letter-spacing: 0.05em;
+        }
+
+        /* ============================================================
+         * EXECUTIVE SUMMARY — Official Brief Panel
+         * ============================================================ */
+        .exec-summary {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 50%, var(--bg-secondary) 100%);
+            border: 1px solid var(--border-strong);
+            border-left: 6px solid var(--navy);
+            padding: var(--sp-8);
+            margin-bottom: var(--sp-12);
+            page-break-inside: avoid;
+            box-shadow: var(--shadow-card);
+            position: relative;
+        }
+
+        .exec-summary::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 6px; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--gold-dim), transparent);
+        }
+
+        /* Diagonal "EYES ONLY" watermark inside summary */
+        .exec-summary::after {
+            content: 'EYES ONLY';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) rotate(-25deg);
+            font-family: var(--font-stencil);
+            font-size: 40px;
+            color: var(--red);
+            opacity: 0.03;
+            pointer-events: none;
+            letter-spacing: 0.15em;
+        }
+
+        .exec-label {
+            font-family: var(--font-sans);
+            font-size: 0.82em;
+            font-weight: 700;
+            color: var(--navy);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: var(--sp-5);
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+            padding-bottom: var(--sp-3);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .exec-label::before {
+            content: '▲';
+            color: var(--red);
+            font-size: 0.85em;
+        }
+
+        .exec-label-badge {
+            margin-left: auto;
+            font-size: 0.85em;
+            color: var(--red);
+            background: var(--red-dim);
+            padding: 2px var(--sp-3);
+            border: 1px solid rgba(178, 34, 52, 0.15);
+            letter-spacing: 0.08em;
+        }
+
+        .exec-summary p {
+            color: var(--text-secondary);
+            line-height: 1.85;
+            margin-bottom: var(--sp-5);
+            text-align: justify;
+            text-indent: 2em;
+        }
+        .exec-summary p:first-of-type { text-indent: 0; }
+        .exec-summary p:last-of-type { margin-bottom: 0; }
+        .exec-summary p strong {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        /* ============================================================
+         * SECTION — Official Department / Bureau Style
+         * ============================================================ */
+        .section {
+            margin-bottom: var(--sp-12);
+            page-break-inside: avoid;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-dark) 100%);
+            color: white;
+            padding: var(--sp-4) var(--sp-6);
+            margin-bottom: 0;
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            position: relative;
+            box-shadow: var(--shadow-card);
+        }
+
+        /* Red classification bar at left */
+        .section-header::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 5px;
+            background: var(--red);
+        }
+
+        /* Gold bottom accent */
+        .section-header::after {
+            content: '';
+            position: absolute;
+            bottom: -2px; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--gold), var(--gold-light), transparent);
+        }
+
+        /* Section color indicator dot */
+        .section-color-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .section-icon { font-size: 1.1em; opacity: 0.9; }
+        .section-title {
+            font-family: var(--font-sans);
+            font-size: 0.95em;
+            font-weight: 700;
+            flex: 1;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .section-count {
+            font-family: var(--font-mono);
+            background: rgba(255,255,255,0.15);
+            color: white;
+            font-size: 0.72em;
+            font-weight: 700;
+            padding: var(--sp-1) var(--sp-3);
+            border: 1px solid rgba(255,255,255,0.3);
+            letter-spacing: 0.05em;
+        }
+
+        .section-body {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-strong);
+            border-top: none;
+        }
+
+        /* ============================================================
+         * BRIEF — Intelligence Item Card
+         * ============================================================ */
+        .brief {
+            padding: var(--sp-5) var(--sp-6);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: var(--sp-4);
+            position: relative;
+            page-break-inside: avoid;
+            transition: background 0.15s ease;
+        }
+        .brief:hover { background: var(--bg-secondary); }
+        .brief:last-child { border-bottom: none; }
+
+        /* Item number column */
+        .brief-number {
+            width: 52px;
+            text-align: center;
+            flex-shrink: 0;
+            font-family: var(--font-mono);
+            padding-top: var(--sp-1);
+        }
+
+        .brief-number-id {
+            font-size: 0.65em;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .brief-number-priority {
+            font-size: 0.65em;
+            font-weight: 700;
+            font-family: var(--font-sans);
+            letter-spacing: 0.06em;
+            padding: 2px 4px;
+            display: inline-block;
+        }
+
+        /* PRIORITY: HIGH label for must-read */
+        .brief.must-read .brief-number-priority {
+            color: var(--text-inverse);
+            background: var(--red);
+        }
+        .brief.recommended .brief-number-priority {
+            color: var(--gold-dark);
+            background: var(--gold-dim);
+            border: 1px solid var(--gold);
+        }
+        .brief.fyi .brief-number-priority {
+            color: var(--priority-fyi);
+            background: var(--priority-fyi-bg);
+        }
+
+        /* Priority-specific styling */
+        .brief.must-read {
+            background: linear-gradient(90deg, var(--priority-must-bg) 0%, var(--bg-primary) 30%);
+            border-left: 5px solid var(--red);
+        }
+        .brief.must-read::after {
+            content: '⚠ PRIORITY: HIGH';
+            position: absolute;
+            top: var(--sp-2); right: var(--sp-3);
+            font-family: var(--font-sans);
+            font-size: 0.55em;
+            font-weight: 800;
+            color: var(--text-inverse);
+            background: var(--red);
+            padding: 2px 8px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        .brief.recommended {
+            border-left: 5px solid var(--gold);
+            background: var(--priority-rec-bg);
+        }
+        .brief.fyi {
+            border-left: 5px solid var(--priority-fyi);
+            background: var(--priority-fyi-bg);
+        }
+
+        .brief-content { flex: 1; min-width: 0; }
+
+        .brief-headline {
+            font-size: 1.02em;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-bottom: var(--sp-3);
+        }
+        .brief-headline a {
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+        .brief-headline a:hover {
+            color: var(--navy);
+            text-decoration: underline;
+        }
+        .brief.must-read .brief-headline a {
+            color: var(--red);
+            font-weight: 700;
+        }
+
+        .brief-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            margin-bottom: var(--sp-3);
+            flex-wrap: wrap;
+            font-family: var(--font-sans);
+            font-size: 0.72em;
+        }
+
+        .source-badge {
+            background: var(--navy-dim);
+            color: var(--navy);
+            font-weight: 600;
+            padding: 2px var(--sp-2);
+            border: 1px solid rgba(27, 58, 92, 0.15);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .tag {
+            background: var(--red-dim);
+            color: var(--red);
+            font-weight: 500;
+            padding: 2px var(--sp-2);
+            border: 1px solid rgba(178, 34, 52, 0.12);
+            font-size: 0.95em;
+        }
+
+        .brief-detail {
+            color: var(--text-secondary);
+            line-height: 1.75;
+            font-size: 0.92em;
+            text-align: justify;
+        }
+        .brief-detail strong { color: var(--text-primary); font-weight: 700; }
+        .brief-detail em { color: var(--navy); font-style: normal; font-weight: 500; }
+        .brief-detail code {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            padding: 1px 4px;
+            font-size: 0.88em;
+            font-family: var(--font-mono);
+            border: 1px solid var(--border);
+        }
+
+        /* ============================================================
+         * SIGNATURE BLOCK — Prepared by / Authorized by
+         * ============================================================ */
+        .signature-block {
+            margin-top: var(--sp-12);
+            padding: var(--sp-8) var(--sp-6);
+            border: 1px solid var(--border-strong);
+            background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+            page-break-inside: avoid;
+        }
+
+        .signature-block-title {
+            font-family: var(--font-sans);
+            font-size: 0.78em;
+            font-weight: 700;
+            color: var(--navy);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: var(--sp-6);
+            padding-bottom: var(--sp-3);
+            border-bottom: 2px solid var(--navy);
+        }
+
+        .signature-row {
+            display: flex;
+            gap: var(--sp-10);
+            margin-bottom: var(--sp-6);
+        }
+
+        .signature-field {
+            flex: 1;
+        }
+
+        .signature-line {
+            border-bottom: 1px solid var(--text-light);
+            height: 40px;
+            margin-bottom: var(--sp-2);
+        }
+
+        .signature-label {
+            font-family: var(--font-sans);
+            font-size: 0.68em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .signature-date {
+            font-family: var(--font-mono);
+            font-size: 0.72em;
+            color: var(--text-muted);
+            margin-top: var(--sp-4);
+        }
+
+        /* ============================================================
+         * FOOTER — Official Document Certification
+         * ============================================================ */
+        .footer {
+            text-align: center;
+            padding: var(--sp-10) 0 var(--sp-8);
+            margin-top: var(--sp-10);
+            color: var(--text-muted);
+            font-family: var(--font-sans);
+            position: relative;
+        }
+
+        /* Double-rule top border */
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 5px;
+            background:
+                linear-gradient(180deg,
+                    var(--navy) 0%, var(--navy) 2px,
+                    transparent 2px, transparent 3px,
+                    var(--navy) 3px, var(--navy) 5px
+                );
+        }
+
+        .footer-classification {
+            font-size: 0.68em;
+            font-weight: 700;
+            color: var(--red);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: var(--sp-4);
+            padding: var(--sp-1) var(--sp-5);
+            border: 2px solid var(--red);
+            display: inline-block;
+        }
+
+        .footer-brand {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: var(--navy);
+            margin-top: var(--sp-3);
+            margin-bottom: var(--sp-2);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .footer-meta {
+            font-size: 0.82em;
+            line-height: 1.5;
+            margin-bottom: var(--sp-4);
+        }
+        .footer-meta .highlight {
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        /* Official stamp decoration */
+        .footer-stamp-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--sp-8);
+            margin-top: var(--sp-6);
+            padding-top: var(--sp-5);
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-stamp {
+            width: 65px; height: 65px;
+            border: 2px solid var(--red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: rotate(-15deg);
+            opacity: 0.5;
+            position: relative;
+        }
+        .footer-stamp::before {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            border: 1px solid var(--red);
+            border-radius: 50%;
+        }
+        .footer-stamp::after {
+            content: '';
+            position: absolute;
+            inset: 8px;
+            border: 1px dashed rgba(178, 34, 52, 0.3);
+            border-radius: 50%;
+        }
+
+        .footer-stamp-text {
+            font-family: var(--font-sans);
+            font-size: 0.48em;
+            font-weight: 800;
+            color: var(--red);
+            text-align: center;
+            line-height: 1.2;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .footer-info {
+            font-size: 0.72em;
+            color: var(--text-light);
+        }
+
+        .footer-version {
+            margin-top: var(--sp-5);
+            font-family: var(--font-mono);
+            font-size: 0.62em;
+            color: var(--text-light);
+            letter-spacing: 0.05em;
+        }
+
+        .footer-legal {
+            margin-top: var(--sp-5);
+            font-size: 0.65em;
+            color: var(--text-light);
+            line-height: 1.5;
+            max-width: 520px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* End classification banner */
+        .classification-banner-end {
+            background: var(--red);
+            color: var(--text-inverse);
+            text-align: center;
+            padding: var(--sp-1) var(--sp-4);
+            font-family: var(--font-sans);
+            font-size: 0.68em;
+            font-weight: 700;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            margin-top: var(--sp-8);
+        }
+
+        /* ============================================================
+         * Print / PDF Overrides
+         * ============================================================ */
+        @media print {
+            body {
+                background: var(--bg-primary) !important;
+                background-image: none !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            body::before, body::after { display: none; }
+            .container { max-width: 100%; padding: 0; }
+            .header { margin-bottom: var(--sp-6); padding: var(--sp-5); box-shadow: none; }
+            .exec-summary { margin-bottom: var(--sp-8); padding: var(--sp-5); box-shadow: none; }
+            .brief { padding: var(--sp-3) var(--sp-4); }
+            .brief:hover { background: transparent; }
+            .section { margin-bottom: var(--sp-8); }
+            .section-header { box-shadow: none; }
+            a { text-decoration: none !important; }
+        }
+
+        /* ============================================================
+         * Mobile Responsive
+         * ============================================================ */
+        @media (max-width: 640px) {
+            body { font-size: 14px; }
+            body::before { font-size: 60px; }
+            body::after { font-size: 10px; }
+            .container { padding: var(--sp-4); }
+            .header { padding: var(--sp-5); }
+            .header::before, .header::after,
+            .header-inner::before, .header-inner::after { display: none; }
+            .header-brand { font-size: 1.5em; letter-spacing: 0.06em; }
+            .header-emblem { width: 70px; height: 70px; }
+            .header-emblem-shield { width: 55px; height: 65px; }
+            .header-meta { flex-direction: column; gap: var(--sp-2); }
+            .header-security { flex-direction: column; gap: var(--sp-1); text-align: center; }
+            .exec-summary { padding: var(--sp-5); }
+            .exec-summary::after { font-size: 24px; }
+            .brief { padding: var(--sp-3) var(--sp-4); flex-direction: column; gap: var(--sp-2); }
+            .brief-number { width: auto; text-align: left; display: flex; gap: var(--sp-2); }
+            .brief.must-read::after { font-size: 0.5em; padding: 1px 4px; }
+            .section-header { padding: var(--sp-3) var(--sp-4); }
+            .signature-row { flex-direction: column; gap: var(--sp-5); }
+            .footer-stamp-row { gap: var(--sp-4); flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- ====== TOP CLASSIFICATION BANNER ====== -->
+        <div class="classification-banner">
+            CLASSIFIED · INTERNAL USE ONLY · DOC-NL-{{ date_str | replace('-', '') }}-001
+        </div>
+
+        <!-- ====== HEADER: Official Government Document ====== -->
+        <header class="header">
+            <div class="header-inner"></div>
+            <div class="header-classification">机密 · 内部参阅</div>
+
+            <!-- CSS Shield Emblem -->
+            <div class="header-emblem">
+                <div class="header-emblem-shield">
+                    <span class="header-emblem-text">NL<br>情报<br>系统</span>
+                </div>
+            </div>
+
+            <div class="header-stars">★ ★ ★</div>
+            <div class="header-docnum">DOC-NL-{{ date_str | replace('-', '') }}-001 · VERSION 1.0</div>
+            <h1 class="header-brand">INTELLIGENCE BRIEFING</h1>
+            <div class="header-title">Daily Situation Report · 每日情报简报</div>
+            <div class="header-rule">★</div>
+            <div class="header-date">发布时间：{{ generated_time }}</div>
+
+            <div class="header-meta">
+                <div class="stat-group">
+                    <div class="stat">
+                        <span class="stat-label">总计：</span>
+                        <span class="stat-value">{{ total_items }}</span>
+                        <span class="stat-label">条</span>
+                    </div>
+                    {% set must_read_total = [] %}
+                    {% for section_key, items in briefs.items() %}
+                    {% if items is iterable and items is not string %}
+                    {% for item in items %}
+                    {% if item.priority == '🔴' %}
+                    {% if must_read_total.append(1) %}{% endif %}
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
+                    {% endfor %}
+                    {% if must_read_total|length > 0 %}
+                    <div class="stat critical">
+                        <span class="stat-label">紧急：</span>
+                        <span class="stat-value">{{ must_read_total|length }}</span>
+                        <span class="stat-label">条</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <div>{{ date_str }}</div>
+            </div>
+
+            <div class="header-security">
+                <span>SECURITY: CLASSIFIED</span>
+                <span>DISTRIBUTION: INTERNAL</span>
+                <span>RETENTION: 30 DAYS</span>
+            </div>
+        </header>
+
+        <!-- ====== EXECUTIVE SUMMARY ====== -->
+        {% if executive_summary %}
+        <div class="exec-summary">
+            <div class="exec-label">
+                执行摘要 · Executive Summary
+                <span class="exec-label-badge">PRIORITY</span>
+            </div>
+            {% for line in executive_summary.strip().split('\n') %}
+            {% if line.strip() %}
+            <p>{{ line.strip() | md_inline }}</p>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- ====== SECTIONS: Intelligence Items ====== -->
+        {% set ns = namespace(item_counter=0) %}
+        {% for section_key in section_order %}
+        {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+        {% set meta = section_configs.get(section_key, {}) %}
+        {% set items = briefs[section_key] %}
+        <section class="section">
+            <div class="section-header">
+                <span class="section-color-dot" style="background: {{ meta.color|default('#6366f1') }};"></span>
+                <div class="section-icon">{{ meta.emoji|default('■') }}</div>
+                <h2 class="section-title">{{ meta.title|default(section_key) }}</h2>
+                <span class="section-count">{{ items|length }} ITEMS</span>
+            </div>
+
+            <div class="section-body">
+                {% for item in items %}
+                {% set ns.item_counter = ns.item_counter + 1 %}
+                {% set priority = item.priority|default('🟢') %}
+                {% set p_class = 'must-read' if priority == '🔴' else ('recommended' if priority == '🟡' else 'fyi') %}
+                <div class="brief {{ p_class }}">
+                    <div class="brief-number">
+                        <span class="brief-number-id">ITEM-{{ '%03d' % ns.item_counter }}</span>
+                        <span class="brief-number-priority">
+                            {% if priority == '🔴' %}HIGH{% elif priority == '🟡' %}MED{% else %}LOW{% endif %}
+                        </span>
+                    </div>
+                    <div class="brief-content">
+                        <div class="brief-headline">
+                            <a href="{{ item.url|default('#') }}" target="_blank">{{ item.headline|default(item.title|default('无标题')) }}</a>
+                        </div>
+                        <div class="brief-meta">
+                            {% if item.source %}
+                            <span class="source-badge">{{ item.source }}</span>
+                            {% endif %}
+                            {% if item.tags %}
+                            {% for tag in item.tags %}
+                            <span class="tag">{{ tag }}</span>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                        {% if item.detail %}
+                        <div class="brief-detail">{{ item.detail|default('') | md_inline }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+        {% endfor %}
+
+        <!-- ====== SIGNATURE BLOCK ====== -->
+        <div class="signature-block">
+            <div class="signature-block-title">Document Authorization</div>
+            <div class="signature-row">
+                <div class="signature-field">
+                    <div class="signature-line"></div>
+                    <div class="signature-label">Prepared by: AI Intelligence System</div>
+                </div>
+                <div class="signature-field">
+                    <div class="signature-line"></div>
+                    <div class="signature-label">Authorized by: Newsloom Command</div>
+                </div>
+            </div>
+            <div class="signature-row">
+                <div class="signature-field">
+                    <div class="signature-line"></div>
+                    <div class="signature-label">Reviewed by: Editorial Division</div>
+                </div>
+                <div class="signature-field">
+                    <div class="signature-date">Date: {{ date_str }} · Classification: INTERNAL</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== FOOTER ====== -->
+        <footer class="footer">
+            <div class="footer-classification">机密文件 · 内部参阅</div>
+            <div class="footer-brand">NEWSLOOM INTELLIGENCE SYSTEM</div>
+            <div class="footer-meta">
+                人工智能筛选整理 · <span class="highlight">{{ date_str }}</span> ·
+                共分析 <span class="highlight">{{ total_items }}</span> 个信息源
+            </div>
+            <div class="footer-stamp-row">
+                <div class="footer-stamp">
+                    <span class="footer-stamp-text">已审<br>核</span>
+                </div>
+                <div class="footer-info">
+                    签发日期：{{ date_str }}<br>
+                    有效期至：{{ date_str }} + 30天<br>
+                    分发范围：内部人员
+                </div>
+                <div class="footer-stamp">
+                    <span class="footer-stamp-text">NL<br>SEAL</span>
+                </div>
+            </div>
+            <div class="footer-version">
+                DOC-NL-{{ date_str | replace('-', '') }}-001 · v1.0 · {{ generated_time }}
+            </div>
+            <div class="footer-legal">
+                本文件系人工智能系统自动生成的情报分析摘要，仅供内部参考使用。
+                未经授权，严禁复制、传播或对外披露本文件内容。
+                违反保密规定者将承担相应法律责任。
+            </div>
+        </footer>
+
+        <!-- ====== BOTTOM CLASSIFICATION BANNER ====== -->
+        <div class="classification-banner-end">
+            END OF DOCUMENT · CLASSIFIED · INTERNAL USE ONLY
+        </div>
+
+    </div>
+</body>
+</html>

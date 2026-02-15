@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goldman Sachs · Investment Research · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * GOLDMAN SACHS — Investment Research Report
+         *
+         * Pure white base · GS Blue (#003594) · Gold (#C4A962)
+         * Full-width deep-blue header · "INVESTMENT RESEARCH" banner
+         * Gold pinstripe accents · Disclaimer banner at top
+         * Striped data tables · Deep-blue table headers
+         * "Conviction List" badge for must-read items
+         * Bottom-line summary box (blue bg, white text)
+         * Page numbers · Analyst attribution · PDF-ready
+         *
+         * Zero external dependencies · Inline CSS only
+         * ============================================================ */
+
+        /* --- PDF Page Setup --- */
+        @page {
+            size: A4;
+            margin: 1.8cm 1.5cm 2cm 1.5cm;
+            @top-center {
+                content: "STRICTLY PRIVATE AND CONFIDENTIAL";
+                font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+                font-size: 6.5pt;
+                color: #999;
+                letter-spacing: 2px;
+                font-weight: 600;
+            }
+            @bottom-left {
+                content: "Goldman Sachs Global Investment Research";
+                font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+                font-size: 7pt;
+                color: #888;
+            }
+            @bottom-right {
+                content: "Page " counter(page) " of " counter(pages);
+                font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+                font-size: 7pt;
+                color: #888;
+            }
+        }
+
+        /* --- Reset --- */
+        *, *::before, *::after {
+            margin: 0; padding: 0; box-sizing: border-box;
+        }
+
+        /* --- Base Body --- */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                         "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei",
+                         "Helvetica Neue", Arial, sans-serif;
+            background: #FFFFFF;
+            color: #1A1A1A;
+            font-size: 14px;
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        a { color: #003594; text-decoration: none; }
+        a:hover { color: #C4A962; }
+
+        /* --- Disclaimer Banner (top of page) --- */
+        .disclaimer-banner {
+            background: linear-gradient(90deg, #003594 0%, #002266 100%);
+            color: rgba(255,255,255,0.7);
+            font-size: 0.65em;
+            font-weight: 600;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            text-align: center;
+            padding: 8px 16px;
+            line-height: 1.4;
+        }
+
+        /* --- Gold Pinstripe under disclaimer --- */
+        .gold-stripe {
+            height: 3px;
+            background: linear-gradient(90deg,
+                #C4A962 0%, #D4BC7A 25%, #C4A962 50%, #B89A52 75%, #C4A962 100%);
+        }
+
+        /* --- Container --- */
+        .container {
+            max-width: 780px;
+            margin: 0 auto;
+            padding: 0 24px 48px;
+        }
+
+        /* ============================================================
+         * HEADER: Deep-blue full-width + INVESTMENT RESEARCH
+         * ============================================================ */
+        .report-header {
+            background: linear-gradient(135deg, #003594 0%, #00256E 40%, #001A4D 100%);
+            color: #FFFFFF;
+            padding: 48px 40px 40px;
+            margin: 0 -24px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Subtle diagonal texture */
+        .report-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                repeating-linear-gradient(
+                    120deg,
+                    transparent,
+                    transparent 60px,
+                    rgba(196, 169, 98, 0.03) 60px,
+                    rgba(196, 169, 98, 0.03) 61px
+                );
+            pointer-events: none;
+        }
+
+        .report-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg,
+                #C4A962 0%, #D4BC7A 30%, #C4A962 50%, #B89A52 70%, #C4A962 100%);
+        }
+
+        .header-inner {
+            position: relative;
+            z-index: 1;
+            max-width: 780px;
+            margin: 0 auto;
+        }
+
+        .header-division {
+            font-size: 0.68em;
+            font-weight: 700;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: #C4A962;
+            margin-bottom: 6px;
+        }
+
+        .header-brand {
+            font-family: Georgia, "Times New Roman", "Songti SC", "SimSun", serif;
+            font-size: 2.2em;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            margin-bottom: 4px;
+            line-height: 1.15;
+        }
+
+        .header-research-tag {
+            font-size: 0.82em;
+            font-weight: 600;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.55);
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(196, 169, 98, 0.35);
+        }
+
+        .header-report-title {
+            font-family: Georgia, "Times New Roman", "Songti SC", "SimSun", serif;
+            font-size: 1.35em;
+            font-weight: 400;
+            line-height: 1.35;
+            margin-bottom: 20px;
+            color: rgba(255,255,255,0.92);
+        }
+
+        .header-meta-grid {
+            display: flex;
+            gap: 32px;
+            flex-wrap: wrap;
+            font-size: 0.78em;
+        }
+
+        .header-meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .header-meta-label {
+            font-size: 0.78em;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: rgba(196, 169, 98, 0.8);
+        }
+
+        .header-meta-value {
+            font-weight: 500;
+            color: rgba(255,255,255,0.85);
+        }
+
+        /* --- Gold stripe after header --- */
+        .header-bottom-stripe {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #C4A962, transparent);
+            margin: 0 -24px;
+        }
+
+        /* ============================================================
+         * METRICS PANEL: Data table style
+         * ============================================================ */
+        .metrics-panel {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            border: 1px solid #D1D5DB;
+            margin: 32px 0;
+            background: #FFFFFF;
+        }
+
+        .metric-cell {
+            padding: 18px 12px;
+            text-align: center;
+            border-right: 1px solid #E5E7EB;
+            position: relative;
+        }
+
+        .metric-cell:last-child { border-right: none; }
+
+        .metric-cell:nth-child(odd) {
+            background: #FAFBFD;
+        }
+
+        .metric-number {
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #003594;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .metric-label {
+            font-size: 0.65em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #737373;
+        }
+
+        /* ============================================================
+         * EXECUTIVE SUMMARY: Bottom Line box
+         * ============================================================ */
+        .executive-summary {
+            background: linear-gradient(135deg, #003594 0%, #002266 100%);
+            color: #FFFFFF;
+            padding: 32px 36px;
+            margin-bottom: 40px;
+            position: relative;
+            page-break-inside: avoid;
+        }
+
+        .executive-summary::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #C4A962, #D4BC7A, #C4A962);
+        }
+
+        .summary-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(196, 169, 98, 0.3);
+        }
+
+        .summary-icon {
+            width: 28px;
+            height: 28px;
+            background: #C4A962;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            color: #003594;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .summary-title {
+            font-family: Georgia, "Times New Roman", "Songti SC", serif;
+            font-size: 1.1em;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            flex: 1;
+        }
+
+        .summary-badge {
+            font-size: 0.6em;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #003594;
+            background: #C4A962;
+            padding: 4px 12px;
+            border-radius: 3px;
+        }
+
+        .executive-summary .summary-body p {
+            color: rgba(255,255,255,0.92);
+            line-height: 1.78;
+            margin-bottom: 14px;
+            font-size: 0.95em;
+        }
+
+        .executive-summary .summary-body p:last-child { margin-bottom: 0; }
+
+        .executive-summary .summary-body strong {
+            color: #C4A962;
+            font-weight: 700;
+        }
+
+        .executive-summary .summary-body code {
+            font-family: "SF Mono", Monaco, "Courier New", monospace;
+            background: rgba(255,255,255,0.12);
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-size: 0.88em;
+        }
+
+        .executive-summary .summary-body em {
+            font-style: italic;
+            color: rgba(255,255,255,0.8);
+        }
+
+        /* ============================================================
+         * SECTION HEADER: Table-style
+         * ============================================================ */
+        .section {
+            margin-bottom: 40px;
+            page-break-inside: avoid;
+        }
+
+        .section-header-bar {
+            background: linear-gradient(135deg, #003594 0%, #00256E 100%);
+            color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            gap: 12px;
+            position: relative;
+        }
+
+        .section-header-bar::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 2px;
+            background: #C4A962;
+        }
+
+        .section-emoji {
+            font-size: 1.05em;
+            opacity: 0.85;
+        }
+
+        .section-title {
+            font-family: Georgia, "Times New Roman", "Songti SC", serif;
+            font-size: 1.05em;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            flex: 1;
+        }
+
+        .section-color-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.4);
+            flex-shrink: 0;
+        }
+
+        .section-count-badge {
+            font-size: 0.68em;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            color: #003594;
+            background: #C4A962;
+            padding: 3px 12px;
+            border-radius: 2px;
+            text-transform: uppercase;
+        }
+
+        /* ============================================================
+         * DATA TABLE: Striped rows, professional grid
+         * ============================================================ */
+        .data-table {
+            width: 100%;
+            border: 1px solid #D1D5DB;
+            border-top: none;
+            border-collapse: collapse;
+        }
+
+        .data-table-header {
+            display: grid;
+            grid-template-columns: 40px 1fr 100px;
+            background: #F3F4F6;
+            border-bottom: 2px solid #D1D5DB;
+            font-size: 0.68em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #4A4A4A;
+        }
+
+        .data-table-header > div {
+            padding: 8px 12px;
+            border-right: 1px solid #E5E7EB;
+        }
+
+        .data-table-header > div:last-child { border-right: none; }
+
+        /* --- Brief Row --- */
+        .brief-row {
+            border-bottom: 1px solid #F0F1F3;
+            padding: 18px 20px;
+            transition: background 0.15s;
+            position: relative;
+            page-break-inside: avoid;
+        }
+
+        .brief-row:hover { background: #F5F7FA; }
+
+        /* Striped rows */
+        .brief-row:nth-child(even) {
+            background: #FAFBFD;
+        }
+        .brief-row:nth-child(even):hover { background: #F0F2F5; }
+
+        /* Must-read: Conviction List */
+        .brief-row.conviction {
+            background: linear-gradient(90deg,
+                rgba(196, 169, 98, 0.08) 0%,
+                rgba(196, 169, 98, 0.04) 30%,
+                transparent 70%);
+            border-left: 4px solid #C4A962;
+        }
+        .brief-row.conviction:nth-child(even) {
+            background: linear-gradient(90deg,
+                rgba(196, 169, 98, 0.10) 0%,
+                rgba(196, 169, 98, 0.05) 30%,
+                #FAFBFD 70%);
+        }
+
+        .brief-row.recommended {
+            border-left: 3px solid #003594;
+        }
+
+        .brief-row.fyi {
+            opacity: 0.88;
+            border-left: 3px solid #D1D5DB;
+        }
+
+        /* Conviction List Badge */
+        .conviction-badge {
+            display: inline-block;
+            font-size: 0.58em;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #FFFFFF;
+            background: linear-gradient(135deg, #C4A962, #B89A52);
+            padding: 3px 10px;
+            border-radius: 2px;
+            margin-bottom: 8px;
+            box-shadow: 0 1px 3px rgba(196, 169, 98, 0.3);
+        }
+
+        .brief-top-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .brief-priority-dot {
+            flex-shrink: 0;
+            font-size: 0.92em;
+            margin-top: 3px;
+        }
+
+        .brief-headline {
+            font-family: Georgia, "Times New Roman", "Songti SC", serif;
+            font-size: 1.02em;
+            font-weight: 600;
+            line-height: 1.42;
+            flex: 1;
+        }
+
+        .brief-headline a { color: #1A1A1A; }
+        .brief-headline a:hover { color: #003594; }
+
+        .brief-row.conviction .brief-headline a {
+            color: #003594;
+            font-weight: 700;
+        }
+
+        /* Meta row */
+        .brief-meta-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        .source-chip {
+            font-size: 0.7em;
+            font-weight: 700;
+            color: #003594;
+            background: rgba(0, 53, 148, 0.06);
+            border: 1px solid rgba(0, 53, 148, 0.12);
+            padding: 2px 8px;
+            border-radius: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .tag-chip {
+            font-size: 0.65em;
+            font-weight: 500;
+            color: #737373;
+            background: #F3F4F6;
+            border: 1px solid #E5E7EB;
+            padding: 2px 7px;
+            border-radius: 2px;
+        }
+
+        .brief-detail {
+            color: #4A4A4A;
+            font-size: 0.92em;
+            line-height: 1.72;
+            text-align: justify;
+            padding-left: 26px;
+        }
+
+        .brief-detail strong {
+            color: #1A1A1A;
+            font-weight: 600;
+        }
+
+        .brief-detail em {
+            font-style: italic;
+            color: #4A4A4A;
+        }
+
+        .brief-detail code {
+            font-family: "SF Mono", Monaco, "Courier New", monospace;
+            background: #F3F4F6;
+            border: 1px solid #E5E7EB;
+            padding: 1px 5px;
+            border-radius: 2px;
+            font-size: 0.88em;
+            color: #1A1A1A;
+        }
+
+        /* ============================================================
+         * BOTTOM LINE BOX: Per-section summary (blue bg white text)
+         * ============================================================ */
+        .bottom-line-box {
+            background: linear-gradient(135deg, #003594 0%, #001A4D 100%);
+            color: #FFFFFF;
+            padding: 18px 24px;
+            margin-top: 2px;
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 4px;
+            font-size: 0.85em;
+            line-height: 1.65;
+            position: relative;
+        }
+
+        .bottom-line-box::before {
+            content: 'BOTTOM LINE';
+            font-size: 0.65em;
+            font-weight: 800;
+            letter-spacing: 0.15em;
+            color: #C4A962;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .bottom-line-box strong { color: #C4A962; }
+
+        /* ============================================================
+         * SECTION DIVIDER: Gold pinstripe
+         * ============================================================ */
+        .section-divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 8px 0 40px;
+        }
+
+        .section-divider-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #C4A962, transparent);
+        }
+
+        .section-divider-diamond {
+            width: 8px;
+            height: 8px;
+            background: #C4A962;
+            transform: rotate(45deg);
+            flex-shrink: 0;
+        }
+
+        /* ============================================================
+         * ANALYST ATTRIBUTION
+         * ============================================================ */
+        .analyst-box {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: #FAFBFD;
+            border: 1px solid #E5E7EB;
+            padding: 20px 24px;
+            margin: 40px 0;
+            page-break-inside: avoid;
+        }
+
+        .analyst-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #003594 0%, #001A4D 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #C4A962;
+            font-family: Georgia, serif;
+            font-size: 1.2em;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .analyst-info {
+            flex: 1;
+        }
+
+        .analyst-name {
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 1em;
+            font-weight: 700;
+            color: #1A1A1A;
+            margin-bottom: 2px;
+        }
+
+        .analyst-title-text {
+            font-size: 0.78em;
+            color: #737373;
+            margin-bottom: 2px;
+        }
+
+        .analyst-contact {
+            font-size: 0.72em;
+            color: #9CA3AF;
+        }
+
+        .analyst-stamp {
+            text-align: right;
+        }
+
+        .analyst-stamp-date {
+            font-family: Georgia, serif;
+            font-size: 0.78em;
+            color: #003594;
+            font-weight: 600;
+        }
+
+        .analyst-stamp-time {
+            font-size: 0.68em;
+            color: #9CA3AF;
+        }
+
+        /* ============================================================
+         * FOOTER: Regulatory disclaimer + copyright
+         * ============================================================ */
+        .footer {
+            margin-top: 48px;
+            border-top: 3px solid #003594;
+            position: relative;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 3px; left: 0; right: 0;
+            height: 2px;
+            background: #C4A962;
+        }
+
+        .footer-legal {
+            background: #FAFBFD;
+            border: 1px solid #E5E7EB;
+            border-top: none;
+            padding: 24px;
+            font-size: 0.68em;
+            color: #9CA3AF;
+            line-height: 1.6;
+            text-align: justify;
+        }
+
+        .footer-legal-title {
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #737373;
+            margin-bottom: 8px;
+            font-size: 0.92em;
+        }
+
+        .footer-brand-bar {
+            background: linear-gradient(135deg, #003594 0%, #001A4D 100%);
+            color: #FFFFFF;
+            text-align: center;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-brand-name {
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 0.88em;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+        }
+
+        .footer-copyright {
+            font-size: 0.68em;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .footer-powered {
+            font-size: 0.62em;
+            color: #C4A962;
+            letter-spacing: 0.08em;
+        }
+
+        /* ============================================================
+         * PRINT STYLES
+         * ============================================================ */
+        @media print {
+            body {
+                background: #FFFFFF !important;
+                font-size: 11pt;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            .container {
+                max-width: 100%;
+                padding: 0;
+            }
+
+            .disclaimer-banner,
+            .gold-stripe,
+            .header-bottom-stripe {
+                -webkit-print-color-adjust: exact;
+            }
+
+            .report-header {
+                margin: 0;
+                page-break-after: avoid;
+            }
+
+            .section {
+                page-break-inside: avoid;
+            }
+
+            .brief-row {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
+            .brief-row:hover { background: transparent !important; }
+            .brief-row:nth-child(even):hover { background: #FAFBFD !important; }
+
+            .executive-summary {
+                page-break-inside: avoid;
+            }
+
+            .bottom-line-box {
+                page-break-inside: avoid;
+            }
+
+            a { color: #1A1A1A !important; }
+        }
+
+        /* ============================================================
+         * RESPONSIVE
+         * ============================================================ */
+        @media (max-width: 768px) {
+            .container { padding: 0 16px 32px; }
+
+            .report-header {
+                padding: 32px 20px 28px;
+                margin: 0 -16px 0;
+            }
+
+            .header-brand { font-size: 1.6em; }
+
+            .header-meta-grid {
+                gap: 16px;
+            }
+
+            .metrics-panel {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .metric-cell:nth-child(2) { border-right: none; }
+
+            .section-header-bar {
+                padding: 10px 14px;
+            }
+
+            .brief-row { padding: 14px 14px; }
+            .brief-detail { padding-left: 0; }
+
+            .analyst-box {
+                flex-direction: column;
+                text-align: center;
+                gap: 12px;
+            }
+
+            .analyst-stamp { text-align: center; }
+
+            .footer-brand-bar {
+                flex-direction: column;
+                gap: 6px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body { font-size: 13px; }
+
+            .report-header { padding: 24px 16px 20px; }
+            .header-brand { font-size: 1.35em; }
+            .header-report-title { font-size: 1.1em; }
+
+            .metrics-panel { grid-template-columns: 1fr 1fr; }
+
+            .executive-summary { padding: 20px; }
+
+            .brief-headline { font-size: 0.95em; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ====== DISCLAIMER BANNER ====== -->
+    <div class="disclaimer-banner">
+        Strictly Private &amp; Confidential — For Authorized Recipients Only — Not For Distribution
+    </div>
+    <div class="gold-stripe"></div>
+
+    <!-- ====== HEADER: Full-width Deep Blue ====== -->
+    <div class="report-header">
+        <div class="header-inner">
+            <div class="header-division">Investment Research</div>
+            <h1 class="header-brand">Goldman Sachs</h1>
+            <div class="header-research-tag">Global Investment Research · Daily Intelligence</div>
+            <h2 class="header-report-title">Daily Intelligence Briefing — Multi-Sector Coverage Report</h2>
+            <div class="header-meta-grid">
+                <div class="header-meta-item">
+                    <span class="header-meta-label">Report Date</span>
+                    <span class="header-meta-value">{{ date_str }}</span>
+                </div>
+                <div class="header-meta-item">
+                    <span class="header-meta-label">Published</span>
+                    <span class="header-meta-value">{{ generated_time }}</span>
+                </div>
+                <div class="header-meta-item">
+                    <span class="header-meta-label">Coverage</span>
+                    <span class="header-meta-value">{{ total_items }} Items</span>
+                </div>
+                <div class="header-meta-item">
+                    <span class="header-meta-label">Sectors</span>
+                    <span class="header-meta-value">{{ section_order|length }} Active</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="header-bottom-stripe"></div>
+
+    <div class="container">
+
+        <!-- ====== KEY METRICS ====== -->
+        {% set ns = namespace(must_count=0, rec_count=0, fyi_count=0) %}
+        {% for section_key, items in briefs.items() %}
+        {% if items is iterable and items is not string %}
+        {% for item in items %}
+        {% if item.priority == '🔴' %}{% set ns.must_count = ns.must_count + 1 %}
+        {% elif item.priority == '🟡' %}{% set ns.rec_count = ns.rec_count + 1 %}
+        {% else %}{% set ns.fyi_count = ns.fyi_count + 1 %}
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+        {% endfor %}
+
+        <div class="metrics-panel">
+            <div class="metric-cell">
+                <div class="metric-number">{{ total_items }}</div>
+                <div class="metric-label">Total Coverage</div>
+            </div>
+            <div class="metric-cell">
+                <div class="metric-number" style="color: #C4A962;">{{ ns.must_count }}</div>
+                <div class="metric-label">Conviction List</div>
+            </div>
+            <div class="metric-cell">
+                <div class="metric-number">{{ ns.rec_count }}</div>
+                <div class="metric-label">Recommended</div>
+            </div>
+            <div class="metric-cell">
+                <div class="metric-number">{{ section_order|length }}</div>
+                <div class="metric-label">Sectors</div>
+            </div>
+        </div>
+
+        <!-- ====== EXECUTIVE SUMMARY: Bottom Line Box ====== -->
+        {% if executive_summary %}
+        <div class="executive-summary">
+            <div class="summary-label">
+                <div class="summary-icon">BL</div>
+                <div class="summary-title">The Bottom Line</div>
+                <span class="summary-badge">Key Insights</span>
+            </div>
+            <div class="summary-body">
+                {% for line in executive_summary.strip().split('\n') %}
+                {% if line.strip() %}
+                <p>{{ line.strip() | md_inline }}</p>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ====== SECTIONS ====== -->
+        {% set ns_sec = namespace(num=1) %}
+        {% for section_key in section_order %}
+        {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+        {% set meta = section_configs.get(section_key, {}) %}
+        {% set items = briefs[section_key] %}
+
+        {% if ns_sec.num > 1 %}
+        <div class="section-divider">
+            <div class="section-divider-line"></div>
+            <div class="section-divider-diamond"></div>
+            <div class="section-divider-line"></div>
+        </div>
+        {% endif %}
+
+        <section class="section">
+            <!-- Section Header: Deep blue bar -->
+            <div class="section-header-bar">
+                <span class="section-emoji">{{ meta.emoji|default('📊') }}</span>
+                <h2 class="section-title">{{ meta.title|default(section_key) }}</h2>
+                <span class="section-color-indicator" style="background: {{ meta.color|default('#003594') }};"></span>
+                <span class="section-count-badge">{{ items|length }} Items</span>
+            </div>
+
+            <!-- Table Header -->
+            <div class="data-table-header">
+                <div style="text-align: center;">Pr.</div>
+                <div>Research Item</div>
+                <div style="text-align: center;">Source</div>
+            </div>
+
+            <!-- Brief Rows -->
+            <div class="data-table">
+                {% for item in items %}
+                {% set priority = item.priority|default('🟢') %}
+                {% set p_class = 'conviction' if priority == '🔴' else ('recommended' if priority == '🟡' else 'fyi') %}
+                <div class="brief-row {{ p_class }}">
+                    {% if priority == '🔴' %}
+                    <div><span class="conviction-badge">★ Conviction List</span></div>
+                    {% endif %}
+
+                    <div class="brief-top-row">
+                        <span class="brief-priority-dot">{{ priority }}</span>
+                        <h3 class="brief-headline">
+                            <a href="{{ item.url|default('#') }}" target="_blank">{{ item.headline|default('Untitled') }}</a>
+                        </h3>
+                    </div>
+
+                    {% if item.source or item.tags %}
+                    <div class="brief-meta-row">
+                        {% if item.source %}
+                        <span class="source-chip">{{ item.source }}</span>
+                        {% endif %}
+                        {% if item.tags %}
+                        {% for tag in item.tags %}
+                        <span class="tag-chip">{{ tag }}</span>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    {% if item.detail %}
+                    <div class="brief-detail">{{ item.detail | md_inline }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Bottom Line Box for each section -->
+            {% set ns_bl = namespace(must_items=0) %}
+            {% for item in items %}
+            {% if item.priority == '🔴' %}{% set ns_bl.must_items = ns_bl.must_items + 1 %}{% endif %}
+            {% endfor %}
+            {% if ns_bl.must_items > 0 %}
+            <div class="bottom-line-box">
+                <strong>{{ meta.title|default(section_key) }}</strong> sector: {{ items|length }} items tracked, <strong>{{ ns_bl.must_items }}</strong> on our Conviction List requiring immediate attention. {{ meta.emoji|default('') }}
+            </div>
+            {% endif %}
+        </section>
+
+        {% set ns_sec.num = ns_sec.num + 1 %}
+        {% endif %}
+        {% endfor %}
+
+        <!-- ====== ANALYST ATTRIBUTION ====== -->
+        <div class="analyst-box">
+            <div class="analyst-avatar">NL</div>
+            <div class="analyst-info">
+                <div class="analyst-name">Newsloom Intelligence Engine</div>
+                <div class="analyst-title-text">Automated Research Division · Multi-Sector Coverage</div>
+                <div class="analyst-contact">newsloom-research@gs-intelligence.internal</div>
+            </div>
+            <div class="analyst-stamp">
+                <div class="analyst-stamp-date">{{ date_str }}</div>
+                <div class="analyst-stamp-time">{{ generated_time }}</div>
+            </div>
+        </div>
+
+        <!-- ====== FOOTER ====== -->
+        <footer class="footer">
+            <div class="footer-legal">
+                <div class="footer-legal-title">Important Disclosures</div>
+                This research report is prepared for informational purposes only and does not constitute an offer, solicitation, or recommendation to buy or sell any securities. The information contained herein has been obtained from sources believed to be reliable, but Goldman Sachs makes no representation or warranty as to its accuracy or completeness. Past performance is not indicative of future results. This document is intended for authorized recipients only and may not be reproduced, redistributed, or passed to any other person or published in whole or in part for any purpose without the prior written consent of Goldman Sachs. Goldman Sachs and its affiliates may have positions in the securities mentioned in this report.
+            </div>
+            <div class="footer-brand-bar">
+                <span class="footer-brand-name">Goldman Sachs</span>
+                <span class="footer-powered">Powered by Newsloom Intelligence</span>
+                <span class="footer-copyright">© {{ date_str[:4] }} The Goldman Sachs Group, Inc. All Rights Reserved.</span>
+            </div>
+        </footer>
+
+    </div>
+</body>
+</html>

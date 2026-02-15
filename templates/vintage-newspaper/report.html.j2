@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Newsloom Gazette · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * VINTAGE NEWSPAPER — 19th Century Broadsheet
+         * ============================================================
+         * Aged paper (#F4ECD8) + deep brown ink (#3C2415) + red accent
+         * CSS noise gradient + sepia + vignette edge darkening
+         * Gothic blackletter masthead + double-rule borders
+         * 3-column desktop layout + first article spans full width
+         * Ornamental dividers (❦) + woodcut geometric CSS
+         * Page numbers (A1, B2...) + "LATE EDITION" badge
+         * ============================================================ */
+
+        /* --- Color Palette --- */
+        :root {
+            /* Paper Tones */
+            --paper:            #F4ECD8;
+            --paper-light:      #F8F2E4;
+            --paper-cream:      #F0E6CE;
+            --paper-tan:        #E8DCC2;
+            --paper-dark:       #DDD0B5;
+            --paper-foxed:      #D4C8A8;
+            --paper-aged:       #C8B898;
+
+            /* Ink Colors */
+            --ink:              #3C2415;
+            --ink-dark:         #2A1A0E;
+            --ink-medium:       #5C3D28;
+            --ink-light:        #7A5C42;
+            --ink-faded:        #9C8268;
+            --ink-ghost:        #B8A58E;
+
+            /* Accents */
+            --red-accent:       #8B1A1A;
+            --red-dark:         #6B1010;
+            --red-light:        #A52A2A;
+            --gold-accent:      #B8860B;
+            --blue-accent:      #2F4F4F;
+
+            /* Priority */
+            --priority-must:       var(--red-accent);
+            --priority-must-bg:    rgba(139, 26, 26, 0.06);
+            --priority-rec:        var(--gold-accent);
+            --priority-rec-bg:     rgba(184, 134, 11, 0.06);
+            --priority-fyi:        var(--blue-accent);
+            --priority-fyi-bg:     rgba(47, 79, 79, 0.04);
+
+            /* Borders */
+            --rule:             #B8A58E;
+            --rule-strong:      #7A5C42;
+            --rule-dark:        var(--ink);
+
+            /* Typography */
+            --font-blackletter: "Old English Text MT", "Blackletter686 BT",
+                                "Times New Roman", "Noto Serif SC", serif;
+            --font-serif:       "Georgia", "Times New Roman",
+                                "Noto Serif SC", "SimSun", "STSong", serif;
+            --font-headline:    "Georgia", "Times New Roman",
+                                "Noto Serif SC", serif;
+            --font-sans:        "Arial", "Helvetica",
+                                "PingFang SC", "Noto Sans SC", sans-serif;
+            --font-typewriter:  "Courier New", "American Typewriter",
+                                "Noto Sans SC", monospace;
+
+            /* Radius */
+            --radius-sm: 2px;
+            --radius-md: 4px;
+
+            /* Shadows */
+            --paper-shadow:     0 8px 32px rgba(62, 39, 35, 0.15);
+            --ink-bleed:        0 1px 2px rgba(60, 36, 21, 0.15);
+            --card-shadow:      0 2px 6px rgba(60, 36, 21, 0.08);
+        }
+
+        /* --- PDF Page Rules --- */
+        @page {
+            size: A4;
+            margin: 2cm 1.5cm;
+            @top-left {
+                content: "THE NEWSLOOM GAZETTE";
+                font-family: "Georgia", serif;
+                font-size: 8pt;
+                color: #3C2415;
+            }
+            @top-right {
+                content: "{{ date_str }}";
+                font-family: "Courier New", monospace;
+                font-size: 8pt;
+                color: #5C3D28;
+            }
+            @bottom-center {
+                content: "— Page " counter(page) " —";
+                font-family: "Georgia", serif;
+                font-size: 9pt;
+                color: #9C8268;
+            }
+        }
+
+        /* --- Reset --- */
+        *, *::before, *::after {
+            margin: 0; padding: 0; box-sizing: border-box;
+        }
+
+        /* --- Body: Aged parchment outer --- */
+        body {
+            font-family: var(--font-serif);
+            /* Outer aged parchment radial */
+            background:
+                radial-gradient(ellipse at 50% 50%,
+                    var(--paper) 40%,
+                    var(--paper-aged) 100%
+                );
+            color: var(--ink);
+            font-size: 15px;
+            line-height: 1.55;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        a {
+            color: var(--blue-accent);
+            text-decoration: underline;
+            text-decoration-style: dotted;
+            text-underline-offset: 3px;
+            transition: color 0.3s;
+        }
+        a:hover {
+            color: var(--red-accent);
+            text-decoration-style: solid;
+        }
+
+        /* --- Newspaper Container --- */
+        .newspaper {
+            max-width: 1020px;
+            margin: 44px auto;
+            padding: 56px 36px;
+            position: relative;
+            /* Multi-layer paper texture:
+               1. Vignette (darkened edges)
+               2. Foxing spots (simulated stains)
+               3. Vertical & horizontal fiber grain
+               4. Base paper color */
+            background:
+                /* Vignette overlay */
+                radial-gradient(ellipse at 50% 50%,
+                    transparent 55%,
+                    rgba(60, 36, 21, 0.08) 85%,
+                    rgba(60, 36, 21, 0.14) 100%
+                ),
+                /* Foxing / aged spots */
+                radial-gradient(circle at 12% 18%, rgba(139, 26, 26, 0.02) 0%, transparent 8%),
+                radial-gradient(circle at 88% 72%, rgba(139, 26, 26, 0.018) 0%, transparent 7%),
+                radial-gradient(circle at 55% 35%, rgba(184, 134, 11, 0.012) 0%, transparent 10%),
+                radial-gradient(circle at 30% 82%, rgba(139, 26, 26, 0.015) 0%, transparent 5%),
+                /* Horizontal paper fiber */
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 3px,
+                    rgba(60, 36, 21, 0.007) 3px,
+                    rgba(60, 36, 21, 0.007) 6px
+                ),
+                /* Vertical paper fiber */
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 4px,
+                    rgba(60, 36, 21, 0.005) 4px,
+                    rgba(60, 36, 21, 0.005) 8px
+                ),
+                /* Diagonal weave overlay */
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 12px,
+                    rgba(60, 36, 21, 0.003) 12px,
+                    rgba(60, 36, 21, 0.003) 13px
+                ),
+                /* Base paper */
+                var(--paper);
+            box-shadow:
+                var(--paper-shadow),
+                0 0 0 1px rgba(60, 36, 21, 0.10);
+        }
+
+        /* Aged top edge */
+        .newspaper::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 6px;
+            background: linear-gradient(90deg,
+                rgba(60, 36, 21, 0.06),
+                rgba(60, 36, 21, 0.02) 20%,
+                transparent 50%,
+                rgba(60, 36, 21, 0.03) 80%,
+                rgba(60, 36, 21, 0.06)
+            );
+        }
+
+        /* Fold line (center crease) */
+        .newspaper::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 50%;
+            width: 1px; height: 100%;
+            background: repeating-linear-gradient(
+                180deg,
+                transparent,
+                transparent 10px,
+                rgba(60, 36, 21, 0.04) 10px,
+                rgba(60, 36, 21, 0.04) 20px
+            );
+            pointer-events: none;
+        }
+
+        /* ============================================================
+         * MASTHEAD — Gothic blackletter header
+         * ============================================================ */
+        .masthead {
+            border-top: 4px double var(--ink);
+            border-bottom: 4px double var(--ink);
+            padding: 36px 18px;
+            margin-bottom: 44px;
+            text-align: center;
+            position: relative;
+            /* Subtle vertical stripe overlay */
+            background:
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 1px,
+                    rgba(60, 36, 21, 0.02) 1px,
+                    rgba(60, 36, 21, 0.02) 2px
+                ),
+                var(--paper-cream);
+        }
+
+        /* Corner fleurons ❧ */
+        .masthead::before {
+            content: '❧';
+            position: absolute;
+            top: 10px; left: 14px;
+            color: var(--ink-faded);
+            font-size: 1.3em;
+        }
+        .masthead::after {
+            content: '❧';
+            position: absolute;
+            top: 10px; right: 14px;
+            color: var(--ink-faded);
+            font-size: 1.3em;
+            transform: scaleX(-1);
+        }
+
+        .masthead-est {
+            font-family: var(--font-typewriter);
+            font-size: 0.70em;
+            color: var(--ink-faded);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .masthead-title {
+            font-family: var(--font-blackletter);
+            font-size: 4em;
+            font-weight: 900;
+            color: var(--ink-dark);
+            text-shadow: var(--ink-bleed);
+            margin-bottom: 6px;
+            letter-spacing: 0.02em;
+            line-height: 0.90;
+        }
+
+        .masthead-rule {
+            height: 2px;
+            background: linear-gradient(90deg,
+                transparent 5%,
+                var(--ink-medium) 20%,
+                var(--ink-medium) 80%,
+                transparent 95%
+            );
+            margin: 14px auto;
+            max-width: 75%;
+        }
+
+        .masthead-motto {
+            font-family: var(--font-serif);
+            font-size: 0.85em;
+            color: var(--ink-medium);
+            font-style: italic;
+            letter-spacing: 0.10em;
+            margin-bottom: 18px;
+        }
+
+        .masthead-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: var(--font-typewriter);
+            font-size: 0.78em;
+            color: var(--ink-faded);
+            border-top: 1px solid var(--ink-light);
+            padding-top: 14px;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        .edition-label {
+            font-family: var(--font-sans);
+            font-weight: 700;
+            font-size: 0.82em;
+            color: var(--red-accent);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            border: 2px solid var(--red-accent);
+            padding: 3px 10px;
+        }
+
+        .price-box {
+            border: 2px solid var(--ink-medium);
+            padding: 3px 6px;
+            font-weight: bold;
+            background: var(--paper-cream);
+        }
+
+        /* ============================================================
+         * BANNER HEADLINE — Dark strip
+         * ============================================================ */
+        .banner {
+            background: var(--ink);
+            color: var(--paper);
+            text-align: center;
+            padding: 14px 18px;
+            margin-bottom: 36px;
+            font-family: var(--font-sans);
+            font-weight: 700;
+            font-size: 0.82em;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            box-shadow: var(--ink-bleed);
+            position: relative;
+        }
+
+        .banner::before,
+        .banner::after {
+            content: '■';
+            margin: 0 18px;
+            font-size: 0.60em;
+            vertical-align: middle;
+            opacity: 0.5;
+        }
+
+        /* ============================================================
+         * WOODCUT ORNAMENTS — Geometric CSS
+         * ============================================================ */
+        .woodcut-ornament {
+            text-align: center;
+            margin: 44px 0;
+            color: var(--ink-faded);
+            font-size: 1.2em;
+            position: relative;
+        }
+
+        .woodcut-ornament::before,
+        .woodcut-ornament::after {
+            content: '';
+            display: inline-block;
+            width: 80px; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--ink-light));
+            vertical-align: middle;
+            margin: 0 18px;
+        }
+        .woodcut-ornament::after {
+            background: linear-gradient(90deg, var(--ink-light), transparent);
+        }
+
+        /* Diamond row block */
+        .woodcut-block {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin: 36px auto;
+            max-width: 200px;
+        }
+
+        .woodcut-block span {
+            width: 8px; height: 8px;
+            background: var(--ink-light);
+            transform: rotate(45deg);
+        }
+        .woodcut-block span:nth-child(2) {
+            background: var(--red-accent);
+            width: 10px; height: 10px;
+        }
+        .woodcut-block span:nth-child(4) {
+            background: var(--gold-accent);
+            width: 10px; height: 10px;
+        }
+
+        /* ============================================================
+         * CONTENTS DIRECTORY — Dotted index
+         * ============================================================ */
+        .contents {
+            border: 1px solid var(--ink-medium);
+            background:
+                linear-gradient(135deg, rgba(139, 26, 26, 0.01), transparent 40%),
+                var(--paper-tan);
+            padding: 22px;
+            margin-bottom: 44px;
+            position: relative;
+        }
+
+        /* Inner dotted border */
+        .contents::before {
+            content: '';
+            position: absolute;
+            top: 4px; left: 4px; right: 4px; bottom: 4px;
+            border: 1px dotted var(--ink-faded);
+            pointer-events: none;
+        }
+
+        .contents-header {
+            font-family: var(--font-blackletter);
+            font-size: 1.3em;
+            color: var(--ink-dark);
+            text-align: center;
+            margin-bottom: 18px;
+            border-bottom: 2px solid var(--ink);
+            padding-bottom: 6px;
+            text-shadow: var(--ink-bleed);
+        }
+
+        .contents-grid {
+            columns: 2;
+            column-gap: 28px;
+            column-rule: 1px dotted var(--ink-light);
+        }
+
+        .contents-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 3px 0;
+            border-bottom: 1px dotted var(--ink-ghost);
+            break-inside: avoid;
+            font-size: 0.88em;
+            transition: color 0.2s;
+        }
+        .contents-item:hover { color: var(--red-accent); }
+
+        .contents-section {
+            flex: 1;
+            color: var(--ink-medium);
+        }
+
+        .contents-page {
+            color: var(--red-accent);
+            font-family: var(--font-typewriter);
+            font-size: 0.82em;
+            font-weight: bold;
+            margin-left: 14px;
+            background: var(--paper-cream);
+            padding: 1px 6px;
+            border: 1px solid var(--ink-light);
+        }
+
+        /* ============================================================
+         * DATA STRIP — Typewriter info bar
+         * ============================================================ */
+        .data-strip {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background:
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(60, 36, 21, 0.01) 2px,
+                    rgba(60, 36, 21, 0.01) 4px
+                ),
+                var(--paper-tan);
+            border: 1px solid var(--ink-light);
+            padding: 6px 18px;
+            margin-bottom: 36px;
+            font-family: var(--font-typewriter);
+            font-size: 0.75em;
+            color: var(--ink-medium);
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .data-strip-value {
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        /* ============================================================
+         * EDITORIAL — Executive summary (double-bordered)
+         * ============================================================ */
+        .editorial {
+            border: 2px solid var(--ink);
+            background:
+                radial-gradient(ellipse at 20% 20%,
+                    rgba(139, 26, 26, 0.015) 0%,
+                    transparent 50%
+                ),
+                var(--paper-cream);
+            padding: 36px 28px;
+            margin-bottom: 44px;
+            position: relative;
+            box-shadow: var(--card-shadow);
+        }
+
+        /* Outer red accent border */
+        .editorial::before {
+            content: '';
+            position: absolute;
+            top: -5px; left: -5px; right: -5px; bottom: -5px;
+            border: 1px solid var(--red-accent);
+            pointer-events: none;
+        }
+
+        /* Corner mark */
+        .editorial::after {
+            content: '';
+            position: absolute;
+            top: 4px; left: 4px;
+            width: 14px; height: 14px;
+            border-top: 2px solid var(--red-accent);
+            border-left: 2px solid var(--red-accent);
+        }
+
+        /* Bottom-right corner mark */
+        .editorial-corner-br {
+            position: absolute;
+            bottom: 4px; right: 4px;
+            width: 14px; height: 14px;
+            border-bottom: 2px solid var(--red-accent);
+            border-right: 2px solid var(--red-accent);
+        }
+
+        .editorial-header {
+            font-family: var(--font-blackletter);
+            font-size: 1.6em;
+            color: var(--ink-dark);
+            text-align: center;
+            margin-bottom: 18px;
+            text-shadow: var(--ink-bleed);
+        }
+
+        .editorial-header::after {
+            content: '';
+            display: block;
+            width: 60%;
+            height: 1px;
+            background: linear-gradient(90deg,
+                transparent,
+                var(--ink-medium),
+                transparent
+            );
+            margin: 14px auto 0;
+        }
+
+        .editorial-content {
+            font-size: 1.0em;
+            line-height: 1.65;
+            text-align: justify;
+            columns: 2;
+            column-gap: 36px;
+            column-rule: 1px solid var(--ink-light);
+        }
+
+        .editorial-content p {
+            margin-bottom: 14px;
+            text-indent: 1.5em;
+        }
+
+        /* Drop cap */
+        .editorial-content p:first-of-type::first-letter {
+            float: left;
+            font-family: var(--font-blackletter);
+            font-size: 4.5em;
+            line-height: 0.75;
+            margin: 0.05em 0.10em 0 0;
+            color: var(--red-accent);
+            text-shadow: 2px 2px 4px rgba(139, 26, 26, 0.20);
+        }
+
+        .editorial-content strong {
+            color: var(--ink-dark);
+            font-weight: 700;
+        }
+
+        .editorial-content em {
+            color: var(--ink-medium);
+        }
+
+        /* ============================================================
+         * CLASSIFIED AD STYLE — Vintage ad box
+         * ============================================================ */
+        .classified-ad {
+            border: 2px double var(--ink-medium);
+            background:
+                linear-gradient(135deg, var(--paper-tan), var(--paper-cream)),
+                var(--paper-tan);
+            padding: 18px;
+            margin: 36px 0;
+            text-align: center;
+            font-family: var(--font-typewriter);
+            font-size: 0.85em;
+            color: var(--ink-medium);
+        }
+
+        .classified-ad strong {
+            display: block;
+            font-family: var(--font-blackletter);
+            font-size: 1.2em;
+            color: var(--ink-dark);
+            margin-bottom: 6px;
+        }
+
+        /* ============================================================
+         * NEWS SECTION — Section with color bar
+         * ============================================================ */
+        .news-section {
+            margin-bottom: 56px;
+            page-break-inside: avoid;
+        }
+
+        .section-header {
+            border-top: 3px solid var(--ink);
+            border-bottom: 1px solid var(--ink-medium);
+            padding: 18px 14px;
+            margin-bottom: 28px;
+            position: relative;
+            /* Subtle horizontal lines overlay */
+            background:
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(60, 36, 21, 0.015) 2px,
+                    rgba(60, 36, 21, 0.015) 4px
+                ),
+                var(--paper-tan);
+        }
+
+        /* Section color bar */
+        .section-header .section-color-bar {
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+        }
+
+        .section-title {
+            font-family: var(--font-blackletter);
+            font-size: 1.9em;
+            color: var(--ink-dark);
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            text-shadow: var(--ink-bleed);
+        }
+
+        .section-ornament {
+            font-size: 0.70em;
+            color: var(--red-accent);
+        }
+
+        .section-count {
+            font-family: var(--font-typewriter);
+            font-size: 0.45em;
+            color: var(--ink-faded);
+            background: var(--paper);
+            padding: 3px 6px;
+            border: 1px solid var(--ink-light);
+            vertical-align: super;
+        }
+
+        .section-page-label {
+            font-family: var(--font-typewriter);
+            font-size: 0.42em;
+            color: var(--ink-faded);
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            letter-spacing: 0.08em;
+        }
+
+        /* ============================================================
+         * 3-COLUMN LAYOUT
+         * ============================================================ */
+        .articles-grid {
+            column-count: 3;
+            column-gap: 28px;
+            column-rule: 1px solid var(--ink-light);
+        }
+
+        /* First article spans full width */
+        .article:first-child {
+            column-span: all;
+            margin-bottom: 28px;
+            border-bottom: 2px double var(--ink-medium);
+            padding-bottom: 28px;
+        }
+
+        .article:first-child .article-body-text {
+            columns: 2;
+            column-gap: 28px;
+            column-rule: 1px dotted var(--ink-light);
+        }
+
+        .article:first-child .article-headline {
+            font-size: 1.5em;
+        }
+
+        /* ============================================================
+         * ARTICLE CARD
+         * ============================================================ */
+        .article {
+            break-inside: avoid;
+            margin-bottom: 22px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid var(--ink-ghost);
+            position: relative;
+        }
+
+        .article:last-child { border-bottom: none; }
+
+        /* Priority indicators */
+        .article.must-read {
+            background: var(--priority-must-bg);
+            padding: 14px;
+            border-left: 3px solid var(--red-accent);
+        }
+
+        .article.recommended {
+            border-left: 3px solid var(--gold-accent);
+            padding-left: 14px;
+        }
+
+        .article.fyi {
+            border-left: 2px solid var(--blue-accent);
+            padding-left: 14px;
+            opacity: 0.92;
+        }
+
+        .article-number {
+            font-family: var(--font-typewriter);
+            font-size: 0.65em;
+            color: var(--ink-ghost);
+            margin-bottom: 3px;
+            letter-spacing: 0.05em;
+        }
+
+        .article-headline {
+            font-family: var(--font-headline);
+            font-size: 1.15em;
+            font-weight: 700;
+            line-height: 1.35;
+            margin-bottom: 6px;
+            color: var(--ink);
+        }
+
+        .article-headline a {
+            color: inherit;
+            text-decoration: none;
+        }
+        .article-headline a:hover {
+            color: var(--red-accent);
+            text-decoration: underline;
+            text-decoration-style: solid;
+        }
+
+        .article.must-read .article-headline a {
+            color: var(--red-accent);
+            font-weight: 800;
+        }
+
+        /* Breaking label */
+        .must-read-label {
+            display: inline-block;
+            font-family: var(--font-sans);
+            font-size: 0.60em;
+            font-weight: 800;
+            color: var(--paper);
+            background: var(--red-accent);
+            padding: 1px 8px;
+            letter-spacing: 0.10em;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        /* Article meta */
+        .article-meta {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 6px;
+            font-family: var(--font-typewriter);
+            font-size: 0.72em;
+            color: var(--ink-faded);
+            flex-wrap: wrap;
+        }
+
+        .source-byline {
+            background: var(--ink);
+            color: var(--paper);
+            padding: 1px 8px;
+            font-weight: 600;
+            font-size: 0.78em;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .tag-vintage {
+            border: 1px solid var(--ink-light);
+            color: var(--ink-medium);
+            padding: 1px 8px;
+            font-size: 0.72em;
+            background: var(--paper-tan);
+            transition: all 0.2s;
+        }
+        .tag-vintage:hover {
+            background: var(--paper-dark);
+            border-color: var(--ink-medium);
+        }
+
+        /* Article body */
+        .article-body-text {
+            font-size: 0.95em;
+            line-height: 1.60;
+            text-align: justify;
+            color: var(--ink);
+        }
+
+        .article-body-text p {
+            margin-bottom: 6px;
+            text-indent: 1.2em;
+        }
+
+        .article-body-text strong {
+            color: var(--ink-dark);
+            font-weight: 700;
+        }
+
+        .article-body-text em {
+            color: var(--ink-medium);
+        }
+
+        .article-body-text code {
+            font-family: var(--font-typewriter);
+            font-size: 0.88em;
+            background: var(--paper-tan);
+            color: var(--blue-accent);
+            padding: 1px 5px;
+            border: 1px solid var(--ink-light);
+        }
+
+        /* ============================================================
+         * FLOWER SEPARATOR — ❦ ornament with rules
+         * ============================================================ */
+        .flower-sep {
+            text-align: center;
+            padding: 22px 0;
+            color: var(--ink-faded);
+            font-size: 0.90em;
+            letter-spacing: 0.50em;
+            position: relative;
+        }
+
+        .flower-sep::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 10%; right: 10%;
+            height: 1px;
+            background: linear-gradient(90deg,
+                transparent,
+                var(--ink-ghost) 20%,
+                var(--ink-light) 50%,
+                var(--ink-ghost) 80%,
+                transparent
+            );
+        }
+
+        .flower-sep-text {
+            position: relative;
+            z-index: 1;
+            background: var(--paper);
+            padding: 0 16px;
+        }
+
+        /* ============================================================
+         * STATISTICS BAR — Vintage data readout
+         * ============================================================ */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 36px;
+        }
+
+        .stats-box {
+            border: 1px solid var(--ink-light);
+            background:
+                linear-gradient(135deg, var(--paper-cream), var(--paper-tan)),
+                var(--paper-cream);
+            padding: 14px 10px;
+            text-align: center;
+        }
+
+        .stats-box-value {
+            font-family: var(--font-blackletter);
+            font-size: 1.8em;
+            color: var(--ink-dark);
+            line-height: 1.1;
+            text-shadow: var(--ink-bleed);
+        }
+
+        .stats-box-label {
+            font-family: var(--font-typewriter);
+            font-size: 0.65em;
+            color: var(--ink-faded);
+            letter-spacing: 0.10em;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        /* ============================================================
+         * FOOTER — Late Edition + Finis
+         * ============================================================ */
+        .newspaper-footer {
+            margin-top: 72px;
+            border-top: 4px double var(--ink);
+            padding: 36px 18px;
+            text-align: center;
+            position: relative;
+            /* Horizontal line pattern */
+            background:
+                repeating-linear-gradient(
+                    0deg,
+                    var(--paper-tan),
+                    var(--paper-tan) 2px,
+                    var(--paper-dark) 2px,
+                    var(--paper-dark) 4px
+                );
+        }
+
+        .newspaper-footer::before {
+            content: '— Finis —';
+            position: absolute;
+            top: -12px; left: 50%;
+            transform: translateX(-50%);
+            background: var(--paper);
+            padding: 0 18px;
+            font-family: var(--font-serif);
+            font-style: italic;
+            font-size: 0.85em;
+            color: var(--ink-faded);
+        }
+
+        .footer-late-edition {
+            display: inline-block;
+            font-family: var(--font-sans);
+            font-weight: 800;
+            font-size: 0.78em;
+            color: var(--paper);
+            background: var(--red-accent);
+            padding: 3px 18px;
+            letter-spacing: 0.20em;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+        }
+
+        .footer-masthead {
+            font-family: var(--font-blackletter);
+            font-size: 1.6em;
+            color: var(--ink-dark);
+            margin-bottom: 14px;
+            text-shadow: var(--ink-bleed);
+        }
+
+        .footer-details {
+            font-family: var(--font-typewriter);
+            font-size: 0.82em;
+            color: var(--ink-medium);
+            margin-bottom: 14px;
+        }
+
+        .footer-motto {
+            font-family: var(--font-serif);
+            font-size: 0.82em;
+            color: var(--ink-faded);
+            font-style: italic;
+            border-top: 1px solid var(--ink-light);
+            padding-top: 14px;
+        }
+
+        .footer-colophon {
+            margin-top: 18px;
+            font-family: var(--font-typewriter);
+            font-size: 0.68em;
+            color: var(--ink-ghost);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        /* ============================================================
+         * PRINT MEDIA
+         * ============================================================ */
+        @media print {
+            body {
+                background: var(--paper) !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .newspaper {
+                max-width: 100%;
+                padding: 0;
+                box-shadow: none;
+                margin: 0;
+            }
+            .newspaper::after { display: none; }
+            .masthead {
+                margin-bottom: 28px;
+                padding: 18px;
+            }
+            .editorial {
+                margin-bottom: 22px;
+                padding: 18px;
+            }
+            .editorial-content { columns: 1; }
+            .articles-grid { column-count: 2; }
+            .article:first-child .article-body-text { columns: 1; }
+            .news-section { margin-bottom: 28px; }
+            .article { margin-bottom: 14px; box-shadow: none; }
+            a { color: var(--ink) !important; text-decoration: underline !important; }
+        }
+
+        /* ============================================================
+         * MOBILE RESPONSIVE
+         * ============================================================ */
+        @media (max-width: 768px) {
+            .newspaper {
+                padding: 22px 14px;
+                margin: 0;
+            }
+            .newspaper::after { display: none; }
+            .masthead-title { font-size: 2.5em; }
+            .masthead-info { justify-content: center; text-align: center; }
+            .editorial-content { columns: 1; }
+            .contents-grid { columns: 1; }
+            .articles-grid { column-count: 1; }
+            .article:first-child .article-body-text { columns: 1; }
+            .article:first-child .article-headline { font-size: 1.2em; }
+            .banner { font-size: 0.72em; letter-spacing: 0.10em; }
+            .data-strip { justify-content: center; }
+            .stats-bar { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 480px) {
+            .masthead-title { font-size: 2.0em; }
+            .masthead::before, .masthead::after { display: none; }
+            .section-title {
+                font-size: 1.4em;
+                flex-wrap: wrap;
+            }
+            .article-headline { font-size: 1.05em; }
+            .editorial-content p:first-of-type::first-letter {
+                font-size: 3.0em;
+            }
+            .stats-bar { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="newspaper">
+
+        <!-- ====== MASTHEAD ====== -->
+        <header class="masthead">
+            <div class="masthead-est">Est. MMXXVI · Volume XXIV</div>
+            <h1 class="masthead-title">The Newsloom Gazette</h1>
+            <div class="masthead-rule"></div>
+            <div class="masthead-motto">"All the Intelligence That's Fit to Analyze"</div>
+            <div class="masthead-info">
+                <div>
+                    <span>{{ date_str }}</span>
+                    <span>·</span>
+                    <span>No. {{ date_str.split('-')[2] }}</span>
+                </div>
+                <span class="edition-label">★ LATE EDITION ★</span>
+                <div class="price-box">5¢</div>
+            </div>
+        </header>
+
+        <!-- ====== BANNER ====== -->
+        <div class="banner">
+            Latest Intelligence Dispatches • {{ total_items }} Articles • Breaking Analysis
+        </div>
+
+        <!-- ====== DATA STRIP ====== -->
+        <div class="data-strip">
+            <div>Articles: <span class="data-strip-value">{{ total_items }}</span></div>
+            <div>Sections: <span class="data-strip-value">{{ section_order|length }}</span></div>
+            <div>Edition: <span class="data-strip-value">{{ date_str }}</span></div>
+            {% set mr_ns = namespace(count=0) %}
+            {% for sk, si in briefs.items() %}
+            {% if si is iterable and si is not string %}
+            {% for it in si %}
+            {% if it.priority == '🔴' %}{% set mr_ns.count = mr_ns.count + 1 %}{% endif %}
+            {% endfor %}
+            {% endif %}
+            {% endfor %}
+            {% if mr_ns.count > 0 %}
+            <div>Breaking: <span class="data-strip-value" style="color: var(--red-accent);">{{ mr_ns.count }}</span></div>
+            {% endif %}
+        </div>
+
+        <!-- ====== CONTENTS ====== -->
+        <div class="contents">
+            <div class="contents-header">Today's Contents</div>
+            <div class="contents-grid">
+                {% set page_ns = namespace(letter=65) %}
+                {% for section_key in section_order %}
+                {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+                {% set meta = section_configs.get(section_key, {}) %}
+                <div class="contents-item">
+                    <span class="contents-section">
+                        <span style="color: {{ meta.color|default('#7A5C42') }};">{{ meta.emoji|default('·') }}</span>
+                        {{ meta.title|default(section_key) }}
+                    </span>
+                    <span class="contents-page">Page {{ '%c'|format(page_ns.letter) }}1</span>
+                </div>
+                {% set page_ns.letter = page_ns.letter + 1 %}
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- ====== EDITORIAL ====== -->
+        {% if executive_summary %}
+        <div class="editorial">
+            <div class="editorial-corner-br"></div>
+            <div class="editorial-header">The Editor's Dispatch</div>
+            <div class="editorial-content">
+                {% for line in executive_summary.strip().split('\n') %}
+                {% if line.strip() %}
+                <p>{{ line.strip() | md_inline }}</p>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ====== WOODCUT BLOCK ====== -->
+        <div class="woodcut-block">
+            <span></span><span></span><span></span><span></span><span></span>
+        </div>
+
+        <!-- ====== STATISTICS ====== -->
+        {% if stats %}
+        <div class="stats-bar">
+            <div class="stats-box">
+                <div class="stats-box-value">{{ total_items }}</div>
+                <div class="stats-box-label">Total Articles</div>
+            </div>
+            <div class="stats-box">
+                <div class="stats-box-value">{{ section_order|length }}</div>
+                <div class="stats-box-label">Sections</div>
+            </div>
+            {% if stats.high_priority is defined %}
+            <div class="stats-box">
+                <div class="stats-box-value" style="color: var(--red-accent);">{{ stats.high_priority }}</div>
+                <div class="stats-box-label">Breaking</div>
+            </div>
+            {% endif %}
+            {% if stats.sources is defined %}
+            <div class="stats-box">
+                <div class="stats-box-value">{{ stats.sources }}</div>
+                <div class="stats-box-label">Sources</div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- ====== NEWS SECTIONS ====== -->
+        {% set sec_ns = namespace(index=1) %}
+        {% set page_ns2 = namespace(letter=65) %}
+        {% for section_key in section_order %}
+        {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+        {% set meta = section_configs.get(section_key, {}) %}
+        {% set sec_color = meta.color|default('#7A5C42') %}
+        {% set items = briefs[section_key] %}
+
+        <section class="news-section">
+            <div class="section-header">
+                <span class="section-color-bar" style="background: {{ sec_color }};"></span>
+                <h2 class="section-title">
+                    <span class="section-ornament">❦</span>
+                    <span>{{ meta.title|default(section_key) }}</span>
+                    <span class="section-ornament">❦</span>
+                    <span class="section-count">{{ items|length }}</span>
+                </h2>
+                <span class="section-page-label">Page {{ '%c'|format(page_ns2.letter) }}1</span>
+            </div>
+
+            <div class="articles-grid">
+                {% for item in items %}
+                {% set priority = item.priority|default('🟢') %}
+                {% set p_class = 'must-read' if priority == '🔴' else ('recommended' if priority == '🟡' else 'fyi') %}
+                <article class="article {{ p_class }}">
+                    {% if priority == '🔴' %}
+                    <div class="must-read-label">! Breaking News</div>
+                    {% endif %}
+                    <div class="article-number">No. {{ '%c'|format(page_ns2.letter) }}{{ '%02d'|format(loop.index) }}</div>
+                    <div class="article-headline">
+                        <a href="{{ item.url|default('#') }}" target="_blank">{{ item.headline|default(item.title|default('Untitled')) }}</a>
+                    </div>
+                    <div class="article-meta">
+                        {% if item.source %}
+                        <span class="source-byline">{{ item.source }}</span>
+                        {% endif %}
+                        {% if item.tags %}
+                        {% for tag in item.tags %}
+                        <span class="tag-vintage" style="border-color: {{ sec_color }}60;">{{ tag }}</span>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                    {% if item.detail %}
+                    <div class="article-body-text">
+                        <p>{{ item.detail | md_inline }}</p>
+                    </div>
+                    {% endif %}
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+
+        {% if not loop.last %}
+        <div class="flower-sep">
+            <span class="flower-sep-text">❦ ✦ ❦</span>
+        </div>
+        {% endif %}
+
+        {% set sec_ns.index = sec_ns.index + 1 %}
+        {% set page_ns2.letter = page_ns2.letter + 1 %}
+        {% endif %}
+        {% endfor %}
+
+        <!-- ====== CLASSIFIED AD ====== -->
+        <div class="classified-ad">
+            <strong>Intelligence Notice</strong>
+            This gazette contains {{ total_items }} articles across {{ section_order|length }} sections
+            · Compiled {{ generated_time }} · For authorized readers only
+        </div>
+
+        <!-- ====== FOOTER ====== -->
+        <footer class="newspaper-footer">
+            <div class="footer-late-edition">★ LATE EDITION ★</div>
+            <div class="footer-masthead">The Newsloom Gazette</div>
+            <div class="footer-details">
+                {{ date_str }} · {{ total_items }} Articles Published · Established MMXXVI
+            </div>
+            <div class="footer-motto">
+                "All the Intelligence That's Fit to Analyze" · Printed in the Digital Age
+            </div>
+            <div class="footer-colophon">
+                Published by Newsloom Intelligence Services · {{ generated_time }}
+            </div>
+        </footer>
+
+    </div>
+</body>
+</html>

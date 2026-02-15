@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>daily brief · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * NORDIC MINIMAL — Scandinavian Hygge Design
+         * ============================================================
+         * Linen #F7F7F5 · Charcoal text · Warm brown accent #D4A574
+         * Subtle linen texture via CSS gradients · Ultra-fine borders
+         * Massive whitespace · Perfect letter-spacing · Everything breathes
+         * Inspired by: Kinfolk, Cereal Magazine, HAY, Muji
+         * ============================================================ */
+
+        /* --- Design Tokens --- */
+        :root {
+            /* Palette — Warm Neutrals */
+            --linen:            #F7F7F5;
+            --linen-dark:       #EFEFE9;
+            --warm-white:       #FDFDFB;
+            --paper:            #FFFFFF;
+
+            /* Accent — Warm Brown */
+            --accent:           #D4A574;
+            --accent-dark:      #C08850;
+            --accent-light:     #E4C8A8;
+            --accent-dim:       rgba(212, 165, 116, 0.10);
+            --accent-faint:     rgba(212, 165, 116, 0.04);
+
+            /* Text — Charcoal Scale */
+            --text-black:       #1A1A1A;
+            --text-dark:        #333333;
+            --text-body:        #4A4A4A;
+            --text-mid:         #777777;
+            --text-light:       #AAAAAA;
+            --text-faint:       #CCCCCC;
+
+            /* Priority — Gentle Desaturated */
+            --pri-high:         #C07060;
+            --pri-high-bg:      rgba(192, 112, 96, 0.06);
+            --pri-mid:          #D4A574;
+            --pri-mid-bg:       rgba(212, 165, 116, 0.06);
+            --pri-low:          #7A9E7A;
+            --pri-low-bg:       rgba(122, 158, 122, 0.04);
+
+            /* Borders — Whisper thin */
+            --border:           rgba(0, 0, 0, 0.06);
+            --border-mid:       rgba(0, 0, 0, 0.08);
+            --border-accent:    rgba(212, 165, 116, 0.25);
+
+            /* Radius */
+            --radius:           16px;
+            --radius-sm:        10px;
+            --radius-xs:        6px;
+
+            /* Spacing */
+            --space-xs:         8px;
+            --space-sm:         16px;
+            --space-md:         24px;
+            --space-lg:         40px;
+            --space-xl:         64px;
+            --space-xxl:        96px;
+        }
+
+        /* --- Reset & Base --- */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+
+        body {
+            font-family:
+                -apple-system, BlinkMacSystemFont, "Segoe UI",
+                "Noto Sans SC", "PingFang SC", "Hiragino Sans GB",
+                "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+            color: var(--text-body);
+            line-height: 1.85;
+            letter-spacing: 0.01em;
+            min-height: 100vh;
+
+            /* Linen texture: subtle crosshatch woven effect */
+            background-color: var(--linen);
+            background-image:
+                /* Horizontal threads */
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 19px,
+                    rgba(180, 160, 130, 0.035) 19px,
+                    rgba(180, 160, 130, 0.035) 20px
+                ),
+                /* Vertical threads */
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 19px,
+                    rgba(180, 160, 130, 0.035) 19px,
+                    rgba(180, 160, 130, 0.035) 20px
+                ),
+                /* Diagonal accent — 45° */
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 37px,
+                    rgba(180, 160, 130, 0.018) 37px,
+                    rgba(180, 160, 130, 0.018) 38px
+                ),
+                /* Diagonal accent — -45° */
+                repeating-linear-gradient(
+                    -45deg,
+                    transparent,
+                    transparent 37px,
+                    rgba(180, 160, 130, 0.018) 37px,
+                    rgba(180, 160, 130, 0.018) 38px
+                );
+        }
+
+        /* --- Layout Container --- */
+        .page-wrapper {
+            max-width: 780px;
+            margin: 0 auto;
+            padding: var(--space-xl) var(--space-md);
+            position: relative;
+        }
+
+        /* --- Links --- */
+        a {
+            color: var(--accent-dark);
+            text-decoration: none;
+            border-bottom: 1px solid var(--border-accent);
+            transition: border-color 0.3s ease, color 0.3s ease;
+        }
+
+        a:hover {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        /* --- Typography Scale --- */
+        .heading-xl {
+            font-size: 2.4rem;
+            font-weight: 300;
+            letter-spacing: 0.15em;
+            text-transform: lowercase;
+            color: var(--text-black);
+            line-height: 1.2;
+        }
+
+        .heading-lg {
+            font-size: 1.1rem;
+            font-weight: 400;
+            letter-spacing: 0.12em;
+            text-transform: lowercase;
+            color: var(--text-dark);
+            line-height: 1.5;
+        }
+
+        .heading-md {
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            color: var(--text-black);
+            line-height: 1.6;
+        }
+
+        .text-small {
+            font-size: 0.82rem;
+            color: var(--text-mid);
+            letter-spacing: 0.02em;
+            line-height: 1.8;
+        }
+
+        .text-xs {
+            font-size: 0.72rem;
+            color: var(--text-light);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        /* ============================================================
+         * HEADER — Ultra-clean with thin-framed title
+         * ============================================================ */
+        .header {
+            text-align: center;
+            padding: var(--space-xxl) 0 var(--space-xl);
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            display: block;
+            width: 48px;
+            height: 1px;
+            background: var(--accent);
+            margin: var(--space-lg) auto 0;
+        }
+
+        .header-frame {
+            display: inline-block;
+            border: 1px solid var(--border);
+            padding: var(--space-md) var(--space-lg);
+            position: relative;
+        }
+
+        /* Decorative dot on frame top */
+        .header-frame::before {
+            content: '·';
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--linen);
+            padding: 0 12px;
+            color: var(--accent);
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+
+        /* Corner accents on frame */
+        .header-frame::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            right: -1px;
+            width: 12px;
+            height: 12px;
+            border-bottom: 1px solid var(--accent-light);
+            border-right: 1px solid var(--accent-light);
+        }
+
+        .header-title {
+            font-size: 2.2rem;
+            font-weight: 300;
+            letter-spacing: 0.22em;
+            text-transform: lowercase;
+            color: var(--text-black);
+            line-height: 1.3;
+        }
+
+        .header-subtitle {
+            margin-top: var(--space-sm);
+            font-size: 0.75rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--text-light);
+            font-weight: 400;
+        }
+
+        .header-date {
+            margin-top: var(--space-md);
+            font-size: 0.85rem;
+            color: var(--text-mid);
+            letter-spacing: 0.08em;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ============================================================
+         * STATS BAR — Three metrics with warm dots
+         * ============================================================ */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--space-lg);
+            padding: var(--space-lg) 0;
+            margin-bottom: var(--space-xl);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.6rem;
+            font-weight: 300;
+            color: var(--text-black);
+            letter-spacing: 0.05em;
+            display: block;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .stat-label {
+            font-size: 0.68rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--text-light);
+            margin-top: 4px;
+            display: block;
+        }
+
+        .stat-separator {
+            color: var(--accent);
+            font-size: 0.5rem;
+            vertical-align: middle;
+            user-select: none;
+        }
+
+        /* ============================================================
+         * TABLE OF CONTENTS — Minimal section index
+         * ============================================================ */
+        .toc {
+            margin-bottom: var(--space-xl);
+            padding: var(--space-md) 0;
+        }
+
+        .toc-title {
+            font-size: 0.68rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: var(--space-sm);
+            font-weight: 400;
+        }
+
+        .toc-list {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-xs) var(--space-md);
+        }
+
+        .toc-item {
+            font-size: 0.82rem;
+            color: var(--text-mid);
+            display: flex;
+            align-items: center;
+        }
+
+        .toc-item a {
+            color: var(--text-mid);
+            border-bottom: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .toc-item a:hover {
+            color: var(--accent-dark);
+            border-bottom-color: var(--accent-light);
+        }
+
+        .toc-item-count {
+            font-size: 0.68rem;
+            color: var(--text-faint);
+            margin-left: 4px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .toc-dot {
+            display: inline-block;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            margin-right: 6px;
+            flex-shrink: 0;
+        }
+
+        /* ============================================================
+         * EXECUTIVE SUMMARY — Warm-accented content block
+         * ============================================================ */
+        .summary-block {
+            background: var(--warm-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-xxl);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Warm gradient left bar */
+        .summary-block::before {
+            content: '';
+            position: absolute;
+            top: var(--space-md);
+            left: 0;
+            width: 3px;
+            height: calc(100% - var(--space-md) * 2);
+            background: linear-gradient(
+                180deg,
+                var(--accent),
+                var(--accent-light),
+                transparent
+            );
+            border-radius: 2px;
+        }
+
+        /* Subtle warm glow top-right */
+        .summary-block::after {
+            content: '';
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(
+                circle,
+                rgba(212, 165, 116, 0.06),
+                transparent 70%
+            );
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .summary-label {
+            font-size: 0.68rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: var(--space-sm);
+            display: block;
+            position: relative;
+            z-index: 1;
+        }
+
+        .summary-text {
+            font-size: 0.95rem;
+            line-height: 2;
+            color: var(--text-dark);
+            position: relative;
+            z-index: 1;
+        }
+
+        .summary-text p {
+            margin-bottom: var(--space-sm);
+        }
+
+        .summary-text p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ============================================================
+         * SECTION DIVIDER — Whitespace + line + warm dot
+         * ============================================================ */
+        .section-block {
+            margin-bottom: var(--space-xxl);
+        }
+
+        .section-divider {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-lg);
+            padding-top: var(--space-xl);
+        }
+
+        .section-divider-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                var(--border-mid),
+                transparent
+            );
+        }
+
+        .section-divider-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            opacity: 0.8;
+        }
+
+        .section-divider-label {
+            font-size: 0.7rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--text-light);
+            flex-shrink: 0;
+            padding: 0 var(--space-xs);
+        }
+
+        /* --- Section Header --- */
+        .section-header {
+            margin-bottom: var(--space-md);
+        }
+
+        .section-emoji {
+            font-size: 1.4rem;
+            display: inline-block;
+            margin-right: var(--space-xs);
+            vertical-align: middle;
+            line-height: 1;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 400;
+            letter-spacing: 0.1em;
+            text-transform: lowercase;
+            color: var(--text-dark);
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .section-count {
+            font-size: 0.72rem;
+            color: var(--text-light);
+            letter-spacing: 0.08em;
+            margin-left: var(--space-xs);
+            vertical-align: middle;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Section accent strip */
+        .section-strip {
+            width: 32px;
+            height: 2px;
+            border-radius: 1px;
+            margin-top: var(--space-xs);
+        }
+
+        .section-description {
+            font-size: 0.78rem;
+            color: var(--text-light);
+            margin-top: 6px;
+            letter-spacing: 0.02em;
+        }
+
+        /* ============================================================
+         * CARDS — White, ultra-fine border, generous padding
+         * ============================================================ */
+        .card-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .card {
+            background: var(--paper);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: var(--space-md);
+            transition:
+                box-shadow 0.3s ease,
+                transform 0.2s ease,
+                border-color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.03);
+            transform: translateY(-1px);
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        /* Must-read variant */
+        .card--must-read {
+            border-left: 3px solid var(--accent);
+            background: linear-gradient(
+                135deg,
+                var(--warm-white),
+                rgba(212, 165, 116, 0.03)
+            );
+        }
+
+        .card--must-read::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(
+                circle at top right,
+                rgba(212, 165, 116, 0.05),
+                transparent 70%
+            );
+            pointer-events: none;
+        }
+
+        /* Pulsing dot indicator for must-read */
+        .card-priority-indicator {
+            position: absolute;
+            top: var(--space-md);
+            right: var(--space-md);
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse-warm 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-warm {
+            0%, 100% { opacity: 0.35; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.15); }
+        }
+
+        /* Card number */
+        .card-number {
+            font-size: 0.62rem;
+            color: var(--text-faint);
+            letter-spacing: 0.1em;
+            font-weight: 300;
+            margin-bottom: 6px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Top row: headline + priority */
+        .card-top-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-xs);
+        }
+
+        .card-priority {
+            font-size: 0.8rem;
+            flex-shrink: 0;
+            line-height: 1;
+            margin-top: 4px;
+        }
+
+        .card-headline {
+            font-size: 0.98rem;
+            font-weight: 600;
+            color: var(--text-black);
+            line-height: 1.65;
+            letter-spacing: 0.01em;
+            flex: 1;
+        }
+
+        .card-headline a {
+            color: inherit;
+            border-bottom: none;
+            transition: color 0.2s ease;
+        }
+
+        .card-headline a:hover {
+            color: var(--accent-dark);
+        }
+
+        /* Detail text */
+        .card-detail {
+            font-size: 0.88rem;
+            line-height: 1.9;
+            color: var(--text-body);
+            margin-top: var(--space-xs);
+        }
+
+        .card-detail strong {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .card-detail em {
+            font-style: italic;
+            color: var(--text-mid);
+        }
+
+        .card-detail code {
+            font-family: "SF Mono", "Fira Code", monospace;
+            font-size: 0.85em;
+            background: var(--linen);
+            padding: 1px 5px;
+            border-radius: 3px;
+            color: var(--accent-dark);
+        }
+
+        /* Meta row */
+        .card-meta {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--space-xs);
+            margin-top: var(--space-sm);
+            padding-top: var(--space-sm);
+            border-top: 1px solid rgba(0, 0, 0, 0.03);
+        }
+
+        .card-source {
+            font-size: 0.72rem;
+            letter-spacing: 0.06em;
+            color: var(--text-mid);
+        }
+
+        .card-source::before {
+            content: '—';
+            margin-right: 6px;
+            color: var(--text-faint);
+        }
+
+        .card-tag {
+            font-size: 0.68rem;
+            letter-spacing: 0.04em;
+            color: var(--text-light);
+            background: var(--linen);
+            padding: 2px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            transition: background 0.2s ease;
+        }
+
+        .card-tag:hover {
+            background: var(--linen-dark);
+        }
+
+        /* Section-colored tag */
+        .card-tag--section {
+            border-color: var(--border);
+        }
+
+        /* ============================================================
+         * PRIORITY BADGES — Gentle colored pills
+         * ============================================================ */
+        .priority-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.62rem;
+            letter-spacing: 0.06em;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .priority-badge--high {
+            background: var(--pri-high-bg);
+            color: var(--pri-high);
+        }
+
+        .priority-badge--mid {
+            background: var(--pri-mid-bg);
+            color: var(--accent-dark);
+        }
+
+        .priority-badge--low {
+            background: var(--pri-low-bg);
+            color: var(--pri-low);
+        }
+
+        /* ============================================================
+         * DECORATIVE ELEMENTS — Minimal but precise
+         * ============================================================ */
+        .deco-line {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                var(--border-mid),
+                transparent
+            );
+        }
+
+        .deco-dot-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: var(--space-lg) 0;
+        }
+
+        .deco-dot {
+            width: 3px;
+            height: 3px;
+            background: var(--accent-light);
+            border-radius: 50%;
+        }
+
+        .deco-dot:nth-child(2) {
+            opacity: 0.6;
+        }
+
+        .deco-dot:nth-child(3) {
+            opacity: 0.3;
+        }
+
+        /* ============================================================
+         * EMPTY STATE
+         * ============================================================ */
+        .empty-state {
+            text-align: center;
+            padding: var(--space-xl) 0;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            letter-spacing: 0.04em;
+        }
+
+        /* ============================================================
+         * BACK TO TOP
+         * ============================================================ */
+        .back-to-top {
+            display: block;
+            text-align: center;
+            padding: var(--space-md) 0;
+            font-size: 0.7rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-light);
+            border-bottom: none;
+            transition: color 0.2s ease;
+        }
+
+        .back-to-top:hover {
+            color: var(--accent);
+            border-bottom: none;
+        }
+
+        /* ============================================================
+         * FOOTER — One line, one rule
+         * ============================================================ */
+        .footer {
+            margin-top: var(--space-xxl);
+            padding-top: var(--space-lg);
+            text-align: center;
+            position: relative;
+        }
+
+        .footer::before {
+            content: '';
+            display: block;
+            width: 48px;
+            height: 1px;
+            background: var(--accent);
+            margin: 0 auto var(--space-lg);
+        }
+
+        .footer-text {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            letter-spacing: 0.1em;
+            line-height: 2;
+        }
+
+        .footer-dot {
+            display: inline-block;
+            width: 3px;
+            height: 3px;
+            background: var(--accent-light);
+            border-radius: 50%;
+            vertical-align: middle;
+            margin: 0 var(--space-xs);
+        }
+
+        .footer-brand {
+            margin-top: var(--space-md);
+            font-size: 0.62rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--text-faint);
+        }
+
+        /* ============================================================
+         * PRINT STYLES — Clean PDF output
+         * ============================================================ */
+        @media print {
+            @page {
+                margin: 1.5cm 2cm;
+                size: A4;
+            }
+
+            body {
+                background: white !important;
+                background-image: none !important;
+                color: #000 !important;
+                font-size: 10.5pt;
+                line-height: 1.7;
+            }
+
+            .page-wrapper {
+                max-width: 100%;
+                padding: 0;
+            }
+
+            .header {
+                padding: 2cm 0 1cm;
+            }
+
+            .card {
+                break-inside: avoid;
+                page-break-inside: avoid;
+                box-shadow: none !important;
+                border: 1px solid #ddd !important;
+            }
+
+            .card:hover {
+                transform: none !important;
+                box-shadow: none !important;
+            }
+
+            .card--must-read {
+                border-left: 3px solid #D4A574 !important;
+            }
+
+            .section-block {
+                break-inside: avoid;
+                page-break-before: auto;
+            }
+
+            .section-divider {
+                padding-top: 1.5cm;
+            }
+
+            a {
+                color: #000 !important;
+                border-bottom: none !important;
+            }
+
+            .card-headline a::after {
+                content: none;
+            }
+
+            .card-source::after {
+                content: none;
+            }
+
+            .back-to-top {
+                display: none !important;
+            }
+
+            .deco-dot-row {
+                display: none !important;
+            }
+
+            .summary-block::after {
+                display: none;
+            }
+
+            @keyframes pulse-warm {
+                0%, 100% { opacity: 1; }
+            }
+        }
+
+        /* ============================================================
+         * RESPONSIVE — Mobile-first adjustments
+         * ============================================================ */
+        @media (max-width: 640px) {
+            .page-wrapper {
+                padding: var(--space-lg) var(--space-sm);
+            }
+
+            .header {
+                padding: var(--space-xl) 0 var(--space-lg);
+            }
+
+            .header-title {
+                font-size: 1.6rem;
+                letter-spacing: 0.12em;
+            }
+
+            .header-frame {
+                padding: var(--space-sm) var(--space-md);
+            }
+
+            .stats-bar {
+                gap: var(--space-md);
+                flex-wrap: wrap;
+            }
+
+            .stat-value {
+                font-size: 1.2rem;
+            }
+
+            .section-divider {
+                padding-top: var(--space-lg);
+            }
+
+            .summary-block {
+                padding: var(--space-md);
+            }
+
+            .card {
+                padding: var(--space-sm);
+                border-radius: var(--radius-sm);
+            }
+
+            .card-meta {
+                gap: 6px;
+            }
+
+            .card-detail {
+                font-size: 0.85rem;
+                line-height: 1.8;
+            }
+
+            .toc-list {
+                flex-direction: column;
+                gap: var(--space-xs);
+            }
+
+            .section-emoji {
+                font-size: 1.2rem;
+            }
+
+            .deco-dot-row {
+                padding: var(--space-md) 0;
+            }
+        }
+
+        /* Extra small screens */
+        @media (max-width: 380px) {
+            .header-title {
+                font-size: 1.3rem;
+                letter-spacing: 0.08em;
+            }
+
+            .stats-bar {
+                gap: var(--space-sm);
+            }
+
+            .stat-value {
+                font-size: 1rem;
+            }
+
+            .card-headline {
+                font-size: 0.92rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper" id="top">
+
+        <!-- ======================================================
+             HEADER — Thin-framed title with breathing room
+             ====================================================== -->
+        <header class="header">
+            <div class="header-frame">
+                <h1 class="header-title">daily brief</h1>
+                <div class="header-subtitle">curated intelligence</div>
+            </div>
+            <div class="header-date">{{ date_str }}</div>
+        </header>
+
+        <!-- ======================================================
+             STATS BAR — Three key metrics, warm dot separators
+             ====================================================== -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-value">{{ total_items }}</span>
+                <span class="stat-label">items</span>
+            </div>
+
+            <span class="stat-separator">●</span>
+
+            <div class="stat-item">
+                <span class="stat-value">{{ section_order | length }}</span>
+                <span class="stat-label">sections</span>
+            </div>
+
+            <span class="stat-separator">●</span>
+
+            <div class="stat-item">
+                {%- set ns_must = namespace(count=0) -%}
+                {%- for sec_key in section_order -%}
+                    {%- for item in briefs.get(sec_key, []) -%}
+                        {%- if item.priority == '🔴' -%}
+                            {%- set ns_must.count = ns_must.count + 1 -%}
+                        {%- endif -%}
+                    {%- endfor -%}
+                {%- endfor -%}
+                <span class="stat-value">{{ ns_must.count }}</span>
+                <span class="stat-label">must-read</span>
+            </div>
+        </div>
+
+        <!-- ======================================================
+             TABLE OF CONTENTS — Color-dotted section index
+             ====================================================== -->
+        <nav class="toc">
+            <div class="toc-title">sections</div>
+            <ul class="toc-list">
+                {%- for section_key in section_order -%}
+                    {%- set items = briefs.get(section_key, []) -%}
+                    {%- if items -%}
+                        {%- set cfg = section_configs.get(section_key, {}) -%}
+                        <li class="toc-item">
+                            <span class="toc-dot" style="background: {{ cfg.color | default('#D4A574') }};"></span>
+                            <a href="#section-{{ section_key }}">
+                                {{ cfg.emoji | default('📌') }}
+                                {{ cfg.title | default(section_key) }}
+                            </a>
+                            <span class="toc-item-count">({{ items | length }})</span>
+                        </li>
+                    {%- endif -%}
+                {%- endfor -%}
+            </ul>
+        </nav>
+
+        <div class="deco-line"></div>
+
+        <!-- ======================================================
+             EXECUTIVE SUMMARY — Warm-accented overview block
+             ====================================================== -->
+        {%- if executive_summary %}
+        <div class="summary-block">
+            <span class="summary-label">executive summary</span>
+            <div class="summary-text">
+                {{ executive_summary | md_inline }}
+            </div>
+        </div>
+        {%- endif %}
+
+        <!-- ======================================================
+             SECTIONS — Each with divider, header, and card list
+             ====================================================== -->
+        {%- set ns_global = namespace(item_num=0) -%}
+
+        {%- for section_key in section_order -%}
+            {%- set items = briefs.get(section_key, []) -%}
+            {%- if items -%}
+                {%- set cfg = section_configs.get(section_key, {}) -%}
+                {%- set sec_color = cfg.color | default('#D4A574') -%}
+
+                <section class="section-block" id="section-{{ section_key }}">
+
+                    <!-- Section Divider: line — dot — label — dot — line -->
+                    <div class="section-divider">
+                        <div class="section-divider-line"></div>
+                        <div class="section-divider-dot" style="background: {{ sec_color }};"></div>
+                        <span class="section-divider-label">{{ section_key }}</span>
+                        <div class="section-divider-dot" style="background: {{ sec_color }};"></div>
+                        <div class="section-divider-line"></div>
+                    </div>
+
+                    <!-- Section Header -->
+                    <div class="section-header">
+                        <span class="section-emoji">{{ cfg.emoji | default('📌') }}</span>
+                        <h2 class="section-title">{{ cfg.title | default(section_key) }}</h2>
+                        <span class="section-count">{{ items | length }} items</span>
+                        <div class="section-strip" style="background: linear-gradient(90deg, {{ sec_color }}, transparent);"></div>
+                    </div>
+
+                    <!-- Card List -->
+                    <div class="card-list">
+                        {%- for item in items -%}
+                            {%- set ns_global.item_num = ns_global.item_num + 1 -%}
+                            {%- set is_must_read = (item.priority == '🔴') -%}
+
+                            <article class="card{% if is_must_read %} card--must-read{% endif %}">
+
+                                {%- if is_must_read %}
+                                <!-- Pulsing indicator for must-read -->
+                                <div class="card-priority-indicator"></div>
+                                {%- endif %}
+
+                                <!-- Item number -->
+                                <div class="card-number">{{ '%02d' | format(ns_global.item_num) }}</div>
+
+                                <!-- Headline + Priority row -->
+                                <div class="card-top-row">
+                                    <h3 class="card-headline">
+                                        {%- if item.url %}
+                                        <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer">
+                                            {{ item.headline }}
+                                        </a>
+                                        {%- else %}
+                                        {{ item.headline }}
+                                        {%- endif %}
+                                    </h3>
+                                    <span class="card-priority">{{ item.priority }}</span>
+                                </div>
+
+                                <!-- Detail -->
+                                {%- if item.detail %}
+                                <div class="card-detail">
+                                    {{ item.detail | md_inline }}
+                                </div>
+                                {%- endif %}
+
+                                <!-- Meta: source + tags -->
+                                <div class="card-meta">
+                                    {%- if item.source %}
+                                    <span class="card-source">{{ item.source }}</span>
+                                    {%- endif %}
+
+                                    {%- if item.tags %}
+                                        {%- for tag in item.tags %}
+                                        <span class="card-tag">{{ tag }}</span>
+                                        {%- endfor %}
+                                    {%- endif %}
+                                </div>
+
+                            </article>
+                        {%- endfor -%}
+                    </div>
+
+                </section>
+
+            {%- endif -%}
+        {%- endfor -%}
+
+        <!-- ======================================================
+             DECORATIVE DOTS — Three fading warm dots
+             ====================================================== -->
+        <div class="deco-dot-row">
+            <span class="deco-dot"></span>
+            <span class="deco-dot"></span>
+            <span class="deco-dot"></span>
+        </div>
+
+        <!-- ======================================================
+             BACK TO TOP
+             ====================================================== -->
+        <a href="#top" class="back-to-top">↑ back to top</a>
+
+        <!-- ======================================================
+             FOOTER — Single line with warm dots
+             ====================================================== -->
+        <footer class="footer">
+            <div class="footer-text">
+                generated {{ generated_time }}
+                <span class="footer-dot"></span>
+                {{ total_items }} items across {{ section_order | length }} sections
+                <span class="footer-dot"></span>
+                newsloom
+            </div>
+            <div class="footer-brand">
+                crafted with care
+            </div>
+        </footer>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,12 @@
+name: "ieee-technical"
+description: "IEEE 技术会议风格 — 白底蓝色，两栏密排，技术报告严谨感"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "light"
+features:
+  - "IEEE 标准蓝 #004B87"
+  - "两栏密排布局"
+  - "Helvetica 无衬线正文"
+  - "技术报告风格"
+  - "紧凑严谨排版"
+  - "A4 PDF 优化"

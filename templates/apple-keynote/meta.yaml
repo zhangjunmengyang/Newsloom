@@ -1,0 +1,17 @@
+name: "Apple Keynote"
+description: "Apple presentation-inspired design with pure black background and vibrant gradient accents"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "dark"
+features:
+  - "Pure black #000 background for dramatic contrast"
+  - "Large SF Pro Display typography"
+  - "Vibrant gradient color accents"
+  - "Full-width color blocks for section separation"
+  - "Minimal brief cards with clean presentation"
+  - "Apple keynote presentation aesthetics"
+category: "tech"
+color_scheme:
+  primary: "#000000"
+  accent: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+  text: "#FFFFFF"

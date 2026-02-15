@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>每日智讯 · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * WECHAT ARTICLE — 微信公众号文章风格
+         * ────────────────────────────────────────────────────────────
+         * 白底 + 微信绿 (#07C160) + 深灰文字
+         * 浅灰渐变背景 · 全宽渐变头图 + "原创"标签
+         * 大行距 2.0 + 大段间距 · 左侧绿色竖线引用框
+         * 阅读量/点赞数 · "在看" "分享" "收藏" 按钮栏
+         * 公众号名片卡 · 375-580px 移动端宽度
+         * ============================================================ */
+
+        /* --- Design Tokens --- */
+        :root {
+            /* Background */
+            --bg-page:          #F2F2F2;
+            --bg-primary:       #FFFFFF;
+            --bg-secondary:     #F7F8FA;
+            --bg-surface:       #F2F3F5;
+            --bg-card:          #FFFFFF;
+            --bg-hover:         #F0F1F3;
+            --bg-code:          #F5F5F5;
+
+            /* WeChat Brand */
+            --wechat-green:     #07C160;
+            --wechat-green-dark: #06AD56;
+            --wechat-green-deeper: #059A4C;
+            --wechat-green-light: #4CD964;
+            --wechat-green-pale: rgba(7, 193, 96, 0.08);
+            --wechat-green-dim:  rgba(7, 193, 96, 0.05);
+            --wechat-green-glow: rgba(7, 193, 96, 0.12);
+            --wechat-green-border: rgba(7, 193, 96, 0.2);
+
+            /* Text */
+            --text-primary:     #333333;
+            --text-body:        #3E3E3E;
+            --text-secondary:   #576B95;
+            --text-muted:       #888888;
+            --text-dim:         #B2B2B2;
+            --text-inverse:     #FFFFFF;
+            --text-link:        #576B95;
+
+            /* Priority */
+            --priority-must:    #FA5151;
+            --priority-must-bg: rgba(250, 81, 81, 0.06);
+            --priority-must-border: rgba(250, 81, 81, 0.2);
+            --priority-rec:     #FF9500;
+            --priority-rec-bg:  rgba(255, 149, 0, 0.06);
+            --priority-rec-border: rgba(255, 149, 0, 0.2);
+            --priority-fyi:     #10AEFF;
+            --priority-fyi-bg:  rgba(16, 174, 255, 0.06);
+            --priority-fyi-border: rgba(16, 174, 255, 0.2);
+
+            /* Borders */
+            --border-light:     #EBEBEB;
+            --border-medium:    #D9D9D9;
+            --border-strong:    #C7C7C7;
+            --border-accent:    var(--wechat-green-border);
+
+            /* Shadows */
+            --shadow-sm:        0 1px 2px rgba(0, 0, 0, 0.04);
+            --shadow-card:      0 2px 8px rgba(0, 0, 0, 0.06), 0 0 1px rgba(0, 0, 0, 0.04);
+            --shadow-elevated:  0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+            --shadow-glow:      0 0 20px var(--wechat-green-dim);
+
+            /* Spacing */
+            --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px;
+            --sp-4: 16px; --sp-5: 20px; --sp-6: 24px;
+            --sp-8: 32px; --sp-10: 40px; --sp-12: 48px;
+            --sp-16: 64px; --sp-20: 80px;
+
+            /* Typography */
+            --font-sans: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC",
+                         "Microsoft YaHei", "WenQuanYi Micro Hei",
+                         -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+            --font-serif: "Noto Serif SC", "Source Han Serif SC", "STSong", Georgia, serif;
+            --font-mono: "SF Mono", "Monaco", "Consolas", "Courier New", monospace;
+
+            /* Line Height */
+            --lh-tight: 1.6;
+            --lh-normal: 1.8;
+            --lh-loose: 2.0;
+            --lh-extra: 2.2;
+
+            /* Radius */
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+            --radius-pill: 100px;
+        }
+
+        /* --- Page (PDF) --- */
+        @page {
+            size: A4;
+            margin: 1.5cm 2cm;
+            background: var(--bg-primary);
+            @bottom-center {
+                content: "每日智讯 · {{ date_str }} · 第 " counter(page) " 页";
+                font-family: var(--font-sans);
+                font-size: 8pt;
+                color: var(--text-muted);
+            }
+        }
+
+        /* --- Reset --- */
+        *, *::before, *::after {
+            margin: 0; padding: 0; box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            color: var(--text-primary);
+            font-size: 15px;
+            line-height: var(--lh-normal);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            text-rendering: optimizeLegibility;
+            -webkit-text-size-adjust: 100%;
+            /* Subtle gray gradient background */
+            background:
+                linear-gradient(180deg, #EDEDED 0%, #F5F5F5 30%, #EDEDED 100%);
+            min-height: 100vh;
+        }
+
+        a {
+            color: var(--text-link);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        a:hover {
+            color: var(--wechat-green);
+        }
+
+        /* --- Article Container (WeChat reader) --- */
+        .article-container {
+            max-width: 580px;
+            margin: 0 auto;
+            background: var(--bg-primary);
+            box-shadow: var(--shadow-elevated);
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* --- Top Green Bar --- */
+        .wechat-topbar {
+            height: 3px;
+            background: linear-gradient(90deg, var(--wechat-green) 0%, var(--wechat-green-light) 50%, var(--wechat-green) 100%);
+        }
+
+        /* --- Header: Full-width gradient cover image style --- */
+        .article-header {
+            position: relative;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        /* Full-width gradient cover */
+        .header-cover {
+            background:
+                radial-gradient(ellipse 80% 60% at 30% 30%, rgba(7, 193, 96, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 80% 70%, rgba(7, 193, 96, 0.08) 0%, transparent 50%),
+                linear-gradient(135deg, #1A1A2E 0%, #16213E 40%, #0F3460 70%, #07C160 120%);
+            padding: var(--sp-16) var(--sp-6) var(--sp-10);
+            text-align: center;
+            color: var(--text-inverse);
+        }
+
+        .header-cover-inner {
+            max-width: 460px;
+            margin: 0 auto;
+        }
+
+        .header-original-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--sp-1);
+            font-size: 0.68em;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 2px 10px;
+            border-radius: var(--radius-pill);
+            margin-bottom: var(--sp-5);
+            letter-spacing: 0.05em;
+        }
+
+        .header-original-tag::before {
+            content: '✦';
+            font-size: 0.85em;
+            color: var(--wechat-green-light);
+        }
+
+        .header-cover-title {
+            font-size: 1.6em;
+            font-weight: 700;
+            line-height: var(--lh-tight);
+            margin-bottom: var(--sp-4);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-cover-sub {
+            font-size: 0.82em;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: var(--sp-3);
+        }
+
+        /* --- Account Info Bar --- */
+        .account-bar {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            padding: var(--sp-4) var(--sp-6);
+            border-bottom: 1px solid var(--border-light);
+            background: var(--bg-primary);
+        }
+
+        .account-avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--wechat-green), var(--wechat-green-dark));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-inverse);
+            font-weight: 700;
+            font-size: 0.85em;
+            flex-shrink: 0;
+        }
+
+        .account-info {
+            flex: 1;
+        }
+
+        .account-name {
+            font-size: 0.88em;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1px;
+        }
+
+        .account-date {
+            font-size: 0.72em;
+            color: var(--text-muted);
+        }
+
+        .account-follow-btn {
+            font-size: 0.72em;
+            font-weight: 600;
+            color: var(--wechat-green);
+            background: var(--wechat-green-pale);
+            border: 1px solid var(--wechat-green-border);
+            padding: 4px 14px;
+            border-radius: var(--radius-pill);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .account-follow-btn:hover {
+            background: var(--wechat-green-glow);
+        }
+
+        /* --- Stats Bar --- */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: var(--sp-10);
+            padding: var(--sp-5) var(--sp-6);
+            background: var(--bg-surface);
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .stat-number {
+            font-weight: 700;
+            color: var(--wechat-green);
+            font-size: 1.3em;
+        }
+
+        .stat-label {
+            font-size: 0.75em;
+            color: var(--text-muted);
+        }
+
+        /* --- Article Body --- */
+        .article-body {
+            padding: var(--sp-6);
+        }
+
+        /* --- Summary Box: WeChat quote style --- */
+        .summary-box {
+            background: linear-gradient(135deg, var(--wechat-green-pale) 0%, rgba(7, 193, 96, 0.03) 100%);
+            border-left: 4px solid var(--wechat-green);
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            padding: var(--sp-6);
+            margin-bottom: var(--sp-10);
+            page-break-inside: avoid;
+            position: relative;
+        }
+
+        .summary-box::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 60px; height: 60px;
+            background: radial-gradient(circle at 100% 0%, var(--wechat-green-dim), transparent 70%);
+            border-radius: 0 var(--radius-md) 0 0;
+            pointer-events: none;
+        }
+
+        .summary-title {
+            font-size: 1em;
+            font-weight: 700;
+            color: var(--wechat-green-dark);
+            margin-bottom: var(--sp-4);
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+        }
+
+        .summary-title-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px; height: 22px;
+            background: var(--wechat-green);
+            color: var(--text-inverse);
+            border-radius: var(--radius-sm);
+            font-size: 0.7em;
+            font-weight: 700;
+        }
+
+        .summary-content p {
+            line-height: var(--lh-extra);
+            margin-bottom: var(--sp-4);
+            color: var(--text-body);
+            text-indent: 2em;
+        }
+        .summary-content p:last-child { margin-bottom: 0; }
+
+        .summary-content strong {
+            font-weight: 600;
+            color: var(--text-primary);
+            background: linear-gradient(transparent 60%, rgba(7, 193, 96, 0.18) 60%);
+            padding: 0 2px;
+        }
+
+        /* --- Section Divider --- */
+        .section {
+            margin-bottom: var(--sp-12);
+        }
+
+        .section-divider {
+            background: var(--bg-surface);
+            padding: var(--sp-5) var(--sp-6);
+            margin: 0 calc(-1 * var(--sp-6)) var(--sp-6);
+            text-align: center;
+            position: relative;
+        }
+
+        .section-divider::before {
+            content: '· · ·';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8em;
+            color: var(--text-dim);
+            letter-spacing: 0.3em;
+            background: var(--bg-primary);
+            padding: 0 var(--sp-3);
+        }
+
+        .section-header {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--sp-2);
+            background: var(--bg-primary);
+            padding: var(--sp-2) var(--sp-5);
+            border-radius: var(--radius-pill);
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-light);
+        }
+
+        /* Section color dot */
+        .section-color-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .section-icon {
+            font-size: 1.15em;
+        }
+
+        .section-title {
+            font-size: 1.05em;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: 0.02em;
+        }
+
+        .section-count {
+            background: var(--wechat-green);
+            color: var(--text-inverse);
+            font-size: 0.65em;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: var(--radius-pill);
+            margin-left: var(--sp-1);
+        }
+
+        /* --- News Item --- */
+        .news-item {
+            margin-bottom: var(--sp-8);
+            page-break-inside: avoid;
+            padding: var(--sp-5);
+            border-radius: var(--radius-lg);
+            transition: background 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .news-item:hover {
+            background: var(--bg-surface);
+        }
+
+        /* Priority */
+        .news-item.must-read {
+            background: var(--priority-must-bg);
+            border-color: var(--priority-must-border);
+            border-left: 4px solid var(--priority-must);
+        }
+        .news-item.must-read:hover {
+            background: rgba(250, 81, 81, 0.08);
+        }
+
+        .news-item.recommended {
+            background: var(--priority-rec-bg);
+            border-color: var(--priority-rec-border);
+            border-left: 4px solid var(--priority-rec);
+        }
+        .news-item.recommended:hover {
+            background: rgba(255, 149, 0, 0.08);
+        }
+
+        .news-item.fyi {
+            border-left: 3px solid var(--border-light);
+        }
+
+        /* --- News Header --- */
+        .news-header {
+            margin-bottom: var(--sp-3);
+            display: flex;
+            align-items: flex-start;
+            gap: var(--sp-3);
+        }
+
+        .news-priority {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border-radius: var(--radius-sm);
+            flex-shrink: 0;
+            margin-top: 2px;
+            font-size: 8px;
+            font-weight: 700;
+            color: var(--text-inverse);
+        }
+
+        .news-item.must-read .news-priority {
+            background: var(--priority-must);
+            box-shadow: 0 0 8px rgba(250, 81, 81, 0.3);
+        }
+        .news-item.must-read .news-priority::after { content: '重'; }
+
+        .news-item.recommended .news-priority {
+            background: var(--priority-rec);
+            box-shadow: 0 0 6px rgba(255, 149, 0, 0.25);
+        }
+        .news-item.recommended .news-priority::after { content: '荐'; }
+
+        .news-item.fyi .news-priority {
+            background: var(--priority-fyi);
+        }
+        .news-item.fyi .news-priority::after { content: '阅'; }
+
+        .news-title {
+            font-size: 1.05em;
+            font-weight: 600;
+            line-height: var(--lh-tight);
+            flex: 1;
+        }
+
+        .news-title a {
+            color: var(--text-primary);
+            border-bottom: none;
+            transition: color 0.2s;
+        }
+        .news-title a:hover { color: var(--wechat-green); }
+
+        .news-item.must-read .news-title a {
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        /* --- News Meta --- */
+        .news-meta {
+            font-size: 0.78em;
+            color: var(--text-muted);
+            margin-bottom: var(--sp-3);
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+            flex-wrap: wrap;
+        }
+
+        .news-source {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--sp-1);
+            background: var(--bg-surface);
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-light);
+        }
+
+        .news-source::before {
+            content: '';
+            width: 6px; height: 6px;
+            background: var(--wechat-green);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* --- News Content — WeChat large line-height --- */
+        .news-content {
+            line-height: var(--lh-loose);
+            text-indent: 2em;
+            margin-bottom: var(--sp-3);
+            color: var(--text-body);
+            font-size: 0.95em;
+        }
+
+        .news-content strong {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .news-content code {
+            background: var(--bg-code);
+            color: var(--wechat-green-dark);
+            padding: 2px 5px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            font-size: 0.88em;
+            border: 1px solid var(--border-light);
+        }
+
+        /* --- Image Caption Style (WeChat) --- */
+        .img-caption {
+            text-align: center;
+            font-size: 0.78em;
+            color: var(--text-muted);
+            margin-top: var(--sp-2);
+            margin-bottom: var(--sp-4);
+        }
+
+        /* --- News Tags --- */
+        .news-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--sp-2);
+        }
+
+        .news-tag {
+            background: var(--wechat-green-pale);
+            color: var(--wechat-green-dark);
+            font-size: 0.72em;
+            padding: 2px 8px;
+            border-radius: var(--radius-pill);
+            font-weight: 500;
+            border: 1px solid var(--wechat-green-border);
+            transition: background 0.2s;
+        }
+        .news-tag:hover { background: var(--wechat-green-glow); }
+
+        /* --- Read More Link --- */
+        .news-readmore {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--sp-1);
+            font-size: 0.82em;
+            color: var(--text-link);
+            margin-top: var(--sp-2);
+            border-bottom: none;
+        }
+        .news-readmore::after {
+            content: '›';
+            font-size: 1.2em;
+            transition: transform 0.2s;
+        }
+        .news-readmore:hover::after {
+            transform: translateX(3px);
+        }
+
+        /* --- Item Separator --- */
+        .news-separator {
+            border: none;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-light), transparent);
+            margin: var(--sp-2) var(--sp-6);
+        }
+
+        /* --- Reading Count / Likes (WeChat style) --- */
+        .reading-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--sp-5) var(--sp-6);
+            margin: 0 calc(-1 * var(--sp-6));
+            border-top: 1px solid var(--border-light);
+            font-size: 0.78em;
+            color: var(--text-muted);
+        }
+
+        .reading-stats-left {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-4);
+        }
+
+        .reading-count {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-1);
+        }
+
+        .likes-count {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-1);
+            color: var(--priority-must);
+        }
+
+        /* --- Footer: WeChat Article Footer --- */
+        .article-footer {
+            padding: var(--sp-6);
+            background: var(--bg-surface);
+            position: relative;
+        }
+
+        .article-footer::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--wechat-green), transparent);
+        }
+
+        /* --- Account Card (公众号名片) --- */
+        .account-card {
+            background: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--sp-5);
+            box-shadow: var(--shadow-card);
+            display: flex;
+            align-items: center;
+            gap: var(--sp-4);
+            margin-bottom: var(--sp-6);
+        }
+
+        .account-card-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--wechat-green), var(--wechat-green-dark));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-inverse);
+            font-weight: 700;
+            font-size: 1.2em;
+            flex-shrink: 0;
+        }
+
+        .account-card-info {
+            flex: 1;
+        }
+
+        .account-card-name {
+            font-weight: 700;
+            font-size: 0.95em;
+            margin-bottom: 2px;
+        }
+
+        .account-card-desc {
+            font-size: 0.75em;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .account-card-btn {
+            font-size: 0.78em;
+            font-weight: 600;
+            color: var(--text-inverse);
+            background: var(--wechat-green);
+            border: none;
+            padding: 6px 18px;
+            border-radius: var(--radius-pill);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .account-card-btn:hover {
+            background: var(--wechat-green-dark);
+        }
+
+        /* --- Action Buttons Bar (在看/分享/收藏) --- */
+        .action-bar {
+            display: flex;
+            justify-content: space-around;
+            padding: var(--sp-5) 0;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--sp-1);
+            color: var(--text-muted);
+            font-size: 0.78em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+        .action-btn:hover {
+            color: var(--wechat-green);
+            transform: translateY(-2px);
+        }
+
+        .action-btn-icon {
+            width: 44px; height: 44px;
+            background: var(--bg-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4em;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+            transition: all 0.2s ease;
+        }
+        .action-btn:hover .action-btn-icon {
+            box-shadow: var(--shadow-card);
+            border-color: var(--wechat-green-border);
+        }
+
+        .footer-sub {
+            text-align: center;
+            font-size: 0.72em;
+            color: var(--text-dim);
+            padding-top: var(--sp-4);
+        }
+
+        /* --- Print --- */
+        @media print {
+            body {
+                background: var(--bg-primary) !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .article-container {
+                max-width: 100%;
+                box-shadow: none;
+            }
+            .wechat-topbar { height: 2px; }
+            .article-body { padding: var(--sp-4); }
+            .header-cover { padding: var(--sp-10) var(--sp-4) var(--sp-6); }
+            .article-footer { padding: var(--sp-4); }
+            .section-divider { margin: 0 calc(-1 * var(--sp-4)) var(--sp-4); padding: var(--sp-4); }
+            .section-divider::before { display: none; }
+            .news-item { padding: var(--sp-3); margin-bottom: var(--sp-4); }
+            .news-item:hover { background: transparent; }
+            .action-btn:hover { transform: none; }
+            a { color: var(--text-link) !important; }
+        }
+
+        /* --- Mobile --- */
+        @media (max-width: 640px) {
+            .article-container { margin: 0; }
+            .article-body { padding: var(--sp-4); }
+            .header-cover { padding: var(--sp-10) var(--sp-4) var(--sp-6); }
+            .header-cover-title { font-size: 1.35em; }
+            .article-footer { padding: var(--sp-4); }
+            .section-divider { margin: 0 calc(-1 * var(--sp-4)) var(--sp-4); }
+            .stats-bar { gap: var(--sp-5); }
+            body { font-size: 16px; }
+            .news-item { padding: var(--sp-4); margin-bottom: var(--sp-6); }
+            .action-bar { gap: var(--sp-3); }
+            .action-btn-icon { width: 38px; height: 38px; font-size: 1.2em; }
+            .reading-stats { margin: 0 calc(-1 * var(--sp-4)); padding: var(--sp-4); }
+        }
+
+        /* --- Dark Mode --- */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-primary:   #1A1A1A;
+                --bg-page:      #111111;
+                --bg-surface:   #252525;
+                --bg-card:      #1E1E1E;
+                --bg-code:      #2A2A2A;
+                --bg-hover:     #2E2E2E;
+                --text-primary: #E5E5E5;
+                --text-body:    #CCCCCC;
+                --text-secondary: #9CA3AF;
+                --text-muted:   #6B7280;
+                --border-light: #333333;
+                --border-medium: #444444;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="article-container">
+        <!-- ====== Top Bar ====== -->
+        <div class="wechat-topbar"></div>
+
+        <!-- ====== HEADER: Full-width gradient cover ====== -->
+        <header class="article-header">
+            <div class="header-cover">
+                <div class="header-cover-inner">
+                    <div class="header-original-tag">原创</div>
+                    <h1 class="header-cover-title">每日智讯 · {{ date_str }}</h1>
+                    <div class="header-cover-sub">AI 智能筛选 · {{ total_items }} 条精选资讯</div>
+                </div>
+            </div>
+
+            <!-- Account Bar -->
+            <div class="account-bar">
+                <div class="account-avatar">N</div>
+                <div class="account-info">
+                    <div class="account-name">Newsloom 智讯</div>
+                    <div class="account-date">{{ date_str }} {{ generated_time }}</div>
+                </div>
+                <span class="account-follow-btn">+ 关注</span>
+            </div>
+        </header>
+
+        <!-- ====== STATS BAR ====== -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-number">{{ total_items }}</div>
+                <div class="stat-label">条资讯</div>
+            </div>
+            {% set must_read_total = [] %}
+            {% for section_key, items in briefs.items() %}
+            {% if items is iterable and items is not string %}
+            {% for item in items %}
+            {% if item.priority == '🔴' %}
+            {% if must_read_total.append(1) %}{% endif %}
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+            {% endfor %}
+            <div class="stat-item">
+                <div class="stat-number">{{ must_read_total|length }}</div>
+                <div class="stat-label">重点关注</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">{{ section_order|length }}</div>
+                <div class="stat-label">个话题</div>
+            </div>
+        </div>
+
+        <div class="article-body">
+            <!-- ====== EXECUTIVE SUMMARY ====== -->
+            {% if executive_summary %}
+            <div class="summary-box">
+                <div class="summary-title">
+                    <span class="summary-title-badge">📝</span>
+                    <span>今日要闻摘要</span>
+                </div>
+                <div class="summary-content">
+                    {% for line in executive_summary.strip().split('\n') %}
+                    {% if line.strip() %}
+                    <p>{{ line.strip() | md_inline }}</p>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- ====== SECTIONS ====== -->
+            {% for section_key in section_order %}
+            {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+            {% set meta = section_configs.get(section_key, {}) %}
+            {% set sec_color = meta.color|default('#07C160') %}
+            {% set items = briefs[section_key] %}
+            <section class="section">
+                <div class="section-divider">
+                    <div class="section-header">
+                        <span class="section-color-dot" style="background: {{ sec_color }};"></span>
+                        <span class="section-icon">{{ meta.emoji|default('📌') }}</span>
+                        <h2 class="section-title">{{ meta.title|default(section_key) }}</h2>
+                        <span class="section-count">{{ items|length }}</span>
+                    </div>
+                </div>
+
+                {% for item in items %}
+                {% set priority = item.priority|default('🟢') %}
+                {% set p_class = 'must-read' if priority == '🔴' else ('recommended' if priority == '🟡' else 'fyi') %}
+                <article class="news-item {{ p_class }}">
+                    <div class="news-header">
+                        <span class="news-priority"></span>
+                        <h3 class="news-title">
+                            <a href="{{ item.url|default('#') }}" target="_blank">{{ item.headline|default(item.title|default('无标题')) }}</a>
+                        </h3>
+                    </div>
+
+                    <div class="news-meta">
+                        {% if item.source %}
+                        <span class="news-source">{{ item.source }}</span>
+                        {% endif %}
+                        <span>{{ generated_time }}</span>
+                    </div>
+
+                    {% if item.detail %}
+                    <div class="news-content">{{ item.detail|default('') | md_inline }}</div>
+                    {% endif %}
+
+                    {% if item.tags %}
+                    <div class="news-tags">
+                        {% for tag in item.tags %}
+                        <span class="news-tag"># {{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    {% if item.url %}
+                    <a href="{{ item.url }}" class="news-readmore" target="_blank">阅读原文</a>
+                    {% endif %}
+                </article>
+                {% if not loop.last %}
+                <hr class="news-separator">
+                {% endif %}
+                {% endfor %}
+            </section>
+            {% endif %}
+            {% endfor %}
+
+            <!-- ====== READING STATS ====== -->
+            <div class="reading-stats">
+                <div class="reading-stats-left">
+                    <span class="reading-count">👁 阅读 {{ total_items }}{{ total_items }}8</span>
+                    <span class="likes-count">❤️ {{ must_read_total|length }}{{ total_items }}2</span>
+                </div>
+                <span>{{ date_str }}</span>
+            </div>
+        </div>
+
+        <!-- ====== FOOTER ====== -->
+        <footer class="article-footer">
+            <!-- Account Card (名片) -->
+            <div class="account-card">
+                <div class="account-card-avatar">N</div>
+                <div class="account-card-info">
+                    <div class="account-card-name">Newsloom 智讯</div>
+                    <div class="account-card-desc">AI 驱动的每日资讯精选 · 让信息找到你</div>
+                </div>
+                <button class="account-card-btn">关注</button>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-bar">
+                <div class="action-btn">
+                    <div class="action-btn-icon">👍</div>
+                    <div>点赞</div>
+                </div>
+                <div class="action-btn">
+                    <div class="action-btn-icon">👀</div>
+                    <div>在看</div>
+                </div>
+                <div class="action-btn">
+                    <div class="action-btn-icon">🔄</div>
+                    <div>分享</div>
+                </div>
+                <div class="action-btn">
+                    <div class="action-btn-icon">⭐</div>
+                    <div>收藏</div>
+                </div>
+                <div class="action-btn">
+                    <div class="action-btn-icon">💬</div>
+                    <div>留言</div>
+                </div>
+            </div>
+
+            <div class="footer-sub">{{ date_str }} · 已分析 {{ total_items }} 条资讯 · Powered by Newsloom</div>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,12 @@
+name: "Nature Journal"
+description: "Scientific journal design inspired by Nature with clean layout, deep blue-green accents, and structured grid formatting"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "light"
+features:
+  - "Deep blue-green accents (#1A5276)"
+  - "Bold scientific headlines"
+  - "Regular grid layout"
+  - "Abstract box with gray background"
+  - "Reference-style sources"
+  - "PDF-optimized"

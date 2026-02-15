@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsloom 水墨日报 · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * 水墨 INK WASH v3 — True Chinese Ink Painting Scroll
+         * 
+         * Complete visual overhaul — immersive xuan paper + ink wash:
+         *   - Rice paper (宣纸) texture via CSS noise patterns
+         *   - Top/bottom ink wash bleeding (radial-gradient ink splashes)
+         *   - Mountain silhouette decorations (CSS gradient peaks)
+         *   - Ink density hierarchy: 浓墨 → 中墨 → 淡墨 → 飞白
+         *   - Prominent vermillion seal (朱砂印) accents
+         *   - Irregular ink-wash dividers between sections
+         *   - Brush stroke effects via gradient manipulation
+         *
+         * Target: 900+ lines · PDF-ready · CJK fonts · Mobile responsive
+         * ============================================================ */
+
+        :root {
+            /* === Xuan Paper (宣纸) Tones — NOT pure white === */
+            --paper:            #F2EDE3;
+            --paper-warm:       #EDE7DA;
+            --paper-aged:       #E8E0D0;
+            --paper-shadow:     #DDD5C5;
+            --paper-deep:       #D0C8B8;
+
+            /* === Ink Density (墨色浓淡) — 6 levels === */
+            --ink-heavy:        #1a1a1a;    /* 浓墨 — titles */
+            --ink-dark:         #2d2926;    /* 重墨 — strong emphasis */
+            --ink-medium:       #444038;    /* 中墨 — body text */
+            --ink-light:        #6b6560;    /* 淡墨 — secondary */
+            --ink-faded:        #8c877e;    /* 飞白 — meta info */
+            --ink-ghost:        #b0a99e;    /* 残墨 — very faint */
+
+            /* === Cinnabar Red (朱砂) — Seal accent system === */
+            --cinnabar:         #B8292A;
+            --cinnabar-bright:  #CC3333;
+            --cinnabar-dark:    #8B1A1A;
+            --cinnabar-dim:     rgba(184, 41, 42, 0.10);
+            --cinnabar-wash:    rgba(184, 41, 42, 0.06);
+            --cinnabar-glow:    rgba(184, 41, 42, 0.25);
+
+            /* === Blue-Ink (青墨) for recommendations === */
+            --blue-ink:         #2F4F4F;
+            --blue-ink-dim:     rgba(47, 79, 79, 0.08);
+            --blue-ink-wash:    rgba(47, 79, 79, 0.05);
+
+            /* === Pine Green (松烟墨) subtle accent === */
+            --pine:             #3D5C3A;
+            --pine-dim:         rgba(61, 92, 58, 0.08);
+
+            /* === Ink Wash Effects === */
+            --ink-splash:       rgba(45, 41, 38, 0.04);
+            --ink-bleed:        rgba(45, 41, 38, 0.08);
+
+            /* === Borders (ink strokes) === */
+            --stroke:           rgba(45, 41, 38, 0.12);
+            --stroke-medium:    rgba(45, 41, 38, 0.22);
+            --stroke-heavy:     rgba(45, 41, 38, 0.40);
+
+            /* === Fonts === */
+            --font-kai:     "KaiTi", "楷体", "STKaiti", "华文楷体", "Noto Serif SC", serif;
+            --font-song:    "STSong", "宋体", "SimSun", "Noto Serif SC", "Source Han Serif SC", Georgia, serif;
+            --font-hei:     "PingFang SC", "Noto Sans SC", "Microsoft YaHei", "微软雅黑", -apple-system, sans-serif;
+            --font-mono:    "SF Mono", "Fira Code", "Courier New", monospace;
+
+            /* === Spacing === */
+            --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px;
+            --sp-5: 20px; --sp-6: 24px; --sp-8: 32px; --sp-10: 40px;
+            --sp-12: 48px; --sp-16: 64px; --sp-20: 80px;
+
+            /* === Shadows (ink-wash soft) === */
+            --shadow-ink:   0 2px 8px rgba(45,41,38,0.06), 0 0 2px rgba(45,41,38,0.04);
+            --shadow-deep:  0 4px 16px rgba(45,41,38,0.10), 0 1px 4px rgba(45,41,38,0.06);
+            --shadow-seal:  0 3px 12px rgba(184,41,42,0.25), 0 1px 4px rgba(184,41,42,0.15);
+        }
+
+        /* --- Page Setup --- */
+        @page {
+            size: A4;
+            margin: 2cm 2.2cm;
+            @bottom-center {
+                content: "水墨日报 · 第 " counter(page) " 页";
+                font-family: "Noto Serif SC", "STSong", serif;
+                font-size: 8pt;
+                color: #8c877e;
+            }
+        }
+
+        /* --- Reset --- */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* ============================================================
+         * BODY — Xuan Paper (宣纸) with Ink Wash Effects
+         * Multiple layers simulating aged rice paper texture
+         * ============================================================ */
+        body {
+            font-family: var(--font-hei);
+            font-size: 16px;
+            line-height: 1.9;
+            color: var(--ink-medium);
+            -webkit-font-smoothing: antialiased;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            position: relative;
+            min-height: 100vh;
+
+            background:
+                /* Layer 1: Paper fiber texture — horizontal fibers */
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 3px,
+                    rgba(139, 115, 85, 0.012) 3px,
+                    rgba(139, 115, 85, 0.012) 4px
+                ),
+                /* Layer 2: Paper fiber texture — vertical fibers (less visible) */
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 5px,
+                    rgba(120, 100, 75, 0.008) 5px,
+                    rgba(120, 100, 75, 0.008) 6px
+                ),
+                /* Layer 3: Paper grain — tiny dots (noise simulation) */
+                repeating-radial-gradient(
+                    circle 0.5px at 2px 2px,
+                    rgba(100, 85, 65, 0.015) 0%,
+                    transparent 100%
+                ),
+                repeating-radial-gradient(
+                    circle 0.3px at 5px 7px,
+                    rgba(80, 70, 55, 0.012) 0%,
+                    transparent 100%
+                ),
+                /* Layer 4: Top ink wash — 墨水渗透 from top */
+                radial-gradient(ellipse 120% 250px at 50% 0%, rgba(45,41,38,0.06) 0%, rgba(45,41,38,0.02) 40%, transparent 70%),
+                /* Layer 5: Bottom ink wash — 墨水渗透 from bottom */
+                radial-gradient(ellipse 120% 200px at 50% 100%, rgba(45,41,38,0.05) 0%, rgba(45,41,38,0.015) 40%, transparent 70%),
+                /* Layer 6: Left edge aging */
+                linear-gradient(90deg, rgba(139,115,85,0.04) 0%, transparent 15%),
+                /* Layer 7: Right edge aging */
+                linear-gradient(270deg, rgba(139,115,85,0.03) 0%, transparent 10%),
+                /* Layer 8: Warm paper base */
+                linear-gradient(180deg, #F2EDE3 0%, #EDE7DA 30%, #F0EBE1 60%, #EDE7DA 100%);
+            background-attachment: fixed;
+        }
+
+        /* --- Mountain Silhouette Decoration (远山轮廓) at top --- */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 200px;
+            background:
+                /* Mountain range — layered peaks */
+                /* Peak 1 — far mountain (lightest) */
+                linear-gradient(165deg, transparent 40%, rgba(45,41,38,0.03) 40.5%, rgba(45,41,38,0.03) 41%, transparent 55%),
+                linear-gradient(195deg, transparent 38%, rgba(45,41,38,0.025) 38.5%, rgba(45,41,38,0.025) 39%, transparent 52%),
+                /* Peak 2 — mid mountain */
+                linear-gradient(170deg, transparent 50%, rgba(45,41,38,0.04) 50.5%, rgba(45,41,38,0.04) 51%, transparent 62%),
+                linear-gradient(190deg, transparent 48%, rgba(45,41,38,0.035) 48.5%, rgba(45,41,38,0.035) 49%, transparent 60%),
+                /* Peak 3 — near mountain (darkest, lowest) */
+                linear-gradient(168deg, transparent 58%, rgba(45,41,38,0.05) 58.5%, rgba(45,41,38,0.05) 59%, transparent 68%),
+                /* Mist at base of mountains */
+                linear-gradient(180deg, transparent 70%, rgba(242,237,227,0.8) 85%, var(--paper) 100%);
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.7;
+        }
+
+        /* --- Ink splash decoration (bottom) — 墨迹点缀 --- */
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -40px; right: -40px;
+            width: 350px; height: 350px;
+            background:
+                radial-gradient(circle 80px at 40% 50%, rgba(45,41,38,0.04) 0%, transparent 100%),
+                radial-gradient(circle 40px at 70% 30%, rgba(45,41,38,0.03) 0%, transparent 100%),
+                radial-gradient(circle 60px at 25% 70%, rgba(45,41,38,0.025) 0%, transparent 100%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* --- Links --- */
+        a {
+            color: var(--cinnabar);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: all 0.25s;
+        }
+        a:hover {
+            color: var(--cinnabar-dark);
+            border-bottom-color: var(--cinnabar);
+        }
+
+        /* --- Container --- */
+        .scroll-container {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: var(--sp-12) var(--sp-8);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ============================================================
+         * HEADER — Calligraphy Scroll Opening (画卷展开)
+         * ============================================================ */
+        .header {
+            text-align: center;
+            padding: var(--sp-16) 0 var(--sp-10);
+            margin-bottom: var(--sp-12);
+            position: relative;
+        }
+
+        /* Top brush stroke decoration */
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 10%; right: 10%;
+            height: 4px;
+            background:
+                linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(45,41,38,0.06) 5%,
+                    rgba(45,41,38,0.25) 15%,
+                    rgba(45,41,38,0.50) 30%,
+                    rgba(45,41,38,0.40) 50%,
+                    rgba(45,41,38,0.55) 65%,
+                    rgba(45,41,38,0.30) 80%,
+                    rgba(45,41,38,0.08) 92%,
+                    transparent 100%
+                );
+            border-radius: 2px;
+        }
+
+        /* Bottom ink wash gradient line */
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 5%; right: 5%;
+            height: 3px;
+            background:
+                linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(45,41,38,0.08) 8%,
+                    rgba(45,41,38,0.35) 20%,
+                    rgba(45,41,38,0.15) 40%,
+                    rgba(45,41,38,0.30) 55%,
+                    rgba(45,41,38,0.45) 70%,
+                    rgba(45,41,38,0.20) 85%,
+                    rgba(45,41,38,0.05) 95%,
+                    transparent 100%
+                );
+            border-radius: 2px;
+        }
+
+        /* Vermillion Seal Stamp (朱砂印) — Large, Prominent */
+        .header-seal {
+            position: absolute;
+            top: var(--sp-6);
+            right: 0;
+            width: 62px;
+            height: 62px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--cinnabar);
+            color: var(--paper);
+            font-size: 1.6em;
+            font-weight: 700;
+            font-family: var(--font-kai);
+            border: 3px solid var(--cinnabar-bright);
+            border-radius: 4px;
+            transform: rotate(-5deg);
+            box-shadow: var(--shadow-seal);
+            /* Aged stamp effect */
+            background-image:
+                radial-gradient(circle 3px at 30% 25%, rgba(242,237,227,0.15) 0%, transparent 100%),
+                radial-gradient(circle 2px at 65% 70%, rgba(242,237,227,0.10) 0%, transparent 100%),
+                radial-gradient(circle 4px at 80% 20%, rgba(242,237,227,0.08) 0%, transparent 100%);
+        }
+
+        /* Small secondary seal */
+        .header-seal-small {
+            position: absolute;
+            bottom: var(--sp-8);
+            left: 0;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--cinnabar-dark);
+            color: var(--paper);
+            font-size: 0.8em;
+            font-weight: 700;
+            font-family: var(--font-kai);
+            border: 2px solid var(--cinnabar);
+            border-radius: 50%;
+            transform: rotate(3deg);
+            box-shadow: 0 2px 8px rgba(184,41,42,0.2);
+        }
+
+        .header-brand {
+            font-size: 3em;
+            font-weight: 700;
+            font-family: var(--font-song);
+            color: var(--ink-heavy);
+            letter-spacing: 0.15em;
+            margin-bottom: var(--sp-4);
+            line-height: 1.2;
+            text-shadow: 0 1px 2px rgba(45,41,38,0.08);
+        }
+
+        .header-subtitle {
+            font-size: 1em;
+            color: var(--ink-light);
+            font-family: var(--font-kai);
+            margin-bottom: var(--sp-6);
+            letter-spacing: 0.08em;
+        }
+
+        .header-date {
+            font-size: 0.92em;
+            color: var(--ink-faded);
+            font-family: var(--font-hei);
+            margin-bottom: var(--sp-3);
+        }
+
+        .header-meta {
+            font-size: 0.85em;
+            color: var(--ink-ghost);
+            font-family: var(--font-hei);
+        }
+        .header-meta .must-count {
+            color: var(--cinnabar);
+            font-weight: 600;
+        }
+
+        /* ============================================================
+         * INK WASH DIVIDERS — Irregular, brush-stroke edges
+         * ============================================================ */
+
+        /* Main ink divider — irregular brushstroke */
+        .ink-divider {
+            position: relative;
+            margin: var(--sp-10) 0;
+            height: 6px;
+        }
+        .ink-divider::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 5%; right: 8%;
+            height: 3px;
+            background:
+                linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(45,41,38,0.05) 3%,
+                    rgba(45,41,38,0.15) 8%,
+                    rgba(45,41,38,0.30) 15%,
+                    rgba(45,41,38,0.12) 25%,
+                    rgba(45,41,38,0.35) 35%,
+                    rgba(45,41,38,0.20) 45%,
+                    rgba(45,41,38,0.08) 55%,
+                    rgba(45,41,38,0.25) 65%,
+                    rgba(45,41,38,0.40) 72%,
+                    rgba(45,41,38,0.18) 82%,
+                    rgba(45,41,38,0.06) 92%,
+                    transparent 100%
+                );
+            border-radius: 1px;
+        }
+        /* Secondary wash line (offset, lighter) */
+        .ink-divider::after {
+            content: '';
+            position: absolute;
+            top: 3px; left: 12%; right: 3%;
+            height: 2px;
+            background:
+                linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(45,41,38,0.02) 10%,
+                    rgba(45,41,38,0.08) 30%,
+                    rgba(45,41,38,0.04) 50%,
+                    rgba(45,41,38,0.10) 70%,
+                    rgba(45,41,38,0.03) 90%,
+                    transparent 100%
+                );
+            border-radius: 1px;
+        }
+
+        /* Cinnabar dot on divider */
+        .ink-dot {
+            display: block;
+            width: 8px;
+            height: 8px;
+            background: var(--cinnabar);
+            border-radius: 50%;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 0 6px var(--cinnabar-wash);
+        }
+
+        /* Section brush accent */
+        .brush-accent {
+            height: 4px;
+            margin: var(--sp-8) 0;
+            background:
+                linear-gradient(90deg,
+                    var(--cinnabar) 0%,
+                    rgba(184,41,42,0.5) 15%,
+                    rgba(184,41,42,0.2) 35%,
+                    rgba(184,41,42,0.05) 60%,
+                    transparent 100%
+                );
+            border-radius: 2px;
+        }
+
+        /* ============================================================
+         * EXECUTIVE SUMMARY — Scroll Quotation Panel
+         * ============================================================ */
+        .exec-summary {
+            background:
+                /* Subtle ink wash on panel */
+                radial-gradient(ellipse 80% 60% at 10% 20%, rgba(45,41,38,0.03) 0%, transparent 100%),
+                radial-gradient(ellipse 60% 50% at 90% 80%, rgba(45,41,38,0.02) 0%, transparent 100%),
+                linear-gradient(180deg, var(--paper-warm) 0%, var(--paper) 100%);
+            border-left: 4px solid var(--cinnabar);
+            border-right: 1px solid var(--stroke);
+            border-top: 1px solid var(--stroke);
+            border-bottom: 1px solid var(--stroke);
+            border-radius: 0 6px 6px 0;
+            padding: var(--sp-10) var(--sp-10);
+            margin-bottom: var(--sp-12);
+            position: relative;
+            page-break-inside: avoid;
+            box-shadow: var(--shadow-deep);
+        }
+
+        /* Large Chinese quotation bracket — opening */
+        .exec-summary::before {
+            content: '「';
+            position: absolute;
+            top: var(--sp-1);
+            left: var(--sp-4);
+            font-size: 3em;
+            color: var(--cinnabar);
+            font-family: var(--font-song);
+            line-height: 1;
+            opacity: 0.4;
+        }
+
+        /* Large Chinese quotation bracket — closing */
+        .exec-summary::after {
+            content: '」';
+            position: absolute;
+            bottom: var(--sp-1);
+            right: var(--sp-4);
+            font-size: 3em;
+            color: var(--cinnabar);
+            font-family: var(--font-song);
+            line-height: 1;
+            opacity: 0.4;
+        }
+
+        .exec-label {
+            font-size: 0.78em;
+            font-weight: 700;
+            letter-spacing: 0.25em;
+            color: var(--cinnabar);
+            margin-bottom: var(--sp-6);
+            font-family: var(--font-kai);
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+        }
+
+        /* Small seal before label */
+        .exec-label::before {
+            content: '摘';
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            background: var(--cinnabar);
+            color: var(--paper);
+            font-size: 0.85em;
+            font-family: var(--font-kai);
+            border-radius: 2px;
+            transform: rotate(-2deg);
+            flex-shrink: 0;
+        }
+
+        .exec-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, var(--stroke-medium), transparent);
+        }
+
+        .exec-summary p {
+            color: var(--ink-medium);
+            font-size: 1.05em;
+            line-height: 2.1;
+            margin-bottom: var(--sp-4);
+            font-family: var(--font-song);
+            text-indent: 2em;
+        }
+        .exec-summary p:last-of-type { margin-bottom: 0; }
+        .exec-summary p strong {
+            color: var(--ink-heavy);
+            font-weight: 700;
+        }
+
+        /* ============================================================
+         * SECTION HEADERS — Ink Wash Chapter Headings
+         * ============================================================ */
+        .section { margin-bottom: var(--sp-12); }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            margin-bottom: var(--sp-6);
+            padding-bottom: var(--sp-4);
+            position: relative;
+        }
+
+        /* Ink wash gradient underline — irregular edge */
+        .section-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 3px;
+            background:
+                linear-gradient(90deg,
+                    rgba(45,41,38,0.40) 0%,
+                    rgba(45,41,38,0.25) 15%,
+                    rgba(45,41,38,0.35) 30%,
+                    rgba(45,41,38,0.10) 50%,
+                    rgba(45,41,38,0.20) 65%,
+                    rgba(45,41,38,0.05) 80%,
+                    transparent 100%
+                );
+            border-radius: 1px;
+        }
+
+        /* Cinnabar dot at line start */
+        .section-header::before {
+            content: '';
+            position: absolute;
+            bottom: -4px; left: 0;
+            width: 10px; height: 10px;
+            background: var(--cinnabar);
+            border-radius: 50%;
+            z-index: 1;
+            box-shadow: 0 0 5px var(--cinnabar-dim);
+        }
+
+        .section-icon { font-size: 1.35em; }
+
+        .section-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--ink-heavy);
+            font-family: var(--font-song);
+            letter-spacing: 0.1em;
+        }
+
+        .section-count {
+            margin-left: auto;
+            font-size: 0.72em;
+            color: var(--ink-faded);
+            font-family: var(--font-hei);
+            background: var(--cinnabar-dim);
+            padding: var(--sp-1) var(--sp-3);
+            border-radius: 3px;
+            border: 1px solid rgba(184,41,42,0.12);
+        }
+
+        /* ============================================================
+         * BRIEF CARDS — Ink-wash Paper Entries
+         * ============================================================ */
+        .brief {
+            padding: var(--sp-6) var(--sp-5);
+            position: relative;
+            page-break-inside: avoid;
+            transition: background 0.25s;
+        }
+
+        /* Ink wash bottom border (not straight!) */
+        .brief::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 3%; right: 5%;
+            height: 1px;
+            background:
+                linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(45,41,38,0.06) 5%,
+                    rgba(45,41,38,0.12) 15%,
+                    rgba(45,41,38,0.08) 30%,
+                    rgba(45,41,38,0.15) 45%,
+                    rgba(45,41,38,0.10) 60%,
+                    rgba(45,41,38,0.06) 75%,
+                    rgba(45,41,38,0.12) 88%,
+                    transparent 100%
+                );
+        }
+
+        .brief:last-child::after { display: none; }
+
+        .brief:hover { background: rgba(45,41,38,0.02); }
+
+        /* Must-read: cinnabar wash + heavy left border */
+        .brief.must-read {
+            background:
+                linear-gradient(90deg, rgba(184,41,42,0.06) 0%, rgba(184,41,42,0.02) 30%, transparent 60%),
+                linear-gradient(180deg, var(--paper-warm) 0%, var(--paper) 100%);
+            border-left: 4px solid var(--cinnabar);
+            padding-left: var(--sp-6);
+            border-radius: 0 4px 4px 0;
+        }
+        .brief.must-read:hover { background: rgba(184,41,42,0.06); }
+
+        /* Recommended: blue-ink wash + subtle left border */
+        .brief.recommended {
+            border-left: 3px solid var(--blue-ink);
+            padding-left: var(--sp-6);
+            background: linear-gradient(90deg, var(--blue-ink-wash) 0%, transparent 30%);
+        }
+
+        .brief-header {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--sp-3);
+            margin-bottom: var(--sp-3);
+        }
+
+        /* Priority badges — stamp style */
+        .brief-priority {
+            flex-shrink: 0;
+            font-size: 0.72em;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-family: var(--font-kai);
+            letter-spacing: 0.1em;
+            margin-top: 4px;
+        }
+        .brief.must-read .brief-priority {
+            background: var(--cinnabar);
+            color: var(--paper);
+            box-shadow: var(--shadow-seal);
+            transform: rotate(-1deg);
+        }
+        .brief.must-read .brief-priority::before { content: '必读'; }
+
+        .brief.recommended .brief-priority {
+            background: var(--blue-ink);
+            color: var(--paper);
+            box-shadow: 0 1px 4px rgba(47,79,79,0.25);
+        }
+        .brief.recommended .brief-priority::before { content: '推荐'; }
+
+        .brief.fyi .brief-priority {
+            background: var(--paper-aged);
+            color: var(--ink-light);
+            border: 1px solid var(--stroke);
+        }
+        .brief.fyi .brief-priority::before { content: '了解'; }
+
+        .brief-headline {
+            flex: 1;
+            font-size: 1.12em;
+            font-weight: 600;
+            line-height: 1.5;
+            font-family: var(--font-song);
+        }
+        .brief-headline a {
+            color: var(--ink-dark);
+            transition: color 0.25s;
+        }
+        .brief-headline a:hover { color: var(--cinnabar); }
+        .brief.must-read .brief-headline a {
+            color: var(--cinnabar-dark);
+            font-weight: 700;
+        }
+
+        .brief-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            margin-bottom: var(--sp-3);
+            flex-wrap: wrap;
+            font-size: 0.82em;
+        }
+
+        .source-badge {
+            color: var(--blue-ink);
+            font-weight: 600;
+            font-family: var(--font-hei);
+            background: var(--blue-ink-dim);
+            padding: 2px 10px;
+            border-radius: 3px;
+            border: 1px solid rgba(47,79,79,0.12);
+        }
+
+        .tag {
+            color: var(--ink-faded);
+            background: var(--paper-aged);
+            padding: 2px 8px;
+            border-radius: 3px;
+            border: 1px solid var(--stroke);
+            font-family: var(--font-hei);
+            font-size: 0.92em;
+            transition: background 0.2s;
+        }
+        .tag:hover { background: var(--paper-shadow); }
+
+        .brief-detail {
+            color: var(--ink-medium);
+            font-size: 0.95em;
+            line-height: 2.0;
+            font-family: var(--font-song);
+        }
+        .brief-detail strong {
+            color: var(--ink-heavy);
+            font-weight: 700;
+        }
+        .brief-detail code {
+            font-family: var(--font-mono);
+            font-size: 0.88em;
+            background: var(--paper-aged);
+            color: var(--cinnabar);
+            padding: 2px 5px;
+            border-radius: 3px;
+            border: 1px solid var(--stroke);
+        }
+
+        /* ============================================================
+         * FOOTER — Scroll Ending with Red Seal
+         * ============================================================ */
+        .footer {
+            text-align: center;
+            padding: var(--sp-12) 0 var(--sp-8);
+            margin-top: var(--sp-16);
+            position: relative;
+        }
+
+        /* Top brush stroke */
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 8%; right: 8%;
+            height: 3px;
+            background:
+                linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(45,41,38,0.06) 5%,
+                    rgba(45,41,38,0.30) 15%,
+                    rgba(45,41,38,0.15) 35%,
+                    rgba(45,41,38,0.40) 50%,
+                    rgba(45,41,38,0.20) 70%,
+                    rgba(45,41,38,0.35) 85%,
+                    rgba(45,41,38,0.08) 95%,
+                    transparent 100%
+                );
+            border-radius: 2px;
+        }
+
+        /* Bottom finishing stroke */
+        .footer::after {
+            content: '';
+            display: block;
+            margin-top: var(--sp-10);
+            height: 4px;
+            background:
+                linear-gradient(90deg,
+                    transparent 3%,
+                    rgba(45,41,38,0.08) 10%,
+                    rgba(45,41,38,0.25) 25%,
+                    rgba(45,41,38,0.15) 40%,
+                    rgba(45,41,38,0.30) 55%,
+                    rgba(45,41,38,0.12) 70%,
+                    rgba(45,41,38,0.20) 85%,
+                    rgba(45,41,38,0.05) 95%,
+                    transparent 100%
+                );
+            border-radius: 2px;
+            opacity: 0.6;
+        }
+
+        /* Large round seal */
+        .footer-seal {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 68px;
+            height: 68px;
+            background: var(--cinnabar);
+            color: var(--paper);
+            border-radius: 50%;
+            font-size: 1em;
+            font-weight: 700;
+            font-family: var(--font-kai);
+            letter-spacing: 0.15em;
+            border: 4px solid var(--cinnabar-bright);
+            box-shadow: var(--shadow-seal);
+            transform: rotate(3deg);
+            margin-bottom: var(--sp-6);
+            /* Aged texture */
+            background-image:
+                radial-gradient(circle 4px at 25% 30%, rgba(242,237,227,0.12) 0%, transparent 100%),
+                radial-gradient(circle 3px at 70% 65%, rgba(242,237,227,0.08) 0%, transparent 100%);
+        }
+
+        .footer-brand {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: var(--ink-heavy);
+            margin-bottom: var(--sp-2);
+            font-family: var(--font-song);
+            letter-spacing: 0.12em;
+        }
+
+        .footer-tagline {
+            font-size: 0.88em;
+            color: var(--ink-light);
+            margin-bottom: var(--sp-2);
+            font-family: var(--font-kai);
+            letter-spacing: 0.06em;
+        }
+
+        .footer-sub {
+            font-size: 0.78em;
+            color: var(--ink-ghost);
+            font-family: var(--font-hei);
+        }
+
+        /* ============================================================
+         * PRINT
+         * ============================================================ */
+        @media print {
+            body {
+                background: #F2EDE3 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            body::before, body::after { display: none !important; }
+            .scroll-container { max-width: 100%; padding: 0; }
+            .header { padding: var(--sp-8) 0; margin-bottom: var(--sp-8); }
+            .exec-summary { margin-bottom: var(--sp-8); padding: var(--sp-6) var(--sp-8); box-shadow: none; }
+            .section { margin-bottom: var(--sp-8); }
+            .brief { padding: var(--sp-4) var(--sp-3); }
+            .brief:hover { background: transparent; }
+            a { color: var(--ink-dark) !important; border-bottom: none !important; }
+            .data-stream { page-break-inside: avoid; }
+        }
+
+        /* ============================================================
+         * MOBILE
+         * ============================================================ */
+        @media (max-width: 640px) {
+            .scroll-container { padding: var(--sp-8) var(--sp-4); }
+            .header { padding: var(--sp-8) 0 var(--sp-6); }
+            .header-brand { font-size: 2.2em; }
+            .header-seal { width: 48px; height: 48px; font-size: 1.2em; top: var(--sp-3); }
+            .header-seal-small { width: 28px; height: 28px; font-size: 0.65em; }
+            .exec-summary { padding: var(--sp-6) var(--sp-5); }
+            .exec-summary p { text-indent: 0; }
+            .exec-summary::before, .exec-summary::after { font-size: 2em; }
+            .brief { padding: var(--sp-4) var(--sp-3); }
+            .section-title { font-size: 1.25em; }
+            .ink-divider { margin: var(--sp-6) 0; }
+            .footer-seal { width: 52px; height: 52px; font-size: 0.85em; }
+        }
+
+        @media (max-width: 420px) {
+            .header-brand { font-size: 1.8em; letter-spacing: 0.08em; }
+            .header-seal { display: none; }
+            .header-seal-small { display: none; }
+            .brief-header { flex-direction: column; gap: var(--sp-1); }
+            .brief-priority { align-self: flex-start; }
+        }
+    </style>
+</head>
+<body>
+    <div class="scroll-container">
+
+        <!-- ====== HEADER: Calligraphy Scroll with Seals ====== -->
+        <header class="header">
+            <div class="header-seal">印</div>
+            <div class="header-seal-small">墨</div>
+
+            <h1 class="header-brand">水墨日报</h1>
+            <div class="header-subtitle">每日科技情报 · 水墨意境 · AI 策展</div>
+            <div class="header-date">{{ date_str }}</div>
+            <div class="header-meta">
+                共计 {{ total_items }} 条资讯
+                {% set must_read_total = [] %}
+                {% for section_key, items in briefs.items() %}
+                {% if items is iterable and items is not string %}
+                {% for item in items %}
+                {% if item.priority == '🔴' %}{% if must_read_total.append(1) %}{% endif %}{% endif %}
+                {% endfor %}
+                {% endif %}
+                {% endfor %}
+                {% if must_read_total|length > 0 %}
+                · <span class="must-count">{{ must_read_total|length }} 条必读</span>
+                {% endif %}
+            </div>
+        </header>
+
+        <!-- ====== EXECUTIVE SUMMARY ====== -->
+        {% if executive_summary %}
+        <div class="exec-summary">
+            <div class="exec-label">今 日 摘 要</div>
+            {% for line in executive_summary.strip().split('\n') %}
+            {% if line.strip() %}
+            <p>{{ line.strip() | md_inline }}</p>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- ====== INK DIVIDER ====== -->
+        <div class="ink-divider">
+            <span class="ink-dot"></span>
+        </div>
+
+        <!-- ====== SECTIONS ====== -->
+        {% for section_key in section_order %}
+        {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+        {% set meta = section_configs.get(section_key, {}) %}
+        {% set items = briefs[section_key] %}
+        <section class="section">
+            <div class="section-header">
+                <span class="section-icon">{{ meta.emoji|default('📌') }}</span>
+                <h2 class="section-title">{{ meta.title|default(section_key) }}</h2>
+                <span class="section-count">{{ items|length }} 条</span>
+            </div>
+
+            {% for item in items %}
+            {% set priority = item.priority|default('🟢') %}
+            {% set p_class = 'must-read' if priority == '🔴' else ('recommended' if priority == '🟡' else 'fyi') %}
+            <div class="brief {{ p_class }}">
+                <div class="brief-header">
+                    <span class="brief-priority"></span>
+                    <div class="brief-headline">
+                        <a href="{{ item.url|default('#') }}" target="_blank">{{ item.headline|default(item.title|default('无标题')) }}</a>
+                    </div>
+                </div>
+                <div class="brief-meta">
+                    {% if item.source %}
+                    <span class="source-badge">{{ item.source }}</span>
+                    {% endif %}
+                    {% if item.tags %}
+                    {% for tag in item.tags %}
+                    <span class="tag">{{ tag }}</span>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+                {% if item.detail %}
+                <div class="brief-detail">{{ item.detail|default('') | md_inline }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </section>
+
+        {% if not loop.last %}
+        <div class="brush-accent"></div>
+        {% endif %}
+
+        {% endif %}
+        {% endfor %}
+
+        <!-- ====== FOOTER: Red Seal ====== -->
+        <footer class="footer">
+            <div class="footer-seal">朱印</div>
+            <div class="footer-brand">Newsloom 智能情报</div>
+            <div class="footer-tagline">意在笔先 · AI 驱动的新闻策展</div>
+            <div class="footer-sub">{{ date_str }} · 分析 {{ total_items }} 条来源</div>
+        </footer>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsloom Daily · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * INSTAGRAM GRADIENT v2 — Stories & Feed Visual System
+         *
+         * Design Language:
+         *   - Warm light gray base (#FAFAFA) mimicking IG background
+         *   - Classic Instagram gradient ring (#405DE6→#833AB4→
+         *     #C13584→#E1306C→#F56040→#FCAF45) on header avatar
+         *   - Post cards: white, rounded 12px, subtle shadow
+         *   - Each card = IG post with user header + action bar
+         *   - Bottom navigation bar (Home, Search, Create, Reels, Profile)
+         *   - "Swipe up ↑" link style on article URLs
+         *   - Rounded everywhere + soft pastel accent tones
+         *
+         * References: instagram.com, IG Stories, IG Shopping,
+         *             Meta Design System, Threads app
+         * ============================================================ */
+
+        /* --- Design Tokens --- */
+        :root {
+            /* Backgrounds */
+            --bg-primary:       #FAFAFA;
+            --bg-card:          #FFFFFF;
+            --bg-surface:       #F2F2F2;
+            --bg-hover:         #EFEFEF;
+            --bg-overlay:       rgba(0, 0, 0, 0.03);
+
+            /* Instagram signature gradients */
+            --ig-gradient:      linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D, #F56040, #F77737, #FCAF45);
+            --ig-gradient-soft: linear-gradient(135deg, rgba(64,93,230,0.08), rgba(131,58,180,0.06), rgba(193,53,132,0.08), rgba(225,48,108,0.06), rgba(245,96,64,0.08), rgba(252,175,69,0.06));
+            --ig-gradient-ring: conic-gradient(from 180deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D, #F56040, #F77737, #FCAF45, #405DE6);
+
+            /* IG palette */
+            --ig-blue:          #405DE6;
+            --ig-purple:        #833AB4;
+            --ig-magenta:       #C13584;
+            --ig-pink:          #E1306C;
+            --ig-red:           #FD1D1D;
+            --ig-orange:        #F56040;
+            --ig-amber:         #F77737;
+            --ig-yellow:        #FCAF45;
+
+            /* Text */
+            --text-primary:     #262626;
+            --text-secondary:   #737373;
+            --text-muted:       #8E8E8E;
+            --text-light:       #C7C7C7;
+            --text-link:        #00376B;
+            --text-white:       #FFFFFF;
+
+            /* Priority */
+            --priority-must:      #ED4956;
+            --priority-must-bg:   rgba(237, 73, 86, 0.07);
+            --priority-must-border: rgba(237, 73, 86, 0.25);
+            --priority-rec:       #F77737;
+            --priority-rec-bg:    rgba(247, 119, 55, 0.06);
+            --priority-rec-border: rgba(247, 119, 55, 0.20);
+            --priority-fyi:       #58C322;
+            --priority-fyi-bg:    rgba(88, 195, 34, 0.05);
+            --priority-fyi-border: rgba(88, 195, 34, 0.15);
+
+            /* Borders */
+            --border:           #DBDBDB;
+            --border-light:     #EFEFEF;
+            --border-hover:     #C7C7C7;
+
+            /* Spacing */
+            --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px;
+            --sp-4: 16px; --sp-5: 20px; --sp-6: 24px;
+            --sp-8: 32px; --sp-10: 40px; --sp-12: 48px;
+            --sp-16: 64px;
+
+            /* Typography */
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+            --font-mono: "SF Mono", "Fira Code", "Consolas", "Noto Sans Mono CJK SC", monospace;
+
+            /* Radius */
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --radius-full: 9999px;
+
+            /* Shadows */
+            --shadow-card: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-elevated: 0 4px 16px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06);
+            --shadow-story: 0 4px 24px rgba(131,58,180,0.15), 0 2px 8px rgba(225,48,108,0.10);
+        }
+
+        /* --- Page (PDF) --- */
+        @page {
+            size: A4;
+            margin: 1.5cm 1.8cm;
+            @bottom-center {
+                content: "Newsloom Daily · " "{{ date_str }}" " · Page " counter(page);
+                font-size: 7pt;
+                color: #8E8E8E;
+                font-family: -apple-system, "PingFang SC", sans-serif;
+            }
+        }
+
+        /* --- Reset --- */
+        *, *::before, *::after {
+            margin: 0; padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            color: var(--text-primary);
+            line-height: 1.6;
+            /* IG-style subtle radial gradient pattern background */
+            background:
+                radial-gradient(ellipse at 10% 20%, rgba(131,58,180,0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 90% 80%, rgba(252,175,69,0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(225,48,108,0.02) 0%, transparent 60%),
+                var(--bg-primary);
+            min-height: 100vh;
+        }
+
+        a {
+            color: var(--text-link);
+            text-decoration: none;
+        }
+        a:hover { text-decoration: underline; }
+
+        /* --- Container (phone-width like IG) --- */
+        .container {
+            max-width: 540px;
+            margin: 0 auto;
+            padding: var(--sp-4) var(--sp-4) 100px;
+        }
+
+        /* ==========================================================
+         * HEADER — Instagram Profile Header + Stories Ring
+         * ========================================================== */
+        .header {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            padding: var(--sp-8) var(--sp-6);
+            margin-bottom: var(--sp-4);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-card);
+        }
+
+        /* Subtle gradient shimmer at top */
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: var(--ig-gradient);
+            opacity: 0.8;
+        }
+
+        /* Avatar with Stories gradient ring */
+        .avatar-ring {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            padding: 3px;
+            background: var(--ig-gradient-ring);
+            display: inline-block;
+            margin-bottom: var(--sp-3);
+            box-shadow: var(--shadow-story);
+        }
+
+        .avatar-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 3px solid var(--bg-card);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2em;
+        }
+
+        .header-username {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--sp-1);
+        }
+
+        .header-handle {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            margin-bottom: var(--sp-5);
+        }
+
+        /* Stats row (like IG profile stats) */
+        .header-stats-row {
+            display: flex;
+            justify-content: center;
+            gap: var(--sp-8);
+            margin-bottom: var(--sp-4);
+            padding: var(--sp-3) 0;
+            border-top: 1px solid var(--border-light);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .header-stat {
+            text-align: center;
+        }
+
+        .header-stat-num {
+            display: block;
+            font-size: 1.15em;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+
+        .header-stat-label {
+            font-size: 0.72em;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .header-bio {
+            font-size: 0.82em;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .header-date-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--sp-2);
+            background: var(--bg-surface);
+            padding: var(--sp-1) var(--sp-3);
+            border-radius: var(--radius-full);
+            font-size: 0.72em;
+            color: var(--text-muted);
+            margin-top: var(--sp-3);
+        }
+
+        /* ==========================================================
+         * STORIES BAR — Section navigation like IG Stories
+         * ========================================================== */
+        .stories-bar {
+            display: flex;
+            gap: var(--sp-3);
+            overflow-x: auto;
+            padding: var(--sp-4) var(--sp-1);
+            margin-bottom: var(--sp-4);
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .stories-bar::-webkit-scrollbar { display: none; }
+
+        .story-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--sp-1);
+            flex-shrink: 0;
+        }
+
+        .story-ring {
+            width: 66px;
+            height: 66px;
+            border-radius: 50%;
+            padding: 2.5px;
+            background: var(--ig-gradient-ring);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .story-ring:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 12px rgba(131,58,180,0.20);
+        }
+
+        .story-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 2.5px solid var(--bg-card);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+        }
+
+        .story-label {
+            font-size: 0.62em;
+            color: var(--text-secondary);
+            max-width: 68px;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* ==========================================================
+         * EXECUTIVE SUMMARY — Highlighted IG Story Card
+         * ========================================================== */
+        .exec-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            padding: var(--sp-5) var(--sp-5);
+            margin-bottom: var(--sp-4);
+            position: relative;
+            box-shadow: var(--shadow-card);
+        }
+
+        .exec-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--ig-gradient);
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        }
+
+        .exec-header {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+            margin-bottom: var(--sp-3);
+        }
+
+        .exec-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--ig-purple), var(--ig-pink));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85em;
+            color: white;
+        }
+
+        .exec-label {
+            font-size: 0.78em;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .exec-label-sub {
+            font-size: 0.68em;
+            color: var(--text-muted);
+        }
+
+        .exec-body p {
+            font-size: 0.88em;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: var(--sp-2);
+        }
+
+        .exec-body p:last-child { margin-bottom: 0; }
+
+        .exec-body strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .exec-body code {
+            font-family: var(--font-mono);
+            background: var(--bg-surface);
+            padding: 1px 5px;
+            border-radius: 4px;
+            font-size: 0.88em;
+            color: var(--ig-purple);
+        }
+
+        /* ==========================================================
+         * SECTION — Post Feed Section Divider
+         * ========================================================== */
+        .section {
+            margin-bottom: var(--sp-6);
+        }
+
+        .section-divider {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            padding: var(--sp-3) var(--sp-4);
+            margin-bottom: var(--sp-3);
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-card);
+        }
+
+        .section-icon-wrap {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15em;
+            flex-shrink: 0;
+        }
+
+        .section-title {
+            font-size: 0.95em;
+            font-weight: 700;
+            color: var(--text-primary);
+            flex: 1;
+        }
+
+        .section-badge {
+            font-size: 0.72em;
+            font-weight: 600;
+            color: var(--text-white);
+            background: var(--ig-gradient);
+            padding: 2px 10px;
+            border-radius: var(--radius-full);
+            min-width: 28px;
+            text-align: center;
+        }
+
+        /* ==========================================================
+         * POST CARD — IG Feed Post Style
+         * ========================================================== */
+        .post-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            margin-bottom: var(--sp-3);
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
+            transition: box-shadow 0.2s, transform 0.15s;
+        }
+        .post-card:hover {
+            box-shadow: var(--shadow-elevated);
+            transform: translateY(-1px);
+        }
+
+        /* Must-read special treatment */
+        .post-card.must-read {
+            border-color: var(--priority-must-border);
+            background: linear-gradient(180deg, var(--priority-must-bg) 0%, var(--bg-card) 30%);
+        }
+
+        /* Post header — like IG post user row */
+        .post-user-row {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+            padding: var(--sp-3) var(--sp-4);
+        }
+
+        .post-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            color: var(--text-white);
+            flex-shrink: 0;
+        }
+
+        .post-user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .post-source {
+            font-size: 0.78em;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--sp-1);
+        }
+
+        .post-source .verified {
+            color: #3897F0;
+            font-size: 0.85em;
+        }
+
+        .post-time {
+            font-size: 0.65em;
+            color: var(--text-muted);
+        }
+
+        .post-priority {
+            font-size: 0.85em;
+        }
+
+        /* Post content zone */
+        .post-content {
+            padding: 0 var(--sp-4) var(--sp-3);
+        }
+
+        .post-headline {
+            font-size: 0.92em;
+            font-weight: 700;
+            line-height: 1.45;
+            margin-bottom: var(--sp-2);
+        }
+
+        .post-headline a {
+            color: var(--text-primary);
+            transition: color 0.15s;
+        }
+        .post-headline a:hover {
+            color: var(--ig-purple);
+            text-decoration: none;
+        }
+
+        .must-read .post-headline a {
+            color: var(--priority-must);
+        }
+
+        .must-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 0.6em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--priority-must);
+            background: var(--priority-must-bg);
+            border: 1px solid var(--priority-must-border);
+            padding: 1px 8px;
+            border-radius: var(--radius-full);
+            margin-left: var(--sp-2);
+            vertical-align: middle;
+        }
+
+        .must-tag .pulse-dot {
+            width: 5px; height: 5px;
+            background: var(--priority-must);
+            border-radius: 50%;
+            animation: pulse-blink 1.4s ease-in-out infinite;
+        }
+
+        @keyframes pulse-blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.15; }
+        }
+
+        .post-detail {
+            font-size: 0.84em;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: var(--sp-2);
+        }
+
+        .post-detail strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .post-detail code {
+            font-family: var(--font-mono);
+            background: var(--bg-surface);
+            padding: 1px 5px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: var(--ig-purple);
+        }
+
+        /* Tags (like IG hashtags) */
+        .post-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--sp-1);
+            padding: 0 var(--sp-4);
+            margin-bottom: var(--sp-2);
+        }
+
+        .ig-tag {
+            font-size: 0.74em;
+            color: var(--text-link);
+            font-weight: 500;
+        }
+
+        /* Action bar — ❤️ 💬 ✈️ 🔖 */
+        .post-actions {
+            display: flex;
+            align-items: center;
+            padding: var(--sp-2) var(--sp-4) var(--sp-3);
+            gap: var(--sp-4);
+        }
+
+        .action-btn {
+            font-size: 1.25em;
+            cursor: pointer;
+            transition: transform 0.15s;
+            line-height: 1;
+            opacity: 0.85;
+        }
+        .action-btn:hover {
+            transform: scale(1.15);
+            opacity: 1;
+        }
+
+        .action-spacer { flex: 1; }
+
+        /* Swipe-up link */
+        .swipe-up-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--sp-1);
+            padding: var(--sp-2) var(--sp-4);
+            border-top: 1px solid var(--border-light);
+            font-size: 0.74em;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: color 0.15s;
+            text-decoration: none;
+        }
+        .swipe-up-link:hover {
+            color: var(--ig-purple);
+            text-decoration: none;
+        }
+
+        .swipe-up-link .arrow {
+            display: inline-block;
+            animation: swipe-float 1.5s ease-in-out infinite;
+        }
+
+        @keyframes swipe-float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+
+        /* ==========================================================
+         * BOTTOM NAV BAR — IG Navigation Bar
+         * ========================================================== */
+        .ig-nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 540px;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: var(--sp-2) 0 env(safe-area-inset-bottom, var(--sp-3));
+            z-index: 1000;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            background: rgba(255,255,255,0.92);
+        }
+
+        .nav-item {
+            font-size: 1.5em;
+            padding: var(--sp-1) var(--sp-3);
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.15s, transform 0.15s;
+        }
+        .nav-item:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        .nav-item.active { opacity: 1; }
+
+        .nav-create {
+            font-size: 1.3em;
+            background: var(--ig-gradient);
+            color: var(--text-white);
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 300;
+            box-shadow: 0 2px 8px rgba(131,58,180,0.20);
+        }
+
+        /* ==========================================================
+         * FOOTER — IG-Style Feed End
+         * ========================================================== */
+        .ig-footer {
+            text-align: center;
+            padding: var(--sp-8) var(--sp-4);
+            margin-top: var(--sp-6);
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-card);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ig-footer::before {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 4px;
+            background: var(--ig-gradient);
+        }
+
+        .footer-checkmark {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--bg-surface);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6em;
+            margin-bottom: var(--sp-3);
+            border: 2px solid var(--border);
+        }
+
+        .footer-title {
+            font-size: 1em;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--sp-1);
+        }
+
+        .footer-subtitle {
+            font-size: 0.78em;
+            color: var(--text-muted);
+            margin-bottom: var(--sp-4);
+        }
+
+        .footer-stats-row {
+            display: flex;
+            justify-content: center;
+            gap: var(--sp-6);
+            margin-bottom: var(--sp-4);
+        }
+
+        .footer-stat {
+            text-align: center;
+        }
+
+        .footer-stat-num {
+            font-size: 1.1em;
+            font-weight: 700;
+            background: var(--ig-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .footer-stat-label {
+            font-size: 0.62em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .footer-powered {
+            font-size: 0.65em;
+            color: var(--text-light);
+            margin-top: var(--sp-3);
+        }
+
+        .ig-follow-btn {
+            display: inline-block;
+            padding: var(--sp-2) var(--sp-6);
+            background: var(--ig-gradient);
+            color: var(--text-white);
+            font-size: 0.82em;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(131,58,180,0.18);
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .ig-follow-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(131,58,180,0.25);
+        }
+
+        /* ==========================================================
+         * PRINT / PDF
+         * ========================================================== */
+        @media print {
+            body {
+                background: #FFFFFF !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .container {
+                max-width: 100%;
+                padding: 0;
+            }
+            .ig-nav-bar { display: none !important; }
+            .post-card {
+                break-inside: avoid;
+                box-shadow: none;
+                border: 1px solid #DBDBDB;
+            }
+            .post-card:hover {
+                transform: none;
+                box-shadow: none;
+            }
+            .header, .ig-footer {
+                box-shadow: none;
+            }
+            a { color: var(--text-primary) !important; }
+            .swipe-up-link .arrow { animation: none; }
+            .must-tag .pulse-dot { animation: none; }
+            *, *::before, *::after {
+                animation-duration: 0s !important;
+                transition-duration: 0s !important;
+            }
+        }
+
+        /* ==========================================================
+         * RESPONSIVE
+         * ========================================================== */
+        @media (max-width: 560px) {
+            .container {
+                padding: var(--sp-3) var(--sp-3) 90px;
+            }
+            .header {
+                padding: var(--sp-6) var(--sp-4);
+                border-radius: var(--radius-lg);
+            }
+            .avatar-ring { width: 76px; height: 76px; }
+            .header-stats-row { gap: var(--sp-5); }
+            .stories-bar { gap: var(--sp-2); }
+            .story-ring { width: 56px; height: 56px; }
+            .story-label { font-size: 0.58em; max-width: 56px; }
+            .post-card { border-radius: var(--radius-md); }
+            .post-headline { font-size: 0.88em; }
+            .post-detail { font-size: 0.82em; }
+            .ig-footer { border-radius: var(--radius-lg); }
+        }
+
+        @media (max-width: 380px) {
+            html { font-size: 14px; }
+            .header-stats-row { gap: var(--sp-4); }
+            .post-actions { gap: var(--sp-3); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- ====== HEADER: IG Profile Header ====== -->
+        <header class="header">
+            <div class="avatar-ring">
+                <div class="avatar-inner">📰</div>
+            </div>
+            <div class="header-username">Newsloom Daily</div>
+            <div class="header-handle">@newsloom · Intelligence Feed</div>
+
+            <!-- Stats row: posts / items / generated -->
+            {% set ns = namespace(must_count=0, section_count=0) %}
+            {% for section in section_order %}
+                {% if section in briefs and briefs[section] is iterable and briefs[section] is not string and briefs[section]|length > 0 %}
+                    {% set ns.section_count = ns.section_count + 1 %}
+                    {% for item in briefs[section] %}
+                        {% if item.priority == '🔴' %}
+                            {% set ns.must_count = ns.must_count + 1 %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+
+            <div class="header-stats-row">
+                <div class="header-stat">
+                    <span class="header-stat-num">{{ total_items }}</span>
+                    <span class="header-stat-label">Posts</span>
+                </div>
+                <div class="header-stat">
+                    <span class="header-stat-num">{{ ns.section_count }}</span>
+                    <span class="header-stat-label">Topics</span>
+                </div>
+                {% if ns.must_count > 0 %}
+                <div class="header-stat">
+                    <span class="header-stat-num">{{ ns.must_count }}</span>
+                    <span class="header-stat-label">Must Read</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="header-bio">
+                Daily intelligence on tech, markets & beyond 🌐<br>
+                Curated {{ generated_time }}
+            </div>
+            <div class="header-date-badge">
+                📅 {{ date_str }}
+            </div>
+        </header>
+
+        <!-- ====== STORIES BAR: Section Quick Nav ====== -->
+        <div class="stories-bar">
+            {% for section in section_order %}
+                {% if section in briefs and briefs[section] is iterable and briefs[section] is not string and briefs[section]|length > 0 %}
+                    {% set meta = section_configs.get(section, {}) %}
+                    <div class="story-item">
+                        <div class="story-ring">
+                            <div class="story-inner">{{ meta.get('emoji', '📌') }}</div>
+                        </div>
+                        <span class="story-label">{{ meta.get('title', section|title) }}</span>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- ====== EXECUTIVE SUMMARY: IG Story Card ====== -->
+        {% if executive_summary %}
+        <div class="exec-card">
+            <div class="exec-header">
+                <div class="exec-icon">⚡</div>
+                <div>
+                    <div class="exec-label">Today's Brief</div>
+                    <div class="exec-label-sub">Executive Summary</div>
+                </div>
+            </div>
+            <div class="exec-body">
+                {% for line in executive_summary.strip().split('\n') %}
+                    {% if line.strip() %}
+                    <p>{{ line.strip() | md_inline }}</p>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ====== FEED: Post Cards per Section ====== -->
+        {% set counter = namespace(post_num=0) %}
+        {% for section in section_order %}
+            {% if section in briefs and briefs[section] is iterable and briefs[section] is not string and briefs[section]|length > 0 %}
+                {% set meta = section_configs.get(section, {}) %}
+                {% set section_color = meta.get('color', '#833AB4') %}
+                {% set section_briefs = briefs[section] %}
+
+                <!-- Section Divider -->
+                <div class="section">
+                    <div class="section-divider">
+                        <div class="section-icon-wrap" style="background: {{ section_color }}15;">
+                            {{ meta.get('emoji', '📌') }}
+                        </div>
+                        <span class="section-title">{{ meta.get('title', section|title) }}</span>
+                        <span class="section-badge">{{ section_briefs|length }}</span>
+                    </div>
+
+                    <!-- Posts -->
+                    {% for brief in section_briefs %}
+                        {% set counter.post_num = counter.post_num + 1 %}
+                        {% set priority_class = 'must-read' if brief.priority == '🔴' else ('recommended' if brief.priority == '🟡' else 'fyi') %}
+
+                        <article class="post-card {{ priority_class }}">
+                            <!-- User Row -->
+                            <div class="post-user-row">
+                                <div class="post-avatar" style="background: {{ section_color }};">
+                                    {{ meta.get('emoji', '📌') }}
+                                </div>
+                                <div class="post-user-info">
+                                    <div class="post-source">
+                                        {{ brief.source }}
+                                        <span class="verified">✓</span>
+                                    </div>
+                                    <div class="post-time">{{ meta.get('title', section|title) }} · #{{ counter.post_num }}</div>
+                                </div>
+                                <span class="post-priority">{{ brief.priority }}</span>
+                            </div>
+
+                            <!-- Content -->
+                            <div class="post-content">
+                                <div class="post-headline">
+                                    <a href="{{ brief.url }}" target="_blank">{{ brief.headline }}</a>
+                                    {% if brief.priority == '🔴' %}
+                                    <span class="must-tag"><span class="pulse-dot"></span> MUST READ</span>
+                                    {% endif %}
+                                </div>
+                                {% if brief.detail %}
+                                <div class="post-detail">
+                                    {{ brief.detail | md_inline }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Tags (hashtags) -->
+                            {% if brief.tags %}
+                            <div class="post-tags">
+                                {% for tag in brief.tags %}
+                                <span class="ig-tag">{{ tag }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+
+                            <!-- Action Bar -->
+                            <div class="post-actions">
+                                <span class="action-btn">❤️</span>
+                                <span class="action-btn">💬</span>
+                                <span class="action-btn">✈️</span>
+                                <span class="action-spacer"></span>
+                                <span class="action-btn">🔖</span>
+                            </div>
+
+                            <!-- Swipe Up Link -->
+                            <a href="{{ brief.url }}" target="_blank" class="swipe-up-link">
+                                <span class="arrow">↑</span> Swipe up to read · {{ brief.source }}
+                            </a>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endfor %}
+
+        <!-- ====== FOOTER: IG Feed End ====== -->
+        <footer class="ig-footer">
+            <div class="footer-checkmark">✓</div>
+            <div class="footer-title">You're All Caught Up</div>
+            <div class="footer-subtitle">
+                You've seen all {{ total_items }} posts from today's intelligence feed
+            </div>
+
+            <div class="footer-stats-row">
+                {% if stats and stats.sections %}
+                <div class="footer-stat">
+                    <div class="footer-stat-num">{{ stats.get('total_input', '—') }}</div>
+                    <div class="footer-stat-label">Scanned</div>
+                </div>
+                {% endif %}
+                <div class="footer-stat">
+                    <div class="footer-stat-num">{{ total_items }}</div>
+                    <div class="footer-stat-label">Curated</div>
+                </div>
+                <div class="footer-stat">
+                    <div class="footer-stat-num">{{ ns.must_count }}</div>
+                    <div class="footer-stat-label">Must Read</div>
+                </div>
+            </div>
+
+            <div class="ig-follow-btn">Follow @newsloom</div>
+
+            <div class="footer-powered">
+                Powered by Newsloom · Instagram Gradient v2.0 · {{ generated_time }}
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- ====== BOTTOM NAV BAR ====== -->
+    <nav class="ig-nav-bar">
+        <span class="nav-item active">🏠</span>
+        <span class="nav-item">🔍</span>
+        <span class="nav-item"><span class="nav-create">＋</span></span>
+        <span class="nav-item">🎬</span>
+        <span class="nav-item">👤</span>
+    </nav>
+
+</body>
+</html>

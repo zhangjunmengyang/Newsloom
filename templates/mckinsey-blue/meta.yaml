@@ -1,0 +1,12 @@
+name: "McKinsey Blue"
+description: "McKinsey-inspired corporate consulting template with professional blue color scheme and PPT-like structured layout"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "light"
+features:
+  - "Corporate McKinsey blue #003C71"
+  - "Helvetica Neue typography"
+  - "Structured bullet point layout"
+  - "PPT presentation aesthetics"
+  - "Data-driven visual hierarchy"
+  - "Executive briefing format"

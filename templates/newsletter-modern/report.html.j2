@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsloom Daily · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * NEWSLETTER MODERN — Substack / Morning Brew Style
+         * ============================================================
+         * Deep Navy #1A1A2E · Bright Teal #4ECDC4 · White card body
+         * Casual but professional newsletter tone
+         * ============================================================ */
+
+        /* --- PDF Page Setup --- */
+        @page {
+            size: A4;
+            margin: 1.5cm 2cm;
+            @bottom-center {
+                content: "Newsloom Daily · " counter(page) " / " counter(pages);
+                font-family: -apple-system, BlinkMacSystemFont, "PingFang SC",
+                             "Noto Sans SC", "Microsoft YaHei", sans-serif;
+                font-size: 8pt;
+                color: #8888A0;
+            }
+        }
+
+        /* --- Reset --- */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* --- Body --- */
+        body {
+            font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+                         "PingFang SC", "Noto Sans SC", "Hiragino Sans GB",
+                         "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
+            font-size: 15px;
+            line-height: 1.65;
+            color: #1A1A2E;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            /* Layered gradient background with noise texture feel */
+            background:
+                radial-gradient(ellipse at 30% 0%, rgba(78,205,196,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 100%, rgba(26,26,46,0.04) 0%, transparent 50%),
+                linear-gradient(175deg, #EEEEF5 0%, #F4F4F9 12%, #F6F6FB 50%, #F2F2F8 88%, #EBEBF2 100%);
+            min-height: 100vh;
+        }
+
+        a {
+            color: #3DBDB4;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        a:hover {
+            color: #1A1A2E;
+        }
+
+        /* --- Email Wrapper --- */
+        .email-wrapper {
+            max-width: 640px;
+            margin: 40px auto;
+            background: #FFFFFF;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow:
+                0 4px 6px rgba(0,0,0,0.03),
+                0 12px 28px rgba(0,0,0,0.07),
+                0 24px 50px rgba(26,26,46,0.05);
+        }
+
+        /* ============================================================
+         * HEADER — Brand Masthead
+         * ============================================================ */
+        .header {
+            position: relative;
+            padding: 48px 32px 40px;
+            text-align: center;
+            color: #FFFFFF;
+            /* Deep navy gradient with teal radial accents */
+            background:
+                radial-gradient(ellipse at 20% 90%, rgba(78,205,196,0.18) 0%, transparent 55%),
+                radial-gradient(ellipse at 85% 15%, rgba(78,205,196,0.12) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(78,205,196,0.05) 0%, transparent 70%),
+                linear-gradient(155deg, #1A1A2E 0%, #16213E 45%, #1A1A2E 75%, #242440 100%);
+            overflow: hidden;
+        }
+
+        /* Dot-grid pattern overlay */
+        .header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                radial-gradient(circle, rgba(255,255,255,0.035) 1px, transparent 1px);
+            background-size: 22px 22px;
+            pointer-events: none;
+        }
+
+        /* Diagonal decorative stripe */
+        .header::after {
+            content: '';
+            position: absolute;
+            top: -60px;
+            right: -40px;
+            width: 180px;
+            height: 180px;
+            background: linear-gradient(135deg, rgba(78,205,196,0.15), transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .header-inner {
+            position: relative;
+            z-index: 2;
+        }
+
+        .brand-icon {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 16px;
+            background: linear-gradient(135deg, #4ECDC4, #3DBDB4);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6em;
+            box-shadow: 0 4px 16px rgba(78,205,196,0.3);
+            transform: rotate(-3deg);
+        }
+
+        .brand-name {
+            font-size: 2.2em;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 6px;
+        }
+        .brand-name em {
+            font-style: normal;
+            color: #4ECDC4;
+        }
+
+        .brand-tagline {
+            font-size: 0.88em;
+            opacity: 0.65;
+            font-weight: 400;
+            letter-spacing: 0.01em;
+            margin-bottom: 20px;
+        }
+
+        .header-pills {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .h-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.14);
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 0.76em;
+            font-weight: 600;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
+        /* ============================================================
+         * BODY
+         * ============================================================ */
+        .body {
+            padding: 32px 28px;
+        }
+
+        /* ============================================================
+         * STATS BAR
+         * ============================================================ */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 32px;
+        }
+
+        .stat-box {
+            background: #FAFBFC;
+            border: 1px solid #E8E8F0;
+            border-radius: 10px;
+            padding: 14px 10px;
+            text-align: center;
+            transition: border-color 0.2s;
+        }
+        .stat-box:hover {
+            border-color: #4ECDC4;
+        }
+
+        .stat-num {
+            font-size: 1.5em;
+            font-weight: 800;
+            color: #1A1A2E;
+            line-height: 1.2;
+        }
+
+        .stat-lbl {
+            font-size: 0.62em;
+            font-weight: 700;
+            color: #8888A0;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 2px;
+        }
+
+        /* ============================================================
+         * TODAY'S TOP STORY
+         * ============================================================ */
+        .top-story {
+            position: relative;
+            background:
+                linear-gradient(135deg, rgba(78,205,196,0.06) 0%, rgba(250,251,252,1) 60%);
+            border: 1px solid rgba(78,205,196,0.25);
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 28px;
+            overflow: hidden;
+        }
+
+        /* Top accent bar */
+        .top-story::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #4ECDC4 0%, #1A1A2E 100%);
+        }
+
+        /* Corner decoration */
+        .top-story::after {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            right: -30px;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(78,205,196,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .top-badge {
+            font-size: 0.68em;
+            font-weight: 800;
+            color: #3DBDB4;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .top-title {
+            font-size: 1.35em;
+            font-weight: 800;
+            line-height: 1.3;
+            color: #1A1A2E;
+            margin-bottom: 10px;
+        }
+        .top-title a {
+            color: inherit;
+        }
+        .top-title a:hover {
+            color: #3DBDB4;
+        }
+
+        .top-detail {
+            font-size: 0.94em;
+            color: #3A3A50;
+            line-height: 1.75;
+            margin-bottom: 16px;
+        }
+        .top-detail strong {
+            color: #1A1A2E;
+        }
+        .top-detail code {
+            font-family: "SF Mono", "Consolas", "Noto Sans Mono CJK SC", monospace;
+            font-size: 0.88em;
+            background: #F4F4F9;
+            padding: 2px 5px;
+            border-radius: 4px;
+            border: 1px solid #E8E8F0;
+            color: #1A1A2E;
+        }
+
+        .top-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #1A1A2E;
+            color: #FFFFFF !important;
+            font-size: 0.82em;
+            font-weight: 700;
+            padding: 8px 20px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            box-shadow: 0 2px 6px rgba(26,26,46,0.15);
+        }
+        .top-cta:hover {
+            background: #242440;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(26,26,46,0.2);
+        }
+
+        /* ============================================================
+         * 💡 WHY IT MATTERS
+         * ============================================================ */
+        .why-box {
+            background:
+                linear-gradient(135deg, #FFF8E1 0%, #FFFCF2 100%);
+            border: 1px solid #F0E0A0;
+            border-radius: 12px;
+            padding: 20px 22px;
+            margin-bottom: 28px;
+            position: relative;
+        }
+
+        /* Left accent */
+        .why-box::before {
+            content: '';
+            position: absolute;
+            top: 12px;
+            bottom: 12px;
+            left: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #F0C040, #DAA520);
+            border-radius: 0 2px 2px 0;
+        }
+
+        .why-label {
+            font-size: 0.75em;
+            font-weight: 800;
+            color: #B8860B;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .why-box p {
+            font-size: 0.9em;
+            color: #3A3A50;
+            line-height: 1.75;
+            margin-bottom: 6px;
+        }
+        .why-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ============================================================
+         * SPONSOR CARD
+         * ============================================================ */
+        .sponsor {
+            background:
+                repeating-linear-gradient(
+                    -45deg,
+                    transparent,
+                    transparent 8px,
+                    rgba(0,0,0,0.008) 8px,
+                    rgba(0,0,0,0.008) 16px
+                ),
+                linear-gradient(180deg, #FFFBF0, #FFF8E8);
+            border: 1px dashed #D0C8A8;
+            border-radius: 14px;
+            padding: 22px 20px;
+            margin: 28px 0;
+            text-align: center;
+        }
+
+        .sponsor-tag {
+            font-size: 0.6em;
+            font-weight: 700;
+            color: #AAAABB;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            margin-bottom: 6px;
+        }
+
+        .sponsor-msg {
+            font-size: 0.88em;
+            color: #8888A0;
+            margin-bottom: 10px;
+        }
+
+        .sponsor-btn {
+            display: inline-block;
+            font-size: 0.78em;
+            font-weight: 600;
+            color: #3DBDB4 !important;
+            border: 1px solid rgba(78,205,196,0.35);
+            padding: 5px 14px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .sponsor-btn:hover {
+            background: rgba(78,205,196,0.08);
+        }
+
+        /* ============================================================
+         * SECTION
+         * ============================================================ */
+        .section {
+            margin-bottom: 36px;
+            page-break-inside: avoid;
+        }
+
+        .sec-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 10px;
+            margin-bottom: 18px;
+            border-bottom: 2px solid #E8E8F0;
+            position: relative;
+        }
+
+        /* Colored left accent matching section_configs color */
+        .sec-accent {
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 42px;
+            height: 2px;
+            border-radius: 1px;
+        }
+
+        .sec-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sec-emoji {
+            font-size: 1.2em;
+        }
+
+        .sec-title {
+            font-size: 1.08em;
+            font-weight: 700;
+            color: #1A1A2E;
+        }
+
+        .sec-count {
+            font-size: 0.66em;
+            font-weight: 700;
+            color: #FFFFFF;
+            padding: 2px 10px;
+            border-radius: 100px;
+        }
+
+        /* ============================================================
+         * BRIEF CARD
+         * ============================================================ */
+        .brief {
+            position: relative;
+            background: #FFFFFF;
+            border: 1px solid #E8E8F0;
+            border-radius: 10px;
+            padding: 18px 20px;
+            margin-bottom: 14px;
+            transition: all 0.2s ease;
+            page-break-inside: avoid;
+        }
+        .brief:hover {
+            border-color: #D0D0DD;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+            transform: translateY(-1px);
+        }
+        .brief:last-child {
+            margin-bottom: 0;
+        }
+
+        .brief.must-read {
+            border-left: 4px solid #E74C3C;
+            background: linear-gradient(90deg, rgba(231,76,60,0.03) 0%, #FFFFFF 30%);
+        }
+        .brief.recommended {
+            border-left: 4px solid #F39C12;
+            background: linear-gradient(90deg, rgba(243,156,18,0.03) 0%, #FFFFFF 30%);
+        }
+        .brief.fyi {
+            border-left: 4px solid #2ECC71;
+            background: linear-gradient(90deg, rgba(46,204,113,0.02) 0%, #FFFFFF 30%);
+        }
+
+        .brief-top {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .brief-dot {
+            font-size: 1.1em;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .brief-hl {
+            flex: 1;
+            font-size: 1em;
+            font-weight: 600;
+            line-height: 1.45;
+        }
+        .brief-hl a {
+            color: #1A1A2E;
+        }
+        .brief-hl a:hover {
+            color: #3DBDB4;
+        }
+
+        .prio-tag {
+            display: inline-flex;
+            font-size: 0.58em;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 100px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            vertical-align: middle;
+            margin-left: 6px;
+            color: #FFFFFF;
+        }
+        .must-read .prio-tag {
+            background: #E74C3C;
+        }
+        .recommended .prio-tag {
+            background: #F39C12;
+        }
+
+        .brief-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 0.78em;
+            color: #8888A0;
+            flex-wrap: wrap;
+        }
+
+        .src-badge {
+            background: rgba(78,205,196,0.08);
+            color: #3DBDB4;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+            border: 1px solid rgba(78,205,196,0.2);
+        }
+
+        .dot-sep {
+            width: 3px;
+            height: 3px;
+            background: #AAAABB;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .tag-chip {
+            background: #FAFBFC;
+            color: #5A5A72;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 0.92em;
+            border: 1px solid #E8E8F0;
+        }
+
+        .brief-body {
+            font-size: 0.92em;
+            color: #3A3A50;
+            line-height: 1.75;
+            margin-bottom: 14px;
+        }
+        .brief-body strong {
+            color: #1A1A2E;
+        }
+        .brief-body code {
+            font-family: "SF Mono", "Consolas", "Noto Sans Mono CJK SC", monospace;
+            font-size: 0.88em;
+            background: #F4F4F9;
+            padding: 2px 5px;
+            border-radius: 4px;
+            border: 1px solid #E8E8F0;
+            color: #1A1A2E;
+        }
+
+        .brief-foot {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .read-link {
+            font-size: 0.82em;
+            font-weight: 600;
+            color: #3DBDB4 !important;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .read-link:hover {
+            color: #1A1A2E !important;
+        }
+
+        .share-row {
+            display: flex;
+            gap: 6px;
+        }
+
+        .share-btn {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #E8E8F0;
+            border-radius: 6px;
+            font-size: 0.82em;
+            color: #8888A0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .share-btn:hover {
+            border-color: #4ECDC4;
+            color: #3DBDB4;
+            background: rgba(78,205,196,0.06);
+        }
+
+        /* ============================================================
+         * SECTION DIVIDER (between sections, visual rhythm)
+         * ============================================================ */
+        .sec-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 8px 0 28px;
+            color: #D0D0DD;
+            font-size: 0.7em;
+        }
+        .sec-divider::before,
+        .sec-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #E8E8F0, transparent);
+        }
+
+        /* ============================================================
+         * FOOTER
+         * ============================================================ */
+        .footer {
+            padding: 32px 28px;
+            text-align: center;
+            border-top: 1px solid #E8E8F0;
+            background:
+                radial-gradient(ellipse at 50% 0%, rgba(78,205,196,0.04) 0%, transparent 60%),
+                linear-gradient(180deg, #FAFBFC 0%, #F4F4F9 100%);
+        }
+
+        .ft-brand {
+            font-size: 1.15em;
+            font-weight: 800;
+            color: #1A1A2E;
+            margin-bottom: 4px;
+        }
+        .ft-brand em {
+            font-style: normal;
+            color: #4ECDC4;
+        }
+
+        .ft-quote {
+            font-size: 0.82em;
+            color: #8888A0;
+            font-style: italic;
+            margin-bottom: 18px;
+        }
+
+        .ft-socials {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+
+        .ft-social {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 14px;
+            border: 1px solid #E8E8F0;
+            border-radius: 8px;
+            font-size: 0.78em;
+            font-weight: 600;
+            color: #5A5A72 !important;
+            transition: all 0.2s;
+        }
+        .ft-social:hover {
+            border-color: #4ECDC4;
+            background: rgba(78,205,196,0.06);
+            color: #3DBDB4 !important;
+        }
+
+        .ft-line {
+            width: 60px;
+            height: 1px;
+            background: #E8E8F0;
+            margin: 16px auto;
+        }
+
+        .ft-legal {
+            font-size: 0.7em;
+            color: #AAAABB;
+            line-height: 1.7;
+        }
+        .ft-legal a {
+            color: #3DBDB4;
+        }
+
+        .unsub {
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 0.72em;
+            color: #AAAABB !important;
+            text-decoration: underline;
+        }
+
+        /* ============================================================
+         * PRINT OVERRIDES
+         * ============================================================ */
+        @media print {
+            body {
+                background: #FFFFFF !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .email-wrapper {
+                max-width: 100%;
+                margin: 0;
+                box-shadow: none;
+                border-radius: 0;
+            }
+            .header::before,
+            .header::after {
+                display: none;
+            }
+            .brief:hover {
+                transform: none;
+                box-shadow: none;
+            }
+            a {
+                color: #1A1A2E !important;
+            }
+            .share-row,
+            .sponsor {
+                display: none;
+            }
+        }
+
+        /* ============================================================
+         * MOBILE
+         * ============================================================ */
+        @media (max-width: 640px) {
+            .email-wrapper {
+                margin: 0;
+                border-radius: 0;
+            }
+            .header {
+                padding: 32px 18px 28px;
+            }
+            .body {
+                padding: 24px 16px;
+            }
+            .brand-name {
+                font-size: 1.7em;
+            }
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .header-pills {
+                flex-direction: column;
+                gap: 6px;
+            }
+            .brief-foot {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .ft-socials {
+                flex-wrap: wrap;
+            }
+            .top-title {
+                font-size: 1.15em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
+
+        <!-- ======================================================
+             HEADER — Brand Masthead
+             ====================================================== -->
+        <header class="header">
+            <div class="header-inner">
+                <div class="brand-icon">📮</div>
+                <h1 class="brand-name">News<em>loom</em> Daily</h1>
+                <div class="brand-tagline">Your morning intelligence, brewed fresh · AI-curated, human-approved</div>
+                <div class="header-pills">
+                    <span class="h-pill">📅 {{ date_str }}</span>
+                    <span class="h-pill">📰 {{ total_items }} stories</span>
+                    <span class="h-pill">⏱️ {{ (total_items * 0.4)|int|default(5) }} min read</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="body">
+
+            <!-- ======================================================
+                 STATS BAR
+                 ====================================================== -->
+            <div class="stats-row">
+                {% set ns = namespace(must=0, rec=0) %}
+                {% for sk in section_order %}
+                {% if sk in briefs and briefs[sk] is iterable and briefs[sk] is not string %}
+                {% for it in briefs[sk] %}
+                {% if it.priority == '🔴' %}{% set ns.must = ns.must + 1 %}{% endif %}
+                {% if it.priority == '🟡' %}{% set ns.rec = ns.rec + 1 %}{% endif %}
+                {% endfor %}
+                {% endif %}
+                {% endfor %}
+                <div class="stat-box">
+                    <div class="stat-num">{{ total_items }}</div>
+                    <div class="stat-lbl">Stories</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num" style="color:#E74C3C;">{{ ns.must }}</div>
+                    <div class="stat-lbl">Must Read</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num">{{ section_order|length }}</div>
+                    <div class="stat-lbl">Topics</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num" style="color:#3DBDB4;">{{ ns.rec }}</div>
+                    <div class="stat-lbl">Rec'd</div>
+                </div>
+            </div>
+
+            <!-- ======================================================
+                 TODAY'S TOP STORY — first 🔴 item
+                 ====================================================== -->
+            {% set ts = namespace(found=false) %}
+            {% for sk in section_order %}
+            {% if not ts.found and sk in briefs and briefs[sk] is iterable and briefs[sk] is not string %}
+            {% for it in briefs[sk] %}
+            {% if it.priority == '🔴' and not ts.found %}
+            {% set ts.found = true %}
+            <div class="top-story">
+                <div class="top-badge">⚡ Today's Top Story</div>
+                <h2 class="top-title">
+                    <a href="{{ it.url|default('#') }}" target="_blank">{{ it.headline }}</a>
+                </h2>
+                {% if it.detail %}
+                <div class="top-detail">{{ it.detail | md_inline }}</div>
+                {% endif %}
+                <a href="{{ it.url|default('#') }}" class="top-cta" target="_blank">Read Full Story →</a>
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+            {% endfor %}
+
+            <!-- ======================================================
+                 💡 WHY IT MATTERS — Executive Summary
+                 ====================================================== -->
+            {% if executive_summary %}
+            <div class="why-box">
+                <div class="why-label">💡 Why It Matters</div>
+                {% for line in executive_summary.strip().split('\n') %}
+                {% if line.strip() %}
+                <p>{{ line.strip() | md_inline }}</p>
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- ======================================================
+                 SPONSOR PLACEHOLDER
+                 ====================================================== -->
+            <div class="sponsor">
+                <div class="sponsor-tag">— Sponsored —</div>
+                <div class="sponsor-msg">Want to reach {{ total_items * 100 }}+ tech professionals? Your brand here.</div>
+                <a href="#" class="sponsor-btn">Learn More →</a>
+            </div>
+
+            <!-- ======================================================
+                 SECTIONS — Briefs
+                 ====================================================== -->
+            {% set sec_ns = namespace(idx=0) %}
+            {% for section_key in section_order %}
+            {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+            {% set meta = section_configs.get(section_key, {}) %}
+            {% set section_color = meta.color|default('#4ECDC4') %}
+            {% set items = briefs[section_key] %}
+
+            {# Visual divider between sections (skip first) #}
+            {% if sec_ns.idx > 0 %}
+            <div class="sec-divider">✦</div>
+            {% endif %}
+            {% set sec_ns.idx = sec_ns.idx + 1 %}
+
+            <section class="section">
+                <div class="sec-head">
+                    <div class="sec-left">
+                        <span class="sec-emoji">{{ meta.emoji|default('📌') }}</span>
+                        <h2 class="sec-title">{{ meta.title|default(section_key) }}</h2>
+                    </div>
+                    <span class="sec-count" style="background:{{ section_color }};">{{ items|length }}</span>
+                    <div class="sec-accent" style="background:{{ section_color }};"></div>
+                </div>
+
+                {% for item in items %}
+                {% set priority = item.priority|default('🟢') %}
+                {% set p_class = 'must-read' if priority == '🔴' else ('recommended' if priority == '🟡' else 'fyi') %}
+                <article class="brief {{ p_class }}">
+                    <div class="brief-top">
+                        <span class="brief-dot">{{ priority }}</span>
+                        <div class="brief-hl">
+                            <a href="{{ item.url|default('#') }}" target="_blank">{{ item.headline }}</a>
+                            {% if priority == '🔴' %}
+                            <span class="prio-tag">Must Read</span>
+                            {% elif priority == '🟡' %}
+                            <span class="prio-tag">Rec'd</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="brief-meta">
+                        {% if item.source %}
+                        <span class="src-badge">{{ item.source }}</span>
+                        {% endif %}
+                        {% if item.tags %}
+                        <span class="dot-sep"></span>
+                        {% for tag in item.tags %}
+                        <span class="tag-chip">{{ tag }}</span>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    {% if item.detail %}
+                    <div class="brief-body">{{ item.detail | md_inline }}</div>
+                    {% endif %}
+
+                    <div class="brief-foot">
+                        <a href="{{ item.url|default('#') }}" class="read-link" target="_blank">Read more →</a>
+                        <div class="share-row">
+                            <span class="share-btn" title="Share via email">📧</span>
+                            <span class="share-btn" title="Share on Twitter">🐦</span>
+                            <span class="share-btn" title="Copy link">🔗</span>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </section>
+
+            {% endif %}
+            {% endfor %}
+
+            <!-- ======================================================
+                 BOTTOM SPONSOR
+                 ====================================================== -->
+            <div class="sponsor">
+                <div class="sponsor-tag">— From Our Partners —</div>
+                <div class="sponsor-msg">Build, ship, and scale AI apps. Sponsored by Newsloom Partners.</div>
+                <a href="#" class="sponsor-btn">Get Started →</a>
+            </div>
+
+        </div><!-- /.body -->
+
+        <!-- ======================================================
+             FOOTER
+             ====================================================== -->
+        <footer class="footer">
+            <div class="ft-brand">News<em>loom</em></div>
+            <div class="ft-quote">"Intelligence in every issue"</div>
+
+            <div class="ft-socials">
+                <a href="#" class="ft-social">🐦 Twitter</a>
+                <a href="#" class="ft-social">📧 Email</a>
+                <a href="#" class="ft-social">📂 Archive</a>
+                <a href="#" class="ft-social">💬 Feedback</a>
+            </div>
+
+            <div class="ft-line"></div>
+
+            <div class="ft-legal">
+                AI-curated with ❤️ · {{ date_str }} · {{ total_items }} sources analyzed<br>
+                Generated {{ generated_time }}<br>
+                <a href="#">Privacy</a> · <a href="#">Terms</a> · <a href="#">Preferences</a>
+            </div>
+
+            <a href="#" class="unsub">Unsubscribe from this newsletter</a>
+        </footer>
+
+    </div><!-- /.email-wrapper -->
+</body>
+</html>

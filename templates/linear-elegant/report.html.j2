@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsloom · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * LINEAR ELEGANT — Linear.app Design Language
+         * ============================================================
+         * Deep dark (#191919) · Linear purple (#5E6AD2)
+         * CSS noise grain texture · Issue card layout
+         * Priority icons (🔴🟡🟢) · Progress bars · <kbd> labels
+         * Project/view navigation · Micro animations
+         * ============================================================ */
+
+        /* --- Design Tokens --- */
+        :root {
+            /* Backgrounds — Linear dark hierarchy */
+            --bg-primary:     #191919;
+            --bg-secondary:   #1E1E1E;
+            --bg-card:        #232323;
+            --bg-surface:     #282828;
+            --bg-hover:       #2E2E2E;
+            --bg-elevated:    #333333;
+
+            /* Text — Linear text scale */
+            --text-primary:   #EEEEEE;
+            --text-secondary: #A0A0A0;
+            --text-muted:     #6B6B6B;
+            --text-subtle:    #4A4A4A;
+
+            /* Brand — Linear purple 5 variants */
+            --brand:          #5E6AD2;
+            --brand-light:    #7C85E2;
+            --brand-dark:     #4850B8;
+            --brand-dim:      rgba(94, 106, 210, 0.12);
+            --brand-glow:     rgba(94, 106, 210, 0.06);
+
+            /* Status colors (Linear-style) */
+            --status-backlog:   #6B6B6B;
+            --status-todo:      #E2E2E2;
+            --status-progress:  #F2C94C;
+            --status-done:      #5E6AD2;
+            --status-cancelled: #4A4A4A;
+
+            /* Priority — Linear priority system */
+            --priority-urgent:   #F2555A;
+            --priority-urgent-bg: rgba(242, 85, 90, 0.10);
+            --priority-high:     #F2C94C;
+            --priority-high-bg:  rgba(242, 201, 76, 0.08);
+            --priority-low:      #4CB782;
+            --priority-low-bg:   rgba(76, 183, 130, 0.06);
+            --priority-none:     #6B6B6B;
+
+            /* Borders */
+            --border:         rgba(255, 255, 255, 0.06);
+            --border-strong:  rgba(255, 255, 255, 0.10);
+            --border-accent:  rgba(94, 106, 210, 0.25);
+
+            /* Spacing — 8pt */
+            --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px;
+            --sp-4: 16px; --sp-5: 20px; --sp-6: 24px;
+            --sp-8: 32px; --sp-10: 40px; --sp-12: 48px;
+            --sp-16: 64px; --sp-20: 80px;
+
+            /* Typography */
+            --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+            --font-mono: "SF Mono", "JetBrains Mono", "Fira Code", "Cascadia Code", "Menlo", monospace;
+            --font-serif: "Georgia", "Noto Serif SC", serif;
+
+            /* Radius — Linear uses small radius */
+            --radius-sm: 4px;
+            --radius-md: 6px;
+            --radius-lg: 8px;
+            --radius-xl: 12px;
+
+            /* Shadows */
+            --shadow-card:     0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+            --shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.5), 0 4px 8px rgba(0, 0, 0, 0.3);
+            --shadow-glow:     0 0 24px rgba(94, 106, 210, 0.15), 0 0 8px rgba(94, 106, 210, 0.08);
+        }
+
+        /* --- PDF --- */
+        @page {
+            size: A4;
+            margin: 1.5cm;
+            background: var(--bg-primary);
+            @bottom-center {
+                content: "Newsloom · " counter(page);
+                font-family: var(--font-sans);
+                font-size: 8pt;
+                color: var(--text-muted);
+            }
+        }
+
+        /* --- Reset & Base --- */
+        *, *::before, *::after {
+            margin: 0; padding: 0; box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            /* Noise grain texture via CSS */
+            background-color: var(--bg-primary);
+            background-image:
+                url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+            background-repeat: repeat;
+            background-size: 256px 256px;
+            color: var(--text-primary);
+            font-size: 14px;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        a {
+            color: var(--brand-light);
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+        a:hover { color: #B4BBED; }
+
+        /* --- Layout --- */
+        .container {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: var(--sp-12) var(--sp-6);
+        }
+
+        /* ============================================================
+         * HEADER — Linear app-bar style
+         * Logo + project name + status indicator
+         * ============================================================ */
+        .header {
+            margin-bottom: var(--sp-12);
+            padding-bottom: var(--sp-8);
+            border-bottom: 1px solid var(--border);
+            position: relative;
+        }
+
+        /* Subtle top glow */
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 500px;
+            height: 200px;
+            background: radial-gradient(ellipse, rgba(94, 106, 210, 0.06) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--sp-6);
+            position: relative;
+        }
+
+        /* Linear-style logo mark */
+        .linear-logo {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+        }
+
+        .logo-mark {
+            width: 28px;
+            height: 28px;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, var(--brand) 0%, var(--brand-light) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-mark-inner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .logo-mark-inner::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 6px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+        }
+
+        .logo-text {
+            font-size: 1.05em;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+        }
+
+        /* Status badge */
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+            font-size: 0.78em;
+            color: var(--text-muted);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            padding: var(--sp-1) var(--sp-3);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--status-done);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Project title */
+        .project-title {
+            font-size: 1.8em;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.03em;
+            margin-bottom: var(--sp-3);
+            position: relative;
+        }
+
+        .project-title-accent {
+            background: linear-gradient(135deg, var(--brand) 0%, var(--brand-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .project-desc {
+            font-size: 0.92em;
+            color: var(--text-secondary);
+            margin-bottom: var(--sp-6);
+        }
+
+        /* Meta row — Linear style info chips */
+        .header-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-4);
+            flex-wrap: wrap;
+        }
+
+        .meta-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--sp-2);
+            font-size: 0.78em;
+            color: var(--text-muted);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: var(--sp-1) var(--sp-3);
+            transition: border-color 0.15s;
+        }
+
+        .meta-chip:hover { border-color: var(--border-strong); }
+
+        .meta-chip-value {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* <kbd> style */
+        kbd, .kbd {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 var(--sp-2);
+            background: var(--bg-surface);
+            border: 1px solid var(--border-strong);
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: 0.72em;
+            color: var(--text-secondary);
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+            line-height: 1;
+        }
+
+        /* Priority badge */
+        .priority-badge-critical {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--sp-1);
+            padding: var(--sp-1) var(--sp-3);
+            background: var(--priority-urgent-bg);
+            color: var(--priority-urgent);
+            font-size: 0.75em;
+            font-weight: 600;
+            border-radius: 100px;
+            border: 1px solid rgba(242, 85, 90, 0.2);
+        }
+
+        /* ============================================================
+         * PROGRESS BAR — Linear project progress
+         * ============================================================ */
+        .progress-section {
+            margin-bottom: var(--sp-8);
+            padding: var(--sp-5) var(--sp-6);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--sp-3);
+        }
+
+        .progress-label {
+            font-size: 0.82em;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .progress-percent {
+            font-family: var(--font-mono);
+            font-size: 0.78em;
+            font-weight: 600;
+            color: var(--brand-light);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-surface);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: var(--sp-3);
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            background: linear-gradient(90deg, var(--brand) 0%, var(--brand-light) 100%);
+            transition: width 0.6s ease;
+        }
+
+        .progress-stats {
+            display: flex;
+            gap: var(--sp-4);
+            font-size: 0.72em;
+            color: var(--text-muted);
+        }
+
+        .progress-stat {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-1);
+        }
+
+        .progress-stat-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        /* ============================================================
+         * EXECUTIVE SUMMARY — Glass card with gradient accent
+         * ============================================================ */
+        .executive-summary {
+            background:
+                linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+            padding: var(--sp-6);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--sp-10);
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border);
+            page-break-inside: avoid;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .executive-summary::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--brand) 0%, var(--brand-light) 50%, transparent 100%);
+        }
+
+        .executive-summary::after {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 120px; height: 120px;
+            background: radial-gradient(circle, rgba(94, 106, 210, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .summary-label {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--sp-2);
+            font-size: 0.72em;
+            font-weight: 600;
+            color: var(--brand-light);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: var(--sp-4);
+            padding: var(--sp-1) var(--sp-3);
+            background: var(--brand-dim);
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(94, 106, 210, 0.15);
+        }
+
+        .summary-content p {
+            position: relative;
+            color: var(--text-secondary);
+            margin-bottom: var(--sp-3);
+            line-height: 1.7;
+            font-size: 0.92em;
+        }
+
+        .summary-content p:last-child { margin-bottom: 0; }
+        .summary-content strong { color: var(--text-primary); font-weight: 600; }
+
+        /* ============================================================
+         * SECTION — Linear project/view navigation tabs
+         * ============================================================ */
+        .section {
+            margin-bottom: var(--sp-12);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+            margin-bottom: var(--sp-5);
+            padding-bottom: var(--sp-3);
+            border-bottom: 1px solid var(--border);
+            position: relative;
+        }
+
+        /* Section color accent underline */
+        .section-header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 48px;
+            height: 2px;
+            border-radius: 1px;
+        }
+
+        .section-icon {
+            font-size: 1.1em;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            flex-shrink: 0;
+        }
+
+        .section-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+            flex: 1;
+        }
+
+        .section-count {
+            font-size: 0.78em;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            background: var(--bg-card);
+            padding: 2px var(--sp-2);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            font-weight: 500;
+        }
+
+        /* Section mini-progress */
+        .section-progress {
+            width: 60px;
+            height: 4px;
+            background: var(--bg-surface);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .section-progress-fill {
+            height: 100%;
+            border-radius: 2px;
+        }
+
+        /* ============================================================
+         * BRIEF — Linear issue card
+         * Left status icon + title + assignee style
+         * ============================================================ */
+        .brief {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: var(--sp-4) var(--sp-5);
+            margin-bottom: var(--sp-2);
+            border: 1px solid var(--border);
+            transition: all 0.15s ease;
+            page-break-inside: avoid;
+            position: relative;
+            display: flex;
+            gap: var(--sp-3);
+            align-items: flex-start;
+        }
+
+        .brief:hover {
+            background: var(--bg-hover);
+            border-color: var(--border-strong);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-card);
+        }
+
+        .brief:last-child { margin-bottom: 0; }
+
+        /* --- Status icon (left side) --- */
+        .brief-status-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid var(--status-backlog);
+            flex-shrink: 0;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Priority variations */
+        .brief.must-read .brief-status-icon {
+            border-color: var(--priority-urgent);
+            background: var(--priority-urgent-bg);
+        }
+        .brief.must-read .brief-status-icon::after {
+            content: '';
+            width: 8px; height: 8px;
+            background: var(--priority-urgent);
+            border-radius: 50%;
+        }
+
+        .brief.recommended .brief-status-icon {
+            border-color: var(--priority-high);
+            background: var(--priority-high-bg);
+        }
+        .brief.recommended .brief-status-icon::after {
+            content: '';
+            width: 6px; height: 6px;
+            background: var(--priority-high);
+            border-radius: 50%;
+        }
+
+        .brief.fyi .brief-status-icon {
+            border-color: var(--priority-low);
+        }
+
+        /* Brief content */
+        .brief-body { flex: 1; min-width: 0; }
+
+        /* Must-read glow */
+        .brief.must-read {
+            border-color: rgba(242, 85, 90, 0.2);
+            background: linear-gradient(90deg, var(--priority-urgent-bg) 0%, var(--bg-card) 30%);
+        }
+
+        .brief.recommended {
+            border-left: 2px solid var(--priority-high);
+        }
+
+        .brief-headline {
+            font-size: 0.95em;
+            font-weight: 500;
+            line-height: 1.45;
+            margin-bottom: var(--sp-2);
+        }
+
+        .brief-headline a {
+            color: var(--text-primary);
+            transition: color 0.15s;
+        }
+        .brief-headline a:hover { color: var(--brand-light); }
+
+        .brief.must-read .brief-headline a {
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+
+        /* Priority label — Linear style */
+        .priority-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 0.68em;
+            font-weight: 600;
+            padding: 1px var(--sp-2);
+            border-radius: var(--radius-sm);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            margin-right: var(--sp-2);
+        }
+
+        .priority-label.urgent {
+            color: var(--priority-urgent);
+            background: var(--priority-urgent-bg);
+            border: 1px solid rgba(242, 85, 90, 0.2);
+        }
+
+        .priority-label.high {
+            color: var(--priority-high);
+            background: var(--priority-high-bg);
+            border: 1px solid rgba(242, 201, 76, 0.15);
+        }
+
+        .priority-label.low {
+            color: var(--priority-low);
+            background: var(--priority-low-bg);
+            border: 1px solid rgba(76, 183, 130, 0.15);
+        }
+
+        /* Meta: source + tags */
+        .brief-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+            margin-bottom: var(--sp-2);
+            flex-wrap: wrap;
+        }
+
+        .source {
+            font-size: 0.72em;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .tag {
+            font-size: 0.68em;
+            padding: 1px var(--sp-2);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-muted);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            transition: all 0.15s;
+        }
+        .tag:hover { border-color: var(--brand-light); color: var(--brand-light); }
+
+        .brief-detail {
+            color: var(--text-secondary);
+            line-height: 1.65;
+            font-size: 0.88em;
+        }
+
+        .brief-detail strong { color: var(--text-primary); font-weight: 600; }
+
+        .brief-detail code {
+            font-family: var(--font-mono);
+            background: rgba(255, 255, 255, 0.06);
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 0.88em;
+            color: var(--brand-light);
+            border: 1px solid var(--border);
+        }
+
+        /* Brief right-side assignee avatar placeholder */
+        .brief-assignee {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.55em;
+            font-weight: 600;
+            color: white;
+            margin-top: 2px;
+        }
+
+        /* ============================================================
+         * FOOTER — Linear status bar style
+         * ============================================================ */
+        .footer {
+            margin-top: var(--sp-16);
+            border-top: 1px solid var(--border);
+            position: relative;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--brand) 0%, var(--brand-light) 100%);
+        }
+
+        /* Status bar */
+        .status-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--sp-3) var(--sp-4);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            margin-top: var(--sp-6);
+            font-size: 0.75em;
+            color: var(--text-muted);
+        }
+
+        .status-bar-left {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-4);
+        }
+
+        .status-bar-item {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+        }
+
+        .status-bar-right {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-3);
+        }
+
+        .footer-credit {
+            text-align: center;
+            margin-top: var(--sp-5);
+            font-size: 0.82em;
+            color: var(--text-muted);
+        }
+
+        .footer-accent {
+            background: linear-gradient(135deg, var(--brand) 0%, var(--brand-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 600;
+        }
+
+        /* ============================================================
+         * Print
+         * ============================================================ */
+        @media print {
+            body {
+                background: var(--bg-primary) !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .container { max-width: 100%; padding: 0; }
+            .header::before { display: none; }
+            .executive-summary { box-shadow: none; }
+            .executive-summary::before, .executive-summary::after { display: none; }
+            .brief { transform: none; box-shadow: none; transition: none; }
+            .brief:hover { background: var(--bg-card); transform: none; box-shadow: none; }
+            .status-dot { animation: none; }
+            a { color: var(--text-primary) !important; }
+            .footer::before { display: none; }
+        }
+
+        /* ============================================================
+         * Mobile
+         * ============================================================ */
+        @media (max-width: 768px) {
+            .container { padding: var(--sp-8) var(--sp-4); }
+            .project-title { font-size: 1.5em; }
+            .header-meta { gap: var(--sp-2); }
+            .progress-section { padding: var(--sp-4); }
+            .section-header { flex-wrap: wrap; }
+            .brief { padding: var(--sp-3) var(--sp-4); }
+        }
+
+        @media (max-width: 480px) {
+            body { font-size: 13px; }
+            .project-title { font-size: 1.3em; }
+            .header-top { flex-direction: column; gap: var(--sp-2); align-items: flex-start; }
+            .brief-assignee { display: none; }
+            .status-bar { flex-direction: column; gap: var(--sp-2); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- ====== HEADER: Linear App Bar ====== -->
+        <header class="header">
+            <div class="header-top">
+                <div class="linear-logo">
+                    <div class="logo-mark">
+                        <div class="logo-mark-inner"></div>
+                    </div>
+                    <span class="logo-text">Newsloom</span>
+                </div>
+                <div class="status-badge">
+                    <span class="status-dot"></span>
+                    <span>Synced · {{ date_str }}</span>
+                </div>
+            </div>
+
+            <h1 class="project-title">
+                Daily <span class="project-title-accent">Intelligence</span> Brief
+            </h1>
+            <div class="project-desc">Strategic insights and market intelligence · {{ date_str }}</div>
+
+            <div class="header-meta">
+                <span class="meta-chip">
+                    <span>⏰</span>
+                    <span class="meta-chip-value">{{ generated_time }}</span>
+                </span>
+                <span class="meta-chip">
+                    <span>📊</span>
+                    <span class="meta-chip-value">{{ total_items }} items</span>
+                </span>
+                {% set must_read_count = [] %}
+                {% for section_key, items in briefs.items() %}
+                {% if items is iterable and items is not string %}
+                {% for item in items %}
+                {% if item.priority == '🔴' %}
+                {% if must_read_count.append(1) %}{% endif %}
+                {% endif %}
+                {% endfor %}
+                {% endif %}
+                {% endfor %}
+                {% if must_read_count|length > 0 %}
+                <span class="priority-badge-critical">
+                    <span>🔴</span>
+                    <span>{{ must_read_count|length }} Urgent</span>
+                </span>
+                {% endif %}
+                <span class="kbd">⌘K</span>
+            </div>
+        </header>
+
+        <!-- ====== PROGRESS BAR ====== -->
+        <div class="progress-section">
+            <div class="progress-header">
+                <span class="progress-label">Analysis Progress</span>
+                <span class="progress-percent">100%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 100%;"></div>
+            </div>
+            <div class="progress-stats">
+                <span class="progress-stat">
+                    <span class="progress-stat-dot" style="background: var(--priority-urgent);"></span>
+                    Urgent {{ must_read_count|length }}
+                </span>
+                <span class="progress-stat">
+                    <span class="progress-stat-dot" style="background: var(--brand);"></span>
+                    Analyzed {{ total_items }}
+                </span>
+                <span class="progress-stat">
+                    <span class="progress-stat-dot" style="background: var(--status-done);"></span>
+                    Sections {{ section_order|length }}
+                </span>
+            </div>
+        </div>
+
+        <!-- ====== EXECUTIVE SUMMARY ====== -->
+        {% if executive_summary %}
+        <section class="executive-summary">
+            <div class="summary-label">⚡ Executive Summary</div>
+            <div class="summary-content">
+                {% for line in executive_summary.strip().split('\n') %}
+                {% if line.strip() %}
+                <p>{{ line.strip() | md_inline }}</p>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- ====== SECTIONS: Linear project views ====== -->
+        {% for section_key in section_order %}
+        {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+        {% set meta = section_configs.get(section_key, {}) %}
+        {% set items = briefs[section_key] %}
+        {% set section_color = meta.color|default('#5E6AD2') %}
+        <section class="section">
+            <div class="section-header" style="--sec-color: {{ section_color }};">
+                <span class="section-icon">{{ meta.emoji|default('📌') }}</span>
+                <h2 class="section-title">{{ meta.title|default(section_key) }}</h2>
+                <span class="section-count">{{ items|length }}</span>
+                <div class="section-progress">
+                    <div class="section-progress-fill" style="width: 100%; background: {{ section_color }};"></div>
+                </div>
+            </div>
+
+            {% for item in items %}
+            {% set priority = item.priority|default('🟢') %}
+            {% set p_class = 'must-read' if priority == '🔴' else ('recommended' if priority == '🟡' else 'fyi') %}
+            <article class="brief {{ p_class }}">
+                <div class="brief-status-icon"></div>
+                <div class="brief-body">
+                    <div class="brief-headline">
+                        {% if priority == '🔴' %}
+                        <span class="priority-label urgent">🔴 Urgent</span>
+                        {% elif priority == '🟡' %}
+                        <span class="priority-label high">🟡 High</span>
+                        {% else %}
+                        <span class="priority-label low">🟢 Low</span>
+                        {% endif %}
+                        <a href="{{ item.url|default('#') }}" target="_blank">
+                            {{ item.headline|default(item.title|default('Untitled')) }}
+                        </a>
+                    </div>
+                    {% if item.source or item.tags %}
+                    <div class="brief-meta">
+                        {% if item.source %}
+                        <span class="source">{{ item.source }}</span>
+                        {% endif %}
+                        {% if item.tags %}
+                        {% for tag in item.tags %}
+                        <span class="tag">{{ tag }}</span>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    {% if item.detail %}
+                    <div class="brief-detail">{{ item.detail|default('') | md_inline }}</div>
+                    {% endif %}
+                </div>
+                <div class="brief-assignee" style="background: {{ section_color }};">
+                    {{ meta.emoji|default('📌') }}
+                </div>
+            </article>
+            {% endfor %}
+        </section>
+        {% endif %}
+        {% endfor %}
+
+        <!-- ====== FOOTER: Linear Status Bar ====== -->
+        <footer class="footer">
+            <div class="status-bar">
+                <div class="status-bar-left">
+                    <span class="status-bar-item">
+                        <span class="status-dot" style="width: 6px; height: 6px; animation: none;"></span>
+                        <span>All synced</span>
+                    </span>
+                    <span class="status-bar-item">
+                        <span>{{ total_items }} issues</span>
+                    </span>
+                    <span class="status-bar-item">
+                        <span>{{ section_order|length }} projects</span>
+                    </span>
+                </div>
+                <div class="status-bar-right">
+                    <span>{{ date_str }}</span>
+                    <kbd>⌘</kbd>
+                </div>
+            </div>
+            <div class="footer-credit">
+                Powered by <span class="footer-accent">Newsloom</span> · {{ total_items }} sources analyzed
+            </div>
+        </footer>
+
+    </div>
+</body>
+</html>

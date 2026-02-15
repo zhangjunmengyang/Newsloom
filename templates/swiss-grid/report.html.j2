@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsloom {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * SWISS GRID — International Typographic Style
+         * Josef Müller-Brockmann · Mathematical precision · Grid system
+         * Black + White + Red · Helvetica dominant · Bold contrasts
+         * 
+         * Design Philosophy: Content is king. The grid is law.
+         * Massive type + micro labels = dramatic hierarchy.
+         * ============================================================ */
+
+        /* --- Design Tokens (CSS Custom Properties) --- */
+        :root {
+            /* Backgrounds — 5 levels */
+            --bg-primary:     #FFFFFF;
+            --bg-secondary:   #FAFAFA;
+            --bg-card:        #F5F5F5;
+            --bg-surface:     #EFEFEF;
+            --bg-hover:       #E8E8E8;
+
+            /* Text — 4 levels */
+            --text-primary:   #000000;
+            --text-secondary: #222222;
+            --text-muted:     #666666;
+            --text-light:     #999999;
+
+            /* Brand — 5 variants (Swiss red) */
+            --brand:          #FF0000;
+            --brand-light:    #FF3333;
+            --brand-dark:     #CC0000;
+            --brand-dim:      rgba(255, 0, 0, 0.08);
+            --brand-glow:     rgba(255, 0, 0, 0.04);
+
+            /* Priority — with bg variants */
+            --priority-must:     #FF0000;
+            --priority-must-bg:  rgba(255, 0, 0, 0.06);
+            --priority-rec:      #555555;
+            --priority-rec-bg:   rgba(85, 85, 85, 0.06);
+            --priority-fyi:      #AAAAAA;
+            --priority-fyi-bg:   rgba(170, 170, 170, 0.04);
+
+            /* Borders — 3 levels */
+            --border:         #E0E0E0;
+            --border-strong:  #000000;
+            --border-accent:  #FF0000;
+
+            /* Spacing — 8pt grid (mathematical) */
+            --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px;
+            --sp-4: 16px; --sp-5: 20px; --sp-6: 24px;
+            --sp-8: 32px; --sp-10: 40px; --sp-12: 48px;
+            --sp-16: 64px; --sp-20: 80px;
+
+            /* Grid System — Base unit */
+            --unit: 24px;
+            --unit-half: 12px;
+            --unit-quarter: 6px;
+            --unit-double: 48px;
+            --unit-triple: 72px;
+            --unit-quad: 96px;
+
+            /* Typography — 3 families + CJK */
+            --font-primary: "Helvetica Neue", "Helvetica", "Arial", "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+            --font-serif:   "Georgia", "Times New Roman", "Noto Serif SC", serif;
+            --font-mono:    "Helvetica Neue", "Monaco", "Consolas", "PingFang SC", monospace;
+
+            /* Type Scale — Bold contrasts (Swiss style) */
+            --text-xs:  10px;
+            --text-sm:  12px;
+            --text-base: 14px;
+            --text-lg:  16px;
+            --text-xl:  20px;
+            --text-2xl: 28px;
+            --text-3xl: 36px;
+            --text-4xl: 56px;
+            --text-5xl: 72px;
+
+            /* Line Heights */
+            --leading-tight:   1.15;
+            --leading-normal:  1.50;
+            --leading-relaxed: 1.75;
+
+            /* Radius — 3 levels (minimal for Swiss) */
+            --radius-sm: 0px;
+            --radius-md: 2px;
+            --radius-lg: 4px;
+
+            /* Shadows — 3 levels (very subtle for Swiss) */
+            --shadow-card:     0 1px 2px rgba(0,0,0,0.04);
+            --shadow-elevated: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-glow:     0 0 20px rgba(255, 0, 0, 0.08);
+        }
+
+        /* --- Page Setup (PDF / WeasyPrint) --- */
+        @page {
+            size: A4;
+            margin: 3cm 2cm;
+
+            @bottom-left {
+                content: "Newsloom";
+                font-family: var(--font-primary);
+                font-size: 8pt;
+                font-weight: 700;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+            }
+            @bottom-center {
+                content: "{{ date_str }}";
+                font-family: var(--font-primary);
+                font-size: 8pt;
+                color: var(--text-muted);
+            }
+            @bottom-right {
+                content: counter(page);
+                font-family: var(--font-primary);
+                font-size: 8pt;
+                font-weight: 700;
+                color: var(--brand);
+            }
+        }
+
+        /* --- Reset & Base --- */
+        *, *::before, *::after {
+            margin: 0; padding: 0; box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: var(--text-base);
+            line-height: var(--leading-normal);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        /* Swiss-style link: black with red underline */
+        a {
+            color: var(--text-primary);
+            text-decoration: underline;
+            text-decoration-color: var(--brand);
+            text-underline-offset: 3px;
+            text-decoration-thickness: 2px;
+            transition: all 0.2s ease;
+        }
+
+        a:hover {
+            color: var(--brand);
+            text-decoration-thickness: 3px;
+        }
+
+        /* --- Grid Container --- */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: var(--unit-quad) var(--unit-double);
+        }
+
+        /* ========================================================
+         * HEADER — Dramatic Swiss Masthead
+         * Massive type weight contrast: light 300 title + bold 700 meta
+         * ======================================================== */
+        .header {
+            margin-bottom: var(--unit-quad);
+            padding-bottom: var(--unit-double);
+            border-bottom: 4px solid var(--border-strong);
+            position: relative;
+        }
+
+        /* Red accent bar at very top */
+        .header::before {
+            content: '';
+            position: absolute;
+            top: calc(-1 * var(--unit-quad));
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--brand);
+        }
+
+        .header-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            grid-gap: var(--unit-double);
+            align-items: end;
+        }
+
+        .header-brand {
+            font-size: var(--text-5xl);
+            font-weight: 300;
+            color: var(--text-primary);
+            margin-bottom: var(--unit-half);
+            letter-spacing: -0.03em;
+            line-height: var(--leading-tight);
+        }
+
+        .header-subtitle {
+            font-size: var(--text-sm);
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: var(--unit);
+        }
+
+        .header-date {
+            font-size: var(--text-xl);
+            font-weight: 400;
+            color: var(--text-secondary);
+            margin-bottom: var(--unit);
+        }
+
+        .header-meta {
+            text-align: right;
+        }
+
+        .header-stats {
+            font-size: var(--text-xs);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            line-height: 2.2;
+        }
+
+        .stat-line {
+            margin-bottom: var(--unit-quarter);
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--sp-2);
+        }
+
+        .stat-number {
+            color: var(--brand);
+            font-weight: 700;
+            font-size: var(--text-lg);
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            align-self: center;
+        }
+
+        .critical-marker {
+            color: var(--brand);
+            font-weight: 700;
+        }
+
+        /* ========================================================
+         * EXECUTIVE SUMMARY — Red-bordered rational block
+         * ======================================================== */
+        .exec-summary {
+            margin-bottom: var(--unit-quad);
+            padding: var(--unit-double);
+            background: var(--bg-card);
+            border-left: var(--unit-quarter) solid var(--brand);
+            page-break-inside: avoid;
+            position: relative;
+        }
+
+        /* Decorative red corner square */
+        .exec-summary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: var(--unit);
+            height: var(--unit);
+            background: var(--brand);
+        }
+
+        .exec-label {
+            font-size: var(--text-xs);
+            font-weight: 700;
+            color: var(--brand);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: var(--unit);
+            padding-bottom: var(--unit-half);
+            border-bottom: 2px solid var(--brand);
+            display: inline-block;
+        }
+
+        .exec-summary p {
+            font-size: var(--text-base);
+            line-height: var(--leading-relaxed);
+            color: var(--text-secondary);
+            margin-bottom: var(--unit);
+        }
+
+        .exec-summary p:last-of-type { margin-bottom: 0; }
+
+        .exec-summary p:first-of-type {
+            font-size: var(--text-lg);
+            line-height: 1.65;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .exec-summary p strong {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        /* ========================================================
+         * SECTION — Numbered modular system
+         * ======================================================== */
+        .section {
+            margin-bottom: var(--unit-quad);
+            page-break-inside: avoid;
+        }
+
+        .section-header {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: var(--unit);
+            margin-bottom: var(--unit-double);
+            padding-bottom: var(--unit);
+            border-bottom: 2px solid var(--border-strong);
+            position: relative;
+        }
+
+        /* Red line above black rule */
+        .section-header::before {
+            content: '';
+            position: absolute;
+            bottom: calc(var(--unit) + 2px + 4px);
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--brand);
+        }
+
+        .section-number {
+            font-size: var(--text-4xl);
+            font-weight: 700;
+            color: var(--brand);
+            line-height: 1;
+            min-width: 60px;
+        }
+
+        .section-title {
+            font-size: var(--text-xl);
+            font-weight: 400;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+        }
+
+        .section-count {
+            font-size: var(--text-xs);
+            font-weight: 700;
+            color: var(--text-muted);
+            text-align: right;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* ========================================================
+         * BRIEF — Grid-based structured data entries
+         * ======================================================== */
+        .brief {
+            display: grid;
+            grid-template-columns: 48px 1fr;
+            gap: var(--unit);
+            margin-bottom: var(--unit-double);
+            padding-bottom: var(--unit-double);
+            border-bottom: 1px solid var(--border);
+            page-break-inside: avoid;
+            transition: background-color 0.15s ease;
+        }
+
+        .brief:hover {
+            background: var(--bg-secondary);
+            margin-left: calc(-1 * var(--sp-4));
+            margin-right: calc(-1 * var(--sp-4));
+            padding-left: var(--sp-4);
+            padding-right: var(--sp-4);
+        }
+
+        .brief:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        /* Index number column */
+        .brief-index {
+            font-size: var(--text-xs);
+            font-weight: 700;
+            color: var(--text-light);
+            text-align: right;
+            width: 48px;
+            padding-top: var(--unit-quarter);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .brief.must-read .brief-index {
+            color: var(--brand);
+            font-size: var(--text-sm);
+        }
+
+        .brief-content { /* Main content area */ }
+
+        .brief-headline {
+            font-size: var(--text-lg);
+            font-weight: 600;
+            line-height: var(--leading-tight);
+            color: var(--text-primary);
+            margin-bottom: var(--unit);
+        }
+
+        .brief-headline a {
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .brief-headline a:hover {
+            color: var(--brand);
+            text-decoration: none;
+        }
+
+        .brief.must-read .brief-headline a {
+            color: var(--brand);
+            font-weight: 700;
+        }
+
+        /* Meta information */
+        .brief-meta {
+            display: flex;
+            gap: var(--unit);
+            align-items: center;
+            margin-bottom: var(--unit);
+            font-size: var(--text-sm);
+            color: var(--text-muted);
+            flex-wrap: wrap;
+        }
+
+        .source-label {
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-secondary);
+            font-size: var(--text-xs);
+        }
+
+        .tag-list {
+            display: flex;
+            gap: var(--unit-half);
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            font-size: var(--text-xs);
+            font-weight: 500;
+            color: var(--text-muted);
+            text-transform: lowercase;
+            border: 1px solid var(--border);
+            padding: 2px var(--unit-half);
+            transition: border-color 0.15s ease, color 0.15s ease;
+        }
+
+        .tag:hover {
+            border-color: var(--brand);
+            color: var(--brand);
+        }
+
+        .brief-detail {
+            font-size: var(--text-base);
+            line-height: var(--leading-relaxed);
+            color: var(--text-secondary);
+        }
+
+        .brief-detail strong {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .brief-detail em {
+            color: var(--text-primary);
+            font-style: normal;
+            font-weight: 500;
+        }
+
+        .brief-detail code {
+            font-family: var(--font-mono);
+            font-size: var(--text-sm);
+            background: var(--bg-secondary);
+            padding: 1px 5px;
+            border: 1px solid var(--border);
+        }
+
+        /* --- Priority Visual System --- */
+        .brief.must-read {
+            border-left: var(--unit-quarter) solid var(--brand);
+            padding-left: var(--unit);
+            background: var(--priority-must-bg);
+        }
+
+        .brief.must-read::after {
+            content: '●';
+            position: absolute;
+            top: 0;
+            right: 0;
+            color: var(--brand);
+            font-size: var(--text-sm);
+        }
+
+        .brief.recommended {
+            border-left: 2px solid var(--border-strong);
+            padding-left: var(--unit);
+            background: var(--priority-rec-bg);
+        }
+
+        .brief.fyi {
+            opacity: 0.75;
+        }
+
+        .brief.fyi:hover {
+            opacity: 1;
+        }
+
+        /* ========================================================
+         * DECORATIVE ELEMENTS — Grid lines & Swiss accents
+         * ======================================================== */
+        .grid-rule {
+            height: 0;
+            border-top: 1px solid var(--border);
+            margin: var(--unit-double) 0;
+            position: relative;
+        }
+
+        .grid-rule::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 0;
+            width: var(--unit);
+            height: 4px;
+            background: var(--brand);
+        }
+
+        /* ========================================================
+         * FOOTER — Minimal rational credits
+         * ======================================================== */
+        .footer {
+            margin-top: var(--unit-quad);
+            padding-top: var(--unit-double);
+            border-top: 4px solid var(--border-strong);
+            text-align: center;
+            font-size: var(--text-sm);
+            color: var(--text-muted);
+            position: relative;
+        }
+
+        /* Red line below black rule */
+        .footer::after {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--brand);
+        }
+
+        .footer-brand {
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: var(--unit-half);
+            font-size: var(--text-base);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+        }
+
+        .footer-meta {
+            line-height: var(--leading-normal);
+            font-size: var(--text-sm);
+        }
+
+        .footer-highlight {
+            color: var(--brand);
+            font-weight: 700;
+        }
+
+        /* ========================================================
+         * PRINT / PDF OVERRIDES
+         * ======================================================== */
+        @media print {
+            body {
+                background: var(--bg-primary) !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            .container { max-width: 100%; padding: 0; }
+
+            .header {
+                margin-bottom: var(--unit-triple);
+                padding-bottom: var(--unit);
+            }
+            .header::before { display: none; }
+
+            .exec-summary {
+                margin-bottom: var(--unit-triple);
+                padding: var(--unit);
+            }
+            .exec-summary::before { display: none; }
+
+            .brief {
+                margin-bottom: var(--unit-double);
+                padding-bottom: var(--unit-double);
+                transition: none;
+            }
+            .brief:hover {
+                background: transparent;
+                margin-left: 0;
+                margin-right: 0;
+                padding-left: 0;
+                padding-right: 0;
+            }
+
+            .section { margin-bottom: var(--unit-triple); }
+            .section-header::before { display: none; }
+
+            a { color: var(--text-primary) !important; text-decoration: none; }
+
+            .footer::after { display: none; }
+        }
+
+        /* ========================================================
+         * MOBILE RESPONSIVE
+         * ======================================================== */
+        @media (max-width: 640px) {
+            .container {
+                padding: var(--unit-double) var(--unit);
+            }
+
+            .header-grid {
+                grid-template-columns: 1fr;
+                gap: var(--unit);
+            }
+
+            .header-meta { text-align: left; }
+            .stat-line { justify-content: flex-start; }
+
+            .header-brand {
+                font-size: var(--text-3xl);
+            }
+
+            .section-number {
+                font-size: var(--text-3xl);
+                min-width: 40px;
+            }
+
+            .brief {
+                grid-template-columns: 32px 1fr;
+                gap: var(--unit-half);
+            }
+
+            .brief-index {
+                width: 32px;
+                font-size: var(--text-xs);
+            }
+
+            .brief:hover {
+                margin-left: 0;
+                margin-right: 0;
+                padding-left: 0;
+                padding-right: 0;
+            }
+
+            .section-header {
+                grid-template-columns: auto 1fr;
+                gap: var(--unit-half);
+            }
+
+            .section-count {
+                grid-column: 1 / -1;
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- ====== HEADER: Dramatic Swiss Masthead ====== -->
+        <header class="header">
+            <div class="header-grid">
+                <div class="header-main">
+                    <div class="header-subtitle">Intelligence Report</div>
+                    <h1 class="header-brand">Newsloom</h1>
+                    <div class="header-date">{{ date_str }}</div>
+                </div>
+                <div class="header-meta">
+                    <div class="header-stats">
+                        <div class="stat-line">
+                            <span class="stat-label">Items</span>
+                            <span class="stat-number">{{ total_items }}</span>
+                        </div>
+                        {% set must_read_total = [] %}
+                        {% for section_key, items in briefs.items() %}
+                        {% if items is iterable and items is not string %}
+                        {% for item in items %}
+                        {% if item.priority == '🔴' %}
+                        {% if must_read_total.append(1) %}{% endif %}
+                        {% endif %}
+                        {% endfor %}
+                        {% endif %}
+                        {% endfor %}
+                        {% if must_read_total|length > 0 %}
+                        <div class="stat-line">
+                            <span class="stat-label">Critical</span>
+                            <span class="critical-marker stat-number">{{ must_read_total|length }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="stat-line">
+                            <span class="stat-label">Generated</span>
+                            <span style="color: var(--text-secondary); font-size: var(--text-sm);">{{ generated_time }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ====== EXECUTIVE SUMMARY: Rational Block ====== -->
+        {% if executive_summary %}
+        <div class="exec-summary">
+            <div class="exec-label">Executive Summary</div>
+            {% for line in executive_summary.strip().split('\n') %}
+            {% if line.strip() %}
+            <p>{{ line.strip() | md_inline }}</p>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- ====== SECTIONS: Numbered Modular System ====== -->
+        {% set section_counter = namespace(value=1) %}
+        {% for section_key in section_order %}
+        {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+        {% set meta = section_configs.get(section_key, {}) %}
+        {% set items = briefs[section_key] %}
+        <section class="section">
+            <div class="section-header">
+                <div class="section-number">{{ '%02d' % section_counter.value }}</div>
+                <h2 class="section-title">{{ meta.title|default(section_key) }}</h2>
+                <div class="section-count">{{ items|length }} Items</div>
+            </div>
+
+            {% set brief_counter = namespace(value=1) %}
+            {% for item in items %}
+            {% set priority = item.priority|default('🟢') %}
+            {% set p_class = 'must-read' if priority == '🔴' else ('recommended' if priority == '🟡' else 'fyi') %}
+            <div class="brief {{ p_class }}">
+                <div class="brief-index">{{ '%02d.%02d' % (section_counter.value, brief_counter.value) }}</div>
+                <div class="brief-content">
+                    <div class="brief-headline">
+                        <a href="{{ item.url|default('#') }}" target="_blank">{{ item.headline|default(item.title|default('Untitled')) }}</a>
+                    </div>
+                    <div class="brief-meta">
+                        {% if item.source %}
+                        <div class="source-label">{{ item.source }}</div>
+                        {% endif %}
+                        {% if item.tags %}
+                        <div class="tag-list">
+                            {% for tag in item.tags %}
+                            <span class="tag">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% if item.detail %}
+                    <div class="brief-detail">{{ item.detail|default('') | md_inline }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            {% set brief_counter.value = brief_counter.value + 1 %}
+            {% endfor %}
+        </section>
+        {% set section_counter.value = section_counter.value + 1 %}
+        {% endif %}
+        {% endfor %}
+
+        <!-- ====== FOOTER: Minimal Swiss Credits ====== -->
+        <footer class="footer">
+            <div class="footer-brand">Newsloom Intelligence System</div>
+            <div class="footer-meta">
+                AI-curated · <span class="footer-highlight">{{ date_str }}</span> ·
+                <span class="footer-highlight">{{ total_items }}</span> sources analyzed
+            </div>
+        </footer>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsloom Bauhaus · {{ date_str }}</title>
+    <style>
+        /* ============================================================
+         * BAUHAUS — Bold Color Block Poster Design
+         * 
+         * Design Philosophy:
+         *   TRUE Bauhaus poster energy — massive color blocks,
+         *   extreme typographic contrast, bold geometric shapes.
+         *   Red/Yellow/Blue used in LARGE areas, not as accents.
+         *   Every section header is a full-width color block.
+         *   Geometric decoration is oversized and unapologetic.
+         *   Layout = asymmetric grid tension.
+         *   The page should feel like a Kandinsky/Mondrian/Bayer poster.
+         *
+         * Core Colors (pure, bold, uncompromised):
+         *   - Bauhaus Red:    #E30613 (DIN Red, bold and warm)
+         *   - Bauhaus Yellow: #FFD100 (Pure golden yellow)
+         *   - Bauhaus Blue:   #003DA5 (Deep cobalt)
+         *   - Pure Black:     #1A1A1A
+         *   - Pure White:     #FFFFFF
+         *   - Warm Gray:      #F2EDE8 (Bauhaus paper tone)
+         * ============================================================ */
+
+        /* --- Design Tokens --- */
+        :root {
+            /* Backgrounds */
+            --bg-paper:         #F2EDE8;
+            --bg-white:         #FFFFFF;
+            --bg-warm:          #FFF8F0;
+            --bg-cool:          #F0F4FA;
+            --bg-hover:         #EDE8E2;
+
+            /* THE TRIAD — large-area colors */
+            --red:              #E30613;
+            --red-dark:         #B80510;
+            --red-light:        #FF3D4D;
+            --yellow:           #FFD100;
+            --yellow-dark:      #E6BC00;
+            --yellow-light:     #FFE04D;
+            --blue:             #003DA5;
+            --blue-dark:        #002D7A;
+            --blue-light:       #0052DE;
+            --blue-bright:      #2563EB;
+
+            /* Text */
+            --black:            #1A1A1A;
+            --text-primary:     #1A1A1A;
+            --text-secondary:   #3D3D3D;
+            --text-muted:       #6B6B6B;
+            --text-dim:         #999999;
+            --text-inverse:     #FFFFFF;
+
+            /* Priority — mapped to triad */
+            --priority-must:    var(--red);
+            --priority-must-bg: rgba(227, 6, 19, 0.08);
+            --priority-rec:     var(--yellow-dark);
+            --priority-rec-bg:  rgba(255, 209, 0, 0.12);
+            --priority-fyi:     var(--blue);
+            --priority-fyi-bg:  rgba(0, 61, 165, 0.06);
+
+            /* Spacing (strict 8pt grid) */
+            --sp-1: 4px;   --sp-2: 8px;   --sp-3: 12px;  --sp-4: 16px;
+            --sp-5: 20px;  --sp-6: 24px;  --sp-8: 32px;  --sp-10: 40px;
+            --sp-12: 48px; --sp-16: 64px; --sp-20: 80px;
+
+            /* Typography — geometric sans-serif */
+            --font-primary: "Futura", "Century Gothic", "Avant Garde Gothic", -apple-system, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+            --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Noto Sans SC", sans-serif;
+            --font-mono: "Courier New", "Monaco", "Consolas", monospace;
+
+            /* Radius — zero for Bauhaus purity */
+            --radius-none: 0px;
+            --radius-tiny: 2px;
+
+            /* Shadows — hard, graphic, not soft */
+            --shadow-hard:     4px 4px 0 rgba(0, 0, 0, 0.12);
+            --shadow-hard-lg:  8px 8px 0 rgba(0, 0, 0, 0.15);
+            --shadow-hard-red: 6px 6px 0 rgba(227, 6, 19, 0.20);
+            --shadow-hard-blue:6px 6px 0 rgba(0, 61, 165, 0.18);
+        }
+
+        /* --- Page (PDF) --- */
+        @page {
+            size: A4;
+            margin: 1.5cm 1.8cm;
+            background: var(--bg-paper);
+            @bottom-left {
+                content: "BAUHAUS NEWSLOOM";
+                font-family: var(--font-primary);
+                font-size: 8pt;
+                color: var(--black);
+                font-weight: 900;
+                text-transform: uppercase;
+                letter-spacing: 0.12em;
+            }
+            @bottom-right {
+                content: counter(page) " / {{ date_str }}";
+                font-family: var(--font-primary);
+                font-size: 8pt;
+                color: var(--black);
+                font-weight: 900;
+            }
+        }
+
+        /* --- Reset --- */
+        *, *::before, *::after {
+            margin: 0; padding: 0; box-sizing: border-box;
+        }
+
+        /* ============================================================
+         * BODY: Warm Bauhaus paper with geometric grid texture
+         * ============================================================ */
+        body {
+            font-family: var(--font-primary);
+            background: var(--bg-paper);
+            color: var(--text-primary);
+            font-size: 14px;
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* ★★★ Geometric grid texture on paper ★★★ */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image:
+                /* Horizontal lines */
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 79px,
+                    rgba(0, 0, 0, 0.025) 79px,
+                    rgba(0, 0, 0, 0.025) 80px
+                ),
+                /* Vertical lines */
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 79px,
+                    rgba(0, 0, 0, 0.025) 79px,
+                    rgba(0, 0, 0, 0.025) 80px
+                );
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ★★★ Decorative geometric corner pieces ★★★ */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 20px; right: 20px;
+            width: 120px; height: 120px;
+            background:
+                /* Large yellow circle */
+                radial-gradient(circle 50px at 50% 50%, var(--yellow) 48%, transparent 50%),
+                /* Small red square overlay */
+                linear-gradient(var(--red), var(--red));
+            background-size: 100% 100%, 30px 30px;
+            background-position: center, 0 0;
+            background-repeat: no-repeat;
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        a {
+            color: var(--blue);
+            text-decoration: none;
+            transition: color 0.15s;
+        }
+        a:hover { color: var(--red); }
+
+        /* --- Container --- */
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: var(--sp-8) var(--sp-6);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ============================================================
+         * HEADER: Massive Bauhaus poster composition
+         * Giant color blocks + extreme typography
+         * ============================================================ */
+        .header {
+            margin-bottom: var(--sp-12);
+            position: relative;
+        }
+
+        /* Top color block strip: Red | Yellow | Blue */
+        .header-color-strip {
+            display: grid;
+            grid-template-columns: 3fr 2fr 3fr;
+            height: 28px;
+            margin-bottom: 0;
+        }
+
+        .header-color-strip .strip-red { background: var(--red); }
+        .header-color-strip .strip-yellow { background: var(--yellow); }
+        .header-color-strip .strip-blue { background: var(--blue); }
+
+        /* Main header grid: 3-column Bauhaus composition */
+        .header-main {
+            display: grid;
+            grid-template-columns: 200px 1fr 160px;
+            min-height: 220px;
+            border: 4px solid var(--black);
+            border-top: none;
+        }
+
+        /* Left panel: Red block */
+        .header-left {
+            background: var(--red);
+            color: var(--text-inverse);
+            padding: var(--sp-6) var(--sp-5);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Large decorative circle in red panel */
+        .header-left::before {
+            content: '';
+            position: absolute;
+            bottom: -40px; right: -40px;
+            width: 160px; height: 160px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .header-left-title {
+            font-size: 2.8em;
+            font-weight: 900;
+            line-height: 0.95;
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+            position: relative;
+        }
+
+        .header-left-sub {
+            font-size: 0.72em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            opacity: 0.8;
+            position: relative;
+        }
+
+        /* Center panel: White with giant title */
+        .header-center {
+            background: var(--bg-white);
+            padding: var(--sp-8) var(--sp-6);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            border-left: 4px solid var(--black);
+            border-right: 4px solid var(--black);
+        }
+
+        /* Yellow triangle decoration */
+        .header-center::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 0; height: 0;
+            border-top: 80px solid var(--yellow);
+            border-left: 80px solid transparent;
+        }
+
+        .header-center h1 {
+            font-size: 3.8em;
+            font-weight: 900;
+            line-height: 0.9;
+            text-transform: uppercase;
+            letter-spacing: -0.04em;
+            color: var(--black);
+            margin-bottom: var(--sp-3);
+        }
+
+        .header-center .tagline {
+            font-size: 0.78em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.20em;
+            color: var(--text-muted);
+        }
+
+        .header-center .date-line {
+            font-size: 1.3em;
+            font-weight: 900;
+            color: var(--red);
+            margin-top: var(--sp-4);
+            letter-spacing: 0.05em;
+        }
+
+        /* Right panel: Blue block */
+        .header-right {
+            background: var(--blue);
+            color: var(--text-inverse);
+            padding: var(--sp-6) var(--sp-5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Geometric square decoration */
+        .header-right::before {
+            content: '';
+            position: absolute;
+            top: 15px; left: 15px;
+            width: 35px; height: 35px;
+            background: var(--yellow);
+        }
+
+        .header-right .stat-number {
+            font-size: 4.5em;
+            font-weight: 900;
+            line-height: 1;
+            position: relative;
+        }
+
+        .header-right .stat-label {
+            font-size: 0.70em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            opacity: 0.8;
+            margin-top: var(--sp-2);
+        }
+
+        /* Bottom strip under header */
+        .header-bottom-strip {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            border: 4px solid var(--black);
+            border-top: none;
+        }
+
+        .header-bottom-strip .cell {
+            padding: var(--sp-3) var(--sp-4);
+            text-align: center;
+            font-size: 0.78em;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .header-bottom-strip .cell-yellow {
+            background: var(--yellow);
+            color: var(--black);
+        }
+
+        .header-bottom-strip .cell-black {
+            background: var(--black);
+            color: var(--text-inverse);
+        }
+
+        .header-bottom-strip .cell-white {
+            background: var(--bg-white);
+            color: var(--black);
+            border-left: 4px solid var(--black);
+            border-right: 4px solid var(--black);
+        }
+
+        /* ============================================================
+         * GEOMETRIC SHAPES: Large decorative elements
+         * ============================================================ */
+        .geo-decoration {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--sp-6);
+            margin: var(--sp-10) 0;
+            position: relative;
+        }
+
+        .geo-circle-lg {
+            width: 48px; height: 48px;
+            background: var(--red);
+            border-radius: 50%;
+            box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.15);
+        }
+
+        .geo-square-lg {
+            width: 44px; height: 44px;
+            background: var(--blue);
+            box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.15);
+        }
+
+        .geo-triangle-lg {
+            width: 0; height: 0;
+            border-left: 26px solid transparent;
+            border-right: 26px solid transparent;
+            border-bottom: 48px solid var(--yellow);
+            filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, 0.12));
+        }
+
+        /* Color line divider: Red — Yellow — Blue */
+        .color-line {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            height: 6px;
+            margin: var(--sp-8) 0;
+        }
+
+        .color-line .cl-red { background: var(--red); }
+        .color-line .cl-yellow { background: var(--yellow); }
+        .color-line .cl-blue { background: var(--blue); }
+
+        /* Thick black line */
+        .black-rule {
+            height: 4px;
+            background: var(--black);
+            margin: var(--sp-8) 0;
+        }
+
+        /* ============================================================
+         * EXECUTIVE SUMMARY: Bold framed composition
+         * ============================================================ */
+        .exec-summary {
+            position: relative;
+            margin-bottom: var(--sp-12);
+            page-break-inside: avoid;
+        }
+
+        /* Top bar: gradient red → yellow → blue */
+        .exec-top-bar {
+            display: grid;
+            grid-template-columns: 2fr 1fr 2fr;
+            height: 10px;
+        }
+
+        .exec-top-bar .bar-red { background: var(--red); }
+        .exec-top-bar .bar-yellow { background: var(--yellow); }
+        .exec-top-bar .bar-blue { background: var(--blue); }
+
+        .exec-content {
+            display: grid;
+            grid-template-columns: 12px 1fr 12px;
+            border: 4px solid var(--black);
+            border-top: none;
+        }
+
+        .exec-stripe-left { background: var(--yellow); }
+        .exec-stripe-right { background: var(--blue); }
+
+        .exec-body {
+            background: var(--bg-white);
+            padding: var(--sp-8) var(--sp-6);
+        }
+
+        .exec-label {
+            font-size: 0.68em;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.20em;
+            color: var(--red);
+            margin-bottom: var(--sp-2);
+        }
+
+        .exec-title {
+            font-size: 2.2em;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+            color: var(--black);
+            margin-bottom: var(--sp-5);
+            line-height: 1;
+        }
+
+        .exec-text {
+            font-family: var(--font-body);
+            font-size: 0.98em;
+            line-height: 1.75;
+            color: var(--text-secondary);
+        }
+
+        .exec-text p {
+            margin-bottom: var(--sp-3);
+        }
+
+        .exec-text p:last-child { margin-bottom: 0; }
+
+        .exec-text strong {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        /* ============================================================
+         * STATS BAR: Bold tricolor data blocks
+         * ============================================================ */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+            background: var(--black);
+            padding: 4px;
+            margin-bottom: var(--sp-12);
+            box-shadow: var(--shadow-hard-lg);
+        }
+
+        .stats-block {
+            text-align: center;
+            padding: var(--sp-6) var(--sp-4);
+        }
+
+        .stats-block:nth-child(1) {
+            background: var(--red);
+            color: var(--text-inverse);
+        }
+
+        .stats-block:nth-child(2) {
+            background: var(--yellow);
+            color: var(--black);
+        }
+
+        .stats-block:nth-child(3) {
+            background: var(--blue);
+            color: var(--text-inverse);
+        }
+
+        .stats-number {
+            font-size: 3em;
+            font-weight: 900;
+            line-height: 1;
+            display: block;
+            margin-bottom: var(--sp-2);
+        }
+
+        .stats-label {
+            font-size: 0.65em;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+        }
+
+        /* ============================================================
+         * SECTION HEADERS: Full-width alternating color blocks
+         * ============================================================ */
+        .section {
+            margin-bottom: var(--sp-12);
+            break-inside: avoid;
+        }
+
+        /* ★★★ ALTERNATING LARGE COLOR BLOCK HEADERS ★★★ */
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: var(--sp-6);
+            border: 4px solid var(--black);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Section color rotation — RED, BLUE, YELLOW, then repeat */
+        .section:nth-child(3n+1) .section-header {
+            background: var(--red);
+            color: var(--text-inverse);
+        }
+        .section:nth-child(3n+1) .section-header .section-count {
+            background: var(--text-inverse);
+            color: var(--red);
+        }
+
+        .section:nth-child(3n+2) .section-header {
+            background: var(--blue);
+            color: var(--text-inverse);
+        }
+        .section:nth-child(3n+2) .section-header .section-count {
+            background: var(--text-inverse);
+            color: var(--blue);
+        }
+
+        .section:nth-child(3n) .section-header {
+            background: var(--yellow);
+            color: var(--black);
+        }
+        .section:nth-child(3n) .section-header .section-count {
+            background: var(--black);
+            color: var(--yellow);
+        }
+
+        /* Geometric shape decoration inside section header */
+        .section:nth-child(3n+1) .section-header::after {
+            content: '';
+            position: absolute;
+            right: 80px; top: 50%;
+            transform: translateY(-50%);
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .section:nth-child(3n+2) .section-header::after {
+            content: '';
+            position: absolute;
+            right: 80px; top: 50%;
+            transform: translateY(-50%);
+            width: 45px; height: 45px;
+            background: rgba(255, 255, 255, 0.10);
+        }
+
+        .section:nth-child(3n) .section-header::after {
+            content: '';
+            position: absolute;
+            right: 80px; top: 50%;
+            transform: translateY(-50%) rotate(45deg);
+            width: 40px; height: 40px;
+            background: rgba(0, 0, 0, 0.06);
+        }
+
+        .section-emoji {
+            font-size: 1.5em;
+            padding: var(--sp-4) var(--sp-5);
+            line-height: 1;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            flex: 1;
+        }
+
+        .section-count {
+            padding: var(--sp-4) var(--sp-6);
+            font-size: 1.6em;
+            font-weight: 900;
+            text-align: center;
+            min-width: 70px;
+            align-self: stretch;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ============================================================
+         * BRIEF CARDS: Geometric bordered cards
+         * ============================================================ */
+        .brief {
+            display: grid;
+            grid-template-columns: 8px 1fr;
+            margin-bottom: var(--sp-4);
+            border: 3px solid var(--black);
+            break-inside: avoid;
+            page-break-inside: avoid;
+            transition: all 0.15s ease;
+            position: relative;
+        }
+
+        .brief:hover {
+            box-shadow: var(--shadow-hard);
+            transform: translate(-3px, -3px);
+        }
+
+        /* Priority color bar */
+        .brief-bar {
+            background: var(--text-dim);
+        }
+
+        .brief.must-read .brief-bar { background: var(--red); }
+        .brief.recommended .brief-bar { background: var(--yellow); }
+        .brief.fyi .brief-bar { background: var(--blue); }
+
+        /* Must-read special: red corner triangle + red tint */
+        .brief.must-read {
+            border-color: var(--red);
+            background: var(--priority-must-bg);
+        }
+
+        .brief.must-read::before {
+            content: '!';
+            position: absolute;
+            top: 0; right: 0;
+            width: 28px; height: 28px;
+            background: var(--red);
+            color: var(--text-inverse);
+            font-size: 0.85em;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+
+        .brief.recommended {
+            background: var(--priority-rec-bg);
+        }
+
+        .brief.fyi {
+            background: var(--bg-white);
+        }
+
+        .brief-content {
+            padding: var(--sp-5) var(--sp-5);
+        }
+
+        .brief-header {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--sp-3);
+            margin-bottom: var(--sp-3);
+        }
+
+        /* Bauhaus geometric priority indicator */
+        .priority-shape {
+            width: 18px; height: 18px;
+            flex-shrink: 0;
+            margin-top: 3px;
+        }
+
+        /* Red circle for must-read */
+        .brief.must-read .priority-shape {
+            background: var(--red);
+            border-radius: 50%;
+        }
+
+        /* Yellow triangle for recommended */
+        .brief.recommended .priority-shape {
+            width: 0; height: 0;
+            border-left: 9px solid transparent;
+            border-right: 9px solid transparent;
+            border-bottom: 18px solid var(--yellow);
+        }
+
+        /* Blue square for fyi */
+        .brief.fyi .priority-shape {
+            background: var(--blue);
+        }
+
+        .brief-title {
+            flex: 1;
+            font-size: 1.05em;
+            line-height: 1.4;
+        }
+
+        .brief-title a {
+            font-weight: 800;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.01em;
+            transition: color 0.15s;
+        }
+
+        .brief-title a:hover { color: var(--red); }
+
+        .brief.must-read .brief-title a {
+            color: var(--red-dark);
+        }
+
+        .brief-detail {
+            font-family: var(--font-body);
+            color: var(--text-secondary);
+            margin-bottom: var(--sp-3);
+            line-height: 1.68;
+            font-size: 0.92em;
+        }
+
+        .brief-detail strong {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .brief-detail code {
+            background: var(--black);
+            color: var(--text-inverse);
+            padding: 2px 6px;
+            font-family: var(--font-mono);
+            font-size: 0.88em;
+        }
+
+        .brief-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+            padding-top: var(--sp-3);
+            border-top: 2px solid var(--black);
+            flex-wrap: wrap;
+        }
+
+        .brief-source {
+            font-size: 0.72em;
+            color: var(--text-primary);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.10em;
+        }
+
+        .brief-tags {
+            display: flex;
+            gap: var(--sp-1);
+            flex-wrap: wrap;
+            margin-left: auto;
+        }
+
+        .tag {
+            background: var(--black);
+            color: var(--text-inverse);
+            padding: 2px var(--sp-2);
+            font-size: 0.65em;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            transition: background 0.15s;
+        }
+
+        /* Alternating tag colors */
+        .tag:nth-child(3n+1):hover { background: var(--red); }
+        .tag:nth-child(3n+2):hover { background: var(--blue); }
+        .tag:nth-child(3n+3):hover { background: var(--yellow-dark); color: var(--black); }
+
+        /* ============================================================
+         * MONDRIAN GRID: Decorative composition between sections
+         * ============================================================ */
+        .mondrian {
+            display: grid;
+            grid-template-columns: 3fr 1fr 2fr;
+            grid-template-rows: 30px 30px;
+            gap: 3px;
+            margin: var(--sp-8) 0;
+            background: var(--black);
+            padding: 3px;
+        }
+
+        .mondrian .m-1 { background: var(--red); grid-row: 1 / 3; }
+        .mondrian .m-2 { background: var(--bg-white); }
+        .mondrian .m-3 { background: var(--blue); grid-row: 1 / 3; }
+        .mondrian .m-4 { background: var(--yellow); }
+
+        /* ============================================================
+         * FOOTER: Poster-style tricolor grid
+         * ============================================================ */
+        .footer {
+            margin-top: var(--sp-16);
+        }
+
+        /* Thick separator */
+        .footer-rule {
+            height: 6px;
+            background: var(--black);
+            margin-bottom: 4px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+            background: var(--black);
+            padding: 4px;
+        }
+
+        .footer-block {
+            text-align: center;
+            padding: var(--sp-6) var(--sp-4);
+        }
+
+        .footer-block:nth-child(1) {
+            background: var(--red);
+            color: var(--text-inverse);
+        }
+        .footer-block:nth-child(2) {
+            background: var(--bg-white);
+            color: var(--black);
+        }
+        .footer-block:nth-child(3) {
+            background: var(--blue);
+            color: var(--text-inverse);
+        }
+
+        .footer-number {
+            font-size: 2.5em;
+            font-weight: 900;
+            line-height: 1;
+            display: block;
+            margin-bottom: var(--sp-1);
+        }
+
+        .footer-label {
+            font-size: 0.65em;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+        }
+
+        .footer-meta-row {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: var(--sp-3) var(--sp-4);
+            background: var(--black);
+            color: var(--text-inverse);
+            font-size: 0.72em;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.10em;
+        }
+
+        .footer-tagline {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: var(--sp-3) var(--sp-4);
+            background: var(--yellow);
+            color: var(--black);
+            font-size: 0.90em;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+        }
+
+        /* ============================================================
+         * PRINT / PDF
+         * ============================================================ */
+        @media print {
+            body {
+                background: var(--bg-paper) !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            body::before, body::after { display: none !important; }
+            .container { max-width: 100%; padding: 0; }
+
+            .section { break-inside: avoid-page; }
+            .brief { break-inside: avoid; page-break-inside: avoid; }
+            .brief:hover { transform: none !important; box-shadow: none !important; }
+
+            .header { margin-bottom: var(--sp-8); }
+            .section { margin-bottom: var(--sp-8); }
+
+            a { color: var(--text-primary) !important; }
+            * { animation: none !important; transition: none !important; }
+        }
+
+        /* ============================================================
+         * MOBILE Responsive
+         * ============================================================ */
+        @media (max-width: 768px) {
+            .container { padding: var(--sp-4) var(--sp-3); }
+
+            .header-main {
+                grid-template-columns: 1fr;
+                min-height: auto;
+            }
+
+            .header-left {
+                padding: var(--sp-5) var(--sp-4);
+                flex-direction: row;
+                align-items: center;
+                gap: var(--sp-4);
+            }
+
+            .header-left-title { font-size: 1.8em; }
+
+            .header-center {
+                border-left: none;
+                border-right: none;
+                border-top: 4px solid var(--black);
+                border-bottom: 4px solid var(--black);
+                padding: var(--sp-6) var(--sp-4);
+            }
+
+            .header-center h1 { font-size: 2.5em; }
+
+            .header-right {
+                flex-direction: row;
+                gap: var(--sp-4);
+                padding: var(--sp-4);
+            }
+
+            .header-right .stat-number { font-size: 2.5em; }
+
+            .header-bottom-strip {
+                grid-template-columns: 1fr;
+            }
+
+            .header-bottom-strip .cell-white {
+                border-left: none;
+                border-right: none;
+                border-top: 4px solid var(--black);
+                border-bottom: 4px solid var(--black);
+            }
+
+            .stats-bar { grid-template-columns: 1fr; }
+            .stats-number { font-size: 2em; }
+
+            .section-header { flex-wrap: wrap; }
+            .section-title { font-size: 1.15em; }
+            .section-count { font-size: 1.2em; min-width: 50px; }
+
+            .brief { grid-template-columns: 6px 1fr; }
+            .brief-content { padding: var(--sp-4) var(--sp-3); }
+
+            .mondrian { grid-template-columns: 2fr 1fr; }
+
+            .footer-grid { grid-template-columns: 1fr; }
+            .footer-tagline, .footer-meta-row { grid-column: 1; }
+        }
+
+        @media (max-width: 480px) {
+            .header-center h1 { font-size: 1.8em; }
+            .header-color-strip { height: 16px; }
+            .brief-title a { font-size: 0.92em; }
+            .color-line { height: 4px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- ====== HEADER: Bauhaus Poster Composition ====== -->
+        <header class="header">
+            <!-- Color strip -->
+            <div class="header-color-strip">
+                <div class="strip-red"></div>
+                <div class="strip-yellow"></div>
+                <div class="strip-blue"></div>
+            </div>
+
+            <!-- Main 3-column grid -->
+            <div class="header-main">
+                <!-- Left: Red block -->
+                <div class="header-left">
+                    <div class="header-left-title">NEWS<br>LOOM</div>
+                    <div class="header-left-sub">Form Follows Function</div>
+                </div>
+
+                <!-- Center: White with giant title -->
+                <div class="header-center">
+                    <h1>Bauhaus<br>Brief</h1>
+                    <div class="tagline">Intelligence Through Design</div>
+                    <div class="date-line">{{ date_str }}</div>
+                </div>
+
+                <!-- Right: Blue block -->
+                <div class="header-right">
+                    <span class="stat-number">{{ total_items }}</span>
+                    <span class="stat-label">Items<br>Curated</span>
+                </div>
+            </div>
+
+            <!-- Bottom info strip -->
+            <div class="header-bottom-strip">
+                <div class="cell cell-yellow">{{ generated_time }}</div>
+                <div class="cell cell-black">AI-Curated Intelligence</div>
+                <div class="cell cell-white">
+                    {% set must_count = [] %}
+                    {% for section in section_order %}
+                    {% if section in briefs %}
+                    {% for brief in briefs[section] %}
+                    {% if brief.priority == '🔴' %}
+                    {% set _ = must_count.append(1) %}
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
+                    {% endfor %}
+                    {{ must_count|length }} Critical Items
+                </div>
+            </div>
+        </header>
+
+        <!-- ====== STATS BAR ====== -->
+        <div class="stats-bar">
+            <div class="stats-block">
+                <span class="stats-number">{{ total_items }}</span>
+                <span class="stats-label">Total Items</span>
+            </div>
+            <div class="stats-block">
+                <span class="stats-number">{{ must_count|length }}</span>
+                <span class="stats-label">Critical</span>
+            </div>
+            <div class="stats-block">
+                <span class="stats-number">{{ section_order|length }}</span>
+                <span class="stats-label">Sections</span>
+            </div>
+        </div>
+
+        <!-- ====== EXECUTIVE SUMMARY ====== -->
+        {% if executive_summary %}
+        <section class="exec-summary">
+            <div class="exec-top-bar">
+                <div class="bar-red"></div>
+                <div class="bar-yellow"></div>
+                <div class="bar-blue"></div>
+            </div>
+            <div class="exec-content">
+                <div class="exec-stripe-left"></div>
+                <div class="exec-body">
+                    <div class="exec-label">◉ Executive Overview</div>
+                    <h2 class="exec-title">Summary</h2>
+                    <div class="exec-text">
+                        {% for line in executive_summary.strip().split('\n') %}
+                        {% if line.strip() %}
+                        <p>{{ line.strip() | md_inline }}</p>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="exec-stripe-right"></div>
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- ====== GEOMETRIC DECORATION ====== -->
+        <div class="geo-decoration">
+            <div class="geo-circle-lg"></div>
+            <div class="geo-square-lg"></div>
+            <div class="geo-triangle-lg"></div>
+        </div>
+
+        <!-- ====== SECTIONS ====== -->
+        <main>
+            {% for section in section_order %}
+            {% if section in briefs and briefs[section] %}
+            {% set meta = section_configs.get(section, {}) %}
+            {% set section_briefs = briefs[section] %}
+
+            <section class="section">
+                <header class="section-header">
+                    <span class="section-emoji">{{ meta.emoji|default('📌') }}</span>
+                    <h2 class="section-title">{{ meta.get('title', section|title)|upper }}</h2>
+                    <span class="section-count">{{ section_briefs|length }}</span>
+                </header>
+
+                {% for brief in section_briefs %}
+                {% set priority_class = 'must-read' if brief.priority == '🔴' else ('recommended' if brief.priority == '🟡' else 'fyi') %}
+
+                <article class="brief {{ priority_class }}">
+                    <div class="brief-bar"></div>
+                    <div class="brief-content">
+                        <div class="brief-header">
+                            <div class="priority-shape"></div>
+                            <div class="brief-title">
+                                <a href="{{ brief.url }}" target="_blank">{{ brief.headline }}</a>
+                            </div>
+                        </div>
+
+                        {% if brief.detail %}
+                        <div class="brief-detail">
+                            {{ brief.detail | md_inline }}
+                        </div>
+                        {% endif %}
+
+                        <div class="brief-meta">
+                            {% if brief.source %}
+                            <span class="brief-source">{{ brief.source }}</span>
+                            {% endif %}
+                            {% if brief.tags %}
+                            <div class="brief-tags">
+                                {% for tag in brief.tags %}
+                                <span class="tag">{{ tag }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </section>
+
+            {% if not loop.last %}
+            <!-- Mondrian-style decorative grid -->
+            <div class="mondrian">
+                <div class="m-1"></div>
+                <div class="m-2"></div>
+                <div class="m-3"></div>
+                <div class="m-4"></div>
+            </div>
+            {% endif %}
+
+            {% endif %}
+            {% endfor %}
+        </main>
+
+        <!-- ====== GEOMETRIC DECORATION ====== -->
+        <div class="color-line">
+            <div class="cl-red"></div>
+            <div class="cl-yellow"></div>
+            <div class="cl-blue"></div>
+        </div>
+
+        <!-- ====== FOOTER ====== -->
+        <footer class="footer">
+            <div class="footer-rule"></div>
+            <div class="footer-grid">
+                <div class="footer-block">
+                    <span class="footer-number">{{ total_items }}</span>
+                    <span class="footer-label">Items</span>
+                </div>
+                <div class="footer-block">
+                    <span class="footer-number">{{ must_count|length }}</span>
+                    <span class="footer-label">Critical</span>
+                </div>
+                <div class="footer-block">
+                    <span class="footer-number">{{ section_order|length }}</span>
+                    <span class="footer-label">Sections</span>
+                </div>
+                <div class="footer-meta-row">
+                    Generated {{ generated_time }} · AI-Curated · {{ date_str }}
+                </div>
+                <div class="footer-tagline">
+                    ◉ Form = Function · Bauhaus Newsloom ▲
+                </div>
+            </div>
+        </footer>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,17 @@
+name: "Goldman Sachs"
+description: "Goldman Sachs corporate style with pure white background and deep blue brand colors"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "light"
+features:
+  - "Pure white #FFFFFF background for professional clarity"
+  - "Deep blue #10259E Goldman Sachs brand color"
+  - "Serif typography (Georgia) for authoritative tone"
+  - "Professional and serious aesthetic"
+  - "Fine gray line separators for structure"
+  - "Data table-inspired layout"
+category: "finance"
+color_scheme:
+  primary: "#FFFFFF"
+  accent: "#10259E"
+  text: "#1A1A1A"

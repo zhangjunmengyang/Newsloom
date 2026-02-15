@@ -1,0 +1,18 @@
+name: "Crypto Neon"
+description: "Cryptocurrency themed design with dark background, neon green and pink accents, and futuristic aesthetics"
+version: "1.0.0"
+author: "Newsloom Template Factory"  
+theme: "dark"
+features:
+  - "Near pure black #0A0A0F background for cyberpunk feel"
+  - "Neon green #00FF88 primary accent color"
+  - "Pink purple #FF00FF secondary accent"
+  - "Glitch effects and digital aesthetics"
+  - "Crypto token symbols as decorative elements"
+  - "Futuristic Web3 inspired design"
+category: "finance"
+color_scheme:
+  primary: "#0A0A0F"
+  accent: "#00FF88"
+  secondary: "#FF00FF"
+  text: "#FFFFFF"

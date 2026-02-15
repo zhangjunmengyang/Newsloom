@@ -1,0 +1,13 @@
+name: "vintage-newspaper"
+description: "复古报纸风格 — 老旧纸张色背景配深棕文字，CSS噪点纹理，经典两栏排版，首字母下沉效果，哥特式标题字体，怀旧新闻报刊美学"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "light"
+features:
+  - "老旧纸张质感背景"
+  - "经典两栏报纸排版"
+  - "哥特式标题字体"
+  - "首字母下沉装饰"
+  - "A4 PDF 优化"
+  - "CJK 字体支持"
+  - "三级优先级视觉"

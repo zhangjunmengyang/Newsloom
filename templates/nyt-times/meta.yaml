@@ -1,0 +1,12 @@
+name: "New York Times"
+description: "Classic newspaper design inspired by the New York Times with elegant serif typography and traditional three-column layout"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "light"
+features:
+  - "Classic serif typography (Georgia/Times)"
+  - "Traditional newspaper layout"
+  - "Double rule separators"
+  - "Three-column design"
+  - "Elegant letter spacing"
+  - "PDF-optimized"

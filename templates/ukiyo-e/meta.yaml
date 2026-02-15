@@ -1,0 +1,12 @@
+name: "Ukiyo-e"
+description: "Japanese ukiyo-e woodblock print inspired template with traditional aesthetics and wave patterns"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "light"
+features:
+  - "Washi paper beige #F5E6D0"
+  - "Hokusai blue #2B4B6F accent"
+  - "Traditional red #C53D43"
+  - "Woodblock print aesthetics"
+  - "Wave pattern decorations"
+  - "Japanese design language"

@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Strategy& Intelligence · {{ date_str }}</title>
+<style>
+/* ============================================================
+ * STRATEGY PLUS — Strategy& (PwC) Strategic Intelligence Report
+ * ────────────────────────────────────────────────────────────
+ * Visual narrative: White base + PwC Orange #D04A02 + Deep Gray
+ * Diagonal stripe pattern · Triangle decorations · Bar chart metrics
+ * Strategic Implication boxes · Matrix/Quadrant decorations
+ * PwC disclaimer footer · ~1200 lines
+ * ============================================================ */
+
+/* ---------- Reset ---------- */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ---------- Page (PDF) ---------- */
+@page {
+    size: A4;
+    margin: 2.2cm 2cm;
+    @bottom-center {
+        content: "Strategy& Intelligence — Confidential — Page " counter(page);
+        font-size: 7.5pt;
+        color: #999;
+        font-family: "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    }
+}
+
+/* ---------- Body: Diagonal Stripe Texture ---------- */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                 "PingFang SC", "Noto Sans SC", "Microsoft YaHei",
+                 "Hiragino Sans GB", sans-serif;
+    color: #1E1E1E;
+    font-size: 15px;
+    line-height: 1.78;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    background-color: #FAFAFA;
+    background-image:
+        /* Subtle diagonal stripes */
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 40px,
+            rgba(208, 74, 2, 0.018) 40px,
+            rgba(208, 74, 2, 0.018) 41px
+        ),
+        repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 80px,
+            rgba(208, 74, 2, 0.008) 80px,
+            rgba(208, 74, 2, 0.008) 81px
+        ),
+        /* Vertical fade */
+        linear-gradient(180deg, #F8F8F8 0%, #FFFFFF 4%, #FFFFFF 96%, #F5F5F5 100%);
+}
+
+a { color: #D04A02; text-decoration: none; transition: opacity 0.2s; }
+a:hover { opacity: 0.75; }
+
+/* ---------- Layout Container ---------- */
+.report-wrap {
+    max-width: 840px;
+    margin: 0 auto;
+    padding: 0;
+}
+
+/* ============================================================
+ * HEADER — Full-width PwC orange band with triangle decorations
+ * ============================================================ */
+.pwc-header {
+    position: relative;
+    background: linear-gradient(145deg, #D04A02 0%, #B33F02 55%, #8C3201 100%);
+    color: #FFFFFF;
+    padding: 80px 56px 64px;
+    overflow: hidden;
+    margin-bottom: 0;
+}
+
+/* Large triangle — top-right */
+.pwc-header::before {
+    content: '';
+    position: absolute;
+    top: -10px; right: 30px;
+    width: 0; height: 0;
+    border-left: 70px solid transparent;
+    border-right: 70px solid transparent;
+    border-bottom: 120px solid rgba(255,255,255,0.05);
+    pointer-events: none;
+}
+
+/* Medium triangle — bottom-left */
+.pwc-header::after {
+    content: '';
+    position: absolute;
+    bottom: 10px; left: 40px;
+    width: 0; height: 0;
+    border-left: 45px solid transparent;
+    border-right: 45px solid transparent;
+    border-bottom: 78px solid rgba(255,255,255,0.035);
+    pointer-events: none;
+}
+
+/* Small triangle cluster — decorative */
+.header-tri-cluster {
+    position: absolute;
+    top: 30px; right: 180px;
+    width: 0; height: 0;
+    border-left: 22px solid transparent;
+    border-right: 22px solid transparent;
+    border-bottom: 38px solid rgba(255,255,255,0.06);
+    pointer-events: none;
+}
+
+.header-eyebrow {
+    font-size: 0.65em;
+    font-weight: 700;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    opacity: 0.65;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 2;
+}
+
+.header-title {
+    font-size: 2.8em;
+    font-weight: 100;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 8px;
+    position: relative;
+    z-index: 2;
+}
+
+.header-title b {
+    font-weight: 800;
+}
+
+.header-subtitle {
+    font-size: 1.05em;
+    font-weight: 300;
+    opacity: 0.8;
+    letter-spacing: 0.02em;
+    margin-bottom: 28px;
+    position: relative;
+    z-index: 2;
+}
+
+.header-date-line {
+    font-size: 0.72em;
+    opacity: 0.55;
+    letter-spacing: 0.12em;
+    font-weight: 500;
+    position: relative;
+    z-index: 2;
+}
+
+/* Orange arrow pointing down after header */
+.header-arrow {
+    text-align: center;
+    background: linear-gradient(180deg, #D04A02 0%, transparent 100%);
+    padding-bottom: 36px;
+}
+
+.header-arrow-inner {
+    display: inline-block;
+    width: 0; height: 0;
+    border-left: 14px solid transparent;
+    border-right: 14px solid transparent;
+    border-top: 14px solid rgba(255,255,255,0.5);
+}
+
+/* ============================================================
+ * CONTENT BODY
+ * ============================================================ */
+.content-body {
+    padding: 48px 56px 60px;
+}
+
+/* ============================================================
+ * KEY METRICS STRIP — Bar chart style data visualization
+ * ============================================================ */
+.metrics-strip {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 24px 0 28px;
+    border-top: 3px solid #1E1E1E;
+    border-bottom: 1px solid #E0E0E0;
+    margin-bottom: 48px;
+    gap: 16px;
+}
+
+.metric-cell {
+    flex: 1;
+    text-align: center;
+    position: relative;
+}
+
+.metric-cell + .metric-cell::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 10%;
+    width: 1px; height: 80%;
+    background: #E8E8E8;
+}
+
+.metric-number {
+    font-size: 2.6em;
+    font-weight: 200;
+    line-height: 1;
+    color: #1E1E1E;
+}
+
+.metric-number.is-accent { color: #D04A02; font-weight: 300; }
+
+.metric-caption {
+    font-size: 0.58em;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #888;
+    margin-top: 6px;
+}
+
+/* Mini bar under each metric */
+.metric-mini-bar {
+    width: 70%;
+    height: 3px;
+    background: #ECECEC;
+    margin: 10px auto 0;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.metric-mini-fill {
+    height: 100%;
+    background: #D04A02;
+    border-radius: 2px;
+    transition: width 0.6s ease;
+}
+
+/* ============================================================
+ * EXECUTIVE SUMMARY — Orange-topped strategic box
+ * ============================================================ */
+.exec-summary {
+    position: relative;
+    background:
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 20px,
+            rgba(208,74,2,0.008) 20px,
+            rgba(208,74,2,0.008) 21px
+        ),
+        linear-gradient(180deg, #FEFCFA 0%, #FFFFFF 100%);
+    border: 1px solid #EDE8E4;
+    padding: 40px 36px 36px;
+    margin-bottom: 56px;
+}
+
+.exec-summary::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #D04A02, #E8690F, #D04A02);
+}
+
+/* Triangle accent inside summary */
+.exec-summary::after {
+    content: '';
+    position: absolute;
+    top: 16px; right: 24px;
+    width: 0; height: 0;
+    border-left: 18px solid transparent;
+    border-right: 18px solid transparent;
+    border-bottom: 31px solid rgba(208,74,2,0.04);
+    pointer-events: none;
+}
+
+.exec-label {
+    font-size: 0.62em;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #D04A02;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.exec-label::before,
+.exec-label::after {
+    content: '—';
+    margin: 0 8px;
+    opacity: 0.3;
+}
+
+.exec-text {
+    font-size: 0.98em;
+    line-height: 2;
+    color: #444;
+}
+
+.exec-text p {
+    margin-bottom: 14px;
+    text-indent: 0;
+}
+
+.exec-text p:last-child { margin-bottom: 0; }
+
+.exec-text strong {
+    color: #D04A02;
+    font-weight: 600;
+}
+
+/* ============================================================
+ * QUADRANT MATRIX DECORATION — Appears before sections
+ * ============================================================ */
+.quadrant-matrix {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    width: 100px;
+    height: 68px;
+    margin: 0 auto 40px;
+    gap: 2px;
+    opacity: 0.12;
+}
+
+.q-cell {
+    border: 1.5px solid #1E1E1E;
+}
+
+.q-cell.q-fill {
+    background: rgba(208,74,2,0.25);
+}
+
+/* Axis labels for quadrant */
+.quadrant-wrapper {
+    position: relative;
+    width: 120px;
+    margin: 0 auto 48px;
+    text-align: center;
+}
+
+.q-axis-x, .q-axis-y {
+    font-size: 0.48em;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #BBB;
+    position: absolute;
+}
+
+.q-axis-x {
+    bottom: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.q-axis-y {
+    top: 50%;
+    left: -32px;
+    transform: translateY(-50%) rotate(-90deg);
+}
+
+/* ============================================================
+ * SECTION CONTAINER — Numbered with bar chart indicator
+ * ============================================================ */
+.intel-section {
+    margin-bottom: 56px;
+    page-break-inside: avoid;
+}
+
+.section-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding-bottom: 18px;
+    border-bottom: 2.5px solid #1E1E1E;
+    margin-bottom: 6px;
+    position: relative;
+}
+
+/* Section number box */
+.sec-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px; height: 42px;
+    flex-shrink: 0;
+    font-size: 0.92em;
+    font-weight: 700;
+    border: 2.5px solid #D04A02;
+    color: #D04A02;
+    line-height: 1;
+}
+
+.sec-info { flex: 1; min-width: 0; }
+
+.sec-title {
+    font-size: 1.5em;
+    font-weight: 300;
+    color: #1E1E1E;
+    line-height: 1.3;
+    margin-bottom: 4px;
+}
+
+.sec-count {
+    font-size: 0.6em;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #999;
+}
+
+/* Color identity strip */
+.sec-color-strip {
+    height: 3px;
+    border-radius: 2px;
+    margin-top: 6px;
+    opacity: 0.7;
+}
+
+/* ── Bar chart visualization (right side of section header) ── */
+.sec-bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 36px;
+    flex-shrink: 0;
+    padding-top: 6px;
+}
+
+.bar-col {
+    width: 7px;
+    border-radius: 1px 1px 0 0;
+    min-height: 4px;
+}
+
+/* ============================================================
+ * SECTION STATS ROW — Input → Output funnel
+ * ============================================================ */
+.sec-stats-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0 14px;
+    border-bottom: 1px dashed #E8E8E8;
+    margin-bottom: 4px;
+    font-size: 0.68em;
+    color: #AAA;
+    letter-spacing: 0.05em;
+}
+
+.sec-stat-label {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.sec-stat-val {
+    color: #666;
+    font-weight: 600;
+}
+
+.sec-stat-arrow {
+    color: #D04A02;
+    font-weight: 700;
+}
+
+/* ============================================================
+ * BRIEF ITEM — Consulting-grade intelligence entry
+ * ============================================================ */
+.brief-item {
+    padding: 22px 0 20px;
+    border-bottom: 1px solid #F0F0F0;
+    position: relative;
+    page-break-inside: avoid;
+    transition: background 0.15s;
+}
+
+.brief-item:last-child { border-bottom: none; }
+.brief-item:hover { background: #FDFCFB; }
+
+/* Priority left accent bar */
+.brief-item::after {
+    content: '';
+    position: absolute;
+    left: -24px; top: 22px;
+    width: 3px;
+    height: 0;
+    border-radius: 2px;
+}
+
+.brief-item.p-critical::after {
+    height: 42px;
+    background: #D04A02;
+}
+
+.brief-item.p-high::after {
+    height: 32px;
+    background: #E8860C;
+    opacity: 0.7;
+}
+
+.brief-item.p-normal::after {
+    height: 20px;
+    background: #CCC;
+    opacity: 0.3;
+}
+
+/* Critical item highlight */
+.brief-item.p-critical {
+    background: rgba(208,74,2,0.02);
+    margin-left: -16px;
+    padding-left: 16px;
+    margin-right: -16px;
+    padding-right: 16px;
+    border-radius: 2px;
+}
+
+/* Priority badge */
+.priority-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.56em;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 2px;
+    margin-bottom: 8px;
+}
+
+.priority-badge.badge-critical {
+    background: rgba(208,74,2,0.08);
+    color: #D04A02;
+}
+
+.priority-badge.badge-high {
+    background: rgba(232,134,12,0.08);
+    color: #C07008;
+}
+
+/* Headline */
+.brief-headline {
+    font-size: 1.15em;
+    font-weight: 400;
+    line-height: 1.45;
+    margin-bottom: 6px;
+}
+
+.brief-headline a {
+    color: #1E1E1E;
+    border-bottom: 1px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.brief-headline a:hover {
+    color: #D04A02;
+    border-bottom-color: rgba(208,74,2,0.3);
+    opacity: 1;
+}
+
+.brief-item.p-critical .brief-headline a {
+    color: #D04A02;
+    font-weight: 500;
+}
+
+/* Meta line */
+.brief-meta-line {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.75em;
+    color: #999;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.meta-source {
+    font-weight: 700;
+    color: #666;
+}
+
+.meta-sep { color: #DDD; }
+
+.meta-tag {
+    color: #AAA;
+    font-size: 0.92em;
+}
+
+/* Detail text */
+.brief-detail-text {
+    font-size: 0.95em;
+    line-height: 1.9;
+    color: #555;
+}
+
+.brief-detail-text strong {
+    color: #1E1E1E;
+    font-weight: 600;
+}
+
+.brief-detail-text code {
+    font-family: "SF Mono", "Consolas", "Liberation Mono", monospace;
+    background: #F5F3F0;
+    color: #D04A02;
+    padding: 1px 6px;
+    font-size: 0.88em;
+    border: 1px solid #EDE8E4;
+    border-radius: 2px;
+}
+
+/* ============================================================
+ * STRATEGIC IMPLICATION BOX — Orange accent for critical items
+ * ============================================================ */
+.strat-implication {
+    position: relative;
+    background:
+        linear-gradient(135deg, rgba(208,74,2,0.04) 0%, rgba(208,74,2,0.01) 100%);
+    border-left: 3px solid #D04A02;
+    padding: 14px 18px;
+    margin-top: 12px;
+}
+
+/* Small triangle decoration */
+.strat-implication::before {
+    content: '';
+    position: absolute;
+    top: 8px; right: 12px;
+    width: 0; height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 14px solid rgba(208,74,2,0.06);
+    pointer-events: none;
+}
+
+.strat-imp-label {
+    font-size: 0.58em;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #D04A02;
+    margin-bottom: 4px;
+}
+
+.strat-imp-body {
+    font-size: 0.85em;
+    line-height: 1.7;
+    color: #666;
+    font-style: italic;
+}
+
+/* ============================================================
+ * SECTION TRANSITION — Diamond separator
+ * ============================================================ */
+.section-divider {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.section-divider::before {
+    content: '';
+    display: inline-block;
+    width: 9px; height: 9px;
+    border: 1.5px solid #CCC;
+    transform: rotate(45deg);
+    opacity: 0.5;
+}
+
+/* ============================================================
+ * SECTION OVERVIEW BAR CHART — Visual dashboard before content
+ * ============================================================ */
+.overview-dashboard {
+    margin-bottom: 48px;
+    padding: 28px 0 24px;
+    border-top: 2px solid #1E1E1E;
+    border-bottom: 1px solid #E8E8E8;
+}
+
+.overview-title {
+    font-size: 0.58em;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #AAA;
+    margin-bottom: 18px;
+    text-align: center;
+}
+
+.overview-bars {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 24px;
+    height: 80px;
+    padding: 0 20px;
+}
+
+.overview-bar-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    max-width: 100px;
+}
+
+.overview-bar-track {
+    width: 100%;
+    height: 60px;
+    display: flex;
+    align-items: flex-end;
+}
+
+.overview-bar-fill {
+    width: 100%;
+    border-radius: 2px 2px 0 0;
+    min-height: 4px;
+    transition: height 0.5s ease;
+}
+
+.overview-bar-label {
+    font-size: 0.5em;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #AAA;
+    text-align: center;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 90px;
+}
+
+.overview-bar-val {
+    font-size: 0.72em;
+    font-weight: 600;
+    color: #666;
+}
+
+/* ============================================================
+ * FOOTER — PwC-style disclaimer & contact
+ * ============================================================ */
+.pwc-footer {
+    position: relative;
+    text-align: center;
+    padding: 56px 56px 48px;
+    margin-top: 0;
+}
+
+.pwc-footer::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 56px; right: 56px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #DDD 20%, #DDD 80%, transparent);
+}
+
+/* Triangle above footer brand */
+.footer-tri {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.footer-tri::after {
+    content: '';
+    display: inline-block;
+    width: 0; height: 0;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-bottom: 20px solid #D04A02;
+    opacity: 0.25;
+}
+
+.footer-brand-name {
+    font-size: 0.95em;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #D04A02;
+    margin-bottom: 4px;
+}
+
+.footer-tagline {
+    font-size: 0.82em;
+    color: #999;
+    font-weight: 300;
+    font-style: italic;
+    margin-bottom: 24px;
+}
+
+.footer-contacts {
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+}
+
+.footer-contact-item { text-align: center; }
+
+.footer-contact-key {
+    font-size: 0.52em;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #BBB;
+}
+
+.footer-contact-val {
+    font-size: 0.8em;
+    color: #666;
+    font-weight: 400;
+}
+
+.footer-gen-time {
+    font-size: 0.72em;
+    color: #BBB;
+    margin-bottom: 20px;
+}
+
+/* Disclaimer text */
+.footer-disclaimer-text {
+    font-size: 0.6em;
+    color: #BBB;
+    max-width: 520px;
+    margin: 0 auto;
+    line-height: 1.65;
+    padding-top: 16px;
+    border-top: 1px solid #ECECEC;
+}
+
+/* PwC-style bottom bar */
+.footer-bottom-bar {
+    margin-top: 28px;
+    padding-top: 12px;
+    border-top: 3px solid #D04A02;
+    font-size: 0.52em;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #CCC;
+}
+
+/* ============================================================
+ * PRINT OVERRIDES
+ * ============================================================ */
+@media print {
+    body {
+        background: white !important;
+        font-size: 11pt;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .report-wrap { max-width: 100%; }
+
+    .pwc-header {
+        padding: 36pt 28pt 28pt;
+        -webkit-print-color-adjust: exact !important;
+    }
+
+    .content-body { padding: 24pt 0; }
+    .pwc-footer { padding: 24pt 0 12pt; }
+
+    .brief-item:hover { background: transparent !important; }
+    .brief-item.p-critical { margin-left: 0; margin-right: 0; }
+
+    a { color: #1E1E1E !important; }
+    a[href]::after { content: none !important; }
+
+    .intel-section { page-break-inside: avoid; }
+    .brief-item { page-break-inside: avoid; }
+
+    .header-arrow { display: none; }
+    .overview-bars { height: 50px; }
+}
+
+/* ============================================================
+ * RESPONSIVE
+ * ============================================================ */
+@media (max-width: 768px) {
+    .pwc-header {
+        padding: 48px 24px 40px;
+    }
+
+    .pwc-header::before,
+    .pwc-header::after,
+    .header-tri-cluster { display: none; }
+
+    .content-body { padding: 28px 20px 36px; }
+    .pwc-footer { padding: 28px 20px 24px; }
+    .pwc-footer::before { left: 20px; right: 20px; }
+
+    .header-title { font-size: 2em; }
+
+    .metrics-strip { flex-wrap: wrap; gap: 12px; }
+    .metric-cell + .metric-cell::before { display: none; }
+    .metric-number { font-size: 2em; }
+
+    .section-head { flex-wrap: wrap; }
+    .sec-bar-chart { display: none; }
+    .sec-num { width: 34px; height: 34px; font-size: 0.8em; }
+
+    .brief-item::after { left: -12px; }
+    .brief-item.p-critical { margin-left: -8px; padding-left: 8px; margin-right: -8px; padding-right: 8px; }
+
+    .overview-bars { gap: 12px; flex-wrap: wrap; height: auto; }
+    .overview-bar-group { max-width: 60px; }
+
+    .footer-contacts { flex-direction: column; gap: 14px; }
+}
+
+@media (max-width: 480px) {
+    .header-title { font-size: 1.6em; }
+    .pwc-header { padding: 32px 16px 28px; }
+    .content-body { padding: 20px 14px 24px; }
+    .exec-summary { padding: 24px 18px 20px; }
+    .exec-summary::after { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="report-wrap">
+
+    <!-- ====== HEADER: Full-width orange band + triangle decorations ====== -->
+    <header class="pwc-header">
+        <div class="header-tri-cluster"></div>
+        <div class="header-eyebrow">Confidential · Strategy& Intelligence</div>
+        <h1 class="header-title"><b>STRATEGY&</b> INTELLIGENCE</h1>
+        <div class="header-subtitle">Strategic intelligence for decisive leadership</div>
+        <div class="header-date-line">{{ date_str }} · Prepared for Executive Review</div>
+    </header>
+
+    <!-- Arrow accent -->
+    <div class="header-arrow"><div class="header-arrow-inner"></div></div>
+
+    <!-- ====== CONTENT BODY ====== -->
+    <div class="content-body">
+
+        <!-- ── KEY METRICS: Bar chart style ── -->
+        {%- set ns = namespace(critical=0, high=0) -%}
+        {%- for section_key, items in briefs.items() -%}
+            {%- if items is iterable and items is not string -%}
+                {%- for item in items -%}
+                    {%- if item.priority == '🔴' -%}
+                        {%- set ns.critical = ns.critical + 1 -%}
+                    {%- elif item.priority == '🟡' -%}
+                        {%- set ns.high = ns.high + 1 -%}
+                    {%- endif -%}
+                {%- endfor -%}
+            {%- endif -%}
+        {%- endfor -%}
+
+        <div class="metrics-strip">
+            <div class="metric-cell">
+                <div class="metric-number">{{ total_items }}</div>
+                <div class="metric-caption">Total Insights</div>
+                <div class="metric-mini-bar">
+                    <div class="metric-mini-fill" style="width: 100%;"></div>
+                </div>
+            </div>
+            <div class="metric-cell">
+                <div class="metric-number is-accent">{{ ns.critical }}</div>
+                <div class="metric-caption">Critical</div>
+                <div class="metric-mini-bar">
+                    <div class="metric-mini-fill" style="width: {% if total_items > 0 %}{{ (ns.critical * 100 / total_items)|round|int }}{% else %}0{% endif %}%;"></div>
+                </div>
+            </div>
+            <div class="metric-cell">
+                <div class="metric-number">{{ ns.high }}</div>
+                <div class="metric-caption">High Priority</div>
+                <div class="metric-mini-bar">
+                    <div class="metric-mini-fill" style="width: {% if total_items > 0 %}{{ (ns.high * 100 / total_items)|round|int }}{% else %}0{% endif %}%;"></div>
+                </div>
+            </div>
+            <div class="metric-cell">
+                <div class="metric-number">{{ briefs|length }}</div>
+                <div class="metric-caption">Sectors</div>
+                <div class="metric-mini-bar">
+                    <div class="metric-mini-fill" style="width: 60%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── EXECUTIVE SUMMARY ── -->
+        {% if executive_summary %}
+        <div class="exec-summary">
+            <div class="exec-label">Key Strategic Insights</div>
+            <div class="exec-text">
+                {% for line in executive_summary.strip().split('\n') %}
+                {% if line.strip() %}
+                <p>{{ line.strip() | md_inline }}</p>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ── QUADRANT MATRIX DECORATION ── -->
+        <div class="quadrant-wrapper">
+            <div class="quadrant-matrix">
+                <div class="q-cell q-fill"></div>
+                <div class="q-cell"></div>
+                <div class="q-cell"></div>
+                <div class="q-cell q-fill"></div>
+            </div>
+            <div class="q-axis-x">IMPACT</div>
+            <div class="q-axis-y">URGENCY</div>
+        </div>
+
+        <!-- ── SECTION OVERVIEW DASHBOARD: Bar chart ── -->
+        {%- set ns_active = namespace(count=0) -%}
+        {%- for sk in section_order -%}
+            {%- if sk in briefs and briefs[sk] is iterable and briefs[sk] is not string and briefs[sk]|length > 0 -%}
+                {%- set ns_active.count = ns_active.count + 1 -%}
+            {%- endif -%}
+        {%- endfor -%}
+
+        {% if ns_active.count > 1 %}
+        <div class="overview-dashboard">
+            <div class="overview-title">Section Intelligence Distribution</div>
+            <div class="overview-bars">
+                {%- set ns_max = namespace(val=1) -%}
+                {%- for sk in section_order -%}
+                    {%- if sk in briefs and briefs[sk] is iterable and briefs[sk] is not string -%}
+                        {%- if briefs[sk]|length > ns_max.val -%}
+                            {%- set ns_max.val = briefs[sk]|length -%}
+                        {%- endif -%}
+                    {%- endif -%}
+                {%- endfor -%}
+                {% for sk in section_order %}
+                {% if sk in briefs and briefs[sk] is iterable and briefs[sk] is not string and briefs[sk]|length > 0 %}
+                {%- set smeta = section_configs.get(sk, {}) -%}
+                {%- set scolor = smeta.color|default('#D04A02') -%}
+                {%- set scount = briefs[sk]|length -%}
+                {%- set bar_pct = (scount * 100 / ns_max.val)|round|int -%}
+                <div class="overview-bar-group">
+                    <div class="overview-bar-val">{{ scount }}</div>
+                    <div class="overview-bar-track">
+                        <div class="overview-bar-fill" style="height: {{ bar_pct }}%; background: {{ scolor }};"></div>
+                    </div>
+                    <div class="overview-bar-label">{{ smeta.title|default(sk|title) }}</div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ====== SECTIONS ====== -->
+        {%- set ns_sec = namespace(idx=0) -%}
+        {% for section_key in section_order %}
+        {% if section_key in briefs and briefs[section_key] is iterable and briefs[section_key] is not string and briefs[section_key]|length > 0 %}
+        {%- set ns_sec.idx = ns_sec.idx + 1 -%}
+        {%- set meta = section_configs.get(section_key, {}) -%}
+        {%- set section_color = meta.color|default('#D04A02') -%}
+        {%- set items = briefs[section_key] -%}
+        {%- set sec_stats = stats.get('sections', {}).get(section_key, {}) if stats else {} -%}
+
+        <section class="intel-section">
+            <!-- Section header -->
+            <div class="section-head">
+                <div class="sec-num" style="border-color: {{ section_color }}; color: {{ section_color }};">
+                    {{ '%02d' | format(ns_sec.idx) }}
+                </div>
+                <div class="sec-info">
+                    <h2 class="sec-title">{{ meta.title|default(section_key|title) }}</h2>
+                    <div class="sec-count">{{ items|length }} item{{ 's' if items|length != 1 else '' }} analyzed</div>
+                    <div class="sec-color-strip" style="background: linear-gradient(90deg, {{ section_color }}, transparent); width: {{ [items|length * 22, 200]|min }}px;"></div>
+                </div>
+                <!-- Mini bar chart visualization -->
+                <div class="sec-bar-chart">
+                    {% for item in items %}
+                    {%- set bh = 36 if item.priority|default('🟢') == '🔴' else (24 if item.priority|default('🟢') == '🟡' else 10) -%}
+                    <div class="bar-col" style="height: {{ bh }}px; background: {{ section_color }};{% if item.priority|default('🟢') != '🔴' %} opacity: {{ 0.55 if item.priority|default('🟢') == '🟡' else 0.22 }};{% endif %}"></div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Funnel stats row -->
+            {% if sec_stats %}
+            <div class="sec-stats-row">
+                <span class="sec-stat-label">Sources</span>
+                <span class="sec-stat-val">{{ sec_stats.get('input', '—') }}</span>
+                <span class="sec-stat-arrow">→</span>
+                <span class="sec-stat-label">Ranked</span>
+                <span class="sec-stat-val">{{ sec_stats.get('after_fine_rank', '—') }}</span>
+                <span class="sec-stat-arrow">→</span>
+                <span class="sec-stat-label">Output</span>
+                <span class="sec-stat-val" style="color: {{ section_color }};">{{ sec_stats.get('output', '—') }}</span>
+            </div>
+            {% endif %}
+
+            <!-- Brief items -->
+            {% for item in items %}
+            {%- set priority = item.priority|default('🟢') -%}
+            {%- set p_cls = 'p-critical' if priority == '🔴' else ('p-high' if priority == '🟡' else 'p-normal') -%}
+            <div class="brief-item {{ p_cls }}">
+                {% if priority == '🔴' %}
+                <div class="priority-badge badge-critical">▲ Critical Insight</div>
+                {% elif priority == '🟡' %}
+                <div class="priority-badge badge-high">◆ High Priority</div>
+                {% endif %}
+
+                <h3 class="brief-headline">
+                    <a href="{{ item.url|default('#') }}" target="_blank" rel="noopener">{{ item.headline|default('Untitled') }}</a>
+                </h3>
+
+                <div class="brief-meta-line">
+                    {% if item.source %}
+                    <span class="meta-source">{{ item.source }}</span>
+                    {% endif %}
+                    {% if item.tags %}
+                    <span class="meta-sep">·</span>
+                    {% for tag in item.tags %}
+                    <span class="meta-tag">{{ tag }}{% if not loop.last %} ·{% endif %}</span>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+
+                {% if item.detail %}
+                <div class="brief-detail-text">{{ item.detail | md_inline }}</div>
+                {% endif %}
+
+                {% if priority == '🔴' %}
+                <div class="strat-implication">
+                    <div class="strat-imp-label">Strategic Implication</div>
+                    <div class="strat-imp-body">
+                        This development warrants executive attention. Monitor for cascading impact across adjacent portfolios and recalibrate strategic positioning as the situation evolves.
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </section>
+
+        {% if not loop.last %}
+        {%- set next_has = namespace(found=false) -%}
+        {%- for remaining_key in section_order[loop.index:] -%}
+            {%- if remaining_key in briefs and briefs[remaining_key] is iterable and briefs[remaining_key] is not string and briefs[remaining_key]|length > 0 -%}
+                {%- set next_has.found = true -%}
+            {%- endif -%}
+        {%- endfor -%}
+        {% if next_has.found %}
+        <div class="section-divider"></div>
+        {% endif %}
+        {% endif %}
+
+        {% endif %}
+        {% endfor %}
+
+    </div>
+    <!-- end .content-body -->
+
+    <!-- ====== FOOTER: PwC-style ====== -->
+    <footer class="pwc-footer">
+        <div class="footer-tri"></div>
+        <div class="footer-brand-name">Strategy& Intelligence</div>
+        <div class="footer-tagline">Clarity in complexity</div>
+
+        <div class="footer-contacts">
+            <div class="footer-contact-item">
+                <div class="footer-contact-key">Report Date</div>
+                <div class="footer-contact-val">{{ date_str }}</div>
+            </div>
+            <div class="footer-contact-item">
+                <div class="footer-contact-key">Total Insights</div>
+                <div class="footer-contact-val">{{ total_items }} strategic items</div>
+            </div>
+            <div class="footer-contact-item">
+                <div class="footer-contact-key">Sectors Covered</div>
+                <div class="footer-contact-val">{{ briefs|length }} domains</div>
+            </div>
+            <div class="footer-contact-item">
+                <div class="footer-contact-key">Prepared By</div>
+                <div class="footer-contact-val">Newsloom AI</div>
+            </div>
+        </div>
+
+        <div class="footer-gen-time">Generated {{ generated_time }} · Confidential</div>
+
+        <div class="footer-disclaimer-text">
+            This briefing is generated by Newsloom Intelligence and is intended for internal
+            decision-support purposes only. All analysis is AI-assisted and should be independently
+            verified before acting upon. The views expressed herein do not constitute professional
+            advice or recommendations. Distribution beyond the intended recipient is prohibited.<br>
+            © {{ date_str[:4] }} Strategy& Intelligence · Part of the Newsloom Platform · All rights reserved.
+        </div>
+
+        <div class="footer-bottom-bar">
+            Strategy& · A Member of the PwC Network
+        </div>
+    </footer>
+
+</div>
+</body>
+</html>

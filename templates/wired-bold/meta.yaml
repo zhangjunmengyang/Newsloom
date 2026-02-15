@@ -1,0 +1,12 @@
+name: "WIRED Bold"
+description: "Futuristic magazine design inspired by WIRED with black background, bold condensed typography, and neon accent colors"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "dark"
+features:
+  - "Pure black background"
+  - "White condensed headlines"
+  - "Neon accent colors (pink/blue/green)"
+  - "Bold futuristic typography"
+  - "Tech pioneer aesthetic"
+  - "PDF-optimized"

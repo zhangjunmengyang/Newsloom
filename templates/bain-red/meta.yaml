@@ -1,0 +1,12 @@
+name: "Bain Red"
+description: "Bain & Company inspired template with signature red color scheme and power-driven data layout"
+version: "1.0.0"
+author: "Newsloom Template Factory"
+theme: "light"
+features:
+  - "Bain signature red #CC0000"
+  - "Simple powerful aesthetics"
+  - "Red line separators"
+  - "Data-driven typography"
+  - "Key takeaway highlights"
+  - "Executive power presentation"
