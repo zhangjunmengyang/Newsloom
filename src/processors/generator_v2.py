@@ -262,9 +262,10 @@ class ReportGeneratorV2:
         self._generate_html_fallback(briefs, exec_summary, date_str, output_path)
 
     def _generate_html_fallback(self, briefs: Dict, exec_summary: str, date_str: str, output_path: Path):
-        """Fallback HTML"""
+        """简化的 Fallback HTML（如果模板加载失败）"""
         total = sum(len(v) for v in briefs.values() if isinstance(v, list))
-        # 生成内联 HTML
+        generated_time = datetime.now().strftime("%Y-%m-%d %H:%M")
+
         sections_html = ""
         for section in self._get_section_order():
             if section not in briefs or not briefs[section]:
@@ -272,13 +273,12 @@ class ReportGeneratorV2:
             meta = self.section_configs.get(section, {})
             emoji = meta.get("emoji", "")
             title = meta.get("title", section)
-            color = meta.get("color", "#6366f1")
 
-            sections_html += f'<section id="section-{section}" class="section">'
-            sections_html += f'<div class="section-header" style="border-color:{color}"><h2>{emoji} {title}</h2><span class="count">{len(briefs[section])}</span></div>'
+            sections_html += f'<section class="section"><div class="section-header"><span class="section-emoji">{emoji}</span><h2 class="section-title">{title}</h2><span class="section-count">{len(briefs[section])}</span></div>'
 
             for brief in briefs[section]:
                 priority = brief.get("priority", "🟢")
+                priority_class = 'must-read' if priority == '🔴' else ('recommended' if priority == '🟡' else 'fyi')
                 headline = brief.get("headline", "")
                 detail = brief.get("detail", "")
                 url = brief.get("url", "#")
@@ -286,22 +286,14 @@ class ReportGeneratorV2:
                 tags = brief.get("tags", [])
                 tags_html = "".join(f'<span class="tag">{t}</span>' for t in tags)
 
-                sections_html += f'''
-                <div class="card" style="border-left-color:{color}">
-                    <div class="card-priority">{priority}</div>
-                    <div class="card-body">
-                        <h3><a href="{url}" target="_blank">{headline}</a></h3>
-                        <div class="card-meta"><span class="source">{source}</span>{tags_html}</div>
-                        <p>{detail}</p>
-                    </div>
-                </div>'''
+                sections_html += f'''<div class="brief"><div class="brief-priority {priority_class}"></div><div class="brief-body"><div class="brief-headline"><a href="{url}" target="_blank">{headline}</a></div><div class="brief-meta">{f'<span class="source-badge">{source}</span>' if source else ''}{tags_html}</div>{f'<div class="brief-detail">{detail}</div>' if detail else ''}</div></div>'''
 
             sections_html += "</section>"
 
         exec_html = ""
         if exec_summary:
             lines = exec_summary.strip().split("\n")
-            exec_html = '<div class="executive-summary"><h2>📌 今日核心</h2>'
+            exec_html = '<div class="exec-summary"><h2>⚡ Executive Summary</h2>'
             for line in lines:
                 if line.strip():
                     exec_html += f"<p>{line}</p>"
@@ -309,40 +301,42 @@ class ReportGeneratorV2:
 
         html = f"""<!DOCTYPE html>
 <html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Newsloom — {date_str}</title>
+<title>Newsloom Daily Brief · {date_str}</title>
 <style>
-:root{{--bg:#0d1117;--card:#161b22;--text:#e6edf3;--muted:#8b949e;--border:#30363d;--link:#58a6ff}}
 *{{margin:0;padding:0;box-sizing:border-box}}
-body{{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;background:var(--bg);color:var(--text);line-height:1.6}}
-.container{{max-width:900px;margin:0 auto;padding:24px}}
-header{{padding:40px 0;border-bottom:1px solid var(--border);margin-bottom:32px}}
-h1{{font-size:2em;margin-bottom:8px}}
-.subtitle{{color:var(--muted);font-size:.9em}}
-.executive-summary{{background:var(--card);border-radius:12px;padding:24px;margin-bottom:32px;border-left:4px solid #f59e0b}}
-.executive-summary h2{{margin-bottom:12px;font-size:1.2em}}
-.executive-summary p{{margin-bottom:8px;color:var(--text)}}
-.section{{margin-bottom:40px}}
-.section-header{{display:flex;align-items:center;gap:12px;padding-bottom:12px;border-bottom:3px solid;margin-bottom:20px}}
-.section-header h2{{font-size:1.5em}}
-.count{{background:var(--card);color:var(--muted);padding:2px 10px;border-radius:10px;font-size:.85em}}
-.card{{display:flex;background:var(--card);border-radius:10px;margin-bottom:16px;border-left:4px solid;overflow:hidden;transition:transform .2s}}
-.card:hover{{transform:translateX(4px)}}
-.card-priority{{display:flex;align-items:center;padding:0 16px;font-size:1.3em;min-width:56px;justify-content:center}}
-.card-body{{padding:16px;flex:1}}
-.card-body h3{{font-size:1.1em;margin-bottom:6px}}
-.card-body h3 a{{color:var(--text);text-decoration:none}}
-.card-body h3 a:hover{{color:var(--link)}}
-.card-meta{{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap}}
-.source{{color:var(--muted);font-size:.85em}}
-.tag{{background:var(--bg);color:var(--link);padding:2px 8px;border-radius:4px;font-size:.8em}}
-.card-body p{{color:var(--muted);font-size:.95em;line-height:1.5}}
-footer{{text-align:center;padding:40px 0;color:var(--muted);border-top:1px solid var(--border);margin-top:40px}}
+body{{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif;background:#fafafa;color:#1a1a2e;font-size:15px;line-height:1.6}}
+.container{{max-width:700px;margin:0 auto;padding:32px 20px;background:#ffffff}}
+.header{{padding:20px 0 24px;border-bottom:2px solid #e2e8f0;margin-bottom:28px}}
+.header-title{{font-size:1.3em;font-weight:700;margin-bottom:6px}}
+.header-meta{{font-size:.85em;color:#64748b}}
+.exec-summary{{background:#fffbeb;border-left:4px solid #f59e0b;border-radius:6px;padding:20px 24px;margin-bottom:32px}}
+.exec-summary h2{{font-size:1.05em;font-weight:700;color:#d97706;margin-bottom:12px;text-transform:uppercase}}
+.exec-summary p{{color:#451a03;font-size:.95em;margin-bottom:6px}}
+.section{{margin-bottom:36px}}
+.section-header{{display:flex;align-items:center;gap:8px;padding-bottom:10px;margin-bottom:16px;border-bottom:1px solid #e2e8f0}}
+.section-emoji{{font-size:1.3em}}
+.section-title{{font-size:1.25em;font-weight:700}}
+.section-count{{margin-left:auto;font-size:.75em;color:#94a3b8;background:#f1f5f9;padding:2px 8px;border-radius:4px}}
+.brief{{display:flex;margin-bottom:16px}}
+.brief-priority{{width:3px;flex-shrink:0;border-radius:2px 0 0 2px;margin-right:14px}}
+.brief-priority.must-read{{background:#ef4444}}
+.brief-priority.recommended{{background:#f59e0b}}
+.brief-priority.fyi{{background:#22c55e}}
+.brief-body{{flex:1}}
+.brief-headline{{font-size:1em;font-weight:600;margin-bottom:4px}}
+.brief-headline a{{color:#1a1a2e;text-decoration:none}}
+.brief-headline a:hover{{color:#6366f1}}
+.brief-meta{{display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap}}
+.source-badge{{font-size:.78em;color:#64748b;background:#f1f5f9;padding:2px 8px;border-radius:3px}}
+.tag{{font-size:.72em;color:#6366f1;background:#eef2ff;padding:2px 6px;border-radius:3px}}
+.brief-detail{{color:#64748b;font-size:.92em}}
+footer{{text-align:center;padding:24px 0;color:#94a3b8;border-top:1px solid #e2e8f0;margin-top:32px;font-size:.8em}}
 </style></head>
 <body><div class="container">
-<header><h1>📰 Newsloom 每日情报</h1><p class="subtitle">{date_str} | {total} 条精选 | Powered by Claude AI</p></header>
+<header class="header"><div class="header-title">📰 Newsloom Daily Brief · {date_str}</div><div class="header-meta">{generated_time} · {total} items</div></header>
 {exec_html}
 {sections_html}
-<footer>Generated by Newsloom v2 📰</footer>
+<footer>Generated by Newsloom · {date_str}</footer>
 </div></body></html>"""
 
         with open(output_path, "w", encoding="utf-8") as f:
@@ -350,112 +344,25 @@ footer{{text-align:center;padding:40px 0;color:var(--muted);border-top:1px solid
         print(f"🌐 HTML (fallback): {output_path}")
 
     def _generate_pdf(self, html_path: Path, pdf_path: Path, date_str: str):
-        """从专用打印模板生成杂志风格 A4 PDF"""
+        """从统一模板生成 PDF（模板已内置 @page 样式）"""
         if not HAS_WEASYPRINT:
             print("⚠️ weasyprint 未安装，跳过 PDF 生成。安装: pip install weasyprint")
             return
 
         try:
-            # 读取已分析的数据（从 HTML 对应的数据）
-            # 为了复用，我们需要从 generate() 方法传入数据
-            # 这里先尝试用打印模板，如果不存在则优雅降级
-
-            if self.jinja_env:
-                try:
-                    # 尝试加载打印专用模板
-                    print_template = self.jinja_env.get_template("report-print.html.j2")
-
-                    # 需要重新获取数据 - 从 self 缓存中读取
-                    if hasattr(self, '_last_render_data'):
-                        render_data = self._last_render_data
-                        html_content = print_template.render(**render_data)
-
-                        pdf_path.parent.mkdir(parents=True, exist_ok=True)
-                        WeasyHTML(string=html_content, base_url=str(self.template_dir)).write_pdf(str(pdf_path))
-
-                        file_size = pdf_path.stat().st_size / 1024
-                        print(f"📕 PDF (magazine print): {pdf_path} ({file_size:.0f} KB)")
-                        return
-                except Exception as e:
-                    print(f"⚠️ 打印模板加载失败，使用备用方案: {e}")
-
-            # Fallback: 从现有 HTML 转换
-            self._generate_pdf_fallback(html_path, pdf_path, date_str)
-
-        except Exception as e:
-            print(f"⚠️ PDF 生成失败: {e}")
-
-    def _generate_pdf_fallback(self, html_path: Path, pdf_path: Path, date_str: str):
-        """备用方案：从 HTML 直接转换（保持向后兼容）"""
-        try:
+            # 直接使用统一模板的 HTML（它已经包含了 @page 和 print 样式）
             with open(html_path, "r", encoding="utf-8") as f:
                 html_content = f.read()
-
-            print_css = """
-<style>
-@page {
-    size: A4;
-    margin: 2cm 1.5cm;
-    @bottom-center {
-        content: "Newsloom """ + date_str + """ — Page " counter(page);
-        font-size: 9px;
-        color: #8b949e;
-    }
-}
-
-body {
-    background: #0d1117 !important;
-    color: #e6edf3 !important;
-    font-size: 11pt !important;
-    line-height: 1.6 !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-}
-
-.section {
-    page-break-before: auto;
-    page-break-inside: avoid;
-}
-
-.card {
-    page-break-inside: avoid;
-    margin-bottom: 12px !important;
-}
-
-.exec-summary, .executive-summary {
-    page-break-inside: avoid;
-    page-break-after: always;
-}
-
-header {
-    page-break-after: avoid;
-    padding: 60px 0 30px !important;
-    text-align: center !important;
-}
-
-.container, .main {
-    max-width: 100% !important;
-    padding: 0 !important;
-}
-
-.sidebar {
-    display: none !important;
-}
-</style>
-"""
-            if "</head>" in html_content:
-                html_content = html_content.replace("</head>", print_css + "</head>")
-            else:
-                html_content = print_css + html_content
 
             pdf_path.parent.mkdir(parents=True, exist_ok=True)
             WeasyHTML(string=html_content, base_url=str(html_path.parent)).write_pdf(str(pdf_path))
 
             file_size = pdf_path.stat().st_size / 1024
-            print(f"📕 PDF (fallback): {pdf_path} ({file_size:.0f} KB)")
+            print(f"📕 PDF: {pdf_path} ({file_size:.0f} KB)")
 
         except Exception as e:
-            raise Exception(f"PDF fallback 生成失败: {e}")
+            print(f"⚠️ PDF 生成失败: {e}")
+
 
     def _generate_discord(self, briefs: Dict, exec_summary: str, date_str: str, output_path: Path):
         """生成 Discord 友好的精简版"""

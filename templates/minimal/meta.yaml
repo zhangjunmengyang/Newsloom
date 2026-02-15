@@ -1,8 +1,0 @@
-name: "Minimal"
-author: "Newsloom Team"
-version: "1.0.0"
-description: "Clean, minimalist theme with simple typography"
-default_theme: "light"
-supports:
-  - html
-  - markdown
