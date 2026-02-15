@@ -13,10 +13,10 @@
 
         @page {
             size: A4;
-            margin: 2cm 1.5cm;
+            margin: 1.2cm 1.5cm;
             @bottom-center {
-                content: "📰 Newsloom · 2026-02-15 · Page " counter(page);
-                font-size: 8pt;
+                content: "📰 Newsloom · 2026-02-15 · p." counter(page);
+                font-size: 7pt;
                 color: #94a3b8;
             }
         }
@@ -98,10 +98,9 @@
             margin-bottom: 0;
         }
 
-        /* Section Header - Compact */
+        /* Section Header - Compact, NO forced page breaks */
         .section {
-            margin-bottom: 36px;
-            page-break-inside: avoid;
+            margin-bottom: 28px;
         }
 
         .section-header {
@@ -223,39 +222,13 @@
             font-size: 0.8em;
         }
 
-        /* Print optimizations */
+        /* Print: tight, no forced breaks, no wasted space */
         @media print {
-            body {
-                background: #ffffff;
-            }
-
-            .container {
-                max-width: 100%;
-                padding: 0;
-            }
-
-            .brief {
-                margin-bottom: 12px;
-            }
-
-            .section {
-                margin-bottom: 28px;
-            }
-
-            .exec-summary {
-                page-break-after: avoid;
-            }
-
-            a {
-                color: #1a1a2e;
-                text-decoration: none;
-            }
-
-            a[href]:after {
-                content: " (" attr(href) ")";
-                font-size: 0.7em;
-                color: #94a3b8;
-            }
+            body { background: #ffffff; }
+            .container { max-width: 100%; padding: 0; }
+            .brief { page-break-inside: avoid; margin-bottom: 10px; }
+            .section { margin-bottom: 20px; }
+            a { color: #1a1a2e; text-decoration: none; }
         }
 
         /* Mobile */
@@ -284,7 +257,7 @@
         <header class="header">
             <div class="header-title">📰 Newsloom Daily Brief · 2026-02-15</div>
             <div class="header-meta">
-                <span>2026-02-15 10:05</span>
+                <span>2026-02-15 10:12</span>
                 <span>·</span>
                 <span>39 items</span>
                 <span>·</span>
@@ -295,11 +268,11 @@
         <!-- Executive Summary: Yellow highlight block -->
         <div class="exec-summary">
             <h2>⚡ Executive Summary</h2>
-            <p>• **BTC 极度恐惧区间但空头拥挤度创年度极值** — Fear & Greed 跌至 8，空头仓位达 2024 年以来最极端水平，IBIT 期权单日 233 万张成交创纪录。上次空头这么拥挤后涨了 83%。不一定抄底，但这组信号值得你的量化系统重点监控——极端情绪 + 极端持仓 + 期权异动三重共振，历史上是高赔率窗口。</p>
-            <p>• **AI Agent 能力边界正在被实战快速拉伸** — 16 个 Claude Agent 协作从零写出能编译 Linux 内核的 C 编译器；Google SRE 用 Gemini CLI 处理真实线上故障；Chrome DevTools 官方出 MCP Server 让 Agent 直接操控浏览器。这不是 demo 了，是生产级工作流。对你的 Agent/RAG 方向来说，tool-calling 能力和多 Agent 协作编排正在成为核心工程问题。</p>
-            <p>• **小模型 tool-calling 横评第二轮出炉，本地部署工具链趋于成熟** — LocalLLaMA 社区对 21 款小模型做了 tool-calling 判断力测试，同时 vibe coding 本地工具链实践也在汇总。结合你做量化的场景，本地跑一个 tool-calling 靠谱的小模型来驱动策略执行/监控 Agent，成本和延迟优势明显，这个方向值得跟进具体评测结果。</p>
-            <p>• **Anthropic CEO 自曝"收入预测偏差一年就可能破产"，AI 宏观生产力提升尚未兑现** — 这两条放一起看：头部 AI 公司烧钱速度远超收入增长的容错空间，同时宏观经济数据还没看到 AI 带来的生产力提升。短期对 AI 概念股和相关 crypto 标的（AI agent token 等）是冷水，但也意味着真正能落地产生收入的 AI 应用会获得溢价。</p>
-            <p>• **美国债务螺旋临界点：利率即将超过 GDP 增速** — 这是宏观层面的慢变量但影响深远。利率 > GDP 增速意味着债务自我膨胀不可逆，长期利好 BTC 作为"数字黄金"的叙事，也是你量化模型中宏观因子需要纳入的结构性变量。当前 BTC 恐慌抛售和这个宏观背景形成有趣的错位。</p>
+            <p><strong>BTC 极度恐惧区间但空头拥挤度创年度极值</strong> — Fear & Greed 跌至 8，空头仓位达 2024 年以来最极端水平，IBIT 期权单日 233 万张成交创纪录。上次空头这么拥挤后涨了 83%。不一定抄底，但这组信号值得你的量化系统重点监控——极端情绪 + 极端持仓 + 期权异动三重共振，历史上是高赔率窗口。</p>
+            <p><strong>AI Agent 能力边界正在被实战快速拉伸</strong> — 16 个 Claude Agent 协作从零写出能编译 Linux 内核的 C 编译器；Google SRE 用 Gemini CLI 处理真实线上故障；Chrome DevTools 官方出 MCP Server 让 Agent 直接操控浏览器。这不是 demo 了，是生产级工作流。对你的 Agent/RAG 方向来说，tool-calling 能力和多 Agent 协作编排正在成为核心工程问题。</p>
+            <p><strong>小模型 tool-calling 横评第二轮出炉，本地部署工具链趋于成熟</strong> — LocalLLaMA 社区对 21 款小模型做了 tool-calling 判断力测试，同时 vibe coding 本地工具链实践也在汇总。结合你做量化的场景，本地跑一个 tool-calling 靠谱的小模型来驱动策略执行/监控 Agent，成本和延迟优势明显，这个方向值得跟进具体评测结果。</p>
+            <p><strong>Anthropic CEO 自曝"收入预测偏差一年就可能破产"，AI 宏观生产力提升尚未兑现</strong> — 这两条放一起看：头部 AI 公司烧钱速度远超收入增长的容错空间，同时宏观经济数据还没看到 AI 带来的生产力提升。短期对 AI 概念股和相关 crypto 标的（AI agent token 等）是冷水，但也意味着真正能落地产生收入的 AI 应用会获得溢价。</p>
+            <p><strong>美国债务螺旋临界点：利率即将超过 GDP 增速</strong> — 这是宏观层面的慢变量但影响深远。利率 > GDP 增速意味着债务自我膨胀不可逆，长期利好 BTC 作为"数字黄金"的叙事，也是你量化模型中宏观因子需要纳入的结构性变量。当前 BTC 恐慌抛售和这个宏观背景形成有趣的错位。</p>
         </div>
 
         <!-- Sections: Linear top-to-bottom -->

@@ -13,10 +13,10 @@
 
         @page {
             size: A4;
-            margin: 2cm 1.5cm;
+            margin: 1.2cm 1.5cm;
             @bottom-center {
-                content: "📰 Newsloom · {{ date_str }} · Page " counter(page);
-                font-size: 8pt;
+                content: "📰 Newsloom · {{ date_str }} · p." counter(page);
+                font-size: 7pt;
                 color: #94a3b8;
             }
         }
@@ -98,10 +98,9 @@
             margin-bottom: 0;
         }
 
-        /* Section Header - Compact */
+        /* Section Header - Compact, NO forced page breaks */
         .section {
-            margin-bottom: 36px;
-            page-break-inside: avoid;
+            margin-bottom: 28px;
         }
 
         .section-header {
@@ -223,39 +222,13 @@
             font-size: 0.8em;
         }
 
-        /* Print optimizations */
+        /* Print: tight, no forced breaks, no wasted space */
         @media print {
-            body {
-                background: #ffffff;
-            }
-
-            .container {
-                max-width: 100%;
-                padding: 0;
-            }
-
-            .brief {
-                margin-bottom: 12px;
-            }
-
-            .section {
-                margin-bottom: 28px;
-            }
-
-            .exec-summary {
-                page-break-after: avoid;
-            }
-
-            a {
-                color: #1a1a2e;
-                text-decoration: none;
-            }
-
-            a[href]:after {
-                content: " (" attr(href) ")";
-                font-size: 0.7em;
-                color: #94a3b8;
-            }
+            body { background: #ffffff; }
+            .container { max-width: 100%; padding: 0; }
+            .brief { page-break-inside: avoid; margin-bottom: 10px; }
+            .section { margin-bottom: 20px; }
+            a { color: #1a1a2e; text-decoration: none; }
         }
 
         /* Mobile */
@@ -310,7 +283,7 @@
             <h2>⚡ Executive Summary</h2>
             {% for line in executive_summary.strip().split('\n') %}
             {% if line.strip() %}
-            <p>{{ line }}</p>
+            <p>{{ line.strip() | md_inline }}</p>
             {% endif %}
             {% endfor %}
         </div>
@@ -348,7 +321,7 @@
                         {% endif %}
                     </div>
                     {% if item.detail %}
-                    <div class="brief-detail">{{ item.detail|default(item.text|default('')) }}</div>
+                    <div class="brief-detail">{{ item.detail|default(item.text|default('')) | md_inline }}</div>
                     {% endif %}
                 </div>
             </div>

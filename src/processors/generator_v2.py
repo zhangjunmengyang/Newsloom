@@ -9,11 +9,29 @@
 """
 
 import json
+import re
 import yaml
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, List, Optional
 from jinja2 import Environment, FileSystemLoader
+from markupsafe import Markup
+
+
+def _md_inline(text: str) -> Markup:
+    """Convert inline markdown (**bold**, *italic*, `code`) to HTML"""
+    if not text:
+        return Markup("")
+    s = str(text)
+    # **bold**
+    s = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', s)
+    # *italic*
+    s = re.sub(r'(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)', r'<em>\1</em>', s)
+    # `code`
+    s = re.sub(r'`(.+?)`', r'<code>\1</code>', s)
+    # • bullet → remove (already in <p>)
+    s = re.sub(r'^[•·]\s*', '', s)
+    return Markup(s)
 
 try:
     # macOS: weasyprint 需要 pango/gobject，确保 homebrew 库路径可用
@@ -51,6 +69,7 @@ class ReportGeneratorV2:
                 trim_blocks=True,
                 lstrip_blocks=True,
             )
+            self.jinja_env.filters['md_inline'] = _md_inline
         else:
             self.jinja_env = None
 
