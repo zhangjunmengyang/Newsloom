@@ -1,50 +1,485 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Newsloom Template Showcase</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsloom · Template Gallery</title>
     <style>
+        :root {
+            --bg-primary: #06060a;
+            --bg-card: #0e0e14;
+            --bg-card-hover: #14141e;
+            --border: rgba(255,255,255,0.06);
+            --border-hover: rgba(139,92,246,0.4);
+            --text-primary: #f0f0f5;
+            --text-secondary: #6b6b80;
+            --text-tertiary: #44445a;
+            --accent-1: #8b5cf6;
+            --accent-2: #ec4899;
+            --accent-3: #06b6d4;
+            --glow: rgba(139,92,246,0.08);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, sans-serif; background: #0a0a0a; color: #eee; padding: 40px; }
-        h1 { text-align: center; font-size: 2em; margin-bottom: 10px; }
-        .subtitle { text-align: center; color: #888; margin-bottom: 40px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-        .card { background: #1a1a1a; border-radius: 12px; overflow: hidden; transition: transform 0.2s; }
-        .card:hover { transform: translateY(-4px); }
-        .card a { text-decoration: none; color: inherit; }
-        .card .preview { height: 200px; background: #222; display: flex; align-items: center; justify-content: center; font-size: 3em; }
-        .card .info { padding: 16px; }
-        .card .name { font-size: 1.1em; font-weight: 600; margin-bottom: 4px; }
-        .card .desc { font-size: 0.85em; color: #888; }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* === Ambient Background === */
+        .ambient {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background:
+                radial-gradient(ellipse 80% 60% at 20% 10%, rgba(139,92,246,0.06) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 80% at 80% 20%, rgba(6,182,212,0.04) 0%, transparent 50%),
+                radial-gradient(ellipse 70% 50% at 50% 90%, rgba(236,72,153,0.04) 0%, transparent 50%);
+        }
+
+        /* === Hero === */
+        .hero {
+            position: relative; z-index: 1;
+            text-align: center;
+            padding: 100px 24px 60px;
+        }
+        .hero::before {
+            content: '';
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 70%);
+            pointer-events: none;
+            animation: heroBreath 8s ease-in-out infinite;
+        }
+        @keyframes heroBreath {
+            0%, 100% { opacity: 0.6; transform: translateX(-50%) scale(1); }
+            50% { opacity: 1; transform: translateX(-50%) scale(1.15); }
+        }
+
+        .hero .badge {
+            display: inline-block;
+            font-size: 0.72em; font-weight: 600;
+            letter-spacing: 0.12em; text-transform: uppercase;
+            color: var(--accent-1);
+            background: rgba(139,92,246,0.1);
+            border: 1px solid rgba(139,92,246,0.2);
+            padding: 6px 16px; border-radius: 100px;
+            margin-bottom: 24px;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.4em, 6vw, 4.2em);
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            line-height: 1.1;
+            background: linear-gradient(135deg, #e0e0ff 0%, #c4b5fd 25%, #a78bfa 50%, #e879a8 75%, #67e8f9 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 6s ease-in-out infinite;
+        }
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero .subtitle {
+            font-size: 1.15em;
+            color: var(--text-secondary);
+            margin-top: 16px;
+            font-weight: 400;
+            max-width: 540px;
+            margin-left: auto; margin-right: auto;
+            line-height: 1.6;
+        }
+
+        .hero .metrics {
+            display: flex; justify-content: center; gap: 48px;
+            margin-top: 40px;
+        }
+        .hero .metric {
+            text-align: center;
+        }
+        .hero .metric .value {
+            font-size: 2.2em; font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero .metric .label {
+            font-size: 0.75em;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 4px;
+        }
+
+        /* === Filters === */
+        .filter-bar {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(6,6,10,0.85);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            display: flex; align-items: center; justify-content: center;
+            gap: 8px; flex-wrap: wrap;
+        }
+        .filter-bar .search {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 14px 8px 36px;
+            color: var(--text-primary);
+            font-size: 0.88em;
+            width: 220px;
+            outline: none;
+            transition: border-color 0.2s;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236b6b80' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242.656a5 5 0 1 1 0-10 5 5 0 0 1 0 10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: 12px center;
+        }
+        .filter-bar .search:focus { border-color: var(--accent-1); }
+        .filter-bar .search::placeholder { color: var(--text-tertiary); }
+
+        .pill {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 7px 16px;
+            border-radius: 100px;
+            cursor: pointer;
+            font-size: 0.82em;
+            font-weight: 500;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .pill:hover { background: rgba(139,92,246,0.08); color: var(--text-primary); border-color: rgba(139,92,246,0.2); }
+        .pill.active {
+            background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(236,72,153,0.15));
+            color: #e0d4ff;
+            border-color: rgba(139,92,246,0.4);
+        }
+
+        .count-badge {
+            display: inline-block;
+            font-size: 0.78em;
+            color: var(--text-tertiary);
+            margin-left: 8px;
+            min-width: 24px;
+            text-align: center;
+            padding: 16px 24px 60px;
+        }
+
+        /* === Grid === */
+        .gallery {
+            position: relative; z-index: 1;
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 32px 24px 80px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        /* === Card === */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+        .card::before {
+            content: '';
+            position: absolute; inset: -1px;
+            border-radius: 17px;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2), var(--accent-3));
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: -1;
+        }
+        .card:hover {
+            transform: translateY(-6px);
+            border-color: transparent;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 40px var(--glow);
+        }
+        .card:hover::before { opacity: 1; }
+        .card:hover .card-inner { border-color: transparent; }
+
+        .card-inner {
+            background: var(--bg-card);
+            border-radius: 15px;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .card a { text-decoration: none; color: inherit; display: block; height: 100%; }
+
+        .card .preview {
+            height: 200px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 4em;
+            position: relative;
+            overflow: hidden;
+        }
+        .card .preview .bg-layer {
+            position: absolute; inset: 0;
+            opacity: 0.7;
+            transition: opacity 0.3s, transform 0.5s;
+        }
+        .card:hover .preview .bg-layer { opacity: 1; transform: scale(1.05); }
+        .card .preview .emoji {
+            position: relative; z-index: 2;
+            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+            transition: transform 0.3s;
+        }
+        .card:hover .preview .emoji { transform: scale(1.1); }
+        .card .preview::after {
+            content: '';
+            position: absolute; bottom: 0; left: 0; right: 0;
+            height: 80px;
+            background: linear-gradient(180deg, transparent 0%, var(--bg-card) 100%);
+            z-index: 1;
+        }
+
+        .card .body { padding: 20px 20px 18px; }
+
+        .card .title-row {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 6px;
+        }
+        .card .name {
+            font-size: 1.05em;
+            font-weight: 650;
+            letter-spacing: -0.01em;
+        }
+        .card .arrow {
+            color: var(--text-tertiary);
+            font-size: 1.1em;
+            transition: all 0.2s;
+        }
+        .card:hover .arrow { color: var(--accent-1); transform: translateX(3px); }
+
+        .card .desc {
+            font-size: 0.82em;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+        .card .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+        .card .tag {
+            font-size: 0.68em;
+            font-weight: 500;
+            padding: 3px 10px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.04);
+            color: var(--text-tertiary);
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+        .card .tag.dark { background: rgba(139,92,246,0.1); color: #a78bfa; }
+        .card .tag.light { background: rgba(251,191,36,0.1); color: #fbbf24; }
+        .card .tag.media { background: rgba(239,68,68,0.1); color: #f87171; }
+        .card .tag.consulting { background: rgba(16,185,129,0.1); color: #34d399; }
+        .card .tag.tech { background: rgba(6,182,212,0.1); color: #22d3ee; }
+        .card .tag.creative { background: rgba(236,72,153,0.1); color: #f472b6; }
+        .card .tag.academic { background: rgba(251,146,60,0.1); color: #fb923c; }
+        .card .tag.social { background: rgba(99,102,241,0.1); color: #818cf8; }
+
+        /* === Footer === */
+        .footer {
+            position: relative; z-index: 1;
+            text-align: center;
+            padding: 40px 24px 60px;
+            border-top: 1px solid var(--border);
+        }
+        .footer .brand {
+            font-size: 1.1em; font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .footer .sub { color: var(--text-tertiary); font-size: 0.82em; margin-top: 6px; }
+        .footer a { color: var(--accent-1); text-decoration: none; }
+        .footer a:hover { text-decoration: underline; }
+
+        /* === No results === */
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 80px 24px;
+            color: var(--text-tertiary);
+            font-size: 1.1em;
+        }
+
+        /* === Responsive === */
+        @media (max-width: 768px) {
+            .hero { padding: 60px 20px 40px; }
+            .hero .metrics { gap: 24px; }
+            .hero .metric .value { font-size: 1.6em; }
+            .gallery { grid-template-columns: 1fr; padding: 20px 16px 60px; }
+            .filter-bar { padding: 12px 16px; gap: 6px; }
+            .filter-bar .search { width: 100%; order: -1; }
+        }
     </style>
 </head>
 <body>
-    <h1>🎨 Newsloom Template Showcase</h1>
-    <p class="subtitle">51 commercial-grade newsletter templates · 2026-02-15</p>
-    <div class="grid">
-    </div>
-    <script>
-        const templates = [
-            {name:'premium', emoji:'💎', desc:'Flagship dark theme · Mesh gradient'},
-            {name:'ink-wash', emoji:'🖌️', desc:'Chinese ink wash · Rice paper texture'},
-            {name:'ukiyo-e', emoji:'🌊', desc:'Japanese ukiyo-e · Waves & Mt. Fuji'},
-            {name:'nyt-times', emoji:'📰', desc:'New York Times · 3-column newspaper'},
-            {name:'ft-salmon', emoji:'🐟', desc:'Financial Times · Salmon pink'},
-            {name:'art-deco', emoji:'🏛️', desc:'1920s Art Deco · Gold geometric'},
-            {name:'midnight-gold', emoji:'✨', desc:'Midnight navy + amber gold'},
-            {name:'glassmorphism', emoji:'🫧', desc:'Frosted glass · Floating orbs'},
-            {name:'stripe-gradient', emoji:'🌈', desc:'Stripe mesh gradient'},
-            {name:'bauhaus', emoji:'🔴', desc:'Bauhaus · Red/Yellow/Blue blocks'},
-            {name:'deep-space', emoji:'🚀', desc:'Space HUD · Stars & nebula'},
-            {name:'retro-terminal', emoji:'💻', desc:'CRT terminal · Green phosphor'},
-            {name:'bloomberg-orange', emoji:'📊', desc:'Bloomberg Terminal · Data grid'},
-            {name:'spotify-green', emoji:'🎵', desc:'Spotify · Stage lighting'},
-            {name:'neon-cyberpunk', emoji:'🌃', desc:'Cyberpunk · Neon city'},
-        ];
-        const grid = document.querySelector('.grid');
-        templates.forEach(t => {
-            grid.innerHTML += `<div class="card"><a href="${t.name}.html"><div class="preview">${t.emoji}</div><div class="info"><div class="name">${t.name}</div><div class="desc">${t.desc}</div></div></a></div>`;
-        });
-    </script>
+    <div class="ambient"></div>
+
+    <section class="hero">
+        <div class="badge">✦ Open Source Template Collection</div>
+        <h1>Newsloom Templates</h1>
+        <p class="subtitle">51 commercial-grade newsletter templates, each with its own visual world. Zero dependencies. Self-contained.</p>
+        <div class="metrics">
+            <div class="metric"><div class="value">51</div><div class="label">Templates</div></div>
+            <div class="metric"><div class="value">56K</div><div class="label">Lines</div></div>
+            <div class="metric"><div class="value">9</div><div class="label">Categories</div></div>
+        </div>
+    </section>
+
+    <nav class="filter-bar">
+        <input type="text" class="search" placeholder="Search templates..." id="search">
+        <button class="pill active" data-cat="all">All <span class="cnt">51</span></button>
+        <button class="pill" data-cat="dark">🌙 Dark</button>
+        <button class="pill" data-cat="light">☀️ Light</button>
+        <button class="pill" data-cat="media">📰 Media</button>
+        <button class="pill" data-cat="consulting">💼 Consulting</button>
+        <button class="pill" data-cat="tech">⚡ Tech</button>
+        <button class="pill" data-cat="creative">🎨 Creative</button>
+        <button class="pill" data-cat="academic">📚 Academic</button>
+        <button class="pill" data-cat="social">💬 Social</button>
+    </nav>
+
+    <main class="gallery" id="gallery"></main>
+
+    <footer class="footer">
+        <div class="brand">Newsloom</div>
+        <div class="sub">AI Intelligence Platform · <a href="https://github.com/zhangjunmengyang/Newsloom">GitHub</a></div>
+    </footer>
+
+<script>
+const T = [
+    // Dark
+    {n:'premium',e:'💎',d:'Flagship dark theme with cosmic mesh gradient and glassmorphism cards',c:['dark','creative'],bg:'linear-gradient(135deg,#1a0533,#0d1b2a,#162447)'},
+    {n:'midnight-gold',e:'✨',d:'Midnight navy base with amber gold foil accents and layered light sources',c:['dark','creative'],bg:'linear-gradient(135deg,#0d1117,#1a1a2e,#16213e)'},
+    {n:'neon-cyberpunk',e:'🌃',d:'Cyberpunk cityscape with neon perspective grid and skyline silhouette',c:['dark','tech'],bg:'linear-gradient(135deg,#0a0014,#1a0033,#000d1a)'},
+    {n:'deep-space',e:'🚀',d:'Space station HUD with CSS stars, nebula effects and holographic panels',c:['dark','tech'],bg:'linear-gradient(135deg,#020111,#0a0a2e,#000)'},
+    {n:'retro-terminal',e:'💻',d:'CRT green phosphor terminal with scanline animation and boot sequence',c:['dark','tech'],bg:'linear-gradient(135deg,#0a0a0a,#0d1a0d,#000)'},
+    {n:'crypto-neon',e:'₿',d:'Crypto exchange dark terminal with honeycomb grid and blinking indicators',c:['dark','tech'],bg:'linear-gradient(135deg,#0d1117,#1a0a2e,#0a1a0a)'},
+    {n:'bloomberg-orange',e:'📊',d:'Bloomberg Terminal with data-dense grids and real-time ticker feel',c:['dark','media'],bg:'linear-gradient(135deg,#1a0a00,#0d0d0d,#1a1a1a)'},
+    {n:'wired-bold',e:'⚡',d:'WIRED magazine with circuit board texture and neon accent typography',c:['dark','media'],bg:'linear-gradient(135deg,#0a0a0a,#0d1a0d,#1a0a1a)'},
+    {n:'spotify-green',e:'🎵',d:'Spotify stage lighting with album art cards and playlist feel',c:['dark','tech'],bg:'linear-gradient(135deg,#0d1a0d,#1a1a1a,#0a0a0a)'},
+    {n:'apple-keynote',e:'🍎',d:'WWDC keynote stage with gradient orbs and "One more thing..." finale',c:['dark','tech'],bg:'linear-gradient(135deg,#000,#0a0a2e,#1a0033)'},
+    {n:'oxford-navy',e:'🎓',d:'Oxford University press with deep navy, gold herringbone and shield crest',c:['dark','academic'],bg:'linear-gradient(135deg,#002147,#001a3a,#000d2e)'},
+    {n:'glassmorphism',e:'🫧',d:'Frosted glass cards with vivid floating orbs and backdrop blur',c:['dark','tech'],bg:'linear-gradient(135deg,#0f172a,#1e1b4b,#0c4a6e)'},
+    {n:'stripe-gradient',e:'🌈',d:'Stripe-inspired mesh gradient with animated glass morphism cards',c:['dark','tech'],bg:'linear-gradient(135deg,#0a1628,#1a0a3e,#0a2818)'},
+    {n:'art-deco',e:'🏛️',d:'1920s Art Deco with gold geometric lines and Chrysler Building aesthetics',c:['dark','creative'],bg:'linear-gradient(135deg,#1a1a2e,#0d0d1a,#2e1a0d)'},
+    // Light / Media
+    {n:'nyt-times',e:'📰',d:'New York Times with 3-column newspaper layout and newsprint texture',c:['light','media'],bg:'linear-gradient(135deg,#f7f5f0,#eae7e0)'},
+    {n:'ft-salmon',e:'🐟',d:'Financial Times with signature salmon pink and financial data cards',c:['light','media'],bg:'linear-gradient(135deg,#fff1e5,#fce4d0)'},
+    {n:'economist-red',e:'🔴',d:'The Economist with red masthead, dual columns and drop caps',c:['light','media'],bg:'linear-gradient(135deg,#fff,#f8f8f8)'},
+    {n:'wsj-classic',e:'📋',d:'Wall Street Journal with 3-column layout, stipple portraits and A-Hed',c:['light','media'],bg:'linear-gradient(135deg,#fffef5,#f5f0e8)'},
+    {n:'the-information',e:'🔒',d:'The Information subscriber-exclusive with long-form depth and paywall CTA',c:['light','media'],bg:'linear-gradient(135deg,#fafaf8,#f0f0ec)'},
+    {n:'newsletter-modern',e:'📧',d:'Substack / Morning Brew newsletter with sponsor slots and share buttons',c:['light','media'],bg:'linear-gradient(135deg,#fff,#f8fafc)'},
+    {n:'magazine',e:'📖',d:'Print magazine spread with editorial layout and pull quotes',c:['light','media'],bg:'linear-gradient(135deg,#fff,#fafafa)'},
+    {n:'vintage-newspaper',e:'📜',d:'19th century newspaper with aged paper, Gothic type and multi-column',c:['light','media'],bg:'linear-gradient(135deg,#f4ecd8,#e8dcc4)'},
+    // Consulting
+    {n:'mckinsey-blue',e:'🔷',d:'McKinsey & Co blue exhibit slides with strategic framework feel',c:['light','consulting'],bg:'linear-gradient(135deg,#fff,#f0f4f8)'},
+    {n:'bcg-green',e:'🟢',d:'BCG strategic report with green accent system and insight boxes',c:['light','consulting'],bg:'linear-gradient(135deg,#fff,#f0f8f0)'},
+    {n:'bain-red',e:'🔴',d:'Bain & Company PPT deck with deep red bands and Key Finding callouts',c:['light','consulting'],bg:'linear-gradient(135deg,#fff,#fff5f5)'},
+    {n:'deloitte-green',e:'🌿',d:'Deloitte professional report with green accent and compliance footer',c:['light','consulting'],bg:'linear-gradient(135deg,#fff,#f0f8f0)'},
+    {n:'goldman-sachs',e:'🏦',d:'Goldman Sachs investment research with Conviction List and analyst attribution',c:['light','consulting'],bg:'linear-gradient(135deg,#fff,#f0f4f8)'},
+    {n:'strategy-plus',e:'📐',d:'Strategy& (PwC) with orange diagonal stripes and quadrant matrix',c:['light','consulting'],bg:'linear-gradient(135deg,#fff,#fff8f0)'},
+    {n:'legal-serif',e:'⚖️',d:'Legal document with formal serif typography and structured sections',c:['light','consulting'],bg:'linear-gradient(135deg,#fafaf8,#f0f0ec)'},
+    {n:'government-official',e:'🏛️',d:'Government gazette with official seal, formal headers and decree style',c:['light','consulting'],bg:'linear-gradient(135deg,#fff,#f5f8fa)'},
+    {n:'healthcare-blue',e:'💊',d:'Clinical report with ECG wave texture, Rx numbering and alert badges',c:['light','consulting'],bg:'linear-gradient(135deg,#fff,#f0f8ff)'},
+    // Tech
+    {n:'linear-elegant',e:'➖',d:'Linear app — clean, dark minimal with high contrast and focus',c:['light','tech'],bg:'linear-gradient(135deg,#fff,#fafafa)'},
+    {n:'notion-clean',e:'📝',d:'Notion ultra-clean layout with emoji anchors and toggle sections',c:['light','tech'],bg:'linear-gradient(135deg,#fff,#fafafa)'},
+    {n:'vercel-stark',e:'▲',d:'Vercel stark black + white with geometric precision and negative space',c:['light','tech'],bg:'linear-gradient(135deg,#fff,#fafafa)'},
+    {n:'figma-playful',e:'🎨',d:'Figma canvas with dot grid, frame cards, toolbar and layer panel',c:['light','tech'],bg:'linear-gradient(135deg,#f5f5f5,#eaeaea)'},
+    // Creative
+    {n:'bauhaus',e:'🟡',d:'Bauhaus movement with primary color blocks and Mondrian grid system',c:['light','creative'],bg:'linear-gradient(135deg,#f5f0e8,#fff)'},
+    {n:'ink-wash',e:'🖌️',d:'Chinese ink wash with rice paper texture, mountain silhouettes and 6 ink tones',c:['light','creative'],bg:'linear-gradient(135deg,#f5f0e8,#e8e0d4)'},
+    {n:'ukiyo-e',e:'🌊',d:'Japanese ukiyo-e with Mt. Fuji, wave patterns and Seigaiha dividers',c:['light','creative'],bg:'linear-gradient(135deg,#f0ebe0,#e0d8c8)'},
+    {n:'monocle-refined',e:'🧐',d:'Monocle magazine with yellow ribbon, refined serif and Editor\'s Pick',c:['light','creative'],bg:'linear-gradient(135deg,#fff,#fafaf5)'},
+    {n:'nordic-minimal',e:'🕯️',d:'Nordic Hygge with linen texture, warm brown accents and breathing space',c:['light','creative'],bg:'linear-gradient(135deg,#f7f7f5,#eeeee8)'},
+    {n:'realestate-luxury',e:'🏠',d:'Luxury real estate with gold accents and marble texture feel',c:['light','creative'],bg:'linear-gradient(135deg,#faf8f5,#f0ece5)'},
+    {n:'swiss-grid',e:'🇨🇭',d:'Swiss International Style with strict grid system and Helvetica',c:['light','creative'],bg:'linear-gradient(135deg,#fff,#f5f5f5)'},
+    // Academic
+    {n:'arxiv-paper',e:'📄',d:'arXiv preprint with LaTeX two-column feel and citation numbering',c:['light','academic'],bg:'linear-gradient(135deg,#fff,#f8f8f8)'},
+    {n:'nature-journal',e:'🔬',d:'Nature journal scientific publication with formal abstract and methods',c:['light','academic'],bg:'linear-gradient(135deg,#fff,#f4f4f4)'},
+    {n:'ieee-technical',e:'📐',d:'IEEE technical paper with dual column, Roman numerals and Algorithm boxes',c:['light','academic'],bg:'linear-gradient(135deg,#fff,#f8f8f8)'},
+    {n:'harvard-crimson',e:'🎓',d:'Harvard crimson accents with academic authority and structured layout',c:['light','academic'],bg:'linear-gradient(135deg,#fff,#faf5f5)'},
+    {n:'education-warm',e:'📒',d:'University textbook with notebook lines, highlighter and chapter numbering',c:['light','academic'],bg:'linear-gradient(135deg,#fff8f0,#fff)'},
+    // Social
+    {n:'twitter-card',e:'𝕏',d:'X/Twitter feed with tweets, engagement bar and trending sidebar',c:['light','social'],bg:'linear-gradient(135deg,#fff,#f7f9fa)'},
+    {n:'reddit-thread',e:'🤖',d:'Reddit with upvote cards, subreddit headers and community sidebar',c:['light','social'],bg:'linear-gradient(135deg,#dae0e6,#cfd6dc)'},
+    {n:'instagram-gradient',e:'📸',d:'Instagram Stories and feed with gradient rings and bottom nav',c:['light','social'],bg:'linear-gradient(135deg,#fafafa,#f0f0f0)'},
+    {n:'wechat-article',e:'💬',d:'WeChat article with Chinese social reading style and QR code footer',c:['light','social'],bg:'linear-gradient(135deg,#f5f5f5,#eee)'},
+];
+
+const gallery = document.getElementById('gallery');
+const searchInput = document.getElementById('search');
+let activeCat = 'all';
+
+function render() {
+    const q = searchInput.value.toLowerCase().trim();
+    const filtered = T.filter(t => {
+        const catMatch = activeCat === 'all' || t.c.includes(activeCat);
+        const qMatch = !q || t.n.includes(q) || t.d.toLowerCase().includes(q) || t.c.some(c => c.includes(q));
+        return catMatch && qMatch;
+    });
+
+    // Update counts
+    document.querySelectorAll('.pill .cnt').forEach(el => el.remove());
+    document.querySelectorAll('.pill').forEach(btn => {
+        const cat = btn.dataset.cat;
+        const count = cat === 'all' ? T.length : T.filter(t => t.c.includes(cat)).length;
+    });
+
+    if (filtered.length === 0) {
+        gallery.innerHTML = '<div class="no-results">No templates match your search.</div>';
+        return;
+    }
+
+    gallery.innerHTML = filtered.map(t => `
+        <article class="card">
+            <div class="card-inner">
+                <a href="${t.n}.html" title="Preview ${t.n}">
+                    <div class="preview">
+                        <div class="bg-layer" style="background:${t.bg}"></div>
+                        <span class="emoji">${t.e}</span>
+                    </div>
+                    <div class="body">
+                        <div class="title-row">
+                            <span class="name">${t.n}</span>
+                            <span class="arrow">→</span>
+                        </div>
+                        <p class="desc">${t.d}</p>
+                        <div class="tags">${t.c.map(c => `<span class="tag ${c}">${c}</span>`).join('')}</div>
+                    </div>
+                </a>
+            </div>
+        </article>
+    `).join('');
+}
+
+document.querySelectorAll('.pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeCat = btn.dataset.cat;
+        render();
+    });
+});
+
+searchInput.addEventListener('input', render);
+render();
+</script>
 </body>
 </html>
