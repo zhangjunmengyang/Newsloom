@@ -13,6 +13,9 @@ conda activate newsloom
 export ANTHROPIC_API_KEY="cr_07d471a61fa7a471003df012202ea71cca9fa87527fec0c23b1ffd22a613f30e"
 export ANTHROPIC_BASE_URL="http://155.138.214.61:3000/api"
 
+# WeasyPrint PDF generation needs homebrew libs (pango/gobject)
+export DYLD_FALLBACK_LIBRARY_PATH="/opt/homebrew/lib:${DYLD_FALLBACK_LIBRARY_PATH:-}"
+
 # Proxy for Reddit and other sources that need it
 export https_proxy="http://127.0.0.1:7897"
 export http_proxy="http://127.0.0.1:7897"
