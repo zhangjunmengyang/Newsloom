@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from server.config import settings
 from server.database import init_db
-from server.routers import reports, sources, pipeline, ws
+from server.routers import reports, sources, pipeline, ws, dashboard, settings_router
 
 
 @asynccontextmanager
@@ -53,9 +53,11 @@ app.add_middleware(
 
 
 # Include routers
+app.include_router(dashboard.router)
 app.include_router(reports.router)
 app.include_router(sources.router)
 app.include_router(pipeline.router)
+app.include_router(settings_router.router)
 app.include_router(ws.router)
 
 

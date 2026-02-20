@@ -1,4 +1,5 @@
 """Data source management endpoints"""
+import yaml
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
@@ -139,3 +140,47 @@ async def toggle_source(
     await db.refresh(source)
 
     return source
+
+
+@router.post("/sync-from-config", response_model=SuccessResponse)
+async def sync_sources_from_config(db: AsyncSession = Depends(get_db)):
+    """Sync sources from sources.yaml to database"""
+    from server.config import settings as app_settings
+
+    config_path = app_settings.sources_config_path
+    if not config_path.exists():
+        raise HTTPException(status_code=404, detail="sources.yaml not found")
+
+    with open(config_path) as f:
+        config = yaml.safe_load(f)
+
+    sources = config.get("sources", {})
+    created = 0
+    updated = 0
+
+    for name, source_config in sources.items():
+        result = await db.execute(select(SourceConfig).where(SourceConfig.name == name))
+        existing = result.scalar_one_or_none()
+
+        if existing:
+            existing.enabled = source_config.get("enabled", True)
+            existing.channel = source_config.get("channel", "")
+            existing.source_type = source_config.get("type", "rss")
+            existing.config = source_config
+            updated += 1
+        else:
+            new_source = SourceConfig(
+                name=name,
+                enabled=source_config.get("enabled", True),
+                channel=source_config.get("channel", ""),
+                source_type=source_config.get("type", "rss"),
+                config=source_config,
+            )
+            db.add(new_source)
+            created += 1
+
+    await db.commit()
+    return SuccessResponse(
+        message=f"Synced {created} new, {updated} updated sources from config",
+        data={"created": created, "updated": updated},
+    )

@@ -1,75 +1,42 @@
 """交易所新币上线 / 下线公告监控
-覆盖：Binance / Upbit / Bithumb / Coinbase / OKX / Bybit / Hyperliquid
-策略：RSS 优先；无 RSS 的交易所解析 HTML 公告页
+策略：
+- Binance: 官方 CMS API (catalogId=48)
+- Upbit: 公开 Market API diff 检测新 KRW 上线
+- Bithumb: 公开 Ticker API diff 检测新上线
+- Coinbase/OKX/Bybit: RSS/公告 API（有则用）
+- CoinGecko Trending: 辅助信号（热门新币）
 """
 
 import httpx
 import feedparser
-from typing import List, Optional
+import json
+from pathlib import Path
+from typing import List, Optional, Set
 from datetime import datetime, timezone, timedelta
-from bs4 import BeautifulSoup
-import re
 from .base import DataSource, Item
 
-
-EXCHANGE_SOURCES = {
-    "Binance": {
-        "type": "rss",
-        "url": "https://www.binance.com/en/support/announcement/new-cryptocurrency-listing?c=48&navId=48",
-        "rss": "https://www.binance.com/en/support/announcement/c-48?page=1",
-        "api": "https://www.binance.com/bapi/composite/v1/public/cms/article/list/query?type=1&pageNo=1&pageSize=20&categoryId=48",
-        "base_url": "https://www.binance.com/en/support/announcement/",
-    },
-    "Upbit": {
-        "type": "html",
-        "url": "https://upbit.com/service_center/notice",
-        "base_url": "https://upbit.com/service_center/notice?id=",
-        "keywords": ["상장", "listing", "신규", "new coin"],  # 韩文"上架"
-    },
-    "Bithumb": {
-        "type": "rss",
-        "rss": "https://feed.bithumb.com/notice",  # 若存在
-        "url": "https://support.bithumb.com/hc/ko/categories/360001625551",
-        "base_url": "https://support.bithumb.com",
-    },
-    "Coinbase": {
-        "type": "rss",
-        "rss": "https://blog.coinbase.com/feed",
-        "base_url": "https://blog.coinbase.com/",
-        "keywords": ["listing", "asset", "support", "launch"],
-    },
-    "OKX": {
-        "type": "rss",
-        "rss": "https://www.okx.com/help-center/rss.xml",
-        "base_url": "https://www.okx.com",
-        "keywords": ["listing", "new", "launch", "spot"],
-    },
-    "Bybit": {
-        "type": "api",
-        "api": "https://announcements.bybit.com/en-US/?category=new_crypto&page=1",
-        "base_url": "https://announcements.bybit.com",
-    },
-}
-
-LISTING_KEYWORDS = [
-    "listing", "listed", "new coin", "new token", "launch", "spot trading",
-    "上线", "上架", "상장", "신규", "새로운 코인", "거래 지원",
-    "will list", "supports", "available", "trading pair",
-]
-
-DELISTING_KEYWORDS = [
-    "delist", "delisting", "remove", "suspend", "discontinue",
-    "下架", "下线", "상장폐지", "거래 중단",
-]
+# 本地缓存：记录上次已知的交易所币种列表，用于 diff 检测新上线
+CACHE_DIR = Path(__file__).parent.parent.parent / "data" / "exchange_cache"
 
 
-def _is_listing_related(title: str, body: str = "") -> bool:
-    text = (title + " " + body).lower()
-    return any(kw.lower() in text for kw in LISTING_KEYWORDS + DELISTING_KEYWORDS)
+def _load_cache(exchange: str) -> Set[str]:
+    path = CACHE_DIR / f"{exchange}_markets.json"
+    if path.exists():
+        try:
+            return set(json.loads(path.read_text()))
+        except Exception:
+            pass
+    return set()
+
+
+def _save_cache(exchange: str, markets: Set[str]):
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    path = CACHE_DIR / f"{exchange}_markets.json"
+    path.write_text(json.dumps(sorted(markets)))
 
 
 class ExchangeListingSource(DataSource):
-    """监控多交易所新币上线/下线公告"""
+    """监控多交易所新币上线信号"""
 
     def get_source_name(self) -> str:
         return "exchange_listing"
@@ -80,98 +47,320 @@ class ExchangeListingSource(DataSource):
             cutoff = datetime.now(timezone.utc) - timedelta(hours=hours_ago)
 
         all_items = []
-        exchanges = self.config.get("exchanges", list(EXCHANGE_SOURCES.keys()))
+        exchanges = self.config.get("exchanges", ["Binance", "Upbit", "Bithumb", "Coinbase", "OKX", "Bybit"])
 
         for exch in exchanges:
             try:
-                items = self._fetch_exchange(exch, cutoff)
+                if exch == "Binance":
+                    items = self._fetch_binance(cutoff)
+                elif exch == "Upbit":
+                    items = self._fetch_upbit_diff()
+                elif exch == "Bithumb":
+                    items = self._fetch_bithumb_diff()
+                elif exch == "Coinbase":
+                    items = self._fetch_coinbase(cutoff)
+                elif exch == "OKX":
+                    items = self._fetch_okx(cutoff)
+                elif exch == "Bybit":
+                    items = self._fetch_bybit(cutoff)
+                else:
+                    items = []
                 all_items.extend(items)
             except Exception as e:
                 print(f"    ⚠️  ExchangeListing [{exch}] error: {e}")
-                continue
 
-        print(f"    ✅ ExchangeListingSource: {len(all_items)} listing signals")
+        # CoinGecko Trending 作为辅助信号
+        try:
+            trending = self._fetch_coingecko_trending()
+            all_items.extend(trending)
+        except Exception as e:
+            print(f"    ⚠️  CoinGecko trending error: {e}")
+
+        print(f"    ✅ ExchangeListingSource: {len(all_items)} signals")
         return all_items
 
-    def _fetch_exchange(self, name: str, cutoff: Optional[datetime]) -> List[Item]:
-        cfg = EXCHANGE_SOURCES.get(name, {})
-        src_type = cfg.get("type", "rss")
-
-        if name == "Binance":
-            return self._fetch_binance(cutoff)
-        elif name == "Coinbase":
-            return self._fetch_rss(name, cfg.get("rss", ""), cfg, cutoff)
-        elif name == "OKX":
-            return self._fetch_rss(name, cfg.get("rss", ""), cfg, cutoff)
-        elif name == "Bithumb":
-            return self._fetch_bithumb(cutoff)
-        elif name == "Upbit":
-            return self._fetch_upbit(cutoff)
-        elif name == "Bybit":
-            return self._fetch_bybit(cutoff)
-        return []
-
+    # ──────────────────────────────────────────────
+    # Binance — CMS API
+    # ──────────────────────────────────────────────
     def _fetch_binance(self, cutoff) -> List[Item]:
-        """Binance 通过官方 API 获取公告列表"""
         url = "https://www.binance.com/bapi/composite/v1/public/cms/article/list/query"
         params = {"type": 1, "pageNo": 1, "pageSize": 20, "catalogId": 48}
         try:
-            r = httpx.get(url, params=params, timeout=20,
-                          headers={
-                              "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
-                              "clienttype": "web",
-                              "lang": "en",
-                          })
+            r = httpx.get(url, params=params, timeout=20, headers={
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
+                "clienttype": "web", "lang": "en",
+            })
             r.raise_for_status()
-            data = r.json()
-            catalogs = data.get("data", {}).get("catalogs", [])
+            catalogs = r.json().get("data", {}).get("catalogs", [])
             articles = catalogs[0].get("articles", []) if catalogs else []
         except Exception as e:
-            print(f"    ⚠️  Binance API error: {e}")
+            print(f"    ⚠️  Binance API: {e}")
             return []
 
         items = []
         for a in articles:
             title = a.get("title", "")
-            if not _is_listing_related(title):
-                continue
             pub_ts = a.get("releaseDate", 0)
             pub_dt = datetime.fromtimestamp(pub_ts / 1000, tz=timezone.utc) if pub_ts else datetime.now(timezone.utc)
             if cutoff and pub_dt < cutoff:
                 continue
             code = a.get("code", "")
-            url = f"https://www.binance.com/en/support/announcement/{code}"
+            url_link = f"https://www.binance.com/en/support/announcement/{code}"
             items.append(self._make_item(
                 native_id=f"binance:{code}",
-                title=f"[Binance] {title}",
+                title=f"[Binance 上线] {title}",
                 text=title,
-                url=url,
+                url=url_link,
                 author="Binance",
                 published_at=pub_dt,
-                metadata={"exchange": "Binance", "tags": ["listing", "exchange"]},
+                metadata={"exchange": "Binance", "tags": ["listing"]},
             ))
         return items
 
-    def _fetch_rss(self, name: str, rss_url: str, cfg: dict, cutoff) -> List[Item]:
-        """通用 RSS 抓取"""
-        if not rss_url:
-            return []
-        keywords = cfg.get("keywords", LISTING_KEYWORDS)
-        try:
-            r = httpx.get(rss_url, timeout=20, headers={"User-Agent": "Newsloom/0.2.0"}, follow_redirects=True)
-            feed = feedparser.parse(r.text)
-        except Exception as e:
-            print(f"    ⚠️  {name} RSS error: {e}")
-            return []
+    # ──────────────────────────────────────────────
+    # Upbit — Market API diff（韩国 #1）
+    # ──────────────────────────────────────────────
+    def _fetch_upbit_diff(self) -> List[Item]:
+        """对比 Upbit KRW market 列表，检测新上线币种"""
+        r = httpx.get(
+            "https://api.upbit.com/v1/market/all?isDetails=true",
+            timeout=15, headers={"User-Agent": "Newsloom/0.2"},
+        )
+        r.raise_for_status()
+        markets_data = r.json()
+
+        current: Set[str] = set()
+        market_info = {}
+        for m in markets_data:
+            market = m.get("market", "")
+            if market.startswith("KRW-"):
+                symbol = market.replace("KRW-", "")
+                current.add(symbol)
+                market_info[symbol] = {
+                    "name": m.get("korean_name", symbol),
+                    "market": market,
+                    "market_event": m.get("market_event", {})
+                }
+
+        cached = _load_cache("upbit")
+        new_listings = current - cached if cached else set()
+        _save_cache("upbit", current)
 
         items = []
-        for entry in feed.entries[:30]:
+        for symbol in new_listings:
+            info = market_info.get(symbol, {})
+            name = info.get("name", symbol)
+            market = info.get("market", f"KRW-{symbol}")
+            title = f"[Upbit 🇰🇷 新上线] {symbol} ({name}) — KRW 交易对开放"
+            url = f"https://upbit.com/exchange?code=CRIX.UPBIT.{market}"
+            items.append(self._make_item(
+                native_id=f"upbit_new:{symbol}",
+                title=title,
+                text=title,
+                url=url,
+                author="Upbit",
+                published_at=datetime.now(timezone.utc),
+                metadata={"exchange": "Upbit", "symbol": symbol, "tags": ["listing", "korea", "🔴"]},
+            ))
+
+        if new_listings:
+            print(f"    🔴 Upbit 新上线: {', '.join(new_listings)}")
+        return items
+
+    # ──────────────────────────────────────────────
+    # Bithumb — Ticker API diff（韩国 #2）
+    # ──────────────────────────────────────────────
+    def _fetch_bithumb_diff(self) -> List[Item]:
+        """对比 Bithumb KRW ticker，检测新上线币种"""
+        r = httpx.get(
+            "https://api.bithumb.com/public/ticker/ALL_KRW",
+            timeout=15, headers={"User-Agent": "Newsloom/0.2"},
+        )
+        r.raise_for_status()
+        data = r.json()
+        if data.get("status") != "0000":
+            return []
+
+        current = set(k for k in data.get("data", {}).keys() if k != "date")
+        cached = _load_cache("bithumb")
+        new_listings = current - cached if cached else set()
+        _save_cache("bithumb", current)
+
+        items = []
+        for symbol in new_listings:
+            title = f"[Bithumb 🇰🇷 新上线] {symbol} — KRW 交易对开放"
+            url = f"https://www.bithumb.com/react/trade/order/{symbol}-KRW"
+            items.append(self._make_item(
+                native_id=f"bithumb_new:{symbol}",
+                title=title,
+                text=title,
+                url=url,
+                author="Bithumb",
+                published_at=datetime.now(timezone.utc),
+                metadata={"exchange": "Bithumb", "symbol": symbol, "tags": ["listing", "korea", "🔴"]},
+            ))
+
+        if new_listings:
+            print(f"    🔴 Bithumb 新上线: {', '.join(new_listings)}")
+        return items
+
+    # ──────────────────────────────────────────────
+    # Coinbase — 官方 Asset 页面 RSS
+    # ──────────────────────────────────────────────
+    def _fetch_coinbase(self, cutoff) -> List[Item]:
+        """Coinbase 上线公告通过官方 asset listing page"""
+        # Coinbase blog RSS 被 403，用官方 asset status API
+        url = "https://api.coinbase.com/v2/assets/summary"
+        try:
+            r = httpx.get(url, timeout=15, headers={"User-Agent": "Newsloom/0.2"}, follow_redirects=True)
+            # 这不是 listing API，退而求其次用 exchange listing RSS 聚合服务
+            # cryptocurrencyalerting.com 的 Coinbase feed
+            feed_url = "https://cryptocurrencyalerting.com/exchange/Coinbase/rss"
+            r2 = httpx.get(feed_url, timeout=10, headers={"User-Agent": "Mozilla/5.0"}, follow_redirects=True)
+            if r2.status_code != 200:
+                return []
+            feed = feedparser.parse(r2.text)
+        except Exception as e:
+            print(f"    ⚠️  Coinbase: {e}")
+            return []
+
+        return self._parse_rss_items("Coinbase", feed, cutoff)
+
+    # ──────────────────────────────────────────────
+    # OKX
+    # ──────────────────────────────────────────────
+    def _fetch_okx(self, cutoff) -> List[Item]:
+        # OKX 公开 instrument API
+        try:
+            r = httpx.get(
+                "https://www.okx.com/api/v5/public/instruments?instType=SPOT",
+                timeout=15, headers={"User-Agent": "Newsloom/0.2"},
+            )
+            data = r.json()
+            instruments = data.get("data", [])
+            current = set(i.get("instId", "") for i in instruments)
+
+            cached = _load_cache("okx")
+            new_listings = current - cached if cached else set()
+            _save_cache("okx", current)
+
+            items = []
+            for inst_id in new_listings:
+                # 只关注 USDT 对
+                if not inst_id.endswith("-USDT"):
+                    continue
+                symbol = inst_id.replace("-USDT", "")
+                title = f"[OKX 新上线] {symbol} — USDT 现货开放"
+                url = f"https://www.okx.com/trade-spot/{inst_id.lower()}"
+                items.append(self._make_item(
+                    native_id=f"okx_new:{inst_id}",
+                    title=title,
+                    text=title,
+                    url=url,
+                    author="OKX",
+                    published_at=datetime.now(timezone.utc),
+                    metadata={"exchange": "OKX", "symbol": symbol, "tags": ["listing"]},
+                ))
+
+            if new_listings:
+                usdt_new = [i for i in new_listings if i.endswith("-USDT")]
+                if usdt_new:
+                    print(f"    🟡 OKX 新上线: {', '.join(usdt_new)}")
+            return items
+
+        except Exception as e:
+            print(f"    ⚠️  OKX: {e}")
+            return []
+
+    # ──────────────────────────────────────────────
+    # Bybit — 公告 API
+    # ──────────────────────────────────────────────
+    def _fetch_bybit(self, cutoff) -> List[Item]:
+        try:
+            r = httpx.get(
+                "https://announcements.bybit.com/en-US/",
+                params={"category": "new_crypto", "page": 1},
+                timeout=15,
+                headers={"User-Agent": "Mozilla/5.0"},
+                follow_redirects=True,
+                verify=False,  # Bybit SSL 有时有问题
+            )
+            if "new_crypto" not in r.url.path and r.status_code != 200:
+                return []
+            # 解析 HTML
+            from bs4 import BeautifulSoup
+            soup = BeautifulSoup(r.text, "html.parser")
+            articles = soup.select("a.article-list-item, .announcement-item a, li.announcement a")
+            items = []
+            for a in articles[:10]:
+                title = a.get_text(strip=True)
+                href = a.get("href", "")
+                if not any(kw in title.lower() for kw in ["list", "launch", "new", "spot", "token"]):
+                    continue
+                url = href if href.startswith("http") else f"https://announcements.bybit.com{href}"
+                items.append(self._make_item(
+                    native_id=f"bybit:{href}",
+                    title=f"[Bybit] {title}",
+                    text=title,
+                    url=url,
+                    author="Bybit",
+                    published_at=datetime.now(timezone.utc),
+                    metadata={"exchange": "Bybit", "tags": ["listing"]},
+                ))
+            return items
+        except Exception as e:
+            print(f"    ⚠️  Bybit: {e}")
+            return []
+
+    # ──────────────────────────────────────────────
+    # CoinGecko Trending — 辅助热度信号
+    # ──────────────────────────────────────────────
+    def _fetch_coingecko_trending(self) -> List[Item]:
+        r = httpx.get(
+            "https://api.coingecko.com/api/v3/search/trending",
+            timeout=10, headers={"User-Agent": "Newsloom/0.2"},
+        )
+        r.raise_for_status()
+        data = r.json()
+        coins = data.get("coins", [])
+
+        items = []
+        for c in coins[:7]:
+            item = c.get("item", {})
+            symbol = item.get("symbol", "")
+            name = item.get("name", "")
+            rank = item.get("market_cap_rank", "?")
+            price_btc = item.get("price_btc", 0)
+            data_item = item.get("data", {})
+            price_change = data_item.get("price_change_percentage_24h", {}).get("usd", 0)
+
+            title = f"[CoinGecko Trending] {symbol} ({name}) — rank#{rank} | 24h: {price_change:+.1f}%"
+            url = f"https://www.coingecko.com/en/coins/{item.get('id', symbol.lower())}"
+
+            items.append(self._make_item(
+                native_id=f"cg_trending:{symbol}",
+                title=title,
+                text=title,
+                url=url,
+                author="CoinGecko",
+                published_at=datetime.now(timezone.utc),
+                metadata={"symbol": symbol, "rank": rank, "price_change_24h": price_change, "tags": ["trending"]},
+            ))
+
+        return items
+
+    # ──────────────────────────────────────────────
+    # Helpers
+    # ──────────────────────────────────────────────
+    def _parse_rss_items(self, name: str, feed, cutoff) -> List[Item]:
+        import time
+        items = []
+        for entry in feed.entries[:20]:
             title = entry.get("title", "")
             link = entry.get("link", "")
             summary = entry.get("summary", "")
-            if not any(kw.lower() in (title + summary).lower() for kw in keywords + LISTING_KEYWORDS):
-                continue
-            pub_dt = self._parse_date(entry)
+            pub = entry.get("published_parsed")
+            pub_dt = datetime.fromtimestamp(time.mktime(pub), tz=timezone.utc) if pub else datetime.now(timezone.utc)
             if cutoff and pub_dt < cutoff:
                 continue
             items.append(self._make_item(
@@ -181,159 +370,6 @@ class ExchangeListingSource(DataSource):
                 url=link,
                 author=name,
                 published_at=pub_dt,
-                metadata={"exchange": name, "tags": ["listing", "exchange"]},
+                metadata={"exchange": name, "tags": ["listing"]},
             ))
         return items
-
-    def _fetch_bithumb(self, cutoff) -> List[Item]:
-        """Bithumb 韩国交易所公告（HTML 解析）"""
-        url = "https://support.bithumb.com/hc/ko/categories/360001625551"
-        try:
-            r = httpx.get(url, timeout=20, headers={
-                "User-Agent": "Mozilla/5.0",
-                "Accept-Language": "ko-KR,ko;q=0.9,en;q=0.8",
-            }, follow_redirects=True)
-            soup = BeautifulSoup(r.text, "html.parser")
-            articles = soup.select("li.article-list-item a, .article-list a")
-        except Exception as e:
-            print(f"    ⚠️  Bithumb scrape error: {e}")
-            return []
-
-        items = []
-        for a in articles[:20]:
-            title = a.get_text(strip=True)
-            href = a.get("href", "")
-            if not _is_listing_related(title):
-                continue
-            full_url = href if href.startswith("http") else f"https://support.bithumb.com{href}"
-            items.append(self._make_item(
-                native_id=f"bithumb:{href}",
-                title=f"[Bithumb] {title}",
-                text=title,
-                url=full_url,
-                author="Bithumb",
-                published_at=datetime.now(timezone.utc),
-                metadata={"exchange": "Bithumb", "tags": ["listing", "korea"]},
-            ))
-        return items
-
-    def _fetch_upbit(self, cutoff) -> List[Item]:
-        """Upbit 韩国交易所公告 API（Upbit 有非官方 JSON 端点）"""
-        url = "https://api-manager.upbit.com/api/v1/notices?page=1&per_page=20&category=trade"
-        try:
-            r = httpx.get(url, timeout=20, headers={
-                "User-Agent": "Mozilla/5.0",
-                "Referer": "https://upbit.com/",
-            }, follow_redirects=True)
-            data = r.json()
-            notices = data.get("data", {}).get("list", []) or data.get("list", [])
-        except Exception:
-            # fallback: HTML
-            return self._fetch_upbit_html(cutoff)
-
-        items = []
-        for n in notices[:20]:
-            title = n.get("title", "")
-            if not _is_listing_related(title):
-                continue
-            nid = n.get("id", "")
-            link = f"https://upbit.com/service_center/notice?id={nid}"
-            pub_str = n.get("created_at", "")
-            try:
-                pub_dt = datetime.fromisoformat(pub_str.replace("Z", "+00:00"))
-            except Exception:
-                pub_dt = datetime.now(timezone.utc)
-            if cutoff and pub_dt < cutoff:
-                continue
-            items.append(self._make_item(
-                native_id=f"upbit:{nid}",
-                title=f"[Upbit] {title}",
-                text=title,
-                url=link,
-                author="Upbit",
-                published_at=pub_dt,
-                metadata={"exchange": "Upbit", "tags": ["listing", "korea"]},
-            ))
-        return items
-
-    def _fetch_upbit_html(self, cutoff) -> List[Item]:
-        """Upbit fallback HTML 解析"""
-        try:
-            r = httpx.get("https://upbit.com/service_center/notice", timeout=20,
-                          headers={"User-Agent": "Mozilla/5.0"}, follow_redirects=True)
-            soup = BeautifulSoup(r.text, "html.parser")
-            rows = soup.select("tbody tr, .notice-list tr")
-        except Exception as e:
-            print(f"    ⚠️  Upbit HTML error: {e}")
-            return []
-
-        items = []
-        for row in rows[:20]:
-            tds = row.find_all("td")
-            if not tds:
-                continue
-            title = tds[0].get_text(strip=True) if tds else ""
-            if not _is_listing_related(title):
-                continue
-            link = row.find("a")
-            href = link.get("href", "") if link else ""
-            full_url = href if href.startswith("http") else f"https://upbit.com{href}"
-            items.append(self._make_item(
-                native_id=f"upbit_html:{href}",
-                title=f"[Upbit] {title}",
-                text=title,
-                url=full_url,
-                author="Upbit",
-                published_at=datetime.now(timezone.utc),
-                metadata={"exchange": "Upbit", "tags": ["listing", "korea"]},
-            ))
-        return items
-
-    def _fetch_bybit(self, cutoff) -> List[Item]:
-        """Bybit 公告 API"""
-        url = "https://announcements.bybit.com/en-US/api/search?category=new_crypto&page=1&limit=20"
-        try:
-            r = httpx.get(url, timeout=20, headers={"User-Agent": "Newsloom/0.2.0"}, follow_redirects=True)
-            data = r.json()
-            items_data = data.get("items", data.get("data", []))
-        except Exception as e:
-            print(f"    ⚠️  Bybit API error: {e}")
-            return []
-
-        items = []
-        for a in items_data[:20]:
-            title = a.get("title", "")
-            link = a.get("url", a.get("link", ""))
-            pub_str = a.get("date_timestamp", a.get("publishTime", ""))
-            try:
-                if isinstance(pub_str, (int, float)):
-                    pub_dt = datetime.fromtimestamp(pub_str / 1000, tz=timezone.utc)
-                else:
-                    pub_dt = datetime.fromisoformat(str(pub_str).replace("Z", "+00:00"))
-            except Exception:
-                pub_dt = datetime.now(timezone.utc)
-            if cutoff and pub_dt < cutoff:
-                continue
-            items.append(self._make_item(
-                native_id=f"bybit:{link}",
-                title=f"[Bybit] {title}",
-                text=title,
-                url=link if link.startswith("http") else f"https://announcements.bybit.com{link}",
-                author="Bybit",
-                published_at=pub_dt,
-                metadata={"exchange": "Bybit", "tags": ["listing", "exchange"]},
-            ))
-        return items
-
-    @staticmethod
-    def _parse_date(entry) -> datetime:
-        """解析 feedparser entry 的发布时间"""
-        for field in ["published_parsed", "updated_parsed", "created_parsed"]:
-            val = getattr(entry, field, None)
-            if val:
-                try:
-                    import time
-                    return datetime.fromtimestamp(time.mktime(val), tz=timezone.utc)
-                except Exception:
-                    pass
-        return datetime.now(timezone.utc)

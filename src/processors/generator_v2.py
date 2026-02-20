@@ -53,10 +53,10 @@ PRIORITY_ORDER = {"🔴": 0, "🟡": 1, "🟢": 2}
 class ReportGeneratorV2:
     """v2 报告生成器"""
 
-    def __init__(self, config: dict):
+    def __init__(self, config: dict, template_name: str = None):
         self.config = config
         self.formats = config.get("generate", {}).get("formats", ["markdown", "html"])
-        self.template_name = config.get("generate", {}).get("template", "magazine")
+        self.template_name = template_name or config.get("generate", {}).get("template", "magazine")
 
         self.project_root = Path(__file__).parent.parent.parent
         self.template_dir = self.project_root / "templates" / self.template_name
@@ -80,6 +80,133 @@ class ReportGeneratorV2:
                 data = yaml.safe_load(f)
                 return data.get("sections", {})
         return {}
+
+    @classmethod
+    def list_templates(cls, config: dict = None) -> List[Dict]:
+        """扫描 templates 目录，返回所有可用模板列表"""
+        if config is None:
+            config = {}
+        project_root = Path(__file__).parent.parent.parent
+        templates_dir = project_root / "templates"
+        
+        if not templates_dir.exists():
+            return []
+        
+        templates = []
+        for template_path in templates_dir.iterdir():
+            if not template_path.is_dir():
+                continue
+                
+            meta_file = template_path / "meta.yaml"
+            template_info = {
+                "name": template_path.name,
+                "description": "No description available",
+                "theme": "default",
+                "features": []
+            }
+            
+            if meta_file.exists():
+                try:
+                    with open(meta_file, "r", encoding="utf-8") as f:
+                        meta = yaml.safe_load(f)
+                        if meta:
+                            template_info.update({
+                                "description": meta.get("description", template_info["description"]),
+                                "theme": meta.get("theme", template_info["theme"]),
+                                "features": meta.get("features", template_info["features"])
+                            })
+                except Exception as e:
+                    print(f"⚠️ 读取 {meta_file} 失败: {e}")
+            
+            # 检查是否有必要的模板文件
+            if (template_path / "report.html.j2").exists():
+                templates.append(template_info)
+        
+        return sorted(templates, key=lambda x: x["name"])
+
+    def preview_template(self, template_name: str) -> str:
+        """生成模板预览 HTML（使用 mock 数据）"""
+        project_root = Path(__file__).parent.parent.parent
+        template_dir = project_root / "templates" / template_name
+        
+        if not template_dir.exists() or not (template_dir / "report.html.j2").exists():
+            return f"<p>Template '{template_name}' not found or invalid.</p>"
+        
+        # Mock 数据用于预览
+        mock_data = {
+            "date_str": "2024-01-15",
+            "generated_time": "2024-01-15 09:30",
+            "total_items": 12,
+            "executive_summary": "今日重点关注：人工智能领域新突破，加密货币市场波动，科技股集体上涨。重要政策发布影响多个行业。",
+            "briefs": {
+                "tech": [
+                    {
+                        "headline": "OpenAI 发布 GPT-4 Turbo 新版本",
+                        "detail": "新版本在推理能力和多模态处理方面有显著提升，API 成本降低 50%",
+                        "url": "#",
+                        "source": "TechCrunch",
+                        "priority": "🔴",
+                        "tags": ["AI", "OpenAI", "GPT-4"]
+                    },
+                    {
+                        "headline": "苹果公司将在下月发布 Vision Pro 2",
+                        "detail": "据内部消息，新版本将支持更高分辨率显示和改进的手势识别",
+                        "url": "#",
+                        "source": "Bloomberg",
+                        "priority": "🟡",
+                        "tags": ["Apple", "VR", "Vision Pro"]
+                    }
+                ],
+                "crypto": [
+                    {
+                        "headline": "比特币突破 45000 美元大关",
+                        "detail": "受机构投资者入场影响，比特币价格创近期新高",
+                        "url": "#",
+                        "source": "CoinDesk",
+                        "priority": "🟡",
+                        "tags": ["BTC", "价格", "突破"]
+                    }
+                ]
+            },
+            "section_configs": {
+                "tech": {
+                    "title": "科技前沿",
+                    "emoji": "💻",
+                    "order": 1
+                },
+                "crypto": {
+                    "title": "加密货币",
+                    "emoji": "₿",
+                    "order": 2
+                }
+            },
+            "section_order": ["tech", "crypto"],
+            "stats": {
+                "sources_count": 25,
+                "keywords_count": 156,
+                "sentiment_score": 0.65
+            }
+        }
+        
+        try:
+            jinja_env = Environment(
+                loader=FileSystemLoader(str(template_dir)),
+                trim_blocks=True,
+                lstrip_blocks=True,
+            )
+            jinja_env.filters['md_inline'] = _md_inline
+            
+            template = jinja_env.get_template("report.html.j2")
+            html = template.render(**mock_data)
+            
+            # 只返回前 5000 字符（预览用）
+            if len(html) > 5000:
+                html = html[:5000] + "...</div></body></html>"
+            
+            return html
+            
+        except Exception as e:
+            return f"<p>Template preview error: {str(e)}</p>"
 
     def _get_section_order(self) -> List[str]:
         return sorted(

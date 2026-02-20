@@ -24,7 +24,7 @@ pipeline:
 
   generate:
     formats: ["markdown", "html", "pdf"]
-    template: "magazine"
+    template: "premium"
     generate_cards: false
     generate_rss: true
 
@@ -36,7 +36,7 @@ ai:
   claude:
     api_key: ${ANTHROPIC_API_KEY}
     base_url: ${ANTHROPIC_BASE_URL}
-    model: "claude-opus-4-6"
+    model: "claude-sonnet-4-6"
     max_tokens: 16384
     temperature: 0.2
 
