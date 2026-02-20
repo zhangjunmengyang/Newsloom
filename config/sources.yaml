@@ -91,6 +91,30 @@ sources:
     max_per_feed: 20
 
   # ============================================================
+  # Anthropic 官方 (无 RSS，Sanity CMS API scraper)
+  # ============================================================
+  anthropic_news:
+    enabled: true
+    channel: "ai"
+    type: "anthropic"
+
+  # ============================================================
+  # 交易所新币上线 / 下线监控 — 🔴 高价值 alpha 信号
+  # 覆盖：Binance / Upbit / Bithumb / Coinbase / OKX / Bybit
+  # ============================================================
+  exchange_listing_monitor:
+    enabled: true
+    channel: "crypto"
+    type: "exchange_listing"
+    exchanges:
+      - Binance
+      - Upbit
+      - Bithumb
+      - Coinbase
+      - OKX
+      - Bybit
+
+  # ============================================================
   # Crypto / Web3
   # ============================================================
   rss_crypto:

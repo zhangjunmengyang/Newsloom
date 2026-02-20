@@ -12,6 +12,8 @@ from .web_search import WebSearchSource
 from .crypto_market import CryptoMarketSource
 from .producthunt import ProductHuntSource
 from .reddit import RedditSource
+from .anthropic import AnthropicSource
+from .exchange_listing import ExchangeListingSource
 
 
 class SourceRegistry:
@@ -27,6 +29,8 @@ class SourceRegistry:
         'crypto_market': CryptoMarketSource,
         'producthunt': ProductHuntSource,
         'reddit': RedditSource,
+        'anthropic': AnthropicSource,
+        'exchange_listing': ExchangeListingSource,
         # More sources can be added:
         # 'twitter': TwitterSource,
     }
