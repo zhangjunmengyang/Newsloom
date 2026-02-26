@@ -4,6 +4,13 @@
 import sys
 from pathlib import Path
 
+# Load .env before anything else
+try:
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).parent / '.env')
+except ImportError:
+    pass
+
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent / 'src'))
 

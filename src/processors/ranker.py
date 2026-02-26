@@ -96,6 +96,14 @@ SOURCE_AUTHORITY = {
     "AI News": 6, "36kr": 6, "机器之心": 7, "量子位": 6,
     # Tier 6: 一般
     "Dev.to AI": 5, "Slashdot": 5,
+    # 交易所上线 (高价值 alpha 信号)
+    "exchange_listing": 10,
+    "Binance": 10, "Upbit": 10, "Bithumb": 10,
+    "Coinbase": 9, "OKX": 9, "Bybit": 8,
+    # Anthropic 官方
+    "anthropic_news": 10, "Anthropic News": 10,
+    # Web Search
+    "web_search": 6,
     # 默认
     "_default": 5,
 }
@@ -173,10 +181,13 @@ class CoarseRanker:
         authority = self.authority.get(source_name, self.authority["_default"])
         authority_factor = 0.5 + (authority / 20.0)  # 5 → 0.75, 10 → 1.0
 
-        # 3. 时效性衰减 (1.0 → 0.3 over 48h)
+        # 3. 时效性衰减 (1.0 → 0.3 over 48h) + breaking news 升权
         now = datetime.now(timezone.utc)
         age_hours = (now - item.published_at).total_seconds() / 3600
         freshness = max(0.3, 1.0 - (age_hours / 72.0))
+        # Breaking news (<2h) 额外 +30%
+        if age_hours < 2:
+            freshness = min(freshness * 1.3, 1.5)
 
         # 4. 互动量加成
         engagement = 1.0
@@ -192,6 +203,21 @@ class CoarseRanker:
         if meta.get("comments"):
             comments = meta["comments"]
             engagement += min(comments / 200, 0.3)
+
+        # 5. 特殊信号加成
+        # 交易所上线 → 强制高分（这是 alpha 信号，不能被埋）
+        if item.source == 'exchange_listing':
+            title_lower = item.title.lower()
+            # 真实上线公告（排除 CoinGecko Trending 这类）
+            if any(k in title_lower for k in ['上线', 'listing', 'new pair', 'new trading', '新增']):
+                base_score = max(base_score, 20.0)
+            # 韩国交易所额外加分（溢价效应）
+            if '🇰🇷' in item.title or any(k in title_lower for k in ['upbit', 'bithumb']):
+                base_score *= 1.5
+
+        # Anthropic 官方公告 → 固定高分
+        if item.source in ('anthropic_news', 'anthropic'):
+            base_score = max(base_score, 12.0)
 
         final_score = base_score * authority_factor * freshness * engagement
         return round(final_score, 3)

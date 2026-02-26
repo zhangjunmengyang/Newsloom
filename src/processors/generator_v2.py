@@ -1,4 +1,4 @@
-"""Layer 4 v2: 报告生成器 — 支持分级阅读 + Executive Summary + 新模板
+"""Layer 4 v2: 报告生成器 - 支持分级阅读 + Executive Summary + 新模板
 
 改进点：
 1. Executive Summary 由 AI 生成（从 analyzer_v2 传入）
@@ -88,15 +88,15 @@ class ReportGeneratorV2:
             config = {}
         project_root = Path(__file__).parent.parent.parent
         templates_dir = project_root / "templates"
-        
+
         if not templates_dir.exists():
             return []
-        
+
         templates = []
         for template_path in templates_dir.iterdir():
             if not template_path.is_dir():
                 continue
-                
+
             meta_file = template_path / "meta.yaml"
             template_info = {
                 "name": template_path.name,
@@ -104,7 +104,7 @@ class ReportGeneratorV2:
                 "theme": "default",
                 "features": []
             }
-            
+
             if meta_file.exists():
                 try:
                     with open(meta_file, "r", encoding="utf-8") as f:
@@ -117,21 +117,21 @@ class ReportGeneratorV2:
                             })
                 except Exception as e:
                     print(f"⚠️ 读取 {meta_file} 失败: {e}")
-            
+
             # 检查是否有必要的模板文件
             if (template_path / "report.html.j2").exists():
                 templates.append(template_info)
-        
+
         return sorted(templates, key=lambda x: x["name"])
 
     def preview_template(self, template_name: str) -> str:
         """生成模板预览 HTML（使用 mock 数据）"""
         project_root = Path(__file__).parent.parent.parent
         template_dir = project_root / "templates" / template_name
-        
+
         if not template_dir.exists() or not (template_dir / "report.html.j2").exists():
             return f"<p>Template '{template_name}' not found or invalid.</p>"
-        
+
         # Mock 数据用于预览
         mock_data = {
             "date_str": "2024-01-15",
@@ -187,7 +187,7 @@ class ReportGeneratorV2:
                 "sentiment_score": 0.65
             }
         }
-        
+
         try:
             jinja_env = Environment(
                 loader=FileSystemLoader(str(template_dir)),
@@ -195,16 +195,16 @@ class ReportGeneratorV2:
                 lstrip_blocks=True,
             )
             jinja_env.filters['md_inline'] = _md_inline
-            
+
             template = jinja_env.get_template("report.html.j2")
             html = template.render(**mock_data)
-            
+
             # 只返回前 5000 字符（预览用）
             if len(html) > 5000:
                 html = html[:5000] + "...</div></body></html>"
-            
+
             return html
-            
+
         except Exception as e:
             return f"<p>Template preview error: {str(e)}</p>"
 
@@ -217,11 +217,12 @@ class ReportGeneratorV2:
     def generate(self, analyzed_data: Dict, date_str: str, output_dir: Path):
         """
         生成所有格式的报告
-        
+
         analyzed_data 结构：
         {
             "briefs": {section: [brief, ...]},
             "executive_summary": "...",
+            "cross_analysis": {...},
             "stats": {...}
         }
         """
@@ -230,6 +231,7 @@ class ReportGeneratorV2:
 
         briefs = analyzed_data.get("briefs", analyzed_data)  # 兼容旧格式
         exec_summary = analyzed_data.get("executive_summary", "")
+        cross_analysis = analyzed_data.get("cross_analysis", {})
         stats = analyzed_data.get("stats", {})
 
         # 按 priority 排序每个 section
@@ -242,11 +244,11 @@ class ReportGeneratorV2:
 
         if "markdown" in self.formats:
             md_path = output_dir / "report.md"
-            self._generate_markdown(briefs, exec_summary, date_str, md_path)
+            self._generate_markdown(briefs, exec_summary, cross_analysis, date_str, md_path)
 
         if "html" in self.formats:
             html_path = output_dir / "report.html"
-            self._generate_html(briefs, exec_summary, stats, date_str, html_path)
+            self._generate_html(briefs, exec_summary, stats, cross_analysis, date_str, html_path)
 
         # PDF 版（从 HTML 转换，适配 A4 打印）
         if "pdf" in self.formats or True:  # 默认总是生成 PDF
@@ -257,11 +259,11 @@ class ReportGeneratorV2:
 
         # Discord 精简版
         discord_path = output_dir / "discord.md"
-        self._generate_discord(briefs, exec_summary, date_str, discord_path)
+        self._generate_discord(briefs, exec_summary, cross_analysis, date_str, discord_path)
 
         print(f"✅ 报告已生成: {output_dir}")
 
-    def _generate_markdown(self, briefs: Dict, exec_summary: str, date_str: str, output_path: Path):
+    def _generate_markdown(self, briefs: Dict, exec_summary: str, cross_analysis: Dict, date_str: str, output_path: Path):
         """生成 Markdown 报告"""
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -274,7 +276,7 @@ class ReportGeneratorV2:
         )
 
         lines = [
-            f"# 📰 Newsloom 每日情报 — {date_str}",
+            f"# 📰 Newsloom 每日情报 - {date_str}",
             "",
             f"*{datetime.now().strftime('%H:%M')} 生成 | {total} 条精选 | {must_read} 条必读*",
             "",
@@ -297,13 +299,13 @@ class ReportGeneratorV2:
             trends = briefs["__trends__"]
             # 只显示 rising 和 new 的，最多 10 条
             display_trends = [t for t in trends if '🔥' in t['trend'] or '🆕' in t['trend']][:10]
-            
+
             if display_trends:
                 lines.append("## 📊 趋势雷达")
                 lines.append("")
                 lines.append("| 关键词 | 趋势 | 今日 | 近7日均值 | 变化 |")
                 lines.append("|--------|------|------|-----------|------|")
-                
+
                 for trend in display_trends:
                     keyword = trend.get('keyword', '')
                     trend_emoji = trend.get('trend', '')
@@ -311,9 +313,9 @@ class ReportGeneratorV2:
                     avg_count = trend.get('avg_count', 0)
                     change_pct = trend.get('change_pct', 0)
                     change_sign = "+" if change_pct >= 0 else ""
-                    
+
                     lines.append(f"| {keyword} | {trend_emoji} | {today_count} | {avg_count} | {change_sign}{change_pct}% |")
-                
+
                 lines.append("")
                 lines.append("---")
                 lines.append("")
@@ -329,7 +331,7 @@ class ReportGeneratorV2:
                 count = len(briefs[section])
                 must = sum(1 for b in briefs[section] if b.get("priority") == "🔴")
                 must_tag = f" ({must}🔴)" if must else ""
-                lines.append(f"- [{emoji} {title}](#{section}) — {count} 条{must_tag}")
+                lines.append(f"- [{emoji} {title}](#{section}) - {count} 条{must_tag}")
         lines.append("")
         lines.append("---")
         lines.append("")
@@ -349,6 +351,7 @@ class ReportGeneratorV2:
             for i, brief in enumerate(briefs[section], 1):
                 headline = brief.get("headline", "No headline")
                 detail = brief.get("detail", "")
+                so_what = brief.get("so_what", "")
                 url = brief.get("url", "#")
                 source = brief.get("source", "")
                 priority = brief.get("priority", "🟢")
@@ -364,6 +367,35 @@ class ReportGeneratorV2:
                 if detail:
                     lines.append(detail)
                     lines.append("")
+                if so_what:
+                    lines.append(f"> 💡 **行动建议：** {so_what}")
+                    lines.append("")
+                lines.append("---")
+                lines.append("")
+
+        # 跨板块关联
+        if cross_analysis:
+            connections = cross_analysis.get("cross_connections", [])
+            main_narrative = cross_analysis.get("main_narrative", "")
+            risk_opp = cross_analysis.get("risk_opportunity", "")
+
+            if connections or main_narrative or risk_opp:
+                lines.append("## 🔗 跨板块关联")
+                lines.append("")
+                if main_narrative:
+                    lines.append(f"**今日主叙事：** {main_narrative}")
+                    lines.append("")
+                for conn in connections:
+                    sections_str = " + ".join(conn.get("sections", []))
+                    insight = conn.get("insight", "")
+                    implication = conn.get("implication", "")
+                    lines.append(f"🔗 **[{sections_str}]** {insight}")
+                    if implication:
+                        lines.append(f"   → {implication}")
+                    lines.append("")
+                if risk_opp:
+                    lines.append(f"⚠️ **关注点：** {risk_opp}")
+                    lines.append("")
                 lines.append("---")
                 lines.append("")
 
@@ -375,7 +407,7 @@ class ReportGeneratorV2:
             f.write("\n".join(lines))
         print(f"📄 Markdown: {output_path}")
 
-    def _generate_html(self, briefs: Dict, exec_summary: str, stats: Dict, date_str: str, output_path: Path):
+    def _generate_html(self, briefs: Dict, exec_summary: str, stats: Dict, cross_analysis: Dict, date_str: str, output_path: Path):
         """生成 HTML 报告（优先用模板）"""
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -387,6 +419,7 @@ class ReportGeneratorV2:
             "generated_time": datetime.now().strftime("%Y-%m-%d %H:%M"),
             "total_items": total,
             "executive_summary": exec_summary,
+            "cross_analysis": cross_analysis,
             "briefs": briefs,
             "section_configs": self.section_configs,
             "section_order": self._get_section_order(),
@@ -510,8 +543,8 @@ footer{{text-align:center;padding:24px 0;color:#94a3b8;border-top:1px solid #e2e
             print(f"⚠️ PDF 生成失败: {e}")
 
 
-    def _generate_discord(self, briefs: Dict, exec_summary: str, date_str: str, output_path: Path):
-        """生成 Discord 友好的精简版"""
+    def _generate_discord(self, briefs: Dict, exec_summary: str, cross_analysis: Dict, date_str: str, output_path: Path):
+        """生成 Discord 友好的精简版（含 so_what + 跨板块关联）"""
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
         lines = [f"**📰 Newsloom 每日情报 — {date_str}**", ""]
@@ -524,7 +557,7 @@ footer{{text-align:center;padding:24px 0;color:#94a3b8;border-top:1px solid #e2e
                     lines.append(line)
             lines.append("")
 
-        # 只展示 🔴必读 和 🟡推荐
+        # 只展示 🔴必读 和 🟡推荐，带 so_what
         for section in self._get_section_order():
             if section not in briefs or not briefs[section]:
                 continue
@@ -542,8 +575,33 @@ footer{{text-align:center;padding:24px 0;color:#94a3b8;border-top:1px solid #e2e
                 priority = b.get("priority", "🟢")
                 headline = b.get("headline", "")
                 url = b.get("url", "")
-                lines.append(f"{priority} [{headline}](<{url}>)")
+                so_what = b.get("so_what", "")
+                line = f"{priority} [{headline}](<{url}>)"
+                if so_what:
+                    line += f"\n  └ 💡 {so_what}"
+                lines.append(line)
             lines.append("")
+
+        # 跨板块关联（精简版）
+        if cross_analysis:
+            connections = cross_analysis.get("cross_connections", [])
+            risk_opp = cross_analysis.get("risk_opportunity", "")
+            main_narrative = cross_analysis.get("main_narrative", "")
+
+            if connections or risk_opp or main_narrative:
+                lines.append("**🔗 跨板块关联**")
+                if main_narrative:
+                    lines.append(f"今日主线：{main_narrative}")
+                for conn in connections[:3]:
+                    insight = conn.get("insight", "")
+                    implication = conn.get("implication", "")
+                    if insight:
+                        lines.append(f"🔗 {insight}")
+                    if implication:
+                        lines.append(f"  → {implication}")
+                if risk_opp:
+                    lines.append(f"⚠️ {risk_opp}")
+                lines.append("")
 
         lines.append("*完整报告见 HTML 版*")
 

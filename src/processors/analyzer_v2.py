@@ -141,16 +141,19 @@ class AIAnalyzerV2:
                 except Exception as e:
                     print(f"     ⚠️ Section '{section}' 处理异常: {e}")
 
-        # Step 3: Executive Summary
+        # Step 3: Executive Summary + 跨板块关联分析
         executive_summary = ""
+        cross_analysis = {}
         if all_briefs:
             executive_summary = self._generate_executive_summary(all_briefs)
+            cross_analysis = self._generate_cross_analysis(all_briefs)
 
         print(f"\n✅ AI 分析完成: {stats['total_output']} 条 briefs")
 
         return {
             "briefs": all_briefs,
             "executive_summary": executive_summary,
+            "cross_analysis": cross_analysis,
             "stats": stats,
         }
 
@@ -270,6 +273,34 @@ class AIAnalyzerV2:
         except Exception as e:
             print(f"     ⚠️ Executive Summary 生成失败: {e}")
             return ""
+
+    def _generate_cross_analysis(self, all_briefs: Dict) -> Dict:
+        """
+        跨板块关联分析 — 找出不同 section 的隐性连接
+        """
+        # 至少需要 2 个有内容的 section 才有意义
+        non_empty = {k: v for k, v in all_briefs.items() if v and not k.startswith('__')}
+        if len(non_empty) < 2:
+            return {}
+
+        print(f"\n  🔗 跨板块关联分析...")
+        prompt = self.prompts.cross_section_analysis_prompt(all_briefs)
+
+        try:
+            result = self.claude.call_with_json(
+                prompt=prompt,
+                system=self.prompts.system_prompt(),
+                max_tokens=1024,
+                temperature=0.3,
+            )
+            if isinstance(result, dict):
+                conns = result.get("cross_connections", [])
+                print(f"     ✓ 发现 {len(conns)} 个跨板块关联")
+                return result
+        except Exception as e:
+            print(f"     ⚠️ 跨板块分析失败: {e}")
+
+        return {}
 
     def save_analyzed_data(self, result: Dict, output_path: Path):
         """保存分析结果"""

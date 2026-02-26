@@ -243,13 +243,34 @@ sources:
   # Web Search (Brave API)
   # ============================================================
   web_search_ai:
-    enabled: false  # 需要 BRAVE_SEARCH_API_KEY
+    enabled: true
     channel: "ai"
     type: "web_search"
     queries:
-      - "AI news today"
-      - "LLM breakthrough 2026"
-      - "OpenAI latest"
+      - "LLM model release 2026"
+      - "AI agent breakthrough site:arxiv.org OR site:openai.com OR site:anthropic.com"
+      - "open source LLM release this week"
+    max_results_per_query: 5
+    api_key: ${BRAVE_SEARCH_API_KEY}
+
+  web_search_crypto:
+    enabled: true
+    channel: "crypto"
+    type: "web_search"
+    queries:
+      - "cryptocurrency exchange listing announcement today"
+      - "crypto regulation news 2026"
+      - "DeFi exploit hack 2026"
+    max_results_per_query: 5
+    api_key: ${BRAVE_SEARCH_API_KEY}
+
+  web_search_macro:
+    enabled: true
+    channel: "finance"
+    type: "web_search"
+    queries:
+      - "Federal Reserve policy 2026"
+      - "China US trade tariff 2026"
     max_results_per_query: 5
     api_key: ${BRAVE_SEARCH_API_KEY}
 
