@@ -62,12 +62,27 @@ def score_item_urgency(item) -> int:
     """快速评估条目紧急度（0-10）"""
     score = 0
     text = (item.title + " " + item.text[:200]).lower()
+    meta = getattr(item, 'metadata', {}) or {}
 
     # 交易所上线：最高优先级
     if item.source == 'exchange_listing':
-        score += 8
-        if '🇰🇷' in item.title or 'upbit' in text or 'bithumb' in text:
-            score += 2  # 韩国交易所上线额外加分
+        title_lower = item.title.lower()
+        # 真实上线公告（排除 CoinGecko Trending）
+        if any(k in title_lower for k in ['上线', 'listing', 'new pair', 'new trading', '新增', '新上线']):
+            score += 8
+            if '🇰🇷' in item.title or 'upbit' in text or 'bithumb' in text:
+                score += 2  # 韩国交易所上线额外加分
+
+        # CoinGecko Trending 异动检测：价格变化 >20% 才值得关注
+        elif 'coingecko trending' in title_lower:
+            price_change = abs(meta.get('price_change_24h', 0))
+            if price_change >= 50:
+                score += 7   # 暴涨/暴跌 ≥50% → 🔴
+            elif price_change >= 30:
+                score += 5   # 大涨/大跌 30-50% → 🟡
+            elif price_change >= 20:
+                score += 3   # 明显异动 20-30% → 边界
+            # <20% 纯热门榜，不加分，会被过滤掉
 
     # Anthropic 官方
     if item.source == 'anthropic_news':
@@ -81,8 +96,8 @@ def score_item_urgency(item) -> int:
             score += 1
 
     # HN 高分帖
-    if hasattr(item, 'metadata') and item.metadata:
-        hn_score = item.metadata.get('score', 0)
+    if meta:
+        hn_score = meta.get('score', 0)
         if hn_score > 500:
             score += 3
         elif hn_score > 200:
@@ -94,7 +109,8 @@ def score_item_urgency(item) -> int:
 def format_signal(item, urgency: int) -> dict:
     """格式化为心跳信号"""
     priority = "🔴" if urgency >= 7 else "🟡" if urgency >= 4 else "🟢"
-    return {
+    meta = getattr(item, 'metadata', {}) or {}
+    sig = {
         "priority": priority,
         "urgency": urgency,
         "title": item.title,
@@ -103,6 +119,12 @@ def format_signal(item, urgency: int) -> dict:
         "channel": item.channel,
         "published": item.published_at.isoformat() if item.published_at else None,
     }
+    # 附加有用的 metadata 字段
+    if meta.get('price_change_24h') is not None:
+        sig['price_change_24h'] = meta['price_change_24h']
+    if meta.get('symbol'):
+        sig['symbol'] = meta['symbol']
+    return sig
 
 
 def run_heartbeat_scan(hours: int = 2, source_filter: list = None) -> dict:
