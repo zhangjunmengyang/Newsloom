@@ -159,7 +159,8 @@ type: report
 
             raw_path = self.data_dir / "raw" / f"{date_str}.jsonl"
             fetcher.save_raw_data(items, raw_path)
-            state_manager.save()
+            # NOTE: state_manager.save() 延迟到 pipeline 全部成功后执行
+            # 避免 fetch 成功但后续步骤失败时，新条目被标记为 seen 导致重跑时被 dedup 跳过
 
         # ============================================================
         # Layer 2: RANK (粗排 + 去重)
@@ -343,6 +344,12 @@ type: report
             signal.alarm(0)
         except (AttributeError, OSError):
             pass
+
+        # Pipeline 全部成功，现在才保存 state（标记 seen items）
+        # 这样如果中间步骤失败，重跑时这些条目不会被 dedup 跳过
+        if "fetch" in layers:
+            state_manager.save()
+            print("💾 State saved (seen items updated)")
 
         print("\n" + "=" * 60)
         print("✅ Pipeline v2 completed!")
