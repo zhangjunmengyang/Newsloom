@@ -52,7 +52,7 @@ class PipelineV2:
         self.reports_dir.mkdir(exist_ok=True)
 
     OBSIDIAN_VAULT = Path("/Users/peterzhang/project/morpheus-vault")
-    OBSIDIAN_NEWSLOOM_DIR = OBSIDIAN_VAULT / "Newsloom"
+    OBSIDIAN_NEWSLOOM_DIR = OBSIDIAN_VAULT / "日报"
 
     def _archive_to_obsidian(self, output_dir: Path, date_str: str):
         """将日报 Markdown 归档到 Obsidian vault"""
