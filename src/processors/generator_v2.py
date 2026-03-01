@@ -567,12 +567,18 @@ footer{{text-align:center;padding:24px 0;color:#94a3b8;border-top:1px solid #e2e
             title = meta.get("title", section)
 
             important = [b for b in briefs[section] if b.get("priority") in ("🔴", "🟡")]
-            if not important:
+            selected = important[:5]
+
+            # 兜底：若本次精排/分级失败导致全是 🟢，也要保证 Discord 版不是空报告
+            if not selected:
+                selected = (briefs[section] or [])[:3]
+
+            if not selected:
                 continue
 
             lines.append(f"**{emoji} {title}**")
-            for b in important[:5]:  # 每个 section 最多 5 条
-                priority = b.get("priority", "🟢")
+            for b in selected:  # 每个 section 最多 5 条（兜底时最多 3 条）
+                priority = b.get("priority") or "🟢"
                 headline = b.get("headline", "")
                 url = b.get("url", "")
                 so_what = b.get("so_what", "")

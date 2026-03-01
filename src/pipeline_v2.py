@@ -225,6 +225,7 @@ type: report
                 api_key=api_key,
                 base_url=self.config["ai"]["claude"].get("base_url") or None,
                 model=self.config["ai"]["claude"].get("model"),
+                protocol=self.config["ai"]["claude"].get("protocol") or "anthropic",
             )
 
             analyzer = AIAnalyzerV2(

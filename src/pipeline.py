@@ -170,7 +170,8 @@ class Pipeline:
                 claude = ClaudeClient(
                     api_key=api_key,
                     base_url=self.config['ai']['claude'].get('base_url') or None,
-                    model=self.config['ai']['claude'].get('model')
+                    model=self.config['ai']['claude'].get('model'),
+                    protocol=self.config['ai']['claude'].get('protocol') or 'anthropic'
                 )
 
                 # 初始化分析器

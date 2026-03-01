@@ -53,3 +53,6 @@ logs/
 playwright/.cache/
 .github/workflows/
 test_output/
+
+# Local DB
+newsloom.db

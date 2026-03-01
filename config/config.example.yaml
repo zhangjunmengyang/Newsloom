@@ -40,9 +40,12 @@ ai:
     # 留空或注释掉则使用官方 API
     base_url: ${ANTHROPIC_BASE_URL:}
 
+    # 协议选择（anthropic 或 OpenAI Responses 兼容端点）
+    protocol: ${AI_PROTOCOL:anthropic}  # anthropic | openai_responses
+
     # 模型选择
     # 可选: claude-sonnet-4-20250514, claude-opus-4-20250514, claude-haiku-4-20250514
-    model: "claude-sonnet-4-20250514"
+    model: ${AI_MODEL:claude-sonnet-4-20250514}
 
     # 生成参数
     max_tokens: 4096          # 单次生成的最大 token 数

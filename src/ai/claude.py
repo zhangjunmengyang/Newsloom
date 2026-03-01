@@ -1,8 +1,15 @@
-"""Claude API 客户端包装器"""
+"""Claude API 客户端包装器
+
+支持两种协议：
+- anthropic: Anthropic 官方 Messages API（默认）
+- openai_responses: OpenAI 兼容的 /v1/responses（部分代理仅支持该接口）
+"""
 
 import time
 import json
 from typing import Optional, Dict, Any
+
+import requests
 from anthropic import Anthropic, APIError, RateLimitError
 
 
@@ -16,23 +23,110 @@ class ClaudeClient:
     - Token 计数
     """
 
-    def __init__(self, api_key: str, base_url: Optional[str] = None, model: Optional[str] = None):
+    def __init__(
+        self,
+        api_key: str,
+        base_url: Optional[str] = None,
+        model: Optional[str] = None,
+        protocol: str = "anthropic",
+    ):
         """
-        初始化 Claude 客户端
+        初始化客户端
 
         Args:
-            api_key: Anthropic API key
+            api_key: API key（Anthropic 或 OpenAI 兼容）
             base_url: 可选的自定义 API base URL
-            model: 模型名称（默认: claude-sonnet-4-5-20250929）
+            model: 模型名称
+            protocol: anthropic | openai_responses
         """
         self.api_key = api_key
         self.model = model or "claude-sonnet-4-5-20250929"
+        self.protocol = (protocol or "anthropic").strip().lower()
+        self.base_url = base_url
 
-        # 初始化 Anthropic 客户端
-        if base_url:
-            self.client = Anthropic(api_key=api_key, base_url=base_url)
+        if self.protocol == "anthropic":
+            if base_url:
+                self.client = Anthropic(api_key=api_key, base_url=base_url)
+            else:
+                self.client = Anthropic(api_key=api_key)
+        elif self.protocol == "openai_responses":
+            # OpenAI Responses 兼容端点（base_url 建议形如 http://host:port/v1）
+            if not base_url:
+                raise ValueError("openai_responses 协议必须提供 base_url（例如 http://host:port/v1）")
+            self.client = None
         else:
-            self.client = Anthropic(api_key=api_key)
+            raise ValueError(f"Unsupported protocol: {self.protocol}")
+
+    def _call_openai_responses(
+        self,
+        prompt: str,
+        system: str,
+        max_tokens: int,
+        temperature: float,
+        timeout: int,
+    ) -> str:
+        url = self.base_url.rstrip("/") + "/responses"
+
+        messages = []
+        if system:
+            messages.append(
+                {
+                    "role": "system",
+                    "content": [{"type": "input_text", "text": system}],
+                }
+            )
+        messages.append(
+            {
+                "role": "user",
+                "content": [{"type": "input_text", "text": prompt}],
+            }
+        )
+
+        payload = {
+            "model": self.model,
+            "input": messages,
+            "max_output_tokens": max_tokens,
+            "temperature": temperature,
+            "stream": False,
+        }
+
+        resp = requests.post(
+            url,
+            headers={
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json",
+            },
+            json=payload,
+            timeout=timeout,
+        )
+
+        # 兼容代理的错误格式
+        if resp.status_code >= 400:
+            try:
+                err = resp.json()
+            except Exception:
+                err = resp.text
+            raise RuntimeError(f"OpenAI responses error {resp.status_code}: {err}")
+
+        data = resp.json()
+
+        # OpenAI Responses: output -> message -> content -> output_text
+        try:
+            outputs = data.get("output") or []
+            for out in outputs:
+                if out.get("type") != "message":
+                    continue
+                for c in out.get("content") or []:
+                    if c.get("type") == "output_text" and c.get("text"):
+                        return c["text"]
+        except Exception:
+            pass
+
+        # 回退：尝试常见字段
+        if "text" in data and isinstance(data["text"], str):
+            return data["text"]
+
+        return ""
 
     def call(
         self,
@@ -41,42 +135,37 @@ class ClaudeClient:
         max_tokens: int = 4096,
         temperature: float = 0.2,
         timeout: int = 120,
-        max_retries: int = 3
+        max_retries: int = 3,
     ) -> str:
-        """
-        调用 Claude API（带重试和超时处理）
-
-        Args:
-            prompt: 用户 prompt
-            system: 系统 prompt
-            max_tokens: 最大输出 tokens
-            temperature: 温度参数
-            timeout: 超时时间（秒）
-            max_retries: 最大重试次数
-
-        Returns:
-            Claude 的响应文本
-        """
+        """调用模型（带重试和超时处理）"""
         for attempt in range(max_retries):
             try:
-                response = self.client.messages.create(
-                    model=self.model,
-                    max_tokens=max_tokens,
-                    temperature=temperature,
-                    system=system if system else None,
-                    messages=[
-                        {"role": "user", "content": prompt}
-                    ],
-                    timeout=timeout
-                )
+                if self.protocol == "anthropic":
+                    response = self.client.messages.create(
+                        model=self.model,
+                        max_tokens=max_tokens,
+                        temperature=temperature,
+                        system=system if system else None,
+                        messages=[{"role": "user", "content": prompt}],
+                        timeout=timeout,
+                    )
 
-                # 提取文本内容
-                if response.content and len(response.content) > 0:
-                    return response.content[0].text
+                    if response.content and len(response.content) > 0:
+                        return response.content[0].text
+                    return ""
 
-                return ""
+                if self.protocol == "openai_responses":
+                    return self._call_openai_responses(
+                        prompt=prompt,
+                        system=system,
+                        max_tokens=max_tokens,
+                        temperature=temperature,
+                        timeout=timeout,
+                    )
 
-            except RateLimitError as e:
+                raise ValueError(f"Unsupported protocol: {self.protocol}")
+
+            except RateLimitError:
                 wait_time = 5 * (attempt + 1)
                 print(f"   ⏳ Rate limit 触发，等待 {wait_time}s...")
                 time.sleep(wait_time)
@@ -105,26 +194,18 @@ class ClaudeClient:
         max_tokens: int = 8192,
         timeout: int = 120,
         max_retries: int = 2,
-        **kwargs
+        **kwargs,
     ) -> Dict[Any, Any]:
-        """
-        调用 Claude API 并解析 JSON 响应
-
-        使用多策略 JSON 提取（从 morning-brief 移植）
-
-        Returns:
-            解析后的 JSON 对象
-        """
+        """调用模型并解析 JSON 响应（多策略提取）"""
         response = self.call(prompt, system, max_tokens, timeout=timeout, max_retries=max_retries, **kwargs)
 
-        # 策略 1: 直接解析
         try:
             return json.loads(response)
         except json.JSONDecodeError:
             pass
 
-        # 策略 2: Strip markdown code fences then parse
         import re
+
         cleaned = response.strip()
         if cleaned.startswith("```"):
             cleaned = re.sub(r'^```\w*\n?', '', cleaned)
@@ -135,11 +216,8 @@ class ClaudeClient:
             except json.JSONDecodeError:
                 pass
         else:
-            cleaned = response  # 没有 fences 时保持原文
+            cleaned = response
 
-        # 后续策略都用 cleaned（已去掉 markdown fences）
-
-        # 策略 3: 提取任意 {...} 或 [...] (balanced brackets)
         start = cleaned.find('[')
         if start == -1:
             start = cleaned.find('{')
@@ -162,14 +240,12 @@ class ClaudeClient:
                 except json.JSONDecodeError:
                     pass
 
-        # 策略 4: Truncated JSON repair — 逐级回退找最大可解析子集
         arr_start = cleaned.find('[')
         if arr_start != -1:
             fragment = cleaned[arr_start:]
-            # 找所有 '}' 的位置，从后往前尝试截断+闭合
             brace_positions = [i for i, c in enumerate(fragment) if c == '}']
             for bp in reversed(brace_positions):
-                candidate = fragment[:bp+1] + ']'
+                candidate = fragment[:bp + 1] + ']'
                 try:
                     result = json.loads(candidate)
                     if isinstance(result, list) and len(result) > 0:
@@ -178,41 +254,22 @@ class ClaudeClient:
                 except json.JSONDecodeError:
                     continue
 
-        # 失败：返回空对象
         print(f"   ⚠️ 无法解析 JSON 响应")
         print(f"   Response preview: {cleaned[:200]}")
         return {}
 
     def estimate_tokens(self, text: str) -> int:
-        """
-        估算 token 数量（粗略估计）
-
-        规则：1 token ≈ 4 字符（英文）或 1.5 字符（中文）
-        """
-        # 简单估计
         return len(text) // 3
 
     def batch_items_by_tokens(self, items: list, max_tokens: int = 100000) -> list:
-        """
-        按 token 数分批 items
-
-        Args:
-            items: Item 列表
-            max_tokens: 每批最大 token 数
-
-        Returns:
-            List[List[Item]]: 分批后的 items
-        """
         batches = []
         current_batch = []
         current_tokens = 0
 
         for item in items:
-            # 估算 item 的 token 数
             item_text = f"{item.title} {item.text}"
             item_tokens = self.estimate_tokens(item_text)
 
-            # 如果加入这个 item 会超过限制，开始新批次
             if current_tokens + item_tokens > max_tokens and current_batch:
                 batches.append(current_batch)
                 current_batch = [item]
@@ -221,7 +278,6 @@ class ClaudeClient:
                 current_batch.append(item)
                 current_tokens += item_tokens
 
-        # 添加最后一批
         if current_batch:
             batches.append(current_batch)
 

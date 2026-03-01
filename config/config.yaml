@@ -36,12 +36,13 @@ ai:
   claude:
     api_key: ${ANTHROPIC_API_KEY}
     base_url: ${ANTHROPIC_BASE_URL}
-    model: "claude-sonnet-4-6"
+    protocol: ${AI_PROTOCOL:anthropic}  # anthropic | openai_responses
+    model: ${AI_MODEL:claude-sonnet-4-6}
     max_tokens: 16384
     temperature: 0.2
 
 output:
-  base_dir: "/Users/peterzhang/project/newsloom/reports"
+  base_dir: "/Users/peterzhang/project/Newsloom/reports"
   keep_days: 30
 
 state:
