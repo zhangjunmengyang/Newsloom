@@ -37,6 +37,12 @@ sources:
         name: "MIT Tech Review"
       - url: "https://the-decoder.com/feed/"
         name: "The Decoder"
+      - url: "https://feeds.feedburner.com/oreilly/radar/atom"
+        name: "O'Reilly Radar"
+      - url: "https://www.axios.com/technology/ai/rss"
+        name: "Axios AI"
+      - url: "https://www.semianalysis.com/feed"
+        name: "SemiAnalysis"
       # --- 个人博客/Newsletter (高信噪比) ---
       - url: "https://simonwillison.net/atom/everything/"
         name: "Simon Willison"
