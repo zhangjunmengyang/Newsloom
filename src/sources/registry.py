@@ -1,6 +1,7 @@
 """Data source registry and management"""
 
 from typing import List, Dict, Type
+import os
 import yaml
 from pathlib import Path
 from .base import DataSource
@@ -39,6 +40,16 @@ class SourceRegistry:
         self.sources_config_path = Path(sources_config_path)
         self.sources_config = self._load_sources_config()
 
+    def _replace_env_vars(self, obj):
+        """Replace ${VAR} placeholders using environment variables."""
+        if isinstance(obj, dict):
+            return {k: self._replace_env_vars(v) for k, v in obj.items()}
+        if isinstance(obj, list):
+            return [self._replace_env_vars(v) for v in obj]
+        if isinstance(obj, str) and obj.startswith('${') and obj.endswith('}'):
+            return os.environ.get(obj[2:-1], '')
+        return obj
+
     def _load_sources_config(self) -> dict:
         """Load sources configuration from YAML"""
         if not self.sources_config_path.exists():
@@ -47,7 +58,8 @@ class SourceRegistry:
         with open(self.sources_config_path) as f:
             config = yaml.safe_load(f)
 
-        return config.get('sources', {})
+        sources = config.get('sources', {})
+        return self._replace_env_vars(sources)
 
     def get_enabled_sources(self) -> List[DataSource]:
         """Return all enabled data source instances"""
