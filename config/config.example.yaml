@@ -41,7 +41,7 @@ ai:
     base_url: ${ANTHROPIC_BASE_URL:}
 
     # 协议选择（anthropic 或 OpenAI Responses 兼容端点）
-    protocol: ${AI_PROTOCOL:anthropic}  # anthropic | openai_responses
+    protocol: ${AI_PROTOCOL:anthropic}  # anthropic | openai_responses  (仅示例；config.yaml 使用 ${AI_PROTOCOL})
 
     # 模型选择
     # 可选: claude-sonnet-4-20250514, claude-opus-4-20250514, claude-haiku-4-20250514

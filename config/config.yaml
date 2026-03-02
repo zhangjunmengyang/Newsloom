@@ -36,8 +36,8 @@ ai:
   claude:
     api_key: ${ANTHROPIC_API_KEY}
     base_url: ${ANTHROPIC_BASE_URL}
-    protocol: ${AI_PROTOCOL:anthropic}  # anthropic | openai_responses
-    model: ${AI_MODEL:claude-sonnet-4-6}
+    protocol: ${AI_PROTOCOL}  # anthropic | openai_responses
+    model: ${AI_MODEL}
     max_tokens: 16384
     temperature: 0.2
 
