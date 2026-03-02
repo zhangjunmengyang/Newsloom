@@ -2,6 +2,7 @@
 
 import httpx
 import time
+import threading
 from typing import List, Optional
 from datetime import datetime, timezone
 
@@ -27,6 +28,9 @@ class WebSearchSource(DataSource):
     """
 
     API_URL = "https://api.search.brave.com/res/v1/web/search"
+
+    _GLOBAL_LOCK = threading.Lock()
+    _LAST_REQ_TS = 0.0
 
     def get_source_name(self) -> str:
         return "web_search"
@@ -74,6 +78,7 @@ class WebSearchSource(DataSource):
                     seen_urls=seen_urls,
                     max_retries=max_retries,
                     retry_backoff_sec=retry_backoff_sec,
+                    min_interval_sec=request_delay_sec,
                 )
                 all_items.extend(items)
             except Exception as e:
@@ -90,6 +95,7 @@ class WebSearchSource(DataSource):
         seen_urls: set,
         max_retries: int = 3,
         retry_backoff_sec: float = 2.0,
+        min_interval_sec: float = 1.1,
     ) -> List[Item]:
         """执行单个查询"""
         params = {
@@ -100,6 +106,13 @@ class WebSearchSource(DataSource):
 
         last_exc: Exception | None = None
         for attempt in range(max_retries):
+            with self._GLOBAL_LOCK:
+                now = time.time()
+                wait = self._LAST_REQ_TS + max(min_interval_sec, 0.0) - now
+                if wait > 0:
+                    time.sleep(wait)
+                self._LAST_REQ_TS = time.time()
+
             resp = httpx.get(self.API_URL, params=params, headers=headers, timeout=30)
 
             # 429: rate limit → 退避重试
