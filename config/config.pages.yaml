@@ -1,0 +1,52 @@
+# Newsloom Configuration (GitHub Pages / CI)
+
+project:
+  name: "Newsloom"
+  timezone: "Asia/Shanghai"
+  language: "zh-CN"
+
+pipeline:
+  enabled_layers: ["fetch", "rank", "analyze", "generate"]
+
+  fetch:
+    parallel_workers: 10
+    timeout_per_source: 30
+    hours_ago: 24
+
+  filter:
+    max_age_hours: 48
+    min_score: 3
+
+  analyze:
+    ai_provider: "claude"
+    two_pass_enabled: true
+    batch_size: 100000
+
+  generate:
+    # GitHub Pages 只需要 HTML（可保留 markdown 归档）
+    formats: ["markdown", "html"]
+    template: "premium"
+    generate_cards: false
+    generate_rss: true
+
+ranking:
+  coarse_top_n: 200
+  dedup_threshold: 0.55
+
+ai:
+  claude:
+    api_key: ${ANTHROPIC_API_KEY}
+    base_url: ${ANTHROPIC_BASE_URL}
+    protocol: ${AI_PROTOCOL}
+    model: ${AI_MODEL}
+    max_tokens: 16384
+    temperature: 0.2
+
+output:
+  # CI 环境必须用相对路径
+  base_dir: "./reports"
+  keep_days: 30
+
+state:
+  file: "./data/state/state.json"
+  dedup_window_days: 7

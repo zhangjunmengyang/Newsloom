@@ -23,12 +23,19 @@ wheels/
 .installed.cfg
 *.egg
 
-# Data and state
-data/
-reports/
+# Data (generated)
 *.jsonl
 *.json
-state.json
+reports/
+data/raw/
+data/filtered/
+data/ranked/
+data/analyzed/
+data/exchange_cache/
+
+# Persistent state (keep in git for dedup/trends across days)
+# data/state/state.json
+# data/trend_history/YYYY-MM-DD.json
 
 # Secrets
 .env
@@ -51,8 +58,9 @@ logs/
 
 # Playwright
 playwright/.cache/
-.github/workflows/
 test_output/
 
 # Local DB
 newsloom.db
+!data/state/state.json
+!data/trend_history/*.json

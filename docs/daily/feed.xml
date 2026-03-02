@@ -1,0 +1,327 @@
+<?xml version="1.0" ?>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+  <channel>
+    <title>Newsloom Daily Intelligence</title>
+    <link>http://localhost:3000</link>
+    <description>AI-curated daily tech and AI news digest</description>
+    <language>zh-cn</language>
+    <lastBuildDate>Mon, 02 Mar 2026 08:31:03 -0000</lastBuildDate>
+    <generator>Newsloom v0.2.0</generator>
+    <atom:link href="http://localhost:3000/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Reverse engineered Apple Neural Engine(ANE) to train Microgpt</title>
+      <link>https://i.redd.it/vl6kd7lvpfmg1.jpeg</link>
+      <guid isPermaLink="true">https://i.redd.it/vl6kd7lvpfmg1.jpeg</guid>
+      <description># Why? Because i bought a mac mini M4 and I wanted to leverage its compute for my compiler project
+
+Training on Metal(GPU) is well known but ANE is a black box and Apple doesn't talk about it. So I ha
+
+Source: r/LocalLLaMA</description>
+      <category>community</category>
+      <pubDate>Mon, 02 Mar 2026 08:31:03 -0000</pubDate>
+    </item>
+    <item>
+      <title>Show HN: Now I Get It – Translate scientific papers into interactive webpages</title>
+      <link>https://nowigetit.us</link>
+      <guid isPermaLink="true">https://nowigetit.us</guid>
+      <description>Understanding scientific articles can be tough, even in your own field. Trying to comprehend articles from others? Good luck.Enter, Now I Get It!I made this app for curious people. Simply upload an ar
+
+Source: Hacker News</description>
+      <category>community</category>
+      <pubDate>Mon, 02 Mar 2026 08:31:03 -0000</pubDate>
+    </item>
+    <item>
+      <title>Claude hits No. 1 on App Store as ChatGPT users defect in show of support for Anthropic's Pentagon stance</title>
+      <link>https://www.businessinsider.com/anthropic-claude-hits-number-one-app-store-openai-chatgpt-2026-2</link>
+      <guid isPermaLink="true">https://www.businessinsider.com/anthropic-claude-hits-number-one-app-store-openai-chatgpt-2026-2</guid>
+      <description>
+⬆️ 200 points | 💬 18 comments | 93% upvoted
+
+Source: r/artificial</description>
+      <category>community</category>
+      <pubDate>Mon, 02 Mar 2026 08:31:03 -0000</pubDate>
+    </item>
+    <item>
+      <title>Deleted my GPT account and ported my AI game project to Claude. Wow!</title>
+      <link>https://www.reddit.com/r/artificial/comments/1rhqqtw/deleted_my_gpt_account_and_ported_my_ai_game/</link>
+      <guid isPermaLink="true">https://www.reddit.com/r/artificial/comments/1rhqqtw/deleted_my_gpt_account_and_ported_my_ai_game/</guid>
+      <description>I had been working since GPT very first allowed agents to create gaming agents capable of narrating and dreaming up complex game systems while following a verbal command line with minimal hard code. S
+
+Source: r/artificial</description>
+      <category>community</category>
+      <pubDate>Mon, 02 Mar 2026 08:31:03 -0000</pubDate>
+    </item>
+    <item>
+      <title>Qwen3.5 35b a3b first small model to not hallucinate summarising 50k token text</title>
+      <link>https://www.reddit.com/r/LocalLLaMA/comments/1ri39a4/qwen35_35b_a3b_first_small_model_to_not/</link>
+      <guid isPermaLink="true">https://www.reddit.com/r/LocalLLaMA/comments/1ri39a4/qwen35_35b_a3b_first_small_model_to_not/</guid>
+      <description>I've always ran this test to see how models did for long-ish text reasoning. It's the first chapters of a text I wrote and will never be online to make sure it's never polluting the training set of th
+
+Source: r/LocalLLaMA</description>
+      <category>community</category>
+      <pubDate>Mon, 02 Mar 2026 08:31:03 -0000</pubDate>
+    </item>
+    <item>
+      <title>Switch to Claude without starting over</title>
+      <link>https://claude.com/import-memory</link>
+      <guid isPermaLink="true">https://claude.com/import-memory</guid>
+      <description>Score: 515 | Comments: 247
+
+Source: Hacker News</description>
+      <category>community</category>
+      <pubDate>Mon, 02 Mar 2026 08:31:03 -0000</pubDate>
+    </item>
+    <item>
+      <title>Ghostty – Terminal Emulator</title>
+      <link>https://ghostty.org/docs</link>
+      <guid isPermaLink="true">https://ghostty.org/docs</guid>
+      <description>Score: 587 | Comments: 257
+
+Source: Hacker News</description>
+      <category>community</category>
+      <pubDate>Mon, 02 Mar 2026 08:31:03 -0000</pubDate>
+    </item>
+    <item>
+      <title>Microgpt explained interactively</title>
+      <link>https://growingswe.com/blog/microgpt</link>
+      <guid isPermaLink="true">https://growingswe.com/blog/microgpt</guid>
+      <description>Score: 171 | Comments: 21
+
+Source: Hacker News</description>
+      <category>community</category>
+      <pubDate>Mon, 02 Mar 2026 08:31:03 -0000</pubDate>
+    </item>
+    <item>
+      <title>13 months since the DeepSeek moment, how far have we gone running models locally?</title>
+      <link>https://i.redd.it/2ovdv238ehmg1.png</link>
+      <guid isPermaLink="true">https://i.redd.it/2ovdv238ehmg1.png</guid>
+      <description>Once upon a time there was a [tweet](https://x.com/carrigmat/status/1884244369907278106#m) from an engineer at Hugging Face explaining how to run the frontier level DeepSeek R1 @ Q8 at \~5 tps for abo
+
+Source: r/LocalLLaMA</description>
+      <category>community</category>
+      <pubDate>Mon, 02 Mar 2026 08:31:03 -0000</pubDate>
+    </item>
+    <item>
+      <title>OpenAI eyes global domination with $110B Amazon and NVIDIA raise, value hits $840B</title>
+      <link>https://interestingengineering.com/ai-robotics/openai-110b-funding-amazon-nvidia</link>
+      <guid isPermaLink="true">https://interestingengineering.com/ai-robotics/openai-110b-funding-amazon-nvidia</guid>
+      <description>
+⬆️ 169 points | 💬 25 comments | 89% upvoted
+
+Source: r/artificial</description>
+      <category>community</category>
+      <pubDate>Mon, 02 Mar 2026 08:31:03 -0000</pubDate>
+    </item>
+    <item>
+      <title>When does MCP make sense vs CLI?</title>
+      <link>https://ejholmes.github.io/2026/02/28/mcp-is-dead-long-live-the-cli.html</link>
+      <guid isPermaLink="true">https://ejholmes.github.io/2026/02/28/mcp-is-dead-long-live-the-cli.html</guid>
+      <description>Score: 229 | Comments: 153
+
+Source: Hacker News</description>
+      <category>community</category>
+      <pubDate>Mon, 02 Mar 2026 08:31:03 -0000</pubDate>
+    </item>
+    <item>
+      <title>Running Qwen3.5 27b dense with 170k context at 100+t/s decode and ~1500t/s prefill on 2x3090 (with 585t/s throughput for</title>
+      <link>https://v.redd.it/kkbjdu2x6img1</link>
+      <guid isPermaLink="true">https://v.redd.it/kkbjdu2x6img1</guid>
+      <description>Hi everyone!
+
+I've been trying to run the new Qwen models as efficiently as possible with my setup - and seem to have performance higher than I've seen around, so wanted to share my scripts and metric
+
+Source: r/LocalLLaMA</description>
+      <category>community</category>
+      <pubDate>Mon, 02 Mar 2026 08:31:03 -0000</pubDate>
+    </item>
+    <item>
+      <title>Market Topping Process?</title>
+      <link>https://www.zerohedge.com/markets/market-topping-process</link>
+      <guid isPermaLink="true">https://www.zerohedge.com/markets/market-topping-process</guid>
+      <description>Market Topping Process? Authored by Lance Roberts via RealInvestmentAdvice.com, As we will discuss further in today’s commentary, the market remains stuck in a fairly narrow trading range. The week op
+
+Source: ZeroHedge</description>
+      <category>finance</category>
+      <pubDate>Mon, 02 Mar 2026 08:31:03 -0000</pubDate>
+    </item>
+    <item>
+      <title>Dow futures plunge nearly 500 points as U.S. attack on Iran sends oil prices soaring, while first American casualties re</title>
+      <link>https://fortune.com/2026/03/01/stock-market-today-dow-futures-oil-prices-us-attack-iran-strait-hormuz-clsoure/</link>
+      <guid isPermaLink="true">https://fortune.com/2026/03/01/stock-market-today-dow-futures-oil-prices-us-attack-iran-strait-hormuz-clsoure/</guid>
+      <description>U.S. stock futures pointed to a risk-off trade Sunday evening as investors reacted to the U.S.-Israeli bombardment of Iran over the weekend. The selloff comes after the U.S. military reported the firs
+
+Source: Fortune</description>
+      <category>finance</category>
+      <pubDate>Mon, 02 Mar 2026 08:31:03 -0000</pubDate>
+    </item>
+    <item>
+      <title>Toncoin (TON) Price Prediction 2025, 2026, 2027-2030</title>
+      <link>https://www.benzinga.com/money/toncoin-ton-price-prediction</link>
+      <guid isPermaLink="true">https://www.benzinga.com/money/toncoin-ton-price-prediction</guid>
+      <description>The post Toncoin (TON) Price Prediction 2025, 2026, 2027-2030 by Ishan Jain appeared first on Benzinga. Visit Benzinga to get more great content like this. Analysts are saying that Toncoin (TON) could
+
+Source: Benzinga</description>
+      <category>finance</category>
+      <pubDate>Mon, 02 Mar 2026 08:31:03 -0000</pubDate>
+    </item>
+    <item>
+      <title>Uniswap (UNI) Price Prediction: 2025, 2026, 2030</title>
+      <link>https://www.benzinga.com/money/uniswap-uni-price-prediction</link>
+      <guid isPermaLink="true">https://www.benzinga.com/money/uniswap-uni-price-prediction</guid>
+      <description>The post Uniswap (UNI) Price Prediction: 2025, 2026, 2030 by Margaret Jackson appeared first on Benzinga. Visit Benzinga to get more great content like this. Uniswap $8.26 Buy Uniswap JOIN THE MOON OR
+
+Source: Benzinga</description>
+      <category>finance</category>
+      <pubDate>Mon, 02 Mar 2026 08:31:03 -0000</pubDate>
+    </item>
+    <item>
+      <title>Is Credit Whispering, Or Screaming?</title>
+      <link>https://www.zerohedge.com/markets/credit-whispering-or-screaming</link>
+      <guid isPermaLink="true">https://www.zerohedge.com/markets/credit-whispering-or-screaming</guid>
+      <description>Is Credit Whispering, Or Screaming? By Peter Tchir of Academy Securities Is Credit Whispering? Or Screaming? For the past couple of years, it has been relatively safe to assume credit is well behaved 
+
+Source: ZeroHedge</description>
+      <category>finance</category>
+      <pubDate>Mon, 02 Mar 2026 08:31:03 -0000</pubDate>
+    </item>
+    <item>
+      <title>Three Maritime Incidents Reported In Strait Of Hormuz Energy Chokepoint</title>
+      <link>https://www.zerohedge.com/geopolitical/first-oil-tanker-hit-strait-hormuz</link>
+      <guid isPermaLink="true">https://www.zerohedge.com/geopolitical/first-oil-tanker-hit-strait-hormuz</guid>
+      <description>Three Maritime Incidents Reported In Strait Of Hormuz Energy Chokepoint Update (1045ET): The United Kingdom Maritime Trade Operations reports three maritime incidents in or around the Strait of Hormuz
+
+Source: ZeroHedge</description>
+      <category>finance</category>
+      <pubDate>Mon, 02 Mar 2026 08:31:03 -0000</pubDate>
+    </item>
+    <item>
+      <title>OPEC+ Agrees To Boost Oil Output As US War On Iran Disrupts Shipments</title>
+      <link>https://www.zerohedge.com/energy/opec-agrees-boost-oil-output-us-war-iran-disrupts-shipments</link>
+      <guid isPermaLink="true">https://www.zerohedge.com/energy/opec-agrees-boost-oil-output-us-war-iran-disrupts-shipments</guid>
+      <description>OPEC+ Agrees To Boost Oil Output As US War On Iran Disrupts Shipments On Sunday, OPEC+ agreed to boost oil output by 206,000 barrels per day for April just as the U.S.-Israeli war on Iran and Tehran's
+
+Source: ZeroHedge</description>
+      <category>finance</category>
+      <pubDate>Mon, 02 Mar 2026 08:31:03 -0000</pubDate>
+    </item>
+    <item>
+      <title>The Microreactor Race Is On</title>
+      <link>https://www.zerohedge.com/energy/microreactor-race</link>
+      <guid isPermaLink="true">https://www.zerohedge.com/energy/microreactor-race</guid>
+      <description>The Microreactor Race Is On Authored by Duggan Flanakin via RealClearEnergy, For the past half century, successive Presidential administrations and the Nuclear Regulatory Commission have thwarted the 
+
+Source: ZeroHedge</description>
+      <category>finance</category>
+      <pubDate>Mon, 02 Mar 2026 08:31:03 -0000</pubDate>
+    </item>
+    <item>
+      <title>Oil Soars Over 10% In OTC Trading, Whether That Sticks Depends On How Long The War Lasts</title>
+      <link>https://www.zerohedge.com/energy/oil-soars-over-10-otc-trading-whether-sticks-depends-how-long-war-lasts</link>
+      <guid isPermaLink="true">https://www.zerohedge.com/energy/oil-soars-over-10-otc-trading-whether-sticks-depends-how-long-war-lasts</guid>
+      <description>Oil Soars Over 10% In OTC Trading, Whether That Sticks Depends On How Long The War Lasts With war in the middle east raging, and the world's most important oil transit choke point - the Straits of Hor
+
+Source: ZeroHedge</description>
+      <category>finance</category>
+      <pubDate>Mon, 02 Mar 2026 08:31:03 -0000</pubDate>
+    </item>
+    <item>
+      <title>UAE stock markets to close for two days amid Iran strikes</title>
+      <link>https://fortune.com/2026/03/01/uae-stock-markets-closuse-abu-dhabi-dubai-exchanges-iran-strikes/</link>
+      <guid isPermaLink="true">https://fortune.com/2026/03/01/uae-stock-markets-closuse-abu-dhabi-dubai-exchanges-iran-strikes/</guid>
+      <description>The United Arab Emirates said its two key markets will close for two days of the week, avoiding a possible meltdown after the Gulf country was repeatedly hit as Iran retaliated against US-Israeli airs
+
+Source: Fortune</description>
+      <category>finance</category>
+      <pubDate>Mon, 02 Mar 2026 08:31:03 -0000</pubDate>
+    </item>
+    <item>
+      <title>Equity Futures Slide, Oil And Gold Jump, But No Panic</title>
+      <link>https://www.zerohedge.com/markets/futures-slide-oil-and-gold-jump-no-panic</link>
+      <guid isPermaLink="true">https://www.zerohedge.com/markets/futures-slide-oil-and-gold-jump-no-panic</guid>
+      <description>Equity Futures Slide, Oil And Gold Jump, But No Panic The widely anticipated Sunday night open of futures trading is here, and it is a bit anticlimatic. Yes, futures are broadly lower, oil and gold ar
+
+Source: ZeroHedge</description>
+      <category>finance</category>
+      <pubDate>Mon, 02 Mar 2026 08:31:03 -0000</pubDate>
+    </item>
+    <item>
+      <title>Germany's Pension Time Bomb: $2+ Billion In CRE Losses Expose Cracks In The Fiat Era</title>
+      <link>https://www.zerohedge.com/markets/germanys-pension-time-bomb-2-billion-cre-losses-expose-cracks-fiat-era</link>
+      <guid isPermaLink="true">https://www.zerohedge.com/markets/germanys-pension-time-bomb-2-billion-cre-losses-expose-cracks-fiat-era</guid>
+      <description>Germany's Pension Time Bomb: $2+ Billion In CRE Losses Expose Cracks In The Fiat Era Submitted by Thomas Kolbe, A shock for the insured members of the Versorgungswerk Zahnärzte Berlin-Brandenburg (VZB
+
+Source: ZeroHedge</description>
+      <category>finance</category>
+      <pubDate>Mon, 02 Mar 2026 08:31:03 -0000</pubDate>
+    </item>
+    <item>
+      <title>Crypto Market Overview</title>
+      <link>https://www.coingecko.com/</link>
+      <guid isPermaLink="true">https://www.coingecko.com/</guid>
+      <description>📊 Crypto Market Overview
+BTC: $65,956.00 (-1.3%)
+ETH: $1,946.28 (-0.7%)
+Top 20 Market Cap: $2,166.4B
+Fear &amp; Greed: 10 (Extreme Fear)
+
+Top 5:
+  BTC: $65,956.00 (-1.3%)
+  ETH: $1,946.28 (-0.7%)
+  USDT: 
+
+Source: crypto_market</description>
+      <category>crypto</category>
+      <pubDate>Mon, 02 Mar 2026 08:31:03 -0000</pubDate>
+    </item>
+    <item>
+      <title>[CoinGecko Trending] BTC (Bitcoin) — rank#1 | 24h: -1.5%</title>
+      <link>https://www.coingecko.com/en/coins/bitcoin</link>
+      <guid isPermaLink="true">https://www.coingecko.com/en/coins/bitcoin</guid>
+      <description>[CoinGecko Trending] BTC (Bitcoin) — rank#1 | 24h: -1.5%
+
+Source: exchange_listing</description>
+      <category>crypto</category>
+      <pubDate>Mon, 02 Mar 2026 08:31:03 -0000</pubDate>
+    </item>
+    <item>
+      <title>Bitcoin traders eye Iran reactions as oil sparks US 5% inflation forecast</title>
+      <link>https://cointelegraph.com/news/bitcoin-traders-eye-iran-reactions-oil-sparks-us-5-inflation-forecast?utm_source=rss_feed&amp;utm_medium=rss&amp;utm_campaign=rss_partner_inbound</link>
+      <guid isPermaLink="true">https://cointelegraph.com/news/bitcoin-traders-eye-iran-reactions-oil-sparks-us-5-inflation-forecast?utm_source=rss_feed&amp;utm_medium=rss&amp;utm_campaign=rss_partner_inbound</guid>
+      <description>Bitcoin avoided a fresh breakdown around major geopolitical events in the Middle East, with BTC price targets now including $74,000 next.
+
+Source: Cointelegraph</description>
+      <category>crypto</category>
+      <pubDate>Mon, 02 Mar 2026 08:31:03 -0000</pubDate>
+    </item>
+    <item>
+      <title>You Can Earn Real Bitcoin for Playing This Mining Empire Game—Should You Bother?</title>
+      <link>https://decrypt.co/359555/earn-real-bitcoin-playing-mining-empire-game-should-you-bother</link>
+      <guid isPermaLink="true">https://decrypt.co/359555/earn-real-bitcoin-playing-mining-empire-game-should-you-bother</guid>
+      <description>Bitcoin Empire on iOS and Android pays out real BTC to players, but is the digital mining grind worth the meager rewards?
+
+Source: Decrypt</description>
+      <category>crypto</category>
+      <pubDate>Mon, 02 Mar 2026 08:31:03 -0000</pubDate>
+    </item>
+    <item>
+      <title>[CoinGecko Trending] XAUT (Tether Gold) — rank#33 | 24h: +0.8%</title>
+      <link>https://www.coingecko.com/en/coins/tether-gold</link>
+      <guid isPermaLink="true">https://www.coingecko.com/en/coins/tether-gold</guid>
+      <description>[CoinGecko Trending] XAUT (Tether Gold) — rank#33 | 24h: +0.8%
+
+Source: exchange_listing</description>
+      <category>crypto</category>
+      <pubDate>Mon, 02 Mar 2026 08:31:03 -0000</pubDate>
+    </item>
+    <item>
+      <title>[CoinGecko Trending] SOL (Solana) — rank#7 | 24h: -1.1%</title>
+      <link>https://www.coingecko.com/en/coins/solana</link>
+      <guid isPermaLink="true">https://www.coingecko.com/en/coins/solana</guid>
+      <description>[CoinGecko Trending] SOL (Solana) — rank#7 | 24h: -1.1%
+
+Source: exchange_listing</description>
+      <category>crypto</category>
+      <pubDate>Mon, 02 Mar 2026 08:31:03 -0000</pubDate>
+    </item>
+  </channel>
+</rss>

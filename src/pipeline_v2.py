@@ -117,8 +117,9 @@ type: report
         if date_str is None:
             date_str = get_date_str()
 
-        # Global timeout: 10 minutes (signal-based, Unix only)
-        global_timeout = 600
+        # Global timeout: default 10 minutes (signal-based, Unix only)
+        # Override via env NEWSLOOM_GLOBAL_TIMEOUT (seconds)
+        global_timeout = int(os.environ.get("NEWSLOOM_GLOBAL_TIMEOUT", "600"))
         try:
             signal.signal(signal.SIGALRM, _timeout_handler)
             signal.alarm(global_timeout)
